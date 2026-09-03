@@ -1,0 +1,20 @@
+name: looplet_solver
+description: >-
+  Build-time solver that computes the provable minimum move count for a LOOPLET
+  puzzle over {row L/R, col U/D}, honoring locked/frozen tiles (F06). Pure Dart,
+  never run on device.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ">=3.4.0 <4.0.0"
+
+dependencies:
+  looplet_core:
+    path: ../looplet_core
+  looplet_engine:
+    path: ../looplet_engine
+
+dev_dependencies:
+  lints: ^4.0.0
+  test: ^1.25.0

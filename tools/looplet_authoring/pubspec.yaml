@@ -1,0 +1,23 @@
+name: looplet_authoring
+description: >-
+  Internal level-authoring CLI for LOOPLET (F06): set target/grid/locks/freezes,
+  run the solver, verify solvability, score difficulty, playtest, export.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ">=3.4.0 <4.0.0"
+
+dependencies:
+  looplet_core:
+    path: ../../packages/looplet_core
+  looplet_engine:
+    path: ../../packages/looplet_engine
+  looplet_content:
+    path: ../../packages/looplet_content
+  looplet_solver:
+    path: ../../packages/looplet_solver
+
+dev_dependencies:
+  lints: ^4.0.0
+  test: ^1.25.0

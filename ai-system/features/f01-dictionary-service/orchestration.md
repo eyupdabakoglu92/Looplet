@@ -13,19 +13,26 @@
 
 ## Current Owner
 
-Project Setup
+Frontend/Mobile Developer
 
 ---
 
 ## Current Phase
 
-Planning → Project Scaffold (DURUM 0: repo is not yet scaffolded)
+Frontend Development (scaffold complete; implementation of `looplet_core` normalization + `looplet_dictionary` service)
 
 ---
 
 ## Active Task Ledger
 
-- [ ] Task ID: F01.0-PS | Assigned Role: Project Setup | Status: Open | Summary: Scaffold the melos monorepo + Flutter app skeleton + pure-Dart package skeletons per `project-authority/setup-manifest.md` "Scaffold / Bootstrap Recipe" (Steps 1–7). Unblocked 2026-09-03 — `setup-manifest.md` now exists.
+- [x] Task ID: F01.0-PS | Assigned Role: Project Setup | Status: Done | Summary: Melos monorepo + 6 pure-Dart packages + Flutter `app` scaffolded per `setup-manifest.md` Steps 1–7. Verified: `melos bootstrap` (7 pkgs), `format:check`, `analyze`, `test` all green; `flutter build ios --release --no-codesign` green. `melos run build:app` (Android) not run locally — no Android SDK on this machine; CI covers it. No dependency substitutions needed.
+- [ ] Task ID: F01.1-FE | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: `TurkishCase` + `normalize` in `looplet_core` per `architecture.md` "Turkish Normalization (CONTRACT)".
+- [ ] Task ID: F01.2-FE | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: `looplet_dictionary` public API exactly as `architecture.md` "Public API" block, incl. `DictionaryAssetSource` + `DictionaryLogger`; wire the `app/pubspec.yaml` asset declaration + `rootBundle` source.
+- [ ] Task ID: F01.3-FE | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: Asset loading + indexing; decide + record in-memory representation vs a measured footprint target.
+- [ ] Task ID: F01.4-FE | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: Fail-safe semantics (missing/corrupt/empty asset) + `StateError` for query-before-load / after-dispose.
+- [ ] Task ID: F01.5-FE | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: Language isolation; `en` stub; `switchLanguage` leaves no residue.
+- [ ] Task ID: F01.6-FE | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: Ship provisional reviewed `assets/tr/dictionary.json` + `assets/en/dictionary.json` stub incl. 5-letter `targets`.
+- [ ] Task ID: F01.7-FE | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: AC-to-test mapping, golden QA word set, `frontend.md` with traceability + representation decision + per-AC evidence.
 
 ---
 
@@ -44,7 +51,7 @@ Planning → Project Scaffold (DURUM 0: repo is not yet scaffolded)
 ## Open Tasks
 
 ### Project Setup
-- [ ] (F01.0-PS) Create the melos-managed monorepo exactly as `platform.md` §3 "Monorepo Layout" specifies. Minimum for this feature:
+- [x] (F01.0-PS) Create the melos-managed monorepo exactly as `platform.md` §3 "Monorepo Layout" specifies. Minimum for this feature:
   * root `melos.yaml`, root `pubspec.yaml`, `.gitignore`, `analysis_options.yaml` (shared lints), `README.md`
   * `packages/looplet_core/` — pure-Dart package, `pubspec.yaml` (no Flutter dep), `lib/looplet_core.dart`, `test/` with one passing smoke test
   * `packages/looplet_dictionary/` — pure-Dart package depending only on `looplet_core`; `lib/looplet_dictionary.dart`; `assets/tr/` and `assets/en/` folders present; `test/` with one passing smoke test
@@ -73,8 +80,9 @@ Planning → Project Scaffold (DURUM 0: repo is not yet scaffolded)
 
 ## Blockers
 
-* None. (Resolved 2026-09-03: `project-authority/setup-manifest.md` created by Tech Lead. The earlier blocker — missing setup manifest — is cleared.)
-* Non-blocking note: the production-quality curated Turkish corpus + target-word review is a Product Owner / content deliverable (F01 PRD Open Questions). Implementation proceeds with a provisional reviewed list; swapping in the final asset is a content change, not code, and does not re-open F01 code.
+* None.
+* Non-blocking note (scaffold): `melos run build:app` (Android App Bundle) was **not** verified locally — this machine has no Android SDK (`flutter doctor`: "Unable to locate Android SDK"). The iOS release build passed locally (`Built build/ios/iphoneos/Runner.app`). The Android gate runs in CI (`.github/workflows/ci.yml`, `subosito/flutter-action` provides the SDK). If CI's Android build fails, that is a scaffold follow-up, not an F01 logic issue.
+* Non-blocking note (content): the production-quality curated Turkish corpus + target-word review is a Product Owner / content deliverable (F01 PRD Open Questions). Implementation proceeds with a provisional reviewed list; swapping in the final asset is a content change, not code, and does not re-open F01 code.
 
 ---
 
@@ -87,52 +95,55 @@ Planning → Project Scaffold (DURUM 0: repo is not yet scaffolded)
   * Contract locked in `architecture.md`: public Dart API, `dictionary.json` asset shape, Turkish normalization spec (`İ ≠ I`, circumflex kept distinct), fail-safe semantics, `looplet_dictionary` may depend only on `looplet_core`.
   * Release Scope = none.
 * 2026-09-03 — Tech Lead (blocker resolution): authored `project-authority/setup-manifest.md`. Scaffold decisions locked there: melos ^6 monorepo; all `looplet_*` packages scaffolded now as compiling skeletons (not just F01's two) so F02/F06 devs fill logic rather than re-scaffold; `app` gets Riverpod + go_router + Drift + sqlite libs now, **no Firebase packages** until the F07/F08/F12 `infra` DURUM 0; containerization N/A; version-substitution rule = nearest lower compatible, same major, recorded.
+* 2026-09-03 — Project Setup (scaffold outcome): all manifest dependency constraints resolved as written (melos 6.3.3, flutter_riverpod 2.6.1, go_router 14.8.1, drift/drift_dev 2.31.0, build_runner 2.15.1) — **no substitutions**. Toolchain: Flutter 3.32.8 / Dart 3.8.1. `app` kept Flutter's generated `flutter_lints ^4.0.0` line to match the pure packages' `lints ^4.0.0`. `app` SDK floor left at Flutter's generated `^3.8.1` (pure packages stay `>=3.4.0 <4.0.0`). iOS deployment target raised to 13.0 in `AppFrameworkInfo.plist` + `Runner.xcodeproj` (3 configs); Android `minSdk = 24`. Android bundle build unverified locally (no Android SDK) — CI gate covers it.
 
 ---
 
 ## Last Update
 
-* Updated By: Tech Lead
+* Updated By: Project Setup
 * Timestamp: 2026-09-03
-* Summary: Resolved the F01.0-PS blocker by authoring `project-authority/setup-manifest.md` for the LOOPLET stack (melos monorepo, `looplet_*` pure-Dart packages, Flutter `app`, CI per `release.md` §4, containerization N/A, Steps 1–7 recipe + canonical commands). F01 unblocked; Current Owner back to Project Setup to execute F01.0-PS.
+* Summary: Executed F01.0-PS. Scaffolded the melos monorepo: root config (`melos.yaml`, `pubspec.yaml`, shared `analysis_options.yaml`, `.gitignore`, `README.md`, `.github/workflows/ci.yml` with SHA-pinned actions), 6 pure-Dart packages (`looplet_core`, `looplet_dictionary` + `assets/tr|en`, `looplet_engine`, `looplet_content`, `looplet_solver`, `tools/looplet_authoring`) each with a compiling barrel + passing smoke test, and the Flutter `app` (portrait-locked, path deps + Riverpod/go_router/Drift/sqlite libs, NO Firebase, iOS 13.0 / Android minSdk 24, placeholder shell). `content/` + `infra/` README stubs. All manifest dependency versions resolved as specified — no substitutions. Verified green: `melos bootstrap` (7 pkgs), `format:check`, `analyze` (6 pkgs + `flutter analyze`), `test` (6 smoke tests + app widget test), `flutter build ios --release --no-codesign`. `melos run build:app` deferred to CI (no local Android SDK). Not committed to git.
 
 ---
 
 ## Next Role
 
-Project Setup
+Frontend/Mobile Developer
 
 ---
 
 ## Next Action
 
-### Project Setup
+### Frontend/Mobile Developer
 
 ```text
-Execute F01.0-PS. Follow project-authority/setup-manifest.md "Scaffold / Bootstrap Recipe" Steps 1–7 exactly:
-1. repo root (melos): melos.yaml with the named scripts, root pubspec.yaml, shared analysis_options.yaml, .gitignore,
-   README.md, .github/workflows/ci.yml (gates per release.md §4; third-party actions pinned to commit SHA).
-2. packages/looplet_core — pure Dart, no flutter dep, barrel + smoke test.
-3. packages/looplet_dictionary — pure Dart, depends only on looplet_core, assets/tr/ + assets/en/ (.gitkeep), barrel + smoke test.
-4. skeleton packages looplet_engine, looplet_content, looplet_solver — barrels + smoke tests, dependency edges per manifest.
-5. tools/looplet_authoring — Dart console package, placeholder main + smoke test.
-6. app — flutter create (ios,android), portrait lock, path deps + the listed runtime/dev deps, NO Firebase packages,
-   iOS target 13.0 / Android minSdk 24, no feature screens.
-7. content/README.md + infra/README.md stubs. Do NOT scaffold infra/functions (future separate DURUM 0).
+Start F01.1-FE, then continue F01.2-FE … F01.7-FE per the Active Task Ledger.
 
-Then verify green (from repo root):
-  melos bootstrap
-  melos run format:check
-  melos run analyze
-  melos run test
-  melos run build:app
-  flutter build ios --release --no-codesign   (best-effort locally; CI enforces on macOS runner)
+Authority: features/f01-dictionary-service/architecture.md is contract authority; features/f01-dictionary-service/prd.md
+holds the Acceptance Criteria; project-authority/platform.md §11 has the Turkish-locale HARD RULE and naming/localization rules.
 
-Commit all pubspec.lock files. If a listed dependency version does not resolve, pick the nearest lower compatible
-version keeping the same major and record the substitution in the Project Setup report — do not change majors or swap packages.
-On any conflict with platform.md / release.md / this orchestration, stop and raise a Tech Lead blocker.
+F01.1-FE — looplet_core (packages/looplet_core):
+- Implement `TurkishCase.toLowerTr(String)` / `toUpperTr(String)` with the explicit map from architecture.md
+  "Turkish Normalization (CONTRACT)": I→ı, İ→i, ı→I, i→İ; Ç↔ç, Ğ↔ğ, Ö↔ö, Ş↔ş, Ü↔ü; all other letters ordinary casing.
+- Implement `normalize(String)` = toLowerTr + trim, returning null if any character is not a Turkish/Latin letter
+  (do NOT return an empty string, do NOT throw).
+- Circumflex vowels (â î û) are DISTINCT letters — never stripped by normalize.
+- İ and I must normalize to different code points (i vs ı) → different keys. This is the pivotal test.
+- Replace the `loopletCoreReady` placeholder; keep the barrel export surface clean (export the public API from lib/looplet_core.dart).
+- Tests: full table over Ç Ğ İ I Ö Ş Ü (upper↔lower both directions), İ≠I, all-caps vs lowercase vs mixed-case equality
+  after normalize, non-letter/empty/whitespace → null, circumflex preserved.
 
-On success: close F01.0-PS, set Next Role = Frontend/Mobile Developer, Next Action = F01.1-FE (TurkishCase + normalize in looplet_core).
+Then F01.2-FE onward: implement the looplet_dictionary public API exactly as architecture.md "Public API"
+(DictionaryService.load / switchLanguage / isValidWord({minLength}) / isEligibleTarget / normalize / isFailSafe / dispose;
+DictionaryAssetSource + DictionaryLogger). Add the dictionary asset declaration + a rootBundle-backed DictionaryAssetSource
+to app/pubspec.yaml + app code (currently commented out in app/pubspec.yaml). Parse the dictionary.json contract shape,
+re-normalize/dedupe/sort defensively on load, and record the in-memory-representation decision + a measured footprint in frontend.md.
+
+Verify with: melos run format:check && melos run analyze && melos run test  (from repo root).
+Produce features/f01-dictionary-service/frontend.md: task-to-code traceability, the representation decision + measurement,
+per-AC test evidence, preserved-behavior = n/a (greenfield).
+On completion set Next Role = QA (client-only) per architecture.md QA Focus.
 ```
 
 ---
@@ -142,3 +153,4 @@ On success: close F01.0-PS, set Next Role = Frontend/Mobile Developer, Next Acti
 * v1 (2026-09-03) — Tech Lead greenfield bootstrap. F01 feature created and activated; Current Owner = Project Setup for DURUM 0 scaffold; routing plan Project Setup → Frontend/Mobile Developer → QA → Tech Lead.
 * v2 (2026-09-03) — Project Setup: blocked. `setup-manifest.md` missing (mandatory input). No scaffold performed. Blocker raised, Next Role → Tech Lead to author the manifest.
 * v3 (2026-09-03) — Tech Lead: authored `project-authority/setup-manifest.md` (LOOPLET stack recipe, Steps 1–7 + canonical commands, containerization N/A). Blocker cleared. Current Status → In Progress; Next Role → Project Setup to execute F01.0-PS.
+* v4 (2026-09-03) — Project Setup: F01.0-PS done. Melos monorepo scaffolded (6 pure-Dart packages + Flutter `app`), all gates green except Android bundle build (deferred to CI — no local Android SDK). No dep substitutions. Current Owner → Frontend/Mobile Developer; Next Role → Frontend/Mobile Developer for F01.1-FE. Scaffold on disk, uncommitted.

@@ -1,0 +1,13 @@
+name: looplet_core
+description: >-
+  Shared value types, Result helpers, and the Turkish-locale case utility used
+  across every LOOPLET package. Pure Dart — no Flutter, no Firebase.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ">=3.4.0 <4.0.0"
+
+dev_dependencies:
+  lints: ^4.0.0
+  test: ^1.25.0

@@ -1,0 +1,37 @@
+# Dart / Flutter
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+pubspec_overrides.yaml
+doc/api/
+*.log
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.DS_Store
+
+# Flutter / iOS
+app/.flutter-plugins
+app/.flutter-plugins-dependencies
+app/ios/Pods/
+app/ios/.symlinks/
+app/ios/Flutter/Flutter.framework
+app/ios/Flutter/Flutter.podspec
+app/ios/Flutter/ephemeral/
+
+# Flutter / Android
+app/android/.gradle/
+app/android/captures/
+app/android/local.properties
+app/android/key.properties
+app/**/GeneratedPluginRegistrant.*
+
+# Coverage
+coverage/
+*.lcov

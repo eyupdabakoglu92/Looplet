@@ -1,0 +1,19 @@
+# App analysis config. Flutter can only `include:` one file, so this pulls in
+# package:flutter_lints/flutter.yaml (which itself includes lints/recommended)
+# and re-states the strict analyzer flags from the workspace root
+# ../analysis_options.yaml.
+
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+
+linter:
+  rules:
+    - always_declare_return_types
+    - prefer_final_locals
+    - prefer_single_quotes
+    - use_super_parameters

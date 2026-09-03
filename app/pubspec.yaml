@@ -1,0 +1,51 @@
+name: looplet_app
+description: LOOPLET — mobile word-based logic puzzle.
+publish_to: none
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.8.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+
+  # LOOPLET domain packages (pure Dart)
+  looplet_core:
+    path: ../packages/looplet_core
+  looplet_dictionary:
+    path: ../packages/looplet_dictionary
+  looplet_engine:
+    path: ../packages/looplet_engine
+  looplet_content:
+    path: ../packages/looplet_content
+
+  # App infrastructure (per platform.md §3)
+  flutter_riverpod: ^2.5.0
+  go_router: ^14.0.0
+  drift: ^2.18.0
+  sqlite3_flutter_libs: ^0.5.0
+  path_provider: ^2.1.0
+  path: ^1.9.0
+
+  # NOTE: Firebase packages are intentionally absent. They are added with the
+  # infra/ DURUM 0 that precedes F07/F08/F12 (see setup-manifest.md).
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  integration_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  drift_dev: ^2.18.0
+  build_runner: ^2.4.0
+
+flutter:
+  uses-material-design: true
+  # F01.2-FE adds the dictionary asset declaration here once the real
+  # dictionary.json files exist (F01.6-FE), together with the rootBundle-backed
+  # DictionaryAssetSource:
+  #   assets:
+  #     - packages/looplet_dictionary/assets/tr/
+  #     - packages/looplet_dictionary/assets/en/

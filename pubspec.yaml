@@ -1,0 +1,11 @@
+name: looplet_workspace
+description: >-
+  LOOPLET monorepo workspace root. Not a publishable package — it only carries
+  the melos dev dependency used to orchestrate the packages/ and app/ workspaces.
+publish_to: none
+
+environment:
+  sdk: ">=3.4.0 <4.0.0"
+
+dev_dependencies:
+  melos: ^6.0.0

@@ -1,0 +1,35 @@
+name: looplet
+
+packages:
+  - packages/**
+  - tools/**
+  - app
+
+command:
+  bootstrap:
+    usePubspecOverrides: true
+
+scripts:
+  analyze:
+    description: Static analysis across all packages, plus flutter analyze for the app.
+    steps:
+      - melos exec --no-flutter -- "dart analyze ."
+      - melos exec --scope="looplet_app" -- "flutter analyze"
+
+  format:
+    description: Format all Dart code in place.
+    run: dart format .
+
+  format:check:
+    description: Fail if any Dart code is not formatted.
+    run: dart format --output=none --set-exit-if-changed .
+
+  test:
+    description: Unit tests in every pure-Dart package with a test/ dir, plus the Flutter app.
+    steps:
+      - melos exec --dir-exists="test" --no-flutter -- "dart test"
+      - melos exec --scope="looplet_app" -- "flutter test"
+
+  build:app:
+    description: Release build of the Flutter app (Android App Bundle).
+    run: melos exec --scope="looplet_app" -- "flutter build appbundle --release"

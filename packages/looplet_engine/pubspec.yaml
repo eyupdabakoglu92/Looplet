@@ -1,0 +1,18 @@
+name: looplet_engine
+description: >-
+  Deterministic 5×5 grid model: circular row/column shift, locked/frozen tile
+  rules, left-to-right win detection, undo/restore primitives (F02). Pure Dart,
+  headless, no runtime randomness.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ">=3.4.0 <4.0.0"
+
+dependencies:
+  looplet_core:
+    path: ../looplet_core
+
+dev_dependencies:
+  lints: ^4.0.0
+  test: ^1.25.0

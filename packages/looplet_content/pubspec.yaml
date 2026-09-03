@@ -1,0 +1,18 @@
+name: looplet_content
+description: >-
+  Puzzle definition models, shared schema enums (tileStatus, direction,
+  difficultyLabel, puzzleType), and JSON (de)serialization shared by the app and
+  the authoring tools. Pure Dart.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ">=3.4.0 <4.0.0"
+
+dependencies:
+  looplet_core:
+    path: ../looplet_core
+
+dev_dependencies:
+  lints: ^4.0.0
+  test: ^1.25.0
