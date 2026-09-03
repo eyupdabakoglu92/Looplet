@@ -1,10 +1,10 @@
 # Feature Board — LOOPLET
 
 Last Updated: 2026-09-03
-Active Phase: Planning — F01 repo scaffold (DURUM 0)
+Active Phase: Planning — F01 repo scaffold (DURUM 0), unblocked
 Active Owner: Project Setup
 
-> Bootstrap snapshot produced by Product Owner (2026-09-03), then activated by Tech Lead greenfield bootstrap (2026-09-03): `platform.md` + `release.md` produced, F01 activated. Feature IDs and names match `product-prd.md` Section 6 exactly. Global owner / active phase sync is Tech Lead's responsibility.
+> Bootstrap snapshot produced by Product Owner (2026-09-03), then activated by Tech Lead greenfield bootstrap (2026-09-03): `platform.md` + `release.md` produced, F01 activated. Project Setup blocked on a missing `setup-manifest.md`; Tech Lead authored it (2026-09-03) and F01 is unblocked. Feature IDs and names match `product-prd.md` Section 6 exactly. Global owner / active phase sync is Tech Lead's responsibility.
 
 ---
 
@@ -12,7 +12,7 @@ Active Owner: Project Setup
 
 | ID | Feature | Status | Owner | QA | Priority | Notes |
 | --- | --- | --- | --- | --- | --- | --- |
-| F01 | dictionary-service | In Progress | Project Setup | — | P0 | Curated Turkish dictionary + Turkish-locale case (İ/I distinct) + validation behind a language key. Foundation for F02 (frozen break) and F06 (solver/content). ACTIVE — DURUM 0 repo scaffold, then Frontend/Mobile Developer → QA. Release Scope: none. No Analyst, no UI Designer. |
+| F01 | dictionary-service | In Progress | Project Setup | — | P0 | Curated Turkish dictionary + Turkish-locale case (İ/I distinct) + validation behind a language key. Foundation for F02 (frozen break) and F06 (solver/content). ACTIVE — DURUM 0 repo scaffold per `setup-manifest.md` (F01.0-PS), then Frontend/Mobile Developer (F01.1–F01.7-FE) → QA (client-only). Release Scope: none. No Analyst, no UI Designer. |
 | F02 | grid-engine | Not Started | — | — | P0 | Deterministic 5×5 shift engine: circular row/col shift, move count, L→R win detection, locked tile, frozen tile, undo/restart primitives. Depends on F01. Headless/testable. |
 | F03 | puzzle-play-session | Not Started | — | — | P0 | In-game screen: swipe→move (dominant axis, threshold, accidental-touch reject), 150–250ms anim + input lock (no queue), MOVES HUD, 3 Undo, separated Restart, completion sequence. Depends on F02. |
 | F04 | star-rating-and-personal-best | Not Started | — | — | P1 | 1–3 star rating (never 0), completion panel, per-level best (improves only), "Perfect" flag. Depends on F03, F06. |

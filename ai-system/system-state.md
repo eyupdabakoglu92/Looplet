@@ -14,7 +14,7 @@ Last Updated: 2026-09-03
 
 ## Environment Status
 
-* Partial — platform + release authority defined; repo not yet scaffolded. Project Setup owns the F01 scaffold task (DURUM 0).
+* Partial — platform + release + setup authority defined; repo not yet scaffolded. Project Setup owns the F01 scaffold task (DURUM 0), now unblocked.
 
 ---
 
@@ -26,7 +26,7 @@ Last Updated: 2026-09-03
 
 ## Setup Authority
 
-* `/ai-system/project-authority/setup-manifest.md` — not yet created (Project Setup output)
+* `/ai-system/project-authority/setup-manifest.md` — Exists (Tech Lead, 2026-09-03). Melos monorepo scaffold recipe (Steps 1–7) + canonical Build/Test/Boot commands; containerization N/A.
 
 ## Release Authority
 
@@ -78,15 +78,15 @@ Last Updated: 2026-09-03
 
 ## Current Reason
 
-* Greenfield bootstrap complete. `platform.md` and `release.md` produced; F01 (dictionary-service) selected as the first feature (P0, no dependencies, blocks F02 + F06). Repo is unscaffolded, so Project Setup runs first (task F01.0-PS) before Frontend/Mobile Developer implements the package.
+* Greenfield bootstrap done. `platform.md`, `release.md`, and `setup-manifest.md` produced; F01 (dictionary-service) is the active feature (P0, no dependencies, blocks F02 + F06). Repo is unscaffolded → Project Setup executes F01.0-PS next, then Frontend/Mobile Developer implements the package.
 
 ## Last Completed Action
 
-* Tech Lead — 2026-09-03 — Greenfield bootstrap: produced `project-authority/platform.md`, `project-authority/release.md`, and F01 feature files (`prd.md`, `architecture.md`, `orchestration.md`). Activated F01. Complexity decision: no Technical Analyst, no UI Designer.
+* Tech Lead — 2026-09-03 — Resolved the F01.0-PS blocker by authoring `project-authority/setup-manifest.md` (melos monorepo recipe, Steps 1–7, canonical commands, containerization N/A). F01 unblocked; Current Owner returned to Project Setup. (Prior: greenfield bootstrap produced `platform.md`, `release.md`, F01 feature files; complexity decision no Analyst / no UI Designer.)
 
 ## Next Expected Action
 
-* `Run Project Setup` — scaffold the melos monorepo + Flutter app skeleton + `looplet_core` / `looplet_dictionary` packages + CI gates, per `features/f01-dictionary-service/orchestration.md → Next Action`.
+* `Run Project Setup` — execute F01.0-PS per `setup-manifest.md` Steps 1–7 and `features/f01-dictionary-service/orchestration.md → Next Action`; verify green with the canonical `melos` commands.
 
 ---
 

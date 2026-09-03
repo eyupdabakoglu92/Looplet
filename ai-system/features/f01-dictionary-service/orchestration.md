@@ -7,7 +7,7 @@
 
 ## Current Status
 
-**Blocked**
+**In Progress**
 
 ---
 
@@ -19,13 +19,13 @@ Project Setup
 
 ## Current Phase
 
-Planning → Project Scaffold (DURUM 0: repo is not yet scaffolded) — BLOCKED: no `setup-manifest.md`
+Planning → Project Scaffold (DURUM 0: repo is not yet scaffolded)
 
 ---
 
 ## Active Task Ledger
 
-- [ ] Task ID: F01.0-PS | Assigned Role: Project Setup | Status: Blocked | Summary: Scaffold the melos monorepo + Flutter app skeleton + pure-Dart package skeletons per `platform.md` §3, and the `looplet_dictionary` / `looplet_core` package structure with a runnable (empty) test target. BLOCKED — `project-authority/setup-manifest.md` does not exist; it is a mandatory input for `Run Project Setup` and Project Setup may not author the scaffold recipe itself.
+- [ ] Task ID: F01.0-PS | Assigned Role: Project Setup | Status: Open | Summary: Scaffold the melos monorepo + Flutter app skeleton + pure-Dart package skeletons per `project-authority/setup-manifest.md` "Scaffold / Bootstrap Recipe" (Steps 1–7). Unblocked 2026-09-03 — `setup-manifest.md` now exists.
 
 ---
 
@@ -73,11 +73,7 @@ Planning → Project Scaffold (DURUM 0: repo is not yet scaffolded) — BLOCKED:
 
 ## Blockers
 
-* **BLOCKER — missing `project-authority/setup-manifest.md`** (raised by Project Setup, 2026-09-03)
-  * Owner: Tech Lead
-  * Impact: F01.0-PS cannot start. `Run Project Setup` requires `setup-manifest.md` as a mandatory input (new-project-bootstrap-checklist §3 "Must Be Filled Before Specific Role Use" / §8 step 5). The manifest carries the project-specific scaffold recipe + canonical build/test/boot commands. Project Setup is explicitly forbidden from authoring architecture/operational authority or adding dependencies beyond the manifest + platform decisions, so it cannot fabricate this recipe.
-  * Resolution needed: Tech Lead creates `project-authority/setup-manifest.md` from `templates/setup-manifest.template.md`, populated for the LOOPLET stack per `platform.md` §3 (melos monorepo; `looplet_core` + `looplet_dictionary` pure-Dart packages; `app/` Flutter skeleton; CI gates per `release.md` §4). Minimum content: workspace targets, scaffold recipe, canonical Build / Test / Boot commands, containerization = N/A, safety rules.
-  * After resolution: re-run `Run Project Setup` to execute F01.0-PS.
+* None. (Resolved 2026-09-03: `project-authority/setup-manifest.md` created by Tech Lead. The earlier blocker — missing setup manifest — is cleared.)
 * Non-blocking note: the production-quality curated Turkish corpus + target-word review is a Product Owner / content deliverable (F01 PRD Open Questions). Implementation proceeds with a provisional reviewed list; swapping in the final asset is a content change, not code, and does not re-open F01 code.
 
 ---
@@ -90,58 +86,53 @@ Planning → Project Scaffold (DURUM 0: repo is not yet scaffolded) — BLOCKED:
   * Repo is unscaffolded → DURUM 0: Project Setup runs first (F01.0-PS), then Frontend/Mobile Developer implements the package, then QA (client-only, automated).
   * Contract locked in `architecture.md`: public Dart API, `dictionary.json` asset shape, Turkish normalization spec (`İ ≠ I`, circumflex kept distinct), fail-safe semantics, `looplet_dictionary` may depend only on `looplet_core`.
   * Release Scope = none.
+* 2026-09-03 — Tech Lead (blocker resolution): authored `project-authority/setup-manifest.md`. Scaffold decisions locked there: melos ^6 monorepo; all `looplet_*` packages scaffolded now as compiling skeletons (not just F01's two) so F02/F06 devs fill logic rather than re-scaffold; `app` gets Riverpod + go_router + Drift + sqlite libs now, **no Firebase packages** until the F07/F08/F12 `infra` DURUM 0; containerization N/A; version-substitution rule = nearest lower compatible, same major, recorded.
 
 ---
 
 ## Last Update
 
-* Updated By: Project Setup
+* Updated By: Tech Lead
 * Timestamp: 2026-09-03
-* Summary: Attempted F01.0-PS. Halted before any scaffold: `project-authority/setup-manifest.md` — a mandatory input for `Run Project Setup` — does not exist, and this role may not author the scaffold recipe. Raised a blocker and routed to Tech Lead. No repo files were created or modified.
-
----
-
-## Completed Tasks
-
-* None. F01.0-PS not started (blocked — see Blockers). No filesystem changes made.
+* Summary: Resolved the F01.0-PS blocker by authoring `project-authority/setup-manifest.md` for the LOOPLET stack (melos monorepo, `looplet_*` pure-Dart packages, Flutter `app`, CI per `release.md` §4, containerization N/A, Steps 1–7 recipe + canonical commands). F01 unblocked; Current Owner back to Project Setup to execute F01.0-PS.
 
 ---
 
 ## Next Role
 
-Tech Lead
+Project Setup
 
 ---
 
 ## Next Action
 
-### Tech Lead
+### Project Setup
 
 ```text
-Create /ai-system/project-authority/setup-manifest.md from templates/setup-manifest.template.md,
-populated for the LOOPLET stack per project-authority/platform.md §3 and project-authority/release.md §4.
+Execute F01.0-PS. Follow project-authority/setup-manifest.md "Scaffold / Bootstrap Recipe" Steps 1–7 exactly:
+1. repo root (melos): melos.yaml with the named scripts, root pubspec.yaml, shared analysis_options.yaml, .gitignore,
+   README.md, .github/workflows/ci.yml (gates per release.md §4; third-party actions pinned to commit SHA).
+2. packages/looplet_core — pure Dart, no flutter dep, barrel + smoke test.
+3. packages/looplet_dictionary — pure Dart, depends only on looplet_core, assets/tr/ + assets/en/ (.gitkeep), barrel + smoke test.
+4. skeleton packages looplet_engine, looplet_content, looplet_solver — barrels + smoke tests, dependency edges per manifest.
+5. tools/looplet_authoring — Dart console package, placeholder main + smoke test.
+6. app — flutter create (ios,android), portrait lock, path deps + the listed runtime/dev deps, NO Firebase packages,
+   iOS target 13.0 / Android minSdk 24, no feature screens.
+7. content/README.md + infra/README.md stubs. Do NOT scaffold infra/functions (future separate DURUM 0).
 
-Minimum content:
-- Workspace Targets: melos monorepo root; packages/looplet_core; packages/looplet_dictionary; app/ (Flutter).
-- Scaffold / Bootstrap Recipe for the F01.0-PS scope:
-  * melos root: melos.yaml, root pubspec.yaml, .gitignore, shared analysis_options.yaml, README.md
-  * packages/looplet_core — pure Dart (no flutter dep), lib barrel + test/ smoke test
-  * packages/looplet_dictionary — pure Dart, depends only on looplet_core, lib barrel, assets/tr/ + assets/en/ folders,
-    assets declared in pubspec, test/ smoke test
-  * app/ — minimal Flutter skeleton that passes release builds for both platforms, no feature screens
-  * optional stubs (not required to compile for F01): packages/looplet_engine, packages/looplet_solver,
-    packages/looplet_content, tools/looplet_authoring, content/, infra/
-  * GitHub Actions workflow running release.md §4 gates; third-party actions pinned to commit SHA
-- Canonical Verification Commands:
-  * Build: (single canonical command, workspace-qualified)
-  * Test: (single canonical command across packages)
-  * Boot / dev run: (single canonical command)
-- Canonical Containerization Commands: N/A (mobile app; see release.md §6)
-- Safety Rules: per template.
+Then verify green (from repo root):
+  melos bootstrap
+  melos run format:check
+  melos run analyze
+  melos run test
+  melos run build:app
+  flutter build ios --release --no-codesign   (best-effort locally; CI enforces on macOS runner)
 
-Then update this orchestration: clear the blocker, set Current Status = In Progress,
-Current Owner = Project Setup, Next Role = Project Setup, Next Action = execute F01.0-PS.
-Sync feature-board.md and system-state.md in the same turn.
+Commit all pubspec.lock files. If a listed dependency version does not resolve, pick the nearest lower compatible
+version keeping the same major and record the substitution in the Project Setup report — do not change majors or swap packages.
+On any conflict with platform.md / release.md / this orchestration, stop and raise a Tech Lead blocker.
+
+On success: close F01.0-PS, set Next Role = Frontend/Mobile Developer, Next Action = F01.1-FE (TurkishCase + normalize in looplet_core).
 ```
 
 ---
@@ -150,3 +141,4 @@ Sync feature-board.md and system-state.md in the same turn.
 
 * v1 (2026-09-03) — Tech Lead greenfield bootstrap. F01 feature created and activated; Current Owner = Project Setup for DURUM 0 scaffold; routing plan Project Setup → Frontend/Mobile Developer → QA → Tech Lead.
 * v2 (2026-09-03) — Project Setup: blocked. `setup-manifest.md` missing (mandatory input). No scaffold performed. Blocker raised, Next Role → Tech Lead to author the manifest.
+* v3 (2026-09-03) — Tech Lead: authored `project-authority/setup-manifest.md` (LOOPLET stack recipe, Steps 1–7 + canonical commands, containerization N/A). Blocker cleared. Current Status → In Progress; Next Role → Project Setup to execute F01.0-PS.
