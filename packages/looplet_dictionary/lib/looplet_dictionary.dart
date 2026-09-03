@@ -1,10 +1,11 @@
-/// Language-scoped word validation for LOOPLET.
+/// Language-scoped word validation for LOOPLET (feature F01).
 ///
-/// This is a scaffold barrel. The public API — `DictionaryService.load`,
-/// `isValidWord`, `isEligibleTarget`, `switchLanguage`, `normalize`,
-/// `DictionaryAssetSource`, `DictionaryLogger` — is specified in
-/// `ai-system/features/f01-dictionary-service/architecture.md` and implemented
-/// from F01.2-FE onward.
+/// Entry point: [DictionaryService.load]. See
+/// `ai-system/features/f01-dictionary-service/architecture.md` for the contract.
 library looplet_dictionary;
 
-export 'src/placeholder.dart';
+export 'src/dictionary_asset.dart' show DictionaryAsset;
+export 'src/dictionary_asset_source.dart';
+export 'src/dictionary_logger.dart';
+export 'src/dictionary_service.dart';
+export 'src/language_code.dart';

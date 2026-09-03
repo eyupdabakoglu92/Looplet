@@ -1,0 +1,27 @@
+{
+  "_note": "Provisional hand-curated Turkish list for development (F01.6-FE). Replace with the reviewed corpus per the F01 PRD Open Questions. All entries lowercase, Turkish-normalized, no proper nouns / profanity / abbreviations.",
+  "schemaVersion": 1,
+  "language": "tr",
+  "words": [
+    "abla", "adam", "aile", "akşam", "arka", "aslan", "ayak", "ayna",
+    "badem", "bahçe", "balık", "balkon", "bina", "boru", "bulut", "buz",
+    "ceza", "çanta", "çiçek", "çorap", "dağ", "damla", "defter", "deniz",
+    "deri", "ders", "elma", "elmas", "erik", "etek", "fare", "fidan",
+    "fırın", "gece", "gemi", "göl", "güney", "halı", "hane", "harf",
+    "iğne", "ilaç", "isim", "kabak", "kaban", "kağıt", "kalem", "kapı",
+    "kar", "kase", "kedi", "kelime", "kir", "kira", "kırmızı", "kış",
+    "kitap", "koku", "kule", "kum", "kuzey", "kır", "lale", "limon",
+    "makas", "masa", "masal", "maya", "meyve", "okul", "orman", "para",
+    "peri", "resim", "roman", "saat", "sabah", "salon", "sandal", "sarı",
+    "sedir", "sepet", "sır", "sınıf", "sokak", "süre", "süt", "şeker",
+    "tabak", "tarih", "taş", "tava", "tavuk", "tuz", "vazo", "yaka",
+    "yaprak", "yara", "yatak", "yaz", "yeni", "zaman", "zemin"
+  ],
+  "targets": [
+    "aslan", "badem", "bahçe", "balık", "bulut", "çanta", "çorap", "damla",
+    "deniz", "fırın", "kabak", "kağıt", "kalem", "kitap", "limon", "makas",
+    "masal", "orman", "resim", "roman", "salon", "sepet", "sokak", "şeker",
+    "tabak", "tarih", "tavuk", "yatak", "zaman", "zemin"
+  ],
+  "exclusionsApplied": ["proper-nouns", "profanity", "abbreviations", "archaic-default-off"]
+}

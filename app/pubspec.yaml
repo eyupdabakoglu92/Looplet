@@ -43,9 +43,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-  # F01.2-FE adds the dictionary asset declaration here once the real
-  # dictionary.json files exist (F01.6-FE), together with the rootBundle-backed
-  # DictionaryAssetSource:
-  #   assets:
-  #     - packages/looplet_dictionary/assets/tr/
-  #     - packages/looplet_dictionary/assets/en/
+  # Dictionary assets are declared by the looplet_dictionary package itself and
+  # reach the bundle as packages/looplet_dictionary/assets/<lang>/dictionary.json.

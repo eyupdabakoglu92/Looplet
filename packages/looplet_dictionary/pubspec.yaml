@@ -16,3 +16,11 @@ dependencies:
 dev_dependencies:
   lints: ^4.0.0
   test: ^1.25.0
+
+# Asset metadata consumed by the Flutter tool when the app depends on this
+# package. The package stays pure Dart (no flutter SDK dependency); the app
+# reads these via rootBundle as `packages/looplet_dictionary/assets/<lang>/dictionary.json`.
+flutter:
+  assets:
+    - assets/tr/dictionary.json
+    - assets/en/dictionary.json

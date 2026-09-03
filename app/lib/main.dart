@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -7,11 +8,11 @@ Future<void> main() async {
   await SystemChrome.setPreferredOrientations(<DeviceOrientation>[
     DeviceOrientation.portraitUp,
   ]);
-  runApp(const LoopletApp());
+  runApp(const ProviderScope(child: LoopletApp()));
 }
 
-/// Scaffold shell. Real routing (go_router), theming, Riverpod scope, and the
-/// game/menu screens land with F03/F05/F09/F10.
+/// Scaffold shell. Real routing (go_router), theming, and the game/menu screens
+/// land with F03/F05/F09/F10.
 class LoopletApp extends StatelessWidget {
   const LoopletApp({super.key});
 

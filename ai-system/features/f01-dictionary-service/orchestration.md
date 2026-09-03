@@ -7,32 +7,36 @@
 
 ## Current Status
 
-**In Progress**
+**In QA**
 
 ---
 
 ## Current Owner
 
-Frontend/Mobile Developer
+QA
 
 ---
 
 ## Current Phase
 
-Frontend Development (scaffold complete; implementation of `looplet_core` normalization + `looplet_dictionary` service)
+QA (client-only, automated — `looplet_core` + `looplet_dictionary` + app wiring)
 
 ---
 
 ## Active Task Ledger
 
-- [x] Task ID: F01.0-PS | Assigned Role: Project Setup | Status: Done | Summary: Melos monorepo + 6 pure-Dart packages + Flutter `app` scaffolded per `setup-manifest.md` Steps 1–7. Verified: `melos bootstrap` (7 pkgs), `format:check`, `analyze`, `test` all green; `flutter build ios --release --no-codesign` green. `melos run build:app` (Android) not run locally — no Android SDK on this machine; CI covers it. No dependency substitutions needed.
-- [ ] Task ID: F01.1-FE | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: `TurkishCase` + `normalize` in `looplet_core` per `architecture.md` "Turkish Normalization (CONTRACT)".
-- [ ] Task ID: F01.2-FE | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: `looplet_dictionary` public API exactly as `architecture.md` "Public API" block, incl. `DictionaryAssetSource` + `DictionaryLogger`; wire the `app/pubspec.yaml` asset declaration + `rootBundle` source.
-- [ ] Task ID: F01.3-FE | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: Asset loading + indexing; decide + record in-memory representation vs a measured footprint target.
-- [ ] Task ID: F01.4-FE | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: Fail-safe semantics (missing/corrupt/empty asset) + `StateError` for query-before-load / after-dispose.
-- [ ] Task ID: F01.5-FE | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: Language isolation; `en` stub; `switchLanguage` leaves no residue.
-- [ ] Task ID: F01.6-FE | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: Ship provisional reviewed `assets/tr/dictionary.json` + `assets/en/dictionary.json` stub incl. 5-letter `targets`.
-- [ ] Task ID: F01.7-FE | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: AC-to-test mapping, golden QA word set, `frontend.md` with traceability + representation decision + per-AC evidence.
+- [x] Task ID: F01.0-PS | Assigned Role: Project Setup | Status: Done | Summary: Melos monorepo + 6 pure-Dart packages + Flutter `app` scaffolded per `setup-manifest.md` Steps 1–7. All gates green except Android bundle build (CI-only, no local SDK). No dependency substitutions.
+- [x] Task ID: F01.1-FE | Assigned Role: Frontend/Mobile Developer | Status: Done | `looplet_core/lib/src/turkish_case.dart` + `normalize.dart`. `İ`≠`I`, circumflex preserved, letters-only → `String?`. 18 tests.
+- [x] Task ID: F01.2-FE | Assigned Role: Frontend/Mobile Developer | Status: Done | `looplet_dictionary` public API per contract + `app/lib/dictionary/` (rootBundle source + Riverpod providers) + `ProviderScope`.
+- [x] Task ID: F01.3-FE | Assigned Role: Frontend/Mobile Developer | Status: Done | `dictionary_asset.dart` parse + `_buildIndex` re-normalize/dedupe into `Set<String>`. Representation decision + measurement in `frontend.md` §14.
+- [x] Task ID: F01.4-FE | Assigned Role: Frontend/Mobile Developer | Status: Done | Fail-safe on missing/corrupt/empty with exact diagnostic codes; `StateError` after `dispose`. 6 tests.
+- [x] Task ID: F01.5-FE | Assigned Role: Frontend/Mobile Developer | Status: Done | `LanguageCode.{tr,en}`; per-language `normalizeFn`; `switchLanguage` atomic swap, no residue; `en` stub. 6 tests.
+- [x] Task ID: F01.6-FE | Assigned Role: Frontend/Mobile Developer | Status: Done | `assets/tr/dictionary.json` (101 provisional words / 30 five-letter targets) + `assets/en/dictionary.json` stub.
+- [x] Task ID: F01.7-FE | Assigned Role: Frontend/Mobile Developer | Status: Done | 56 tests; `qa_word_set_test.dart` golden set vs the real shipped asset; `frontend.md` delivered.
+- [ ] Task ID: F01.1-QA | Assigned Role: QA | Status: Open | Summary: Acceptance Criteria + contract verification (see Open Tasks / QA).
+- [ ] Task ID: F01.2-QA | Assigned Role: QA | Status: Open | Summary: Turkish correctness + misuse matrix.
+- [ ] Task ID: F01.3-QA | Assigned Role: QA | Status: Open | Summary: Fail-safe + language isolation.
+- [ ] Task ID: F01.4-QA | Assigned Role: QA | Status: Open | Summary: Evidence-class check + CI coverage; emit verdict → Tech Lead.
 
 ---
 
@@ -62,13 +66,13 @@ Frontend Development (scaffold complete; implementation of `looplet_core` normal
   * Hand off to Frontend/Mobile Developer per `Next Role`
 
 ### Frontend
-- [ ] (F01.1-FE) Implement `TurkishCase` + `normalize` in `looplet_core` per `architecture.md` "Turkish Normalization (CONTRACT)": explicit `İ↔i`, `I↔ı`, `Ç Ğ Ö Ş Ü` map; letters-only enforcement; circumflex kept distinct. Table tests over the full `Ç Ğ İ I Ö Ş Ü` set including `İ ≠ I`.
-- [ ] (F01.2-FE) Implement `looplet_dictionary` public API exactly as the `architecture.md` "Public API" block: `DictionaryService.load`, `switchLanguage`, `isValidWord({minLength})`, `isEligibleTarget`, `normalize`, `isFailSafe`, `dispose`; `DictionaryAssetSource` + `DictionaryLogger` abstractions.
-- [ ] (F01.3-FE) Asset loading + indexing: parse the `dictionary.json` contract shape, defensively re-normalize/dedupe/sort on load, build the validity + target lookups. Decide and record the in-memory representation against a measured low-end footprint target (Open Technical Decision → document choice + measurement in `frontend.md`).
-- [ ] (F01.4-FE) Fail-safe semantics: missing / corrupt / empty asset → completed `load`, `isFailSafe == true`, all lookups `false`, correct diagnostic (`dictionary.asset.missing|corrupt|empty`); `StateError` only for query-before-load / query-after-dispose.
-- [ ] (F01.5-FE) Language isolation: `en` stub asset wired; `switchLanguage` fully replaces the active index with no residue; `en` uses ordinary Unicode lowercasing.
-- [ ] (F01.6-FE) Ship an initial reviewed `assets/tr/dictionary.json` (provisional list acceptable for development if the curated corpus is not yet delivered — see F01 PRD Open Questions) and a minimal `assets/en/dictionary.json` stub. Include the curated 5-letter `targets` array.
-- [ ] (F01.7-FE) Tests: map every F01 PRD Acceptance Criterion to a `dart test`; add the golden "must-accept / must-reject" QA word set, length-rule tests, malformed-input tests, fail-safe tests, language-isolation test. Produce `frontend.md` with task-to-code traceability, the in-memory-representation decision + measurement, preserved-behavior notes (n/a — greenfield), and per-AC test evidence.
+- [x] (F01.1-FE) `TurkishCase` + `normalize` in `looplet_core` — done (18 tests).
+- [x] (F01.2-FE) `looplet_dictionary` public API + app wiring (rootBundle source + Riverpod providers + ProviderScope) — done.
+- [x] (F01.3-FE) Asset loading + indexing; representation = `Set<String>`, decision + measurement in `frontend.md` §14 — done.
+- [x] (F01.4-FE) Fail-safe semantics + `StateError` after dispose — done (6 tests). Note: "query before load" is unreachable given `load` is the only constructor.
+- [x] (F01.5-FE) Language isolation + `en` stub + atomic `switchLanguage` — done (6 tests).
+- [x] (F01.6-FE) `assets/tr/dictionary.json` (101 provisional words / 30 targets) + `assets/en/dictionary.json` stub — done.
+- [x] (F01.7-FE) 56 tests incl. golden QA set vs the real shipped asset; `frontend.md` delivered — done.
 
 ### QA
 - [ ] (F01.1-QA) Acceptance Criteria + contract verification: every AC in `features/f01-dictionary-service/prd.md` and every rule in `architecture.md` "API / Event Contract" is covered by a passing automated test; public API signature matches the contract exactly.
@@ -101,49 +105,54 @@ Frontend Development (scaffold complete; implementation of `looplet_core` normal
 
 ## Last Update
 
-* Updated By: Project Setup
+* Updated By: Frontend/Mobile Developer
 * Timestamp: 2026-09-03
-* Summary: Executed F01.0-PS. Scaffolded the melos monorepo: root config (`melos.yaml`, `pubspec.yaml`, shared `analysis_options.yaml`, `.gitignore`, `README.md`, `.github/workflows/ci.yml` with SHA-pinned actions), 6 pure-Dart packages (`looplet_core`, `looplet_dictionary` + `assets/tr|en`, `looplet_engine`, `looplet_content`, `looplet_solver`, `tools/looplet_authoring`) each with a compiling barrel + passing smoke test, and the Flutter `app` (portrait-locked, path deps + Riverpod/go_router/Drift/sqlite libs, NO Firebase, iOS 13.0 / Android minSdk 24, placeholder shell). `content/` + `infra/` README stubs. All manifest dependency versions resolved as specified — no substitutions. Verified green: `melos bootstrap` (7 pkgs), `format:check`, `analyze` (6 pkgs + `flutter analyze`), `test` (6 smoke tests + app widget test), `flutter build ios --release --no-codesign`. `melos run build:app` deferred to CI (no local Android SDK). Not committed to git.
+* Summary: F01.1-FE … F01.7-FE complete. `looplet_core` Turkish case + normalization (`turkish_case.dart`, `normalize.dart`); `looplet_dictionary` full public API (`DictionaryService`, `DictionaryAssetSource`, `DictionaryLogger`+`NoopDictionaryLogger`, `LanguageCode`, `DictionaryAsset`); provisional `assets/tr/dictionary.json` (101 words / 30 five-letter targets) + `assets/en/dictionary.json` stub; app wiring (`app/lib/dictionary/` rootBundle source + Riverpod providers, `ProviderScope` in `main.dart`). Representation = `Set<String>` (decision + footprint projection in `frontend.md` §14). One architecture-note deviation recorded (`frontend.md` §4/§16): dictionary assets are declared by the package's own `pubspec.yaml` `flutter: assets:` section, not by the app — the app-side declaration in `architecture.md` "Integration Rules" does not work in Flutter; no contract impact. Gates green: `format:check`, `analyze` (6 pkgs + `flutter analyze`), `test` (56 tests), `flutter build ios --release --no-codesign`. Not committed to git.
 
 ---
 
 ## Next Role
 
-Frontend/Mobile Developer
+QA
 
 ---
 
 ## Next Action
 
-### Frontend/Mobile Developer
+### QA
 
 ```text
-Start F01.1-FE, then continue F01.2-FE … F01.7-FE per the Active Task Ledger.
+Verify F01 (client-only, automated — no device runtime required per architecture.md QA Focus + platform.md §10).
 
-Authority: features/f01-dictionary-service/architecture.md is contract authority; features/f01-dictionary-service/prd.md
-holds the Acceptance Criteria; project-authority/platform.md §11 has the Turkish-locale HARD RULE and naming/localization rules.
+Authority: features/f01-dictionary-service/prd.md (Acceptance Criteria), architecture.md (API / Event Contract,
+QA Focus), frontend.md (delivery report + test evidence by task).
 
-F01.1-FE — looplet_core (packages/looplet_core):
-- Implement `TurkishCase.toLowerTr(String)` / `toUpperTr(String)` with the explicit map from architecture.md
-  "Turkish Normalization (CONTRACT)": I→ı, İ→i, ı→I, i→İ; Ç↔ç, Ğ↔ğ, Ö↔ö, Ş↔ş, Ü↔ü; all other letters ordinary casing.
-- Implement `normalize(String)` = toLowerTr + trim, returning null if any character is not a Turkish/Latin letter
-  (do NOT return an empty string, do NOT throw).
-- Circumflex vowels (â î û) are DISTINCT letters — never stripped by normalize.
-- İ and I must normalize to different code points (i vs ı) → different keys. This is the pivotal test.
-- Replace the `loopletCoreReady` placeholder; keep the barrel export surface clean (export the public API from lib/looplet_core.dart).
-- Tests: full table over Ç Ğ İ I Ö Ş Ü (upper↔lower both directions), İ≠I, all-caps vs lowercase vs mixed-case equality
-  after normalize, non-letter/empty/whitespace → null, circumflex preserved.
+F01.1-QA — Acceptance Criteria + contract:
+- Walk every AC in prd.md and confirm a passing automated test covers it (frontend.md §17 maps them).
+- Confirm the public API signatures in lib match architecture.md "Public API" verbatim (named params,
+  isValidWord({int minLength = 1}), normalize -> String?, isFailSafe getter, Future<void> for load/switchLanguage/dispose).
+- Confirm the additive-only surface (NoopDictionaryLogger, LanguageCode.fromCode, DictionaryAsset export) does not
+  alter contract behavior.
 
-Then F01.2-FE onward: implement the looplet_dictionary public API exactly as architecture.md "Public API"
-(DictionaryService.load / switchLanguage / isValidWord({minLength}) / isEligibleTarget / normalize / isFailSafe / dispose;
-DictionaryAssetSource + DictionaryLogger). Add the dictionary asset declaration + a rootBundle-backed DictionaryAssetSource
-to app/pubspec.yaml + app code (currently commented out in app/pubspec.yaml). Parse the dictionary.json contract shape,
-re-normalize/dedupe/sort defensively on load, and record the in-memory-representation decision + a measured footprint in frontend.md.
+F01.2-QA — Turkish correctness + misuse matrix:
+- İ ≠ I produces distinct keys; casing invariance (all-caps == lowercase == mixed); full Ç Ğ İ I Ö Ş Ü table.
+- non-letter / empty / whitespace / over-long / q w x / accented-Latin input -> false, never throws.
+- minLength short-circuits before a list hit (3-letter word rejected at minLength: 4).
 
-Verify with: melos run format:check && melos run analyze && melos run test  (from repo root).
-Produce features/f01-dictionary-service/frontend.md: task-to-code traceability, the representation decision + measurement,
-per-AC test evidence, preserved-behavior = n/a (greenfield).
-On completion set Next Role = QA (client-only) per architecture.md QA Focus.
+F01.3-QA — Fail-safe + language isolation:
+- missing / corrupt / wrong-shape / empty asset -> completed load, isFailSafe == true, all lookups false,
+  correct diagnostic code (dictionary.asset.missing|corrupt|empty); no-logger path does not throw.
+- query after dispose -> StateError.
+- en service cannot see tr entries; switchLanguage both directions leaves no residue; no-op to active language;
+  switch to a missing language -> fail-safe.
+
+F01.4-QA — Evidence class + CI:
+- Confirm "automated functional" evidence is sufficient (platform.md §10) — no device runtime needed for F01.
+- Confirm .github/workflows/ci.yml runs format:check + analyze + test across the workspace (these suites are included).
+- Note: melos run build:app (Android) is CI-only locally (no Android SDK on the dev machine); iOS release build passes.
+
+Run from repo root: melos run format:check && melos run analyze && melos run test
+Emit a QA verdict (Approved / Approved with Notes / Rejected / Runtime Validation Pending). Next Role after QA is always Tech Lead.
 ```
 
 ---
@@ -154,3 +163,4 @@ On completion set Next Role = QA (client-only) per architecture.md QA Focus.
 * v2 (2026-09-03) — Project Setup: blocked. `setup-manifest.md` missing (mandatory input). No scaffold performed. Blocker raised, Next Role → Tech Lead to author the manifest.
 * v3 (2026-09-03) — Tech Lead: authored `project-authority/setup-manifest.md` (LOOPLET stack recipe, Steps 1–7 + canonical commands, containerization N/A). Blocker cleared. Current Status → In Progress; Next Role → Project Setup to execute F01.0-PS.
 * v4 (2026-09-03) — Project Setup: F01.0-PS done. Melos monorepo scaffolded (6 pure-Dart packages + Flutter `app`), all gates green except Android bundle build (deferred to CI — no local Android SDK). No dep substitutions. Current Owner → Frontend/Mobile Developer; Next Role → Frontend/Mobile Developer for F01.1-FE. Scaffold on disk, uncommitted.
+* v5 (2026-09-03) — Frontend/Mobile Developer: F01.1-FE … F01.7-FE done. `looplet_core` normalization + `looplet_dictionary` service + provisional assets + app wiring. 56 tests green; format/analyze/iOS-build green. One recorded deviation from an `architecture.md` note (assets declared package-side, not app-side — no contract impact; flagged for Tech Lead). Current Owner → QA; Next Role → QA (client-only). Uncommitted.

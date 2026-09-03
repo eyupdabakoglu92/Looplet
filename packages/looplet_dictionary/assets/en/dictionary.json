@@ -1,0 +1,14 @@
+{
+  "_note": "Minimal English stub (F01.5-FE). The real English corpus is a later language-pack deliverable; this only exercises the language-keyed plumbing.",
+  "schemaVersion": 1,
+  "language": "en",
+  "words": [
+    "about", "chair", "green", "happy", "house", "light", "music",
+    "plant", "table", "water", "world"
+  ],
+  "targets": [
+    "chair", "green", "happy", "house", "light", "music", "plant",
+    "table", "water", "world"
+  ],
+  "exclusionsApplied": ["proper-nouns", "profanity", "abbreviations"]
+}
