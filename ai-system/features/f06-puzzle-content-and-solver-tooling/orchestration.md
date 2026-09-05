@@ -7,25 +7,25 @@
 
 ## Current Status
 
-**In Progress**
+**In Progress** → analysis delivered; pending Tech Lead contract finalization
 
 ---
 
 ## Current Owner
 
-Technical Analyst
+Tech Lead
 
 ---
 
 ## Current Phase
 
-Analysis (contract brief drafted with open technical decisions; Technical Analyst pass before contract finalization)
+Analysis complete → Tech Lead contract finalization (lock the `analysis.md` §17 items into `architecture.md`, open FE/QA tasks)
 
 ---
 
 ## Active Task Ledger
 
-- [ ] Task ID: F06.0-AN | Assigned Role: Technical Analyst | Status: Open | Summary: Analyze F06 per `prd.md` "Open Questions" + `architecture.md` "Open Technical Decisions". Produce `analysis.md` with options + trade-offs + a marked recommendation for: (1) solver algorithm + search bound + frozen-thaw branching + minimality-proof argument; (2) difficulty-score computable definitions + formula + `easy`/`medium`/`hard`/`expert` thresholds; (3) `Puzzle` JSON schema + whether `looplet_content` may depend on `looplet_engine`; (4) CLI command set + puzzle-definition input format (desktop preview: recommend no for MVP); (5) content-rule heuristics (Turkish-frequency biasing table; "misleading nonsense strings" rule); (6) Daily pool size + no-duplication + no-repeat-window rules; (7) `WordValidator` adapter placement. Plus: functional breakdown, edge cases, task breakdown (solver / content / CLI / QA), and a Delivery Note for Tech Lead separating decisions-to-lock from questions-that-stay-open.
+- [x] Task ID: F06.0-AN | Assigned Role: Technical Analyst | Status: Done | `analysis.md` delivered — all 7 open items resolved with options + trade-offs + a marked recommendation: (1) **forward BFS** + `canonicalKey` visited + `SearchBudget` (bidirectional BFS from `platform.md` §13 dropped — goal-is-a-set + frozen-thaw irreversibility break meet-in-the-middle); (2) computable §48 metric definitions + score formula + label thresholds (weights/thresholds configurable); (3) `looplet_content` engine-free, `Puzzle` stores raw fields + `toEngineConfig()` in a consumer; (4) CLI-only, `solve`/`playtest`/`export`/`check`/`fill`; (5) seeded Turkish-frequency `fill` + offensive/near-target filter; (6) Daily pool ~60 + date→id manifest + no-repeat-window 30d; (7) `looplet_solver` → `looplet_engine` only, `WordValidator` adapter in `tools`. Plus functional breakdown, edge cases, task breakdown (F06.1–F06.8), Delivery Note (LOCK vs OPEN). Recommends F06 delivers **toolchain + smoke set**; full 30 Journey + ~60 Daily authoring = separate content task.
 
 ---
 
@@ -44,7 +44,7 @@ Analysis (contract brief drafted with open technical decisions; Technical Analys
 ## Open Tasks
 
 ### Analysis
-- [ ] (F06.0-AN) Technical analysis of F06 (see Active Task Ledger). Output: `features/f06-puzzle-content-and-solver-tooling/analysis.md`.
+- [x] (F06.0-AN) Technical analysis of F06 — done. Output: `features/f06-puzzle-content-and-solver-tooling/analysis.md`.
 
 ### Backend
 - _(none — F06 has no server; the "backend" work here is the pure-Dart `looplet_solver` + `looplet_content`, sequenced under Frontend/Mobile Developer once the contract is finalized)_
@@ -59,9 +59,10 @@ Analysis (contract brief drafted with open technical decisions; Technical Analys
 
 ## Blockers
 
-* None. Analysis pass in progress.
+* None. Analysis complete (`analysis.md`); Tech Lead contract finalization next.
 * Dependency note: F01 (Done) + F02 (Done) — F06 builds directly on F02's `GridState` / `applyMove` / `canonicalKey` / `legalMoves` and F01's `WordValidator`.
 * Carried non-blocking note (from F02 QA): when `looplet_engine` is next touched (likely by F06's solver work), tidy `GridState.applyMove` to read all `EngineConfig` fields from one source. No defect today.
+* Flagged for Tech Lead: `analysis.md` recommends forward BFS instead of `platform.md` §13's "bidirectional BFS" — §13 should be updated. Not a blocker (F06's `architecture.md` is the feature contract authority).
 
 ---
 
@@ -78,69 +79,65 @@ Analysis (contract brief drafted with open technical decisions; Technical Analys
 
 ## Last Update
 
-* Updated By: Tech Lead
+* Updated By: Technical Analyst
 * Timestamp: 2026-09-05
-* Summary: F02 closed (Done). F06 puzzle-content-and-solver-tooling activated. Created `prd.md` (derived, with an explicit "Open Questions" list) + `architecture.md` (initial contract brief — LOCKED build-time-only substrate + publish gates + artifact layout; PENDING ANALYSIS for solver algorithm, difficulty metrics, `Puzzle` schema, CLI scope, content heuristics, Daily pool rules, validator placement) + this orchestration. Complexity COMPLEX → **Technical Analyst pass**. `feature-board.md` + `system-state.md` synced same turn (F02 Done, F06 active / Analysis).
+* Summary: F06.0-AN complete. `analysis.md` delivered — all 7 open items resolved with options/trade-offs/recommendation. Headline recommendations: (1) **forward BFS** over `canonicalKey` + `SearchBudget` (maxDepth 16 / maxNodes 5M / 30s) — `platform.md` §13's bidirectional BFS dropped (goal-is-a-set + frozen-thaw irreversibility); minimality is BFS-by-construction; (2) computable §48 difficulty metric definitions + score formula + configurable weights/thresholds; (3) `looplet_content` stays engine-free (`Puzzle` raw fields + consumer-side `toEngineConfig()`); (4) CLI-only (`solve`/`playtest`/`export`/`check`/`fill`), JSON def-files; (5) seeded Turkish-frequency `fill` + offensive/near-target filter; (6) Daily pool ~60 + date→id manifest + 30d no-repeat, medium/hard band; (7) `looplet_solver` → `looplet_engine` only, dictionary adapter in `tools`. Task breakdown F06.1–F06.8; recommends F06 ships **toolchain + ~5-puzzle smoke set**, full 30 Journey + ~60 Daily = separate content task. Flagged: `platform.md` §13 should be updated by the Tech Lead.
 
 ---
 
 ## Next Role
 
-Technical Analyst
+Tech Lead
 
 ---
 
 ## Next Action
 
-### Technical Analyst
+### Tech Lead
 
 ```text
-Analyze F06 puzzle-content-and-solver-tooling. Produce features/f06-puzzle-content-and-solver-tooling/analysis.md.
+Finalize the F06 contract from analysis.md.
 
-Authority: features/f06-.../prd.md (system requirements, Acceptance Criteria, Edge Cases, Open Questions),
-features/f06-.../architecture.md (what is LOCKED vs PENDING ANALYSIS), product-prd.md §46–49,
-project-authority/platform.md §13 (solver direction). Inherited: features/f02-grid-engine/architecture.md
-(GridState / applyMove / canonicalKey / legalMoves — the solver's substrate) and F01's WordValidator port.
+1. Move analysis.md §17 "LOCK" items into features/f06-.../architecture.md, converting each [PENDING ANALYSIS]
+   section to [LOCKED]:
+   - Solver = forward BFS over GridState.canonicalKey visited set + parent map, fixed Move successor order, FIFO;
+     first isSolved dequeued = provable minimum (goal tested on dequeue). SolveResult = Optimal(moves, sequence) |
+     Unsolvable | BudgetExceeded(budget); deterministic, byte-stable sequence. SearchBudget defaults
+     maxDepth 16 / maxNodes 5,000,000 / timeBudget 30s (tunable; mechanism locked). IDA* = documented per-puzzle
+     fallback only. Bidirectional BFS NOT adopted.
+   - looplet_content depends on looplet_core only; Puzzle stores raw fields; a consumer builds EngineConfig via
+     toEngineConfig(). Puzzle.language is a validated String.
+   - looplet_solver depends on looplet_engine only; WordValidator->DictionaryService adapter lives in
+     tools/looplet_authoring.
+   - Puzzle JSON shape per analysis.md §5 (grid row strings; "r,c" coords; unknown keys ignored; typed
+     PuzzleFormatException; optimalMoves required + non-nullable).
+   - CLI-only. Commands solve / playtest / export / check / fill. export gate: non-zero exit + no file on
+     unsolvable / budgetExceeded / optimalMoves == 0. check is the CI content gate; add to .github/workflows/ci.yml.
+   - Difficulty: lock the metric DEFINITIONS (analysis.md §12 table); keep weights + thresholds in a configurable
+     DifficultyWeights/DifficultyThresholds value (const defaults, recalibrated after F06.8).
+   - Content layout content/journey/<lang>/levelNN.json, content/daily/<lang>/pool/*.json,
+     content/daily/<lang>/manifest.json; check enforces Journey band consistency + Journey internal + Journey<->Daily
+     dedup + Daily no-repeat-window (30d).
 
-Resolve, with options + trade-offs + a marked Recommendation for each (Tech Lead makes the final call):
+2. Keep OPEN (record in architecture.md "Open Technical Decisions", do not block implementation): exact SearchBudget
+   numbers + difficulty weights/thresholds (finalize during F06.8); Turkish frequency table source; near-target filter
+   strength for MVP; MVP Daily pool size + band; difficultyBreakdown required vs optional; package:args in the tool.
 
-1. SOLVER ALGORITHM. platform.md §13 says "bidirectional BFS over a packed canonical grid-state hash;
-   fall back to IDA* if memory-bound". Evaluate that against two facts: (a) the goal is a SET of states
-   (any grid with a full left-to-right target row), not a single state; (b) frozen-thaw is irreversible
-   (a backward move cannot un-thaw). Compare at least: forward BFS with a canonicalKey visited set + a
-   depth/node/time bound; IDA* with an admissible heuristic (e.g. minimum shifts to bring the target
-   letters into some row, ignoring collisions); bidirectional with an enumerated goal frontier. State the
-   memory/time behavior on a 5×5 with locked + up to N frozen tiles, the search bound that separates
-   "publishable" from budgetExceeded, and the argument for why the chosen method returns a PROVABLE minimum
-   (including the frozen-thaw ordering branch).
+3. Decide the SCOPE SPLIT (analyst recommendation): F06 implementation = F06.1–F06.7 (toolchain) + a ~5-puzzle smoke
+   set; full 30 Journey + ~60 Daily authoring = a separate follow-on content task (owner TBD), still required before
+   F05/F07 ship. Confirm or override.
 
-2. DIFFICULTY SCORE. Give concrete, computable definitions for every §48 parameter: optimal move count;
-   "correct-looking intermediate states"; "required temporary displacement"; locked count; frozen count;
-   "number of plausible routes". Propose a score formula and the score→label thresholds
-   (easy / medium / hard / expert). It must be deterministic.
+4. Decide whether to amend project-authority/platform.md §13 (bidirectional BFS -> forward BFS + bound). Analyst
+   recommends yes.
 
-3. PUZZLE SCHEMA. Exact JSON shape for the looplet_content Puzzle (grid as row strings vs arrays;
-   locks/freezes representation; how the nested EngineConfig is expressed; contentVersion semantics).
-   Recommend whether looplet_content may depend on looplet_engine for the EngineConfig type, or whether
-   Puzzle stores raw fields and builds EngineConfig(...) on load (Tech Lead leans to the latter).
+5. Replace the F06 orchestration "Frontend" / "QA" placeholder tasks with the concrete F06.1-FE … F06.7-FE +
+   F06.1-QA … F06.5-QA tasks from analysis.md §16; set Next Role = Frontend/Mobile Developer.
 
-4. CLI SCOPE. Exact command set (solve / playtest / export + any others), the puzzle-definition input
-   format (file? flags? interactive?), and confirm CLI-only for the MVP (no Flutter-desktop preview).
+6. Carry the F02 non-blocking note: while touching looplet_engine for F06's solver, tidy GridState.applyMove to
+   read all EngineConfig fields from one source.
 
-5. CONTENT-RULE HEURISTICS. The Turkish letter-frequency biasing method (a weighted sampling table —
-   propose the source/approach, not the full table) and the "misleading nonsense strings" reduction rule.
-
-6. DAILY POOL RULES. MVP pool size; no-duplication-with-Journey rule; no-repeat-within-window rule.
-
-7. WORDVALIDATOR ADAPTER PLACEMENT. looplet_solver depends on looplet_dictionary directly, vs takes the
-   WordValidator port with the adapter in tools/looplet_authoring. (Neither is on-device.)
-
-Also produce: a technical functional breakdown, an edge-case list beyond prd.md, and a task breakdown
-(solver / content model / CLI / content-set authoring / QA). In the Delivery Note for Tech Lead, separate
-"decisions the Tech Lead can lock into architecture.md" from "questions that must stay open".
-
-Do not write code or pick the final architecture — that is the Tech Lead's call. Next Role after analysis is
-always Tech Lead.
+Consumed Signals: analysis.md consumed into architecture.md on 2026-09-05 (once step 1 is done). Next Role after
+Tech Lead = Frontend/Mobile Developer.
 ```
 
 ---
@@ -148,3 +145,4 @@ always Tech Lead.
 ## Change Log
 
 * v1 (2026-09-05) — Tech Lead: F06 created and activated after F02 `Done`. `prd.md` + initial `architecture.md` (LOCKED substrate + gates; PENDING ANALYSIS for 7 items) + orchestration. Complexity COMPLEX → Technical Analyst pass (F06.0-AN → `analysis.md`). Routing: Technical Analyst → Tech Lead (finalize contract) → Frontend/Mobile Developer → QA → Tech Lead.
+* v2 (2026-09-05) — Technical Analyst: F06.0-AN done. `analysis.md` delivered (7 items resolved + recommendation; functional breakdown; edge cases; task breakdown F06.1–F06.8; LOCK-vs-OPEN Delivery Note). Recommends forward BFS (not bidirectional), engine-free `looplet_content`, CLI-only, toolchain + smoke-set scope. Current Owner → Tech Lead; Next Role → Tech Lead to finalize `architecture.md`.
