@@ -1,10 +1,10 @@
 # Feature Board — LOOPLET
 
-Last Updated: 2026-09-03
-Active Phase: Planning — F01 repo scaffold (DURUM 0), unblocked
-Active Owner: Project Setup
+Last Updated: 2026-09-05
+Active Phase: Frontend Development — F02 grid-engine
+Active Owner: Frontend/Mobile Developer
 
-> Bootstrap snapshot produced by Product Owner (2026-09-03), then activated by Tech Lead greenfield bootstrap (2026-09-03): `platform.md` + `release.md` produced, F01 activated. Project Setup blocked on a missing `setup-manifest.md`; Tech Lead authored it (2026-09-03) and F01 is unblocked. Feature IDs and names match `product-prd.md` Section 6 exactly. Global owner / active phase sync is Tech Lead's responsibility.
+> Bootstrap by Product Owner (2026-09-03) → Tech Lead greenfield bootstrap (`platform.md`, `release.md`, `setup-manifest.md`). F01 dictionary-service delivered: Project Setup scaffold → Frontend/Mobile Developer → QA (Approved with Notes, 2026-09-05) → **Done**. F02 grid-engine activated 2026-09-05. Feature IDs/names match `product-prd.md` Section 6. Global owner / active phase sync is Tech Lead's responsibility.
 
 ---
 
@@ -12,8 +12,8 @@ Active Owner: Project Setup
 
 | ID | Feature | Status | Owner | QA | Priority | Notes |
 | --- | --- | --- | --- | --- | --- | --- |
-| F01 | dictionary-service | In Progress | Project Setup | — | P0 | Curated Turkish dictionary + Turkish-locale case (İ/I distinct) + validation behind a language key. Foundation for F02 (frozen break) and F06 (solver/content). ACTIVE — DURUM 0 repo scaffold per `setup-manifest.md` (F01.0-PS), then Frontend/Mobile Developer (F01.1–F01.7-FE) → QA (client-only). Release Scope: none. No Analyst, no UI Designer. |
-| F02 | grid-engine | Not Started | — | — | P0 | Deterministic 5×5 shift engine: circular row/col shift, move count, L→R win detection, locked tile, frozen tile, undo/restart primitives. Depends on F01. Headless/testable. |
+| F01 | dictionary-service | Done | — | QA | P0 | Curated Turkish dictionary + Turkish-locale case (İ/I distinct) + validation behind a language key. Delivered: `looplet_core` normalization + `looplet_dictionary` service + provisional assets + app wiring. QA verdict Approved with Notes (`qa.md`); 56 workspace tests green. Non-blocking: architecture wording clarified; Android CI to confirm; production Turkish corpus is a PO/content deliverable. Release Scope: none. |
+| F02 | grid-engine | In Progress | Frontend/Mobile Developer | — | P0 | Deterministic 5×5 shift engine: pure `GridState`/`applyMove` core + `GridEngine` façade; circular row/col shift, movable-subsequence rotation around locked/frozen fixed points, L→R win detection, row-only frozen thaw (len 4/5 windows), undo re-fold, restart, `canonicalKey` for the F06 solver, `WordValidator` port. Depends on F01 (Done). Headless. ACTIVE — Frontend/Mobile Developer (F02.0-CORE → F02.6-FE) → QA (client-only). COMPLEX; no Analyst, no UI Designer. Release Scope: none. |
 | F03 | puzzle-play-session | Not Started | — | — | P0 | In-game screen: swipe→move (dominant axis, threshold, accidental-touch reject), 150–250ms anim + input lock (no queue), MOVES HUD, 3 Undo, separated Restart, completion sequence. Depends on F02. |
 | F04 | star-rating-and-personal-best | Not Started | — | — | P1 | 1–3 star rating (never 0), completion panel, per-level best (improves only), "Perfect" flag. Depends on F03, F06. |
 | F05 | journey-progression | Not Started | — | — | P0 | 30 handcrafted sequential levels, linear unlock by completion, source §20 difficulty curve, per-level micro-tutorials (columns at L4–6), CONTINUE resume. Depends on F03, F06. |

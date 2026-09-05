@@ -7,38 +7,31 @@
 
 ## Current Status
 
-**In QA** → QA verdict: Approved with Notes (2026-09-05). Pending Tech Lead reconcile + `Done`.
+**Done**
 
 ---
 
 ## Current Owner
 
-Tech Lead
+-
 
 ---
 
 ## Current Phase
 
-QA complete (client-only, automated) → Tech Lead reconcile + global sync
+Closed
 
 ---
 
 ## Active Task Ledger
 
-- [x] Task ID: F01.0-PS | Assigned Role: Project Setup | Status: Done | Summary: Melos monorepo + 6 pure-Dart packages + Flutter `app` scaffolded per `setup-manifest.md` Steps 1–7. All gates green except Android bundle build (CI-only, no local SDK). No dependency substitutions.
-- [x] Task ID: F01.1-FE | Assigned Role: Frontend/Mobile Developer | Status: Done | `looplet_core/lib/src/turkish_case.dart` + `normalize.dart`. `İ`≠`I`, circumflex preserved, letters-only → `String?`. 18 tests.
-- [x] Task ID: F01.2-FE | Assigned Role: Frontend/Mobile Developer | Status: Done | `looplet_dictionary` public API per contract + `app/lib/dictionary/` (rootBundle source + Riverpod providers) + `ProviderScope`.
-- [x] Task ID: F01.3-FE | Assigned Role: Frontend/Mobile Developer | Status: Done | `dictionary_asset.dart` parse + `_buildIndex` re-normalize/dedupe into `Set<String>`. Representation decision + measurement in `frontend.md` §14.
-- [x] Task ID: F01.4-FE | Assigned Role: Frontend/Mobile Developer | Status: Done | Fail-safe on missing/corrupt/empty with exact diagnostic codes; `StateError` after `dispose`. 6 tests.
-- [x] Task ID: F01.5-FE | Assigned Role: Frontend/Mobile Developer | Status: Done | `LanguageCode.{tr,en}`; per-language `normalizeFn`; `switchLanguage` atomic swap, no residue; `en` stub. 6 tests.
-- [x] Task ID: F01.6-FE | Assigned Role: Frontend/Mobile Developer | Status: Done | `assets/tr/dictionary.json` (101 provisional words / 30 five-letter targets) + `assets/en/dictionary.json` stub.
-- [x] Task ID: F01.7-FE | Assigned Role: Frontend/Mobile Developer | Status: Done | 56 tests; `qa_word_set_test.dart` golden set vs the real shipped asset; `frontend.md` delivered.
-- [x] Task ID: F01.1-QA | Assigned Role: QA | Status: Done | Every AC + contract item mapped to an executed test (`qa.md` §4/§6). Public API matches contract verbatim.
-- [x] Task ID: F01.2-QA | Assigned Role: QA | Status: Done | `İ≠I` distinct keys (verified vs real asset: `kir`/`kır`); casing invariance; full normalization table; malformed/over-long/`q w x`/accented-Latin → `false` no throw; `minLength` short-circuit.
-- [x] Task ID: F01.3-QA | Assigned Role: QA | Status: Done | missing/corrupt/wrong-shape/empty → fail-safe + exact codes; `StateError` after dispose; `en` isolation; `switchLanguage` no residue both directions.
-- [x] Task ID: F01.4-QA | Assigned Role: QA | Status: Done | Evidence class `automated functional` confirmed sufficient (`architecture.md` QA Focus + `platform.md` §10). `melos run format:check`/`analyze`/`test` (56) executed green + independent QA probe. Verdict emitted.
+None — feature terminal (Done, 2026-09-05).
 
-_All F01 execution tasks complete. Verdict: Approved with Notes. Awaiting Tech Lead global-state sync + terminal cleanup (`Active Task Ledger → None`)._
+Historical task record (all complete):
+
+- [x] F01.0-PS (Project Setup) — melos monorepo + 6 pure-Dart packages + Flutter `app` scaffolded per `setup-manifest.md` Steps 1–7.
+- [x] F01.1-FE … F01.7-FE (Frontend/Mobile Developer) — `looplet_core` Turkish case + normalization; `looplet_dictionary` full public API; provisional `assets/tr|en/dictionary.json`; app wiring (rootBundle source + Riverpod providers + `ProviderScope`). 56 workspace tests.
+- [x] F01.1-QA … F01.4-QA (QA) — AC + contract traceability; Turkish correctness + misuse matrix; fail-safe + language isolation; evidence-class + CI. Verdict: **Approved with Notes** (`qa.md`).
 
 ---
 
@@ -108,49 +101,21 @@ _All F01 execution tasks complete. Verdict: Approved with Notes. Awaiting Tech L
 
 ## Last Update
 
-* Updated By: QA
+* Updated By: Tech Lead
 * Timestamp: 2026-09-05
-* Summary: F01 QA complete — verdict **Approved with Notes**. Scope: client-only, automated functional. QA executed `melos run format:check` / `analyze` / `test` (56 green) + an independent QA probe (created, run green, removed) asserting contract behaviors directly against the real shipped `assets/tr/dictionary.json`: `İ≠I` distinctness (`kir`/`kır`), fail-safe codes (missing/corrupt/empty), language isolation + no `switchLanguage` residue (both directions), `minLength` short-circuit, `StateError` after `dispose`, malformed/circumflex handling. Every `prd.md` system requirement + every AC mapped to an executed test (`qa.md` §3/§4). Contract fully preserved (`qa.md` §6). Two non-blocking notes for Tech Lead (architecture wording re: asset declaration; Android CI build) + one content follow-up (provisional dictionary). No required fixes. `qa.md` written. Not committed to git.
+* Summary: F01 closed. Reconciled QA verdict **Approved with Notes** — delivery reconciliation passed (task coverage complete, contract fully preserved per `qa.md` §6, evidence = executed automated suites + independent probe, no required fixes). Notes are genuinely non-blocking; Release Scope = none → no release gate. Terminal cleanup applied (Status = Done, Current Owner = -, Active Task Ledger = None, Next Action = Closed). Applied an additive clarification to `architecture.md` "Integration Rules" documenting the package-declares-its-own-assets bundling mechanism (`LanguageCode.assetPath` / bundle key unchanged — no contract change). `feature-board.md` and `system-state.md` synced in the same turn; F02 (grid-engine) activated.
 
 ---
 
 ## Next Role
 
-Tech Lead
+Closed
 
 ---
 
 ## Next Action
 
-### Tech Lead
-
-```text
-Reconcile F01 QA verdict (Approved with Notes) and sync global state.
-
-1. Global state sync (Tech Lead-owned):
-   - feature-board.md: F01 dictionary-service Status Not Started/In Progress -> Done; Owner -> - ; QA -> QA.
-     Update "Last Updated", "Active Phase", "Active Owner" (F01 is the first feature; next up is F02).
-   - system-state.md: Active Feature -> F02 (next), or "—" pending F02 activation; Current Phase/Role/Reason;
-     Last Completed Action = QA F01 Approved with Notes 2026-09-05; Next Expected Action = activate F02.
-   - This orchestration: terminal cleanup per role-execution-contract §6 — Current Status = Done,
-     Current Owner = -, Active Task Ledger = None, Next Role = Tech Lead (or F02's first role), Next Action = Closed.
-
-2. Apply the architecture.md wording fix (non-blocking, no re-QA):
-   features/f01-dictionary-service/architecture.md "Integration Rules" — the dictionary assets are declared by
-   looplet_dictionary's own pubspec.yaml (flutter: assets:), NOT by app/pubspec.yaml. The app provides the
-   rootBundle-backed DictionaryAssetSource; bundle key packages/looplet_dictionary/assets/<lang>/dictionary.json
-   and LanguageCode.assetPath are unchanged.
-
-3. Informational: confirm the Android job in .github/workflows/ci.yml is green on first CI run (melos run build:app
-   was not runnable locally — no Android SDK). iOS release build passed locally.
-
-4. Activate F02 (grid-engine): P0, depends on F01 (now Done). Open features/f02-grid-engine/ with prd.md +
-   architecture.md + orchestration.md; run the complexity decision (F02 is likely COMPLEX — state machine,
-   locked/frozen tile rules, determinism matrix). Route to Technical Analyst or straight to contract + implementation
-   per that decision.
-
-Release gate: none for F01 (Release Scope = none). No DevOps/Release Engineer step.
-```
+Closed. F01 dictionary-service is Done (2026-09-05). Non-blocking follow-ups tracked in `## Blockers` (architecture clarification applied; Android CI confirmation; provisional-dictionary content swap = PO/content deliverable, no code re-open). Workflow continues at `features/f02-grid-engine/orchestration.md`.
 
 ---
 
@@ -162,3 +127,4 @@ Release gate: none for F01 (Release Scope = none). No DevOps/Release Engineer st
 * v4 (2026-09-03) — Project Setup: F01.0-PS done. Melos monorepo scaffolded (6 pure-Dart packages + Flutter `app`), all gates green except Android bundle build (deferred to CI — no local Android SDK). No dep substitutions. Current Owner → Frontend/Mobile Developer; Next Role → Frontend/Mobile Developer for F01.1-FE. Scaffold on disk, uncommitted.
 * v5 (2026-09-03) — Frontend/Mobile Developer: F01.1-FE … F01.7-FE done. `looplet_core` normalization + `looplet_dictionary` service + provisional assets + app wiring. 56 tests green; format/analyze/iOS-build green. One recorded deviation from an `architecture.md` note (assets declared package-side, not app-side — no contract impact; flagged for Tech Lead). Current Owner → QA; Next Role → QA (client-only). Uncommitted.
 * v6 (2026-09-05) — QA: verdict **Approved with Notes**. Client-only automated functional scope. 56 tests + independent QA probe executed green against the real shipped asset. Every prd.md requirement + AC traced to an executed test; contract fully preserved. 2 non-blocking notes (architecture wording; Android CI) + 1 content follow-up. No required fixes. Current Owner → Tech Lead; Next Role → Tech Lead for global-state sync + F02 activation.
+* v7 (2026-09-05) — Tech Lead: F01 reconciled and **closed (Done)**. Delivery reconciliation passed; notes non-blocking; no release gate (Release Scope = none). Terminal cleanup applied. `architecture.md` "Integration Rules" clarified (package-declares-assets mechanism; no contract change). `feature-board.md` + `system-state.md` synced same turn. F02 (grid-engine) activated → `features/f02-grid-engine/`.

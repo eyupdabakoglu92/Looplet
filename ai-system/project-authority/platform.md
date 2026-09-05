@@ -1,6 +1,6 @@
 # Project Platform Authority — LOOPLET
 
-Last Updated: 2026-09-03
+Last Updated: 2026-09-05
 Owner: Tech Lead
 
 ---
@@ -180,7 +180,7 @@ Melos-managed monorepo. Domain packages import **no** Flutter.
 * **Date/time:** UTC epoch millis internally; monotonic `Stopwatch` for durations; `dailyDate` is a device-local `YYYY-MM-DD`.
 * **Turkish locale (HARD RULE):** game and dictionary logic must never call Dart's default `String.toUpperCase()` / `toLowerCase()` on letters. Use the explicit Turkish case map in `looplet_core` (`İ↔i`, `I↔ı`, and `ç ğ ö ş ü` preserved). `İ` and `I` are distinct letters everywhere.
 * **Localization:** Flutter `gen-l10n` with ARB files; `tr` is the default locale, `en` is scaffolded; no hardcoded user-facing strings; the dictionary is keyed by language; RTL is out of scope for the MVP.
-* **Shared identifiers / enums:** puzzle schema enums are defined once in `looplet_content`; Firestore docs mirror the same string values.
+* **Shared identifiers / enums:** *serialized* puzzle-schema enums (`difficultyLabel`, `puzzleType`) are defined once in `looplet_content`; Firestore docs mirror the same string values. *Engine primitive* value types (`MoveAxis`, `MoveDirection`, `TileStatus`, `GridCoord`) are defined in `looplet_core` — so `looplet_engine` (which must not depend on `looplet_content`, per §3) can use them — and `looplet_content` re-exports them so downstream code has one import site. (Carve-out added 2026-09-05 with F02 activation.)
 * **Determinism:** no runtime RNG anywhere in gameplay or content selection on device. Any shuffling/generation happens only in `tools/looplet_authoring` at authoring time.
 
 ---

@@ -184,6 +184,7 @@ class DictionaryService {
 
 * Backend → frontend mapping: n/a (no backend).
 * The Flutter app provides the concrete `DictionaryAssetSource` (backed by `rootBundle`) and `DictionaryLogger` (backed by the app logger / Crashlytics non-fatal). Tests provide fakes.
+* Asset bundling: `looplet_dictionary` declares its own asset files in its `pubspec.yaml` `flutter:` `assets:` section (a package that ships assets — the package stays free of a `flutter` SDK dependency). The app therefore gets them in the bundle automatically and reads them at the key `packages/looplet_dictionary/assets/<lang>/dictionary.json` (= `LanguageCode.assetPath`). The app pubspec does **not** re-declare these assets. (Impl decision reconciled 2026-09-05 — the app-side directory declaration form does not resolve a dependency's assets in Flutter.)
 * `looplet_dictionary` depends on `looplet_core` only. It must not depend on `flutter`, `looplet_engine`, `looplet_content`, or any Firebase package.
 * The service instance is owned by an app-level Riverpod provider (session-level, not screen-level); screens never construct or dispose it.
 * Navigation / route contract: n/a (no UI).
