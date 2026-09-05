@@ -7,25 +7,40 @@
 
 ## Current Status
 
-**In Progress** → analysis delivered; pending Tech Lead contract finalization
+**In Progress**
 
 ---
 
 ## Current Owner
 
-Tech Lead
+Frontend/Mobile Developer
 
 ---
 
 ## Current Phase
 
-Analysis complete → Tech Lead contract finalization (lock the `analysis.md` §17 items into `architecture.md`, open FE/QA tasks)
+Frontend Development (contract finalized from `analysis.md`; implement the toolchain + smoke set)
+
+---
+
+## Consumed Signals
+
+* `analysis.md` consumed into `architecture.md` on 2026-09-05. Downstream roles use `architecture.md` as contract authority; read `analysis.md` only for the deeper rationale (§12 algorithm analysis, §16 task breakdown detail).
+* Unresolved analysis questions: **None** — the 7 open items are resolved in `architecture.md`; what remains ("Open Technical Decisions") are tunable *values* (budget numbers, difficulty weights, frequency table source) that do not block implementation.
 
 ---
 
 ## Active Task Ledger
 
-- [x] Task ID: F06.0-AN | Assigned Role: Technical Analyst | Status: Done | `analysis.md` delivered — all 7 open items resolved with options + trade-offs + a marked recommendation: (1) **forward BFS** + `canonicalKey` visited + `SearchBudget` (bidirectional BFS from `platform.md` §13 dropped — goal-is-a-set + frozen-thaw irreversibility break meet-in-the-middle); (2) computable §48 metric definitions + score formula + label thresholds (weights/thresholds configurable); (3) `looplet_content` engine-free, `Puzzle` stores raw fields + `toEngineConfig()` in a consumer; (4) CLI-only, `solve`/`playtest`/`export`/`check`/`fill`; (5) seeded Turkish-frequency `fill` + offensive/near-target filter; (6) Daily pool ~60 + date→id manifest + no-repeat-window 30d; (7) `looplet_solver` → `looplet_engine` only, `WordValidator` adapter in `tools`. Plus functional breakdown, edge cases, task breakdown (F06.1–F06.8), Delivery Note (LOCK vs OPEN). Recommends F06 delivers **toolchain + smoke set**; full 30 Journey + ~60 Daily authoring = separate content task.
+- [x] Task ID: F06.0-AN | Assigned Role: Technical Analyst | Status: Done | `analysis.md` delivered; consumed into `architecture.md` (7 open items resolved).
+- [ ] Task ID: F06.1-FE | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: `looplet_content` `Puzzle` model + `fromJson`/`toJson` + `PuzzleType`/`DifficultyLabel` enums + `PuzzleFormatException`. `looplet_content` → `looplet_core` only. Tests: lossless round-trip; reject missing `optimalMoves` / bad `schemaVersion` / bad shape / bad `"r,c"` coord / wrong type; ignore unknown keys. (`difficultyBreakdown` required in the artifact — confirm here.)
+- [ ] Task ID: F06.2-FE | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: `looplet_solver` `Solver.solve` — forward BFS over `GridState.canonicalKey` (visited `Set<String>` + parent `Map`), successors from `EngineConfig.legalMoves` sorted by a total `Move` order, FIFO, `SearchBudget` (maxDepth 16 / maxNodes 5M / timeBudget 30s). `SolveResult` sealed (`Optimal(moves, sequence)` | `Unsolvable` | `BudgetExceeded(budget)`). `looplet_solver` → `looplet_engine` only. Tests: minimality vs an INDEPENDENT exhaustive reference (brute-force DFS enumerating all solutions ≤ small bound — not the same BFS) on no-tiles / locked / 1-frozen / 2-frozen; `Unsolvable`; `BudgetExceeded`; determinism (identical `moves` + byte-identical `sequence`); returned sequence uses only `applied` moves and reaches `isSolved`.
+- [ ] Task ID: F06.3-FE | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: `Solver.enumerateOptimalSolutions(config, validator, {cap})` — up to `cap` distinct optimal solutions in a deterministic order. Tests: small puzzle with a known count; `cap` behavior ("≥ cap").
+- [ ] Task ID: F06.4-FE | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: `DifficultyScorer.score` + `DifficultyWeights`/`DifficultyThresholds` (const defaults, overridable). Implement the 6 metrics per `architecture.md` "Difficulty Score" table (`o`, `cNorm`, `tdDegree`, `L`, `F`, `firstMoves`, `distinctOptimalSolutions`), the score formula, and the label. Tests: determinism for fixed weights/thresholds; per-metric monotonicity; documented thresholds honored; a few hand-checked reference puzzles.
+- [ ] Task ID: F06.5-FE | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: `tools/looplet_authoring` CLI (`package:args`) + JSON def-file parser + `solve` / `playtest` / `export` commands + the export gate + `Puzzle` artifact writer + the `WordValidator`→`DictionaryService` adapter (here, not in `looplet_solver`). Move shorthand `R<i>`/`L<i>`/`D<i>`/`U<i>`. Tests (CLI invoked from `dart test`): `export` exits non-zero + writes nothing on `unsolvable` / `budgetExceeded` / `optimalMoves == 0` / malformed def; `playtest` per-step reporting; `solve` output shape; a valid `export` re-decodes losslessly with `optimalMoves` == a fresh solve.
+- [ ] Task ID: F06.6-FE | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: `check <dir|glob>` command — `Puzzle` schema; re-verify stored `optimalMoves` == fresh `Solver.solve`; Journey level 1–3 ⇒ `columnMovesEnabled == false`; `difficultyLabel` in the §20 band for the level number; Journey internal dedup; Journey↔Daily dedup; Daily `manifest.json` no-repeat-window (30d); shipped `targetWord` is `isEligibleTarget` (F01). Wire `looplet_authoring check content/` into `.github/workflows/ci.yml` as a required job. Tests: planted bad artifacts each caught with a named failure.
+- [ ] Task ID: F06.7-FE | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: `fill --seed <n> [--frozen-safe] [--avoid-near-target]` — seeded Turkish letter-frequency weighted sampler (a ~29-entry `const` table; pick a published source) + offensive-string guard (always on) + `--avoid-near-target` edit-distance-1-from-target filter (default off) + bounded retry. Tests: seed reproducibility; statistical closeness to the frequency table vs uniform; RNG confined to the seeded generator; reject an already-solved fill. Also: while touching `looplet_engine` for the solver work, tidy `GridState.applyMove` to read all `EngineConfig` fields from one source (carried F02 non-blocking note).
+- [ ] Task ID: F06.SMOKE-FE | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: Author a ~5-puzzle smoke set (one per §20 curve band: no-tiles / columns-disabled levels 1–3 / locked / frozen / locked+frozen), run each through `solve` → `export` → `check`, commit to `content/journey/tr/` (or a `content/smoke/` dir). Proves the pipeline end to end; `check content/` green in CI. **Not** the full 30 Journey + Daily pool — that is `F06-CONTENT` (follow-on, see Open Tasks).
 
 ---
 
@@ -47,22 +62,37 @@ Analysis complete → Tech Lead contract finalization (lock the `analysis.md` §
 - [x] (F06.0-AN) Technical analysis of F06 — done. Output: `features/f06-puzzle-content-and-solver-tooling/analysis.md`.
 
 ### Backend
-- _(none — F06 has no server; the "backend" work here is the pure-Dart `looplet_solver` + `looplet_content`, sequenced under Frontend/Mobile Developer once the contract is finalized)_
+- _(none — F06 has no server; `looplet_solver` + `looplet_content` are pure Dart, sequenced under Frontend/Mobile Developer)_
 
 ### Frontend
-- [ ] (F06.x-FE) Placeholder — populated by the Tech Lead after the Analyst pass + contract finalization. Expected shape: `looplet_content` `Puzzle` model + JSON; `looplet_solver` search + `SolveResult`; difficulty scorer; `tools/looplet_authoring` CLI (`solve` / `playtest` / `export` + definition input); content-generation helpers; the 30 Journey artifacts + Daily pool; the build-time content check; tests.
+- [ ] (F06.1-FE) `looplet_content` `Puzzle` model + JSON + enums + `PuzzleFormatException`.
+- [ ] (F06.2-FE) `looplet_solver` forward-BFS `Solver.solve` + `SolveResult` + `SearchBudget`.
+- [ ] (F06.3-FE) `Solver.enumerateOptimalSolutions` (bounded, deterministic).
+- [ ] (F06.4-FE) `DifficultyScorer` + configurable weights/thresholds + the 6 metrics.
+- [ ] (F06.5-FE) `tools/looplet_authoring` CLI — `solve` / `playtest` / `export` + export gate + def-file parser + `WordValidator` adapter.
+- [ ] (F06.6-FE) `check` command + CI wiring.
+- [ ] (F06.7-FE) `fill` helper (seeded Turkish-frequency + guards) + carried `applyMove` config-source tidy.
+- [ ] (F06.SMOKE-FE) ~5-puzzle smoke set through `solve` → `export` → `check`; committed; CI green.
 
 ### QA
-- [ ] (F06.x-QA) Placeholder — populated by the Tech Lead after contract finalization. Expected: solver minimality vs exhaustive-BFS reference; locked/frozen honoring; `unsolvable` / `budgetExceeded`; determinism + stable tie-break; `Puzzle` round-trip + schema rejection; difficulty determinism + thresholds; CLI behaviors incl. export gate; build-time content check catches planted bad artifacts; Turkish-frequency + seeded reproducibility.
+- [ ] (F06.1-QA) Solver minimality vs an independent exhaustive reference (no-tiles / locked / 1-frozen / 2-frozen); `Unsolvable` + `BudgetExceeded`; determinism + byte-stable tie-break; returned sequence uses only `applied` moves and reaches `isSolved`.
+- [ ] (F06.2-QA) `Puzzle` JSON lossless round-trip; `PuzzleFormatException` for missing `optimalMoves` / bad `schemaVersion` / malformed shape / bad coord / wrong type; unknown-key tolerance.
+- [ ] (F06.3-QA) Difficulty determinism (fixed weights/thresholds); per-metric monotonicity; documented thresholds honored; `breakdown` fields present.
+- [ ] (F06.4-QA) CLI: `solve` / `playtest` / `export` / `check` / `fill` behaviors; `export` gate exit codes + no-file guarantee; `check` catches every planted bad artifact (no `optimalMoves`; level-2 with columns enabled; Journey↔Daily dup; stored optimal ≠ fresh solve; ineligible target); `fill` seed reproducibility + frequency closeness.
+- [ ] (F06.5-QA) Build-time `check content/` wired into CI and green on the committed smoke set; RNG confined to `fill`; evidence class `automated functional` confirmed sufficient. Emit verdict → Tech Lead.
+
+### Content (follow-on — NOT part of the F06 implementation delivery)
+- [ ] (F06-CONTENT) Author the full 30 Journey levels (honoring the source §20 difficulty curve) + the ~60-puzzle Daily pool + `daily/<lang>/manifest.json`; run `check`; commit to `content/`. Owner: Level Designer / user. Gated on F06 (toolchain) reaching `Done` with a QA-approved pipeline. Still MVP scope (product PRD §42) and a prerequisite for F05 and F07 reaching `Done`. Tunable values finalized here: `SearchBudget` numbers, `DifficultyWeights`/`DifficultyThresholds`, the Turkish frequency table source, MVP Daily pool size + band.
 
 ---
 
 ## Blockers
 
-* None. Analysis complete (`analysis.md`); Tech Lead contract finalization next.
+* None. Contract finalized in `architecture.md`; F06.1-FE … F06.SMOKE-FE ready for Frontend/Mobile Developer.
 * Dependency note: F01 (Done) + F02 (Done) — F06 builds directly on F02's `GridState` / `applyMove` / `canonicalKey` / `legalMoves` and F01's `WordValidator`.
-* Carried non-blocking note (from F02 QA): when `looplet_engine` is next touched (likely by F06's solver work), tidy `GridState.applyMove` to read all `EngineConfig` fields from one source. No defect today.
-* Flagged for Tech Lead: `analysis.md` recommends forward BFS instead of `platform.md` §13's "bidirectional BFS" — §13 should be updated. Not a blocker (F06's `architecture.md` is the feature contract authority).
+* Carried into F06.7-FE (from F02 QA): tidy `GridState.applyMove` to read all `EngineConfig` fields from one source while `looplet_engine` is open for the solver work. No defect today.
+* `platform.md` §13 amended 2026-09-05 (bidirectional BFS → forward BFS + `SearchBudget`); §3 layout note + `Open Technical Decisions` updated (CLI-only).
+* Scope note: `F06-CONTENT` (full 30 Journey + Daily pool authoring) is a follow-on, NOT part of this delivery — see Open Tasks → Content. F06 (toolchain + smoke set) can reach `Done` without it; F05/F07 cannot reach `Done` without it.
 
 ---
 
@@ -79,65 +109,62 @@ Analysis complete → Tech Lead contract finalization (lock the `analysis.md` §
 
 ## Last Update
 
-* Updated By: Technical Analyst
+* Updated By: Tech Lead
 * Timestamp: 2026-09-05
-* Summary: F06.0-AN complete. `analysis.md` delivered — all 7 open items resolved with options/trade-offs/recommendation. Headline recommendations: (1) **forward BFS** over `canonicalKey` + `SearchBudget` (maxDepth 16 / maxNodes 5M / 30s) — `platform.md` §13's bidirectional BFS dropped (goal-is-a-set + frozen-thaw irreversibility); minimality is BFS-by-construction; (2) computable §48 difficulty metric definitions + score formula + configurable weights/thresholds; (3) `looplet_content` stays engine-free (`Puzzle` raw fields + consumer-side `toEngineConfig()`); (4) CLI-only (`solve`/`playtest`/`export`/`check`/`fill`), JSON def-files; (5) seeded Turkish-frequency `fill` + offensive/near-target filter; (6) Daily pool ~60 + date→id manifest + 30d no-repeat, medium/hard band; (7) `looplet_solver` → `looplet_engine` only, dictionary adapter in `tools`. Task breakdown F06.1–F06.8; recommends F06 ships **toolchain + ~5-puzzle smoke set**, full 30 Journey + ~60 Daily = separate content task. Flagged: `platform.md` §13 should be updated by the Tech Lead.
+* Summary: F06 contract finalized. Consumed `analysis.md` into `architecture.md` — all [PENDING ANALYSIS] sections → [LOCKED]: forward BFS + `SearchBudget` (bidirectional BFS dropped); `looplet_content` engine-free (`Puzzle` raw fields + `toEngineConfig()` helper); `looplet_solver` → `looplet_engine` only (dict adapter in `tools`); `Puzzle` JSON shape; CLI-only (`solve`/`playtest`/`export`/`check`/`fill`); difficulty metric *definitions* locked, weights/thresholds configurable; `content/` layout + `check` rules. Amended `platform.md` §13 (bidirectional → forward BFS) + §3/§13 notes (CLI-only). **Scope split accepted:** F06 delivers the toolchain (F06.1-FE … F06.7-FE) + a ~5-puzzle smoke set (F06.SMOKE-FE); the full 30 Journey + ~60 Daily authoring is `F06-CONTENT` (follow-on, Level-Designer-owned, still MVP, prerequisite for F05/F07 `Done`). Opened F06.1-FE … F06.SMOKE-FE + F06.1-QA … F06.5-QA. Current Owner → Frontend/Mobile Developer.
 
 ---
 
 ## Next Role
 
-Tech Lead
+Frontend/Mobile Developer
 
 ---
 
 ## Next Action
 
-### Tech Lead
+### Frontend/Mobile Developer
 
 ```text
-Finalize the F06 contract from analysis.md.
+Implement the F06 toolchain + smoke set. Authority: features/f06-puzzle-content-and-solver-tooling/architecture.md
+(contract — the [LOCKED] sections; the "Open Technical Decisions" are tunable start-values, use the recommended ones).
+Deeper rationale in analysis.md (§12 algorithm, §16 task detail). Inherited: F02 architecture.md (GridState /
+applyMove / canonicalKey / legalMoves) + F01 WordValidator.
 
-1. Move analysis.md §17 "LOCK" items into features/f06-.../architecture.md, converting each [PENDING ANALYSIS]
-   section to [LOCKED]:
-   - Solver = forward BFS over GridState.canonicalKey visited set + parent map, fixed Move successor order, FIFO;
-     first isSolved dequeued = provable minimum (goal tested on dequeue). SolveResult = Optimal(moves, sequence) |
-     Unsolvable | BudgetExceeded(budget); deterministic, byte-stable sequence. SearchBudget defaults
-     maxDepth 16 / maxNodes 5,000,000 / timeBudget 30s (tunable; mechanism locked). IDA* = documented per-puzzle
-     fallback only. Bidirectional BFS NOT adopted.
-   - looplet_content depends on looplet_core only; Puzzle stores raw fields; a consumer builds EngineConfig via
-     toEngineConfig(). Puzzle.language is a validated String.
-   - looplet_solver depends on looplet_engine only; WordValidator->DictionaryService adapter lives in
-     tools/looplet_authoring.
-   - Puzzle JSON shape per analysis.md §5 (grid row strings; "r,c" coords; unknown keys ignored; typed
-     PuzzleFormatException; optimalMoves required + non-nullable).
-   - CLI-only. Commands solve / playtest / export / check / fill. export gate: non-zero exit + no file on
-     unsolvable / budgetExceeded / optimalMoves == 0. check is the CI content gate; add to .github/workflows/ci.yml.
-   - Difficulty: lock the metric DEFINITIONS (analysis.md §12 table); keep weights + thresholds in a configurable
-     DifficultyWeights/DifficultyThresholds value (const defaults, recalibrated after F06.8).
-   - Content layout content/journey/<lang>/levelNN.json, content/daily/<lang>/pool/*.json,
-     content/daily/<lang>/manifest.json; check enforces Journey band consistency + Journey internal + Journey<->Daily
-     dedup + Daily no-repeat-window (30d).
+Order (Active Task Ledger):
+1. F06.1-FE — looplet_content Puzzle model + fromJson/toJson + PuzzleType/DifficultyLabel + PuzzleFormatException.
+   looplet_content -> looplet_core ONLY. Round-trip + rejection tests. difficultyBreakdown: include as required.
+2. F06.2-FE — looplet_solver Solver.solve: forward BFS over GridState.canonicalKey (visited Set<String> + parent Map),
+   successors = config.legalMoves(state) sorted by a total Move order, FIFO, SearchBudget(maxDepth: 16,
+   maxNodes: 5000000, timeBudget: 30s). SolveResult sealed (Optimal / Unsolvable / BudgetExceeded). looplet_solver ->
+   looplet_engine ONLY. A Stopwatch IS allowed in looplet_solver (build-time tooling; the no-clock guard is
+   looplet_engine-only). Tests: minimality vs an INDEPENDENT exhaustive reference (brute-force DFS enumerating all
+   solutions <= a small bound — NOT the same BFS code) on no-tiles / locked / 1-frozen / 2-frozen; Unsolvable;
+   BudgetExceeded; determinism (identical moves + byte-identical sequence); returned sequence uses only applied moves
+   and reaches isSolved.
+3. F06.3-FE — Solver.enumerateOptimalSolutions(config, validator, {cap}) — deterministic order, "<= cap" semantics.
+4. F06.4-FE — DifficultyScorer.score + DifficultyWeights/DifficultyThresholds (const defaults from architecture.md,
+   overridable). Implement o / cNorm / tdDegree / L / F / firstMoves / distinctOptimalSolutions per the
+   architecture.md "Difficulty Score" table; the score formula; the label. Determinism + monotonicity tests.
+5. F06.5-FE — tools/looplet_authoring CLI (package:args). JSON def-file parser. solve / playtest / export commands +
+   export gate (non-zero exit + no file on unsolvable / budgetExceeded / optimalMoves == 0 / malformed def).
+   The WordValidator->DictionaryService adapter lives HERE (tools depends on looplet_dictionary; looplet_solver does
+   NOT). Move shorthand R/L/D/U + index. CLI-invoked-from-dart-test tests.
+6. F06.6-FE — check <dir|glob> command (schema; re-verify optimalMoves vs a fresh solve; Journey band + columns for
+   levels 1-3; Journey internal + Journey<->Daily dedup; Daily manifest no-repeat-window 30d; targetWord eligibility).
+   Wire `looplet_authoring check content/` into .github/workflows/ci.yml. Planted-bad-artifact tests.
+7. F06.7-FE — fill --seed helper (seeded Turkish letter-frequency table ~29 entries — pick a published source; a
+   const map is fine; record the source in a comment) + offensive-string guard (always) + --avoid-near-target
+   (default off) + bounded retry. Seed-reproducibility + frequency-closeness tests. ALSO: tidy GridState.applyMove in
+   looplet_engine to read all EngineConfig fields from one source (carried F02 non-blocking note) — re-run the F02
+   engine suite to confirm no regression.
+8. F06.SMOKE-FE — author ~5 Journey puzzles (one per curve band: no-tiles / columns-disabled / locked / frozen /
+   locked+frozen) via def-files, run solve -> export -> check, commit under content/journey/tr/ (or content/smoke/),
+   confirm `check content/` green.
 
-2. Keep OPEN (record in architecture.md "Open Technical Decisions", do not block implementation): exact SearchBudget
-   numbers + difficulty weights/thresholds (finalize during F06.8); Turkish frequency table source; near-target filter
-   strength for MVP; MVP Daily pool size + band; difficultyBreakdown required vs optional; package:args in the tool.
-
-3. Decide the SCOPE SPLIT (analyst recommendation): F06 implementation = F06.1–F06.7 (toolchain) + a ~5-puzzle smoke
-   set; full 30 Journey + ~60 Daily authoring = a separate follow-on content task (owner TBD), still required before
-   F05/F07 ship. Confirm or override.
-
-4. Decide whether to amend project-authority/platform.md §13 (bidirectional BFS -> forward BFS + bound). Analyst
-   recommends yes.
-
-5. Replace the F06 orchestration "Frontend" / "QA" placeholder tasks with the concrete F06.1-FE … F06.7-FE +
-   F06.1-QA … F06.5-QA tasks from analysis.md §16; set Next Role = Frontend/Mobile Developer.
-
-6. Carry the F02 non-blocking note: while touching looplet_engine for F06's solver, tidy GridState.applyMove to
-   read all EngineConfig fields from one source.
-
-Consumed Signals: analysis.md consumed into architecture.md on 2026-09-05 (once step 1 is done). Next Role after
-Tech Lead = Frontend/Mobile Developer.
+Verify from repo root: melos run format:check && melos run analyze && melos run test
+Produce features/f06-.../frontend.md: task-to-code traceability; the solver's worst-case node/time on the smoke set;
+the difficulty weights/thresholds used; per-AC evidence. On completion set Next Role = QA.
 ```
 
 ---
@@ -146,3 +173,4 @@ Tech Lead = Frontend/Mobile Developer.
 
 * v1 (2026-09-05) — Tech Lead: F06 created and activated after F02 `Done`. `prd.md` + initial `architecture.md` (LOCKED substrate + gates; PENDING ANALYSIS for 7 items) + orchestration. Complexity COMPLEX → Technical Analyst pass (F06.0-AN → `analysis.md`). Routing: Technical Analyst → Tech Lead (finalize contract) → Frontend/Mobile Developer → QA → Tech Lead.
 * v2 (2026-09-05) — Technical Analyst: F06.0-AN done. `analysis.md` delivered (7 items resolved + recommendation; functional breakdown; edge cases; task breakdown F06.1–F06.8; LOCK-vs-OPEN Delivery Note). Recommends forward BFS (not bidirectional), engine-free `looplet_content`, CLI-only, toolchain + smoke-set scope. Current Owner → Tech Lead; Next Role → Tech Lead to finalize `architecture.md`.
+* v3 (2026-09-05) — Tech Lead: F06 contract **finalized**. `analysis.md` consumed into `architecture.md` (all [PENDING ANALYSIS] → [LOCKED]). `platform.md` §13 amended (forward BFS + `SearchBudget`; bidirectional dropped) + §3/§13 CLI-only notes. Scope split accepted: F06 = toolchain + ~5-puzzle smoke set; `F06-CONTENT` (full 30 Journey + Daily pool) = Level-Designer follow-on, still MVP, prerequisite for F05/F07 `Done`. Opened F06.1-FE … F06.SMOKE-FE + F06.1-QA … F06.5-QA. Current Owner → Frontend/Mobile Developer; Next Role → Frontend/Mobile Developer.

@@ -1,6 +1,6 @@
 # System State — LOOPLET
 
-Last Updated: 2026-09-05 (F02 closed, F06 activated)
+Last Updated: 2026-09-05 (F02 closed; F06 activated + contract finalized)
 
 > Global workflow snapshot. Stack/runtime authority lives in `project-authority/platform.md`; release authority in `project-authority/release.md`. This file carries the current snapshot only.
 
@@ -71,23 +71,23 @@ Last Updated: 2026-09-05 (F02 closed, F06 activated)
 
 ## Current Phase
 
-* Analysis — F06 puzzle-content-and-solver-tooling
+* Frontend Development — F06 puzzle-content-and-solver-tooling (toolchain + smoke set)
 
 ## Current Role
 
-* Technical Analyst
+* Frontend/Mobile Developer
 
 ## Current Reason
 
-* F01 and F02 both Done (QA Approved with Notes, 2026-09-05). F06 — the build-time solver + level editor + `looplet_content` `Puzzle` model — activated as the last P0; F05 (Journey) and F07 (Daily) need its content-production pipeline. Complexity is high and several parts are genuinely open (provable-minimum search algorithm with frozen-thaw branching; computable definitions for the §48 difficulty-score parameters; editor scope; content-artifact schema). Tech Lead routed to a **Technical Analyst** pass before finalizing the contract.
+* F01 + F02 Done. F06 activated (last P0): Technical Analyst pass (`analysis.md`) → Tech Lead contract finalized (`architecture.md`). Solver = **forward BFS** over F02's `canonicalKey` + `SearchBudget` (bidirectional BFS from `platform.md` §13 dropped — amended). Scope split: F06 = `looplet_solver` + `looplet_content` `Puzzle` + `tools/looplet_authoring` CLI + a ~5-puzzle smoke set; `F06-CONTENT` (full 30 Journey + ~60 Daily authoring) = Level-Designer follow-on, still MVP, prerequisite for F05/F07 `Done`. Frontend/Mobile Developer implements F06.1-FE … F06.SMOKE-FE next.
 
 ## Last Completed Action
 
-* Tech Lead — 2026-09-05 — Closed F02 (Done; reconciled QA Approved with Notes, terminal cleanup). Activated F06: `prd.md` + initial `architecture.md` (locks the F02-built search substrate + build-time-only + publish gates; enumerates open decisions) + orchestration with `Current Owner = Technical Analyst`. Synced `feature-board.md` + `system-state.md`.
+* Tech Lead — 2026-09-05 — Finalized the F06 contract: consumed `analysis.md` into `architecture.md` (all [PENDING ANALYSIS] → [LOCKED]); amended `platform.md` §13 (forward BFS + `SearchBudget`) + §3/§13 CLI-only notes; accepted the toolchain-vs-content scope split; opened F06.1-FE … F06.SMOKE-FE + F06.1-QA … F06.5-QA. Synced `feature-board.md` + `system-state.md`.
 
 ## Next Expected Action
 
-* `Run Technical Analyst` — analyze F06 per `features/f06-puzzle-content-and-solver-tooling/orchestration.md → Next Action` (solver algorithm alternatives + minimality argument; §48 difficulty-metric definitions; `Puzzle` schema; editor scope; task breakdown). Then `Run Tech Lead` to finalize the contract.
+* `Run Frontend/Mobile Developer` — implement F06 per `features/f06-puzzle-content-and-solver-tooling/orchestration.md → Next Action` (F06.1-FE `Puzzle` model → F06.2-FE forward-BFS solver → … → F06.SMOKE-FE ~5-puzzle smoke set).
 
 ---
 
@@ -95,9 +95,10 @@ Last Updated: 2026-09-05 (F02 closed, F06 activated)
 
 ## Portfolio Summary
 
-* 13 features. F01 `Done`, F02 `Done`. F06 `In Progress` (Analysis). F03, F04, F05, F07–F13 `Not Started`.
+* 13 features. F01 `Done`, F02 `Done`. F06 `In Progress` (Frontend Development — toolchain + smoke set). F03, F04, F05, F07–F13 `Not Started`.
 * Priority: P0 = F01✓, F02✓, F06, F08, F03, F05 · P1 = F04, F09, F10, F07, F12 · P2 = F11, F13.
 * Critical path: F01✓ → F02✓ → **F06** → (F03, F08) → F04 → F05 → F09 → F10 → F07 → F13; F12 cross-cutting and release-blocking.
+* **`F06-CONTENT`** (full 30 Journey + ~60 Daily authoring) — a Level-Designer follow-on split off from F06; still MVP scope; blocks F05 and F07 from reaching `Done` but not F06.
 
 ## Active Rework
 
@@ -117,7 +118,7 @@ Last Updated: 2026-09-05 (F02 closed, F06 activated)
 
 ## Contract Version
 
-* v1 — established 2026-09-03. Project contract rules in `platform.md` §4. F01 + F02 contracts locked and closed. F06 initial contract (`features/f06-puzzle-content-and-solver-tooling/architecture.md`) locks the build-time-only substrate (`GridState`/`applyMove`/`canonicalKey`/`legalMoves` from F02) + publish gates (unsolvable / optimal-less → cannot export); open technical decisions pending the Technical Analyst pass. `platform.md` §11 carries the engine-primitive-enum carve-out.
+* v1 — established 2026-09-03. Project contract rules in `platform.md` §4. F01 + F02 contracts locked and closed. **F06 contract finalized 2026-09-05** (`features/f06-.../architecture.md`): forward-BFS solver over F02's `canonicalKey` + `SearchBudget`; `SolveResult` = `Optimal` | `Unsolvable` | `BudgetExceeded`; `looplet_content` engine-free `Puzzle` model + JSON; CLI-only `tools/looplet_authoring`; `export` gate; `check` CI content gate; difficulty metric definitions locked (weights/thresholds configurable). `platform.md` §11 carries the engine-primitive-enum carve-out; **§13 amended 2026-09-05** (bidirectional BFS → forward BFS + bound).
 
 ## Pending Breaking Change
 
@@ -142,7 +143,7 @@ Kural:
 
 # 9. GLOBAL RISKS
 
-* Solver optimality & performance (F06): the star rating is only fair if the stored optimal is a proven minimum; locked + multiple frozen tiles blow up the state space. Approach set in `platform.md` §13 (bidirectional BFS, build-time only); final form locked in F06 `architecture.md`.
+* Solver optimality & performance (F06): the star rating is only fair if the stored optimal is a proven minimum. Approach **finalized** — forward BFS over F02's `canonicalKey` + a `SearchBudget` (maxDepth 16 / maxNodes 5M / 30s); minimality is BFS-by-construction; `budgetExceeded` ⇒ not shippable. Residual risk: worst-case node/time on levels 26–30 (locked+frozen) — bounded by the budget; QA validates minimality against an independent exhaustive reference; `check` re-solves every artifact in CI. A dictionary corpus change invalidates all frozen-tile `optimalMoves` (must re-`export`).
 * Difficulty-curve tuning of 30 handcrafted levels (F05/F06) is manual and playtest-heavy and directly drives the Level 5 Reach and retention KPIs.
 * Turkish dictionary curation quality (F01) — proper nouns / profanity / abbreviations / archaic exclusion is manual review; frozen-tile UX depends on it. Corpus sourcing is an open Product Owner item.
 * Local-timezone daily reset (F07) — clock manipulation, DST, and travel across midnight create streak-integrity edge cases.

@@ -1,6 +1,6 @@
 # Project Platform Authority — LOOPLET
 
-Last Updated: 2026-09-05
+Last Updated: 2026-09-05 (§13 solver approach amended per F06 analysis)
 Owner: Tech Lead
 
 ---
@@ -54,7 +54,7 @@ Melos-managed monorepo. Domain packages import **no** Flutter.
 /packages/looplet_engine    pure Dart: grid model, Move, circular shift, locked/frozen, win  (F02)
 /packages/looplet_solver    pure Dart: minimum-move solver (depends on looplet_engine)       (F06 lib)
 /packages/looplet_content   pure Dart: puzzle definition models + JSON (de)serialization, schema/version enums
-/tools/looplet_authoring    Dart CLI (+ optional Flutter desktop editor) for level authoring (F06 tooling)
+/tools/looplet_authoring    Dart CLI for level authoring — solve/playtest/export/check/fill  (F06 tooling; CLI-only for MVP)
 /content                    versioned puzzle JSON artifacts (journey + daily), checked in
 /infra                      Firebase project config, Cloud Functions (TS), Firestore rules, Remote Config templates
 ```
@@ -195,7 +195,7 @@ Melos-managed monorepo. Domain packages import **no** Flutter.
 
 # 13. Open Technical Decisions (tracked)
 
-* **Solver algorithm (F06):** approach is set here — provable minimum via complete search of the 5×5 state space, build-time only, sharing `looplet_engine`. Default implementation: bidirectional BFS over a packed canonical grid-state hash; fall back to IDA* only if memory-bound on worst-case locked+frozen levels. Final form is locked in F06's `architecture.md`.
+* **Solver algorithm (F06):** approach is set here — provable minimum via complete search of the 5×5 state space, build-time only, sharing `looplet_engine`. **Implementation: forward BFS** over `GridState.canonicalKey` with a visited set + parent map + a `SearchBudget` (maxDepth / maxNodes / timeBudget); the first `isSolved` state dequeued is the proven minimum (the goal is a *set* — any full target row). Amended 2026-09-05 (F06 analysis): bidirectional BFS is **not** used — the goal-is-a-set plus the irreversibility of frozen-tile thaw break meet-in-the-middle. IDA* remains a documented per-puzzle fallback only. Final form is locked in F06's `architecture.md`.
 * **App Check enforcement level (F07/F08):** soft-enforce for the MVP; hard-enforce decision deferred.
-* **Level editor surface (F06):** CLI is the MVP-critical path; a Flutter desktop editor is optional and decided in F06.
+* **Level editor surface (F06):** CLI-only for the MVP (`solve`/`playtest`/`export`/`check`/`fill`); a Flutter desktop editor is a Future Consideration. Locked 2026-09-05 in F06's `architecture.md`.
 * **Product-analytics depth (F12):** GA4 built-in funnels/retention are assumed sufficient for the §52 gate; a dedicated tool (PostHog/Amplitude) is a Future Consideration only if GA4 proves insufficient.
