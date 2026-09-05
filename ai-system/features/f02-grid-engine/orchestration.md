@@ -7,31 +7,35 @@
 
 ## Current Status
 
-**In Progress**
+**In QA**
 
 ---
 
 ## Current Owner
 
-Frontend/Mobile Developer
+QA
 
 ---
 
 ## Current Phase
 
-Frontend Development (contract locked; implement `looplet_engine` pure core + façade)
+QA (client-only, automated — `looplet_engine` + `looplet_core` primitives + app validator wiring)
 
 ---
 
 ## Active Task Ledger
 
-- [ ] Task ID: F02.0-CORE | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: Add engine primitive value types to `looplet_core` — `MoveAxis`, `MoveDirection`, `TileStatus`, `GridCoord` (value equality + `hashCode` + row-major `compareTo`) — with unit tests. Export from the barrel.
-- [ ] Task ID: F02.1-FE | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: `EngineConfig` (fields + constructor validation + `EngineConfigError extends ArgumentError`) and `EngineConfig.legalMoves(GridState)`. Written for a square `gridSize` from config, not hard-coded 5.
-- [ ] Task ID: F02.2-FE | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: Pure `GridState` — `initial(config, validator)` (thaw + win evaluated at t=0), `letters`/`thawedCells`/`isSolved` (unmodifiable views), `statusAt`/`isMovable`, and `applyMove(move, config, validator) -> GridStep` implementing the full CONTRACT shift algorithm (steps 1–8), thaw evaluation (row-only, len-4 + len-5 windows, all-frozen-in-row thaw together, monotonic), and win evaluation (`anyRowEqualsTarget`, L→R only, Turkish-normalized, repeated letters).
-- [ ] Task ID: F02.3-FE | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: `GridState.canonicalKey()` exactly per contract (Turkish-lower row-major letters + `§` + sorted thawed coords; excludes locked/target/columnMovesEnabled; no `hashCode`/iteration-order leakage). `GridState` value `==`/`hashCode` (letters + thawedCells + isSolved). `GridStep` type.
-- [ ] Task ID: F02.4-FE | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: `GridEngine` façade — `config`/`state`/`moveCount`/`isSolved`/`appliedMoves`; `applyMove` (delegates to `state.applyMove`, appends to history iff `applied`); `undo` (removes last move, re-folds from `initialState`, `nothingToUndo`/`puzzleComplete` rejects); `restart` (clears history). Optional `restoreMoves(List<Move>)` batch for F08 if per-move replay is awkward (must equal one-by-one replay).
-- [ ] Task ID: F02.5-FE | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: `WordValidator` port + `NeverValidWordValidator` in `looplet_engine`. App-side `DictionaryWordValidator implements WordValidator` adapting F01 `DictionaryService` (`app/lib/`), plus a Riverpod provider that builds it from `dictionaryServiceProvider`. No engine→`looplet_dictionary` dependency. No game screen (F03).
-- [ ] Task ID: F02.6-FE | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: Test suite — every `prd.md` AC; shift table (4 dirs ± wrap, rows+cols, 5-shift identity); locked rotation (worked example, 2 locked/line, each position, fully-immovable → not counted); frozen thaw (len-4/len-5 window, word not through frozen cell, multi-frozen same row, different rows independent, t=0 pre-worded, NO column scan, permanence, revert on undo); win/no-win (full-row any casing, `LASAM` no, column no, `MASAL` repeats, win+thaw same move, pre-solved t=0); move counting; undo/restart; rejection matrix (`columnMovesDisabled`/`outOfRange`/`lineFullyImmovable`/`puzzleComplete`/`nothingToUndo` each leaves state+count unchanged); `EngineConfig` validation throws; `legalMoves` == applied-true set; determinism (double-fold `==` + equal `canonicalKey`; differs on any change); no-RNG guard test (no `Random`/`DateTime.now`/`dart:io` in `looplet_engine`). Produce `frontend.md` with task-to-code traceability, the letter-storage decision + a states/sec micro-benchmark note, per-AC evidence.
+- [x] Task ID: F02.0-CORE | Assigned Role: Frontend/Mobile Developer | Status: Done | `looplet_core` primitives (`MoveAxis`/`MoveDirection`/`TileStatus`/`GridCoord`), re-exported by `looplet_content`. 5 tests.
+- [x] Task ID: F02.1-FE | Assigned Role: Frontend/Mobile Developer | Status: Done | `EngineConfig` + `_validate` (→ `EngineConfigError`) + `legalMoves`. 13 + 5 tests.
+- [x] Task ID: F02.2-FE | Assigned Role: Frontend/Mobile Developer | Status: Done | Pure `GridState` + `applyMove` (shift algorithm steps 1–8, row-only thaw len 4..n, L→R Turkish-normalized win). 12 + 8 + 8 tests.
+- [x] Task ID: F02.3-FE | Assigned Role: Frontend/Mobile Developer | Status: Done | `canonicalKey` + `GridState` value equality. 10 tests.
+- [x] Task ID: F02.4-FE | Assigned Role: Frontend/Mobile Developer | Status: Done | `GridEngine` façade — `undo` re-fold from `_initialState`, `restart`, `restoreMoves` (throws `StateError` on rejected move). 10 tests.
+- [x] Task ID: F02.5-FE | Assigned Role: Frontend/Mobile Developer | Status: Done | `WordValidator` port + `NeverValidWordValidator`; `app/lib/engine/` `DictionaryWordValidator` + `wordValidatorProvider`. 2 app tests. `looplet_engine` pubspec unchanged (`looplet_core` only).
+- [x] Task ID: F02.6-FE | Assigned Role: Frontend/Mobile Developer | Status: Done | 83 engine tests + `acceptance_criteria_test.dart` (17, 1:1 with prd.md ACs) + `no_rng_guard_test.dart`. `frontend.md` with letter-storage decision (flat row-major `List<String>`) + micro-benchmark (~208k applyMove+canonicalKey ops/sec JIT).
+- [ ] Task ID: F02.1-QA | Assigned Role: QA | Status: Open | Summary: AC + contract verification (every `prd.md` AC → a passing test; public API matches `architecture.md`; shift + locked + win matrices).
+- [ ] Task ID: F02.2-QA | Assigned Role: QA | Status: Open | Summary: Frozen-tile behavior (timing, row-window scan, word-not-through-cell, multi-frozen, independence, row-only, permanence, undo-revert, thaw+win).
+- [ ] Task ID: F02.3-QA | Assigned Role: QA | Status: Open | Summary: Determinism + `canonicalKey` + rejection matrix + `EngineConfig` validation + `legalMoves` == applied-true set + no-RNG guard.
+- [ ] Task ID: F02.4-QA | Assigned Role: QA | Status: Open | Summary: Evidence class + CI; run `melos run format:check && analyze && test`; emit verdict → Tech Lead.
 
 ---
 
@@ -50,13 +54,13 @@ Frontend Development (contract locked; implement `looplet_engine` pure core + fa
 ## Open Tasks
 
 ### Frontend
-- [ ] (F02.0-CORE) `looplet_core` primitive value types (see ledger).
-- [ ] (F02.1-FE) `EngineConfig` + validation + `legalMoves`.
-- [ ] (F02.2-FE) Pure `GridState` + `applyMove` (shift algorithm, thaw eval, win eval) + `GridStep`.
-- [ ] (F02.3-FE) `canonicalKey` + value equality.
-- [ ] (F02.4-FE) `GridEngine` façade (undo re-fold, restart, moveCount).
-- [ ] (F02.5-FE) `WordValidator` port + app-side `DictionaryWordValidator` adapter + provider.
-- [ ] (F02.6-FE) Full test suite + `frontend.md`.
+- [x] (F02.0-CORE) `looplet_core` primitives — done.
+- [x] (F02.1-FE) `EngineConfig` + validation + `legalMoves` — done.
+- [x] (F02.2-FE) Pure `GridState` + `applyMove` + `GridStep` — done.
+- [x] (F02.3-FE) `canonicalKey` + value equality — done.
+- [x] (F02.4-FE) `GridEngine` façade + `restoreMoves` — done.
+- [x] (F02.5-FE) `WordValidator` port + app adapter + provider — done.
+- [x] (F02.6-FE) 83 engine tests + AC-traceability + no-RNG guard + `frontend.md` — done.
 
 ### QA
 - [ ] (F02.1-QA) AC + contract verification: every `prd.md` AC → a passing test; public API matches `architecture.md` "API / Event Contract" verbatim; shift table + locked-rotation + win/no-win matrices covered.
@@ -69,7 +73,8 @@ Frontend Development (contract locked; implement `looplet_engine` pure core + fa
 ## Blockers
 
 * None.
-* Dependency note: F01 dictionary-service is **Done** (2026-09-05). F02 consumes word validation via the injected `WordValidator` port, so it does not import `looplet_dictionary`; the app supplies a `DictionaryService` adapter (F02.5-FE).
+* Dependency note: F01 dictionary-service is **Done** (2026-09-05). F02 consumes word validation via the injected `WordValidator` port, so it does not import `looplet_dictionary`; the app supplies a `DictionaryService` adapter (`app/lib/engine/dictionary_word_validator.dart`).
+* Non-blocking (scaffold/CI): `melos run build:app` (Android AAB) still CI-only locally (no Android SDK). `flutter analyze` / `flutter test` green locally; iOS release build was green after F01.
 
 ---
 
@@ -88,51 +93,56 @@ Frontend Development (contract locked; implement `looplet_engine` pure core + fa
 
 ## Last Update
 
-* Updated By: Tech Lead
+* Updated By: Frontend/Mobile Developer
 * Timestamp: 2026-09-05
-* Summary: F02 grid-engine activated. Created `prd.md` (derived, execution-ready) + `architecture.md` (full contract — two-layer engine, shift/locked/frozen/win semantics all locked, `canonicalKey` spec, determinism guard, `WordValidator` port) + this orchestration. Complexity COMPLEX but no Analyst / no UI Designer (justified). Routed straight to Frontend/Mobile Developer: F02.0-CORE → F02.1-FE … F02.6-FE → QA (client-only) → Tech Lead. `platform.md` §11 amended for the engine-primitive-enum carve-out. `feature-board.md` + `system-state.md` synced same turn (F01 Done, F02 active).
+* Summary: F02.0-CORE + F02.1-FE … F02.6-FE complete. `looplet_core` engine primitives (`MoveAxis`/`MoveDirection`/`TileStatus`/`GridCoord`), re-exported by `looplet_content`. `looplet_engine`: `Move`, `WordValidator`/`NeverValidWordValidator`, `EngineConfig`+`EngineConfigError`+`legalMoves`, `MoveRejectReason`, `GridStep`, pure `GridState` (flat row-major storage, `applyMove` shift algorithm steps 1–8, row-only thaw len 4..n, L→R Turkish-normalized win, `canonicalKey`, value equality), `GridEngine` façade (`undo` re-fold, `restart`, `restoreMoves`). App: `DictionaryWordValidator` + `wordValidatorProvider` (no engine→`looplet_dictionary` dependency). 145 workspace tests green (engine 83 incl. 17 AC-traceability + no-RNG guard); `format:check` / `analyze` (6 pkgs + `flutter analyze`) green. Micro-benchmark ~208k applyMove+canonicalKey ops/sec (JIT). `frontend.md` written. Not committed to git.
 
 ---
 
 ## Next Role
 
-Frontend/Mobile Developer
+QA
 
 ---
 
 ## Next Action
 
-### Frontend/Mobile Developer
+### QA
 
 ```text
-Implement F02 grid-engine. Authority: features/f02-grid-engine/architecture.md (contract — follow the shift
-algorithm steps 1–8, thaw evaluation, win evaluation, and canonicalKey spec verbatim); features/f02-grid-engine/prd.md
-(Acceptance Criteria + Edge Cases); project-authority/platform.md §11 (Turkish HARD RULE, no runtime RNG).
+Verify F02 grid-engine (client-only, automated — no device runtime required per architecture.md QA Focus + platform.md §10).
 
-Order:
-1. F02.0-CORE — add MoveAxis, MoveDirection, TileStatus, GridCoord to looplet_core (value equality + hashCode +
-   row-major compareTo); export from lib/looplet_core.dart; table tests. Then update looplet_content's barrel to
-   re-export them (keep looplet_content's own placeholder otherwise — F02 does not implement the Puzzle model).
-2. F02.1-FE — EngineConfig + constructor validation (dims, single-grapheme non-empty cells, targetWord.length ==
-   gridSize + letters-only, coords in range, lockedCells ∩ frozenCells == ∅) throwing EngineConfigError; legalMoves.
-3. F02.2-FE — pure GridState.initial + applyMove. Implement the shift algorithm EXACTLY as architecture.md steps 1–8
-   (movable-position cyclic subsequence; forward = right/down = new p_i gets l_{(i-1) mod k}; backward = inverse).
-   Thaw: row-only, windows [0..3],[1..4],[0..4], validator.isValidWord(window, minLength: 4), all frozen-unthawed
-   cells in the row thaw together, monotonic. Win: join(row, TurkishCase.toLowerTr) == toLowerTr(targetWord), any row,
-   L→R only. Evaluate thaw then win, at t=0 and after every applied move. GridStep with applied/rejectedReason/state/
-   thawedThisStep/solvedThisStep.
-4. F02.3-FE — canonicalKey + GridState value ==/hashCode.
-5. F02.4-FE — GridEngine façade: applyMove appends only when applied; undo removes last move and recomputes
-   state = fold(initialState, remainingMoves); restart clears history. Add restoreMoves(List<Move>) only if needed
-   for F08 (must equal one-by-one replay).
-6. F02.5-FE — WordValidator + NeverValidWordValidator in looplet_engine; DictionaryWordValidator (app/lib/) adapting
-   F01 DictionaryService + a Riverpod provider. Do NOT add looplet_dictionary to looplet_engine's pubspec.
-7. F02.6-FE — the full test matrix in the ledger; a guard test asserting looplet_engine source has no Random /
-   DateTime.now / dart:io. frontend.md: task-to-code traceability, letter-storage decision + states/sec micro-benchmark,
-   per-AC evidence.
+Authority: features/f02-grid-engine/prd.md (Acceptance Criteria + Edge Cases), architecture.md (API / Event Contract,
+Shift algorithm, Thaw/Win evaluation, canonicalKey, QA Focus), frontend.md (delivery report + test evidence by task).
 
-Verify from repo root: melos run format:check && melos run analyze && melos run test
-On completion set Next Role = QA (client-only) per architecture.md QA Focus.
+F02.1-QA — AC + contract:
+- Walk every AC bullet in prd.md; confirm acceptance_criteria_test.dart (17) + the matrix files cover each. Confirm the
+  public API (EngineConfig / GridState / GridEngine / Move / GridStep / MoveRejectReason / WordValidator) matches
+  architecture.md "API / Event Contract" (note the deviations recorded in frontend.md §14: GridState.initial as a
+  factory, GridState holds its config, restoreMoves throws — none change behavior).
+- Shift table (4 dirs ± wrap, rows + cols, 5-shift identity); locked rotation worked example E A C B D; win/no-win
+  (reverse LASAM, vertical column, repeated letters MSAAL ≠ MASAL, casing-insensitive, pre-solved t=0).
+
+F02.2-QA — Frozen tile:
+- thaw at t=0; word not through the frozen cell (4-letter window); two frozen tiles in one row thaw together; frozen
+  rows evaluated independently; **row only — the column is never scanned** (dedicated test); thaw permanent across a
+  later word-breaking move; **undo of the causing move re-freezes the tile**; thaw + win on the same move → both flags,
+  engine terminal.
+
+F02.3-QA — Determinism / rejections / validation:
+- double independent fold → GridState == and equal canonicalKey; façade == pure fold; 50 folds → one key; canonicalKey
+  differs on any letter/thawed change, reflects the thawed set (§2,2), uses Turkish-lower (İ→i, I→ı).
+- every MoveRejectReason (columnMovesDisabled / lineFullyImmovable / outOfRange / puzzleComplete / nothingToUndo)
+  leaves state + moveCount unchanged.
+- each malformed EngineConfig throws EngineConfigError; legalMoves matches the applied-true set exactly and is empty
+  when solved.
+- no-RNG guard test present and green (no Random / DateTime.now / Stopwatch / dart:io / Isolate.spawn in looplet_engine/lib).
+
+F02.4-QA — Evidence class + CI:
+- Confirm "automated functional" evidence is sufficient (architecture.md QA Focus + platform.md §10) — no device runtime.
+- Confirm .github/workflows/ci.yml runs format:check + analyze + test across the workspace.
+- Run from repo root: melos run format:check && melos run analyze && melos run test
+- Emit a QA verdict. Next Role after QA is always Tech Lead.
 ```
 
 ---
@@ -140,3 +150,4 @@ On completion set Next Role = QA (client-only) per architecture.md QA Focus.
 ## Change Log
 
 * v1 (2026-09-05) — Tech Lead: F02 grid-engine created and activated. `prd.md` + `architecture.md` (full contract) + orchestration. Complexity COMPLEX; no Analyst / no UI Designer (justified). Routing: Frontend/Mobile Developer (F02.0-CORE → F02.6-FE) → QA → Tech Lead. `platform.md` §11 amended for the engine-primitive-enum carve-out.
+* v2 (2026-09-05) — Frontend/Mobile Developer: F02.0-CORE + F02.1-FE … F02.6-FE done. `looplet_core` primitives + `looplet_engine` (pure `GridState`/`applyMove` core + `GridEngine` façade + `WordValidator` port) + app adapter. 145 workspace tests green (engine 83); format/analyze green. 3 recorded impl decisions (letter storage = flat list; `restoreMoves` throws; `GridState` holds config) — none change the contract. Current Owner → QA; Next Role → QA (client-only). Uncommitted.
