@@ -1,6 +1,6 @@
 # System State — LOOPLET
 
-Last Updated: 2026-09-05
+Last Updated: 2026-09-05 (F02 closed, F06 activated)
 
 > Global workflow snapshot. Stack/runtime authority lives in `project-authority/platform.md`; release authority in `project-authority/release.md`. This file carries the current snapshot only.
 
@@ -14,7 +14,7 @@ Last Updated: 2026-09-05
 
 ## Environment Status
 
-* Initialized — melos monorepo scaffolded (`app` + 6 pure-Dart packages + CI). `melos run format:check` / `analyze` / `test` green (56 workspace tests). `flutter build ios --release --no-codesign` green. Android `build:app` = CI-only locally (no Android SDK on the dev machine). Firebase `infra/` not yet provisioned (separate DURUM 0 before F07/F08/F12).
+* Initialized — melos monorepo (`app` + 6 pure-Dart packages + CI). `melos run format:check` / `analyze` / `test` green (**145 workspace tests**: core 22, dictionary 32, engine 83, scaffold 3, app 4+1). `flutter build ios --release --no-codesign` green. Android `build:app` = CI-only locally (no Android SDK on the dev machine). Firebase `infra/` not yet provisioned (separate DURUM 0 before F07/F08/F12).
 
 ---
 
@@ -59,11 +59,11 @@ Last Updated: 2026-09-05
 
 ## Active Feature
 
-* F02 — grid-engine
+* F06 — puzzle-content-and-solver-tooling
 
 ## Active Orchestration Path
 
-* `/ai-system/features/f02-grid-engine/orchestration.md`
+* `/ai-system/features/f06-puzzle-content-and-solver-tooling/orchestration.md`
 
 ---
 
@@ -71,23 +71,23 @@ Last Updated: 2026-09-05
 
 ## Current Phase
 
-* Frontend Development — F02 grid-engine
+* Analysis — F06 puzzle-content-and-solver-tooling
 
 ## Current Role
 
-* Frontend/Mobile Developer
+* Technical Analyst
 
 ## Current Reason
 
-* F01 dictionary-service delivered and closed (QA Approved with Notes, 2026-09-05). F02 grid-engine activated — the deterministic 5×5 rules engine that F03/F04/F05/F06/F07 all depend on. Complexity COMPLEX but no Technical Analyst / no UI Designer (product PRD already fully enumerates the semantics; Tech Lead locked the contract in `architecture.md`). Frontend/Mobile Developer implements `looplet_engine` (pure core + façade) next.
+* F01 and F02 both Done (QA Approved with Notes, 2026-09-05). F06 — the build-time solver + level editor + `looplet_content` `Puzzle` model — activated as the last P0; F05 (Journey) and F07 (Daily) need its content-production pipeline. Complexity is high and several parts are genuinely open (provable-minimum search algorithm with frozen-thaw branching; computable definitions for the §48 difficulty-score parameters; editor scope; content-artifact schema). Tech Lead routed to a **Technical Analyst** pass before finalizing the contract.
 
 ## Last Completed Action
 
-* Tech Lead — 2026-09-05 — Closed F01 (Done; reconciled QA Approved with Notes, terminal cleanup, additive `architecture.md` clarification). Activated F02 grid-engine: `prd.md` + full `architecture.md` contract + orchestration. Amended `platform.md` §11 (engine-primitive-enum carve-out to `looplet_core`). Synced `feature-board.md` + `system-state.md`.
+* Tech Lead — 2026-09-05 — Closed F02 (Done; reconciled QA Approved with Notes, terminal cleanup). Activated F06: `prd.md` + initial `architecture.md` (locks the F02-built search substrate + build-time-only + publish gates; enumerates open decisions) + orchestration with `Current Owner = Technical Analyst`. Synced `feature-board.md` + `system-state.md`.
 
 ## Next Expected Action
 
-* `Run Frontend/Mobile Developer` — implement F02 per `features/f02-grid-engine/orchestration.md → Next Action` (F02.0-CORE primitives → F02.1–F02.6-FE engine + tests).
+* `Run Technical Analyst` — analyze F06 per `features/f06-puzzle-content-and-solver-tooling/orchestration.md → Next Action` (solver algorithm alternatives + minimality argument; §48 difficulty-metric definitions; `Puzzle` schema; editor scope; task breakdown). Then `Run Tech Lead` to finalize the contract.
 
 ---
 
@@ -95,9 +95,9 @@ Last Updated: 2026-09-05
 
 ## Portfolio Summary
 
-* 13 features. F01 `Done`. F02 `In Progress` (Frontend Development). F03–F13 `Not Started`.
-* Priority: P0 = F01✓, F02, F06, F08, F03, F05 · P1 = F04, F09, F10, F07, F12 · P2 = F11, F13.
-* Critical path: F01✓ → **F02** → F06 → (F03, F08) → F04 → F05 → F09 → F10 → F07 → F13; F12 cross-cutting and release-blocking.
+* 13 features. F01 `Done`, F02 `Done`. F06 `In Progress` (Analysis). F03, F04, F05, F07–F13 `Not Started`.
+* Priority: P0 = F01✓, F02✓, F06, F08, F03, F05 · P1 = F04, F09, F10, F07, F12 · P2 = F11, F13.
+* Critical path: F01✓ → F02✓ → **F06** → (F03, F08) → F04 → F05 → F09 → F10 → F07 → F13; F12 cross-cutting and release-blocking.
 
 ## Active Rework
 
@@ -117,7 +117,7 @@ Last Updated: 2026-09-05
 
 ## Contract Version
 
-* v1 — established 2026-09-03. Project contract rules in `platform.md` §4. F01 contract locked + closed (`features/f01-dictionary-service/architecture.md`). F02 contract locked 2026-09-05 (`features/f02-grid-engine/architecture.md`): two-layer engine (pure `GridState`/`applyMove` + `GridEngine` façade), shift/locked/frozen/win semantics, `canonicalKey` state identity, `WordValidator` port, no runtime RNG. `platform.md` §11 amended (engine-primitive-enum carve-out).
+* v1 — established 2026-09-03. Project contract rules in `platform.md` §4. F01 + F02 contracts locked and closed. F06 initial contract (`features/f06-puzzle-content-and-solver-tooling/architecture.md`) locks the build-time-only substrate (`GridState`/`applyMove`/`canonicalKey`/`legalMoves` from F02) + publish gates (unsolvable / optimal-less → cannot export); open technical decisions pending the Technical Analyst pass. `platform.md` §11 carries the engine-primitive-enum carve-out.
 
 ## Pending Breaking Change
 

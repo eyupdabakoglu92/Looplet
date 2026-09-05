@@ -7,35 +7,31 @@
 
 ## Current Status
 
-**In QA** → QA verdict: Approved with Notes (2026-09-05). Pending Tech Lead reconcile + `Done`.
+**Done**
 
 ---
 
 ## Current Owner
 
-Tech Lead
+-
 
 ---
 
 ## Current Phase
 
-QA complete (client-only, automated) → Tech Lead reconcile + global sync
+Closed
 
 ---
 
 ## Active Task Ledger
 
-- [x] Task ID: F02.0-CORE | Assigned Role: Frontend/Mobile Developer | Status: Done | `looplet_core` primitives (`MoveAxis`/`MoveDirection`/`TileStatus`/`GridCoord`), re-exported by `looplet_content`. 5 tests.
-- [x] Task ID: F02.1-FE | Assigned Role: Frontend/Mobile Developer | Status: Done | `EngineConfig` + `_validate` (→ `EngineConfigError`) + `legalMoves`. 13 + 5 tests.
-- [x] Task ID: F02.2-FE | Assigned Role: Frontend/Mobile Developer | Status: Done | Pure `GridState` + `applyMove` (shift algorithm steps 1–8, row-only thaw len 4..n, L→R Turkish-normalized win). 12 + 8 + 8 tests.
-- [x] Task ID: F02.3-FE | Assigned Role: Frontend/Mobile Developer | Status: Done | `canonicalKey` + `GridState` value equality. 10 tests.
-- [x] Task ID: F02.4-FE | Assigned Role: Frontend/Mobile Developer | Status: Done | `GridEngine` façade — `undo` re-fold from `_initialState`, `restart`, `restoreMoves` (throws `StateError` on rejected move). 10 tests.
-- [x] Task ID: F02.5-FE | Assigned Role: Frontend/Mobile Developer | Status: Done | `WordValidator` port + `NeverValidWordValidator`; `app/lib/engine/` `DictionaryWordValidator` + `wordValidatorProvider`. 2 app tests. `looplet_engine` pubspec unchanged (`looplet_core` only).
-- [x] Task ID: F02.6-FE | Assigned Role: Frontend/Mobile Developer | Status: Done | 83 engine tests + `acceptance_criteria_test.dart` (17, 1:1 with prd.md ACs) + `no_rng_guard_test.dart`. `frontend.md` with letter-storage decision (flat row-major `List<String>`) + micro-benchmark (~208k applyMove+canonicalKey ops/sec JIT).
-- [x] Task ID: F02.1-QA | Assigned Role: QA | Status: Done | Every AC → executed test (`acceptance_criteria_test.dart` 1:1, `qa.md` §4); public API matches `architecture.md` (3 latitude deviations acceptable); shift/locked/win matrices verified + QA probe.
-- [x] Task ID: F02.2-QA | Assigned Role: QA | Status: Done | Frozen thaw: t=0 + on-move, row-window scan len 4..n, word-not-through-cell, multi-frozen together, rows independent, **row-only (no column scan)**, permanence, undo re-freeze, thaw+win terminal — all verified (`qa.md` §5/§10 + QA probe).
-- [x] Task ID: F02.3-QA | Assigned Role: QA | Status: Done | Determinism (40–50 folds → 1 key), `canonicalKey` structure (`§`, thawed coord, `İ≠I`), every rejection reason leaves state+count unchanged, 6 `EngineConfig` malformed inputs throw, `legalMoves` == applied-true set (exhaustive), no-RNG guard green.
-- [x] Task ID: F02.4-QA | Assigned Role: QA | Status: Done | Evidence class `automated functional` confirmed sufficient (`architecture.md` QA Focus + `platform.md` §10). `melos run format:check`/`analyze`/`test` (145) executed green + independent 8-assertion QA probe. Verdict emitted (`qa.md`).
+None — feature terminal (Done, 2026-09-05).
+
+Historical task record (all complete):
+
+- [x] F02.0-CORE (Frontend/Mobile Developer) — `looplet_core` engine primitives (`MoveAxis`/`MoveDirection`/`TileStatus`/`GridCoord`), re-exported by `looplet_content`.
+- [x] F02.1-FE … F02.6-FE (Frontend/Mobile Developer) — `looplet_engine`: `Move`, `WordValidator` port, `EngineConfig`+`legalMoves`, pure `GridState`/`applyMove` (shift algorithm, row-only thaw, L→R win), `canonicalKey` + value equality, `GridEngine` façade (`undo` re-fold / `restart` / `restoreMoves`), no-RNG guard. App: `DictionaryWordValidator` + `wordValidatorProvider`. 83 engine tests + 17 AC-traceability.
+- [x] F02.1-QA … F02.4-QA (QA) — AC + contract traceability; frozen-tile behavior; determinism + rejections + validation; evidence-class + CI. Verdict: **Approved with Notes** (`qa.md`) — 145 workspace tests + independent probe green; 3 non-blocking notes (dual config source in `applyMove`; Android CI; Phase-2 target path untested); no required fixes.
 
 ---
 
@@ -94,48 +90,21 @@ QA complete (client-only, automated) → Tech Lead reconcile + global sync
 
 ## Last Update
 
-* Updated By: QA
+* Updated By: Tech Lead
 * Timestamp: 2026-09-05
-* Summary: F02 QA complete — verdict **Approved with Notes**. Scope: client-only, automated functional. QA ran `melos run format:check` / `analyze` / `test` (145 green) + an independent 8-assertion QA probe (created / run green / removed) against the real engine: locked rotation `E A C B D` + column anchor; frozen thaw **row-only** (a `MASAL` column does not thaw); undo re-freezes; thaw+win terminal; every rejection reason leaves state + count unchanged; determinism (40 folds → 1 key) + `canonicalKey` structure (`§`, thawed coord, `İ≠I`); `legalMoves` == applied-true set (exhaustive); 6 malformed `EngineConfig` inputs throw; 5-shift identity. Every `prd.md` requirement + AC mapped to an executed test (`qa.md` §3/§4). Contract fully preserved (`qa.md` §6). Three non-blocking notes for Tech Lead: (1) `applyMove` reads config from two sources — latent fragility, no defect; (2) Android CI build; (3) Phase-2 non-full-row-target path untested by design. No required fixes. `qa.md` written. Not committed to git.
+* Summary: F02 closed. Reconciled QA verdict **Approved with Notes** — delivery reconciliation passed (task coverage complete, contract fully preserved per `qa.md` §6, evidence = 145 executed workspace tests + independent 8-assertion probe, no required fixes). Notes non-blocking; Release Scope = none → no release gate. Terminal cleanup applied. The `platform.md` §11 engine-primitive-enum carve-out (made at F02 activation) is consistent. `feature-board.md` + `system-state.md` synced same turn; F06 (puzzle-content-and-solver-tooling) activated with a Technical Analyst pass.
 
 ---
 
 ## Next Role
 
-Tech Lead
+Closed
 
 ---
 
 ## Next Action
 
-### Tech Lead
-
-```text
-Reconcile F02 QA verdict (Approved with Notes) and sync global state.
-
-1. Global state sync (Tech Lead-owned):
-   - feature-board.md: F02 grid-engine In Progress -> Done; Owner -> - ; QA -> QA. Update Last Updated / Active Phase /
-     Active Owner (next up is F06 — solver/tooling, the last P0).
-   - system-state.md: Active Feature -> F06 (next) or "—" pending activation; Current Phase/Role/Reason;
-     Last Completed Action = QA F02 Approved with Notes 2026-09-05; Next Expected Action = activate F06.
-   - features/f02-grid-engine/orchestration.md: terminal cleanup per role-execution-contract §6 (Status = Done,
-     Current Owner = -, Active Task Ledger = None, Next Role = -/Closed, Next Action = Closed).
-
-2. Non-blocking follow-up (optional, do NOT reopen F02): note in F06's brief that when Frontend/Mobile Developer
-   next touches looplet_engine, GridState.applyMove should read all EngineConfig fields from one source
-   (prefer the stored _config, or drop it and always thread the parameter). No defect today.
-
-3. Informational: confirm the Android job in .github/workflows/ci.yml is green (melos run build:app not runnable
-   locally — no Android SDK). flutter analyze / flutter test / (after F01) iOS release build all green locally.
-
-4. Activate F06 (puzzle-content-and-solver-tooling): P0, depends on F01 (Done) + F02 (Done). This is the last P0 and
-   the content-production pipeline that F05 and F07 need. It is Infrastructure + tooling; complexity is high (provable
-   minimum-move search over the F02 canonicalKey state space, honoring locked/frozen; a level editor; difficulty
-   scoring). Open features/f06-*/ with prd.md + architecture.md + orchestration.md; run the complexity decision
-   (Technical Analyst may be warranted for the solver algorithm + difficulty-scoring parameterization).
-
-Release gate: none for F02 (Release Scope = none).
-```
+Closed. F02 grid-engine is Done (2026-09-05). Non-blocking follow-ups carried in `## Blockers` (dual config source in `applyMove` → tidy when `looplet_engine` is next touched, likely F06; Android CI confirmation; Phase-2 non-full-row-target path untested by design). Workflow continues at `features/f06-puzzle-content-and-solver-tooling/orchestration.md`.
 
 ---
 
@@ -144,3 +113,4 @@ Release gate: none for F02 (Release Scope = none).
 * v1 (2026-09-05) — Tech Lead: F02 grid-engine created and activated. `prd.md` + `architecture.md` (full contract) + orchestration. Complexity COMPLEX; no Analyst / no UI Designer (justified). Routing: Frontend/Mobile Developer (F02.0-CORE → F02.6-FE) → QA → Tech Lead. `platform.md` §11 amended for the engine-primitive-enum carve-out.
 * v2 (2026-09-05) — Frontend/Mobile Developer: F02.0-CORE + F02.1-FE … F02.6-FE done. `looplet_core` primitives + `looplet_engine` (pure `GridState`/`applyMove` core + `GridEngine` façade + `WordValidator` port) + app adapter. 145 workspace tests green (engine 83); format/analyze green. 3 recorded impl decisions (letter storage = flat list; `restoreMoves` throws; `GridState` holds config) — none change the contract. Current Owner → QA; Next Role → QA (client-only). Uncommitted.
 * v3 (2026-09-05) — QA: verdict **Approved with Notes**. Client-only automated functional. 145 tests + independent 8-assertion QA probe executed green. Every prd.md requirement + AC traced to an executed test; contract fully preserved. 3 non-blocking notes (dual config source in `applyMove`; Android CI; Phase-2 target path untested). No required fixes. Current Owner → Tech Lead; Next Role → Tech Lead for global-state sync + F06 activation.
+* v4 (2026-09-05) — Tech Lead: F02 reconciled and **closed (Done)**. Delivery reconciliation passed; notes non-blocking; no release gate. Terminal cleanup applied. `feature-board.md` + `system-state.md` synced same turn. F06 (puzzle-content-and-solver-tooling) activated → Technical Analyst pass.

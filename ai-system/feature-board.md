@@ -1,10 +1,10 @@
 # Feature Board — LOOPLET
 
 Last Updated: 2026-09-05
-Active Phase: Frontend Development — F02 grid-engine
-Active Owner: Frontend/Mobile Developer
+Active Phase: Analysis — F06 puzzle-content-and-solver-tooling
+Active Owner: Technical Analyst
 
-> Bootstrap by Product Owner (2026-09-03) → Tech Lead greenfield bootstrap (`platform.md`, `release.md`, `setup-manifest.md`). F01 dictionary-service delivered: Project Setup scaffold → Frontend/Mobile Developer → QA (Approved with Notes, 2026-09-05) → **Done**. F02 grid-engine activated 2026-09-05. Feature IDs/names match `product-prd.md` Section 6. Global owner / active phase sync is Tech Lead's responsibility.
+> Bootstrap by Product Owner (2026-09-03) → Tech Lead greenfield bootstrap (`platform.md`, `release.md`, `setup-manifest.md`). **F01 dictionary-service** → Done (QA Approved with Notes, 2026-09-05). **F02 grid-engine** → Done (QA Approved with Notes, 2026-09-05). **F06 puzzle-content-and-solver-tooling** activated 2026-09-05 with a Technical Analyst pass. Feature IDs/names match `product-prd.md` Section 6. Global owner / active phase sync is Tech Lead's responsibility.
 
 ---
 
@@ -13,11 +13,11 @@ Active Owner: Frontend/Mobile Developer
 | ID | Feature | Status | Owner | QA | Priority | Notes |
 | --- | --- | --- | --- | --- | --- | --- |
 | F01 | dictionary-service | Done | — | QA | P0 | Curated Turkish dictionary + Turkish-locale case (İ/I distinct) + validation behind a language key. Delivered: `looplet_core` normalization + `looplet_dictionary` service + provisional assets + app wiring. QA verdict Approved with Notes (`qa.md`); 56 workspace tests green. Non-blocking: architecture wording clarified; Android CI to confirm; production Turkish corpus is a PO/content deliverable. Release Scope: none. |
-| F02 | grid-engine | In Progress | Frontend/Mobile Developer | — | P0 | Deterministic 5×5 shift engine: pure `GridState`/`applyMove` core + `GridEngine` façade; circular row/col shift, movable-subsequence rotation around locked/frozen fixed points, L→R win detection, row-only frozen thaw (len 4/5 windows), undo re-fold, restart, `canonicalKey` for the F06 solver, `WordValidator` port. Depends on F01 (Done). Headless. ACTIVE — Frontend/Mobile Developer (F02.0-CORE → F02.6-FE) → QA (client-only). COMPLEX; no Analyst, no UI Designer. Release Scope: none. |
+| F02 | grid-engine | Done | — | QA | P0 | Deterministic 5×5 shift engine: pure `GridState`/`applyMove` core + `GridEngine` façade; movable-subsequence rotation around locked/frozen fixed points, L→R win, row-only frozen thaw, undo re-fold, `canonicalKey` for the F06 solver, `WordValidator` port. QA verdict Approved with Notes (`qa.md`); 145 workspace tests green. Non-blocking: `applyMove` dual config source (tidy on next touch); Android CI; Phase-2 target path untested. Release Scope: none. |
+| F06 | puzzle-content-and-solver-tooling | In Progress | Technical Analyst | — | P0 | Build-time solver (provable minimum moves over F02's state space, honoring locked/frozen) + internal level editor (target/grid/locks/freezes, solvability check, difficulty score + Easy/Medium/Hard/Expert, playtest, export with required `optimalMoves`) + the `looplet_content` `Puzzle` model. Produces the 30 Journey levels + Daily pool. Unsolvable / optimal-less puzzles cannot publish. Depends on F01 (Done) + F02 (Done). ACTIVE — Technical Analyst pass → Tech Lead contract finalize → Frontend/Mobile Developer → QA. COMPLEX. Release Scope: none (build-time tooling, never on device). |
 | F03 | puzzle-play-session | Not Started | — | — | P0 | In-game screen: swipe→move (dominant axis, threshold, accidental-touch reject), 150–250ms anim + input lock (no queue), MOVES HUD, 3 Undo, separated Restart, completion sequence. Depends on F02. |
 | F04 | star-rating-and-personal-best | Not Started | — | — | P1 | 1–3 star rating (never 0), completion panel, per-level best (improves only), "Perfect" flag. Depends on F03, F06. |
 | F05 | journey-progression | Not Started | — | — | P0 | 30 handcrafted sequential levels, linear unlock by completion, source §20 difficulty curve, per-level micro-tutorials (columns at L4–6), CONTINUE resume. Depends on F03, F06. |
-| F06 | puzzle-content-and-solver-tooling | Not Started | — | — | P0 | Internal level editor + build-time solver (provable minimum moves, honors locked/frozen), solvability + difficulty scoring, playtest, export with required metadata. Produces Journey levels + Daily pool. Depends on F01, F02. Not player-visible but P0. |
 | F07 | daily-challenge | Not Started | — | — | P1 | One shared puzzle/day/language, local-midnight reset, move-count score (time tie-break), first run official, streak (current + best). Leaderboard-ready data model, no leaderboard. Depends on F03, F04, F06, F08. |
 | F08 | offline-persistence-and-sync | Not Started | — | — | P0 | Persist active puzzle + progress + bests + streak + settings; full offline Journey; offline Daily if pre-fetched; deferred exactly-once sync with first-run-authoritative reconciliation; guest-only, account-adoptable schema. |
 | F09 | onboarding-tutorial | Not Started | — | — | P1 | Interactive 3-step tutorial (row / column / form target), action-gated, < 60s, flows into Level 1, shown once. Depends on F03. KPI gate: > 85% completion. |
