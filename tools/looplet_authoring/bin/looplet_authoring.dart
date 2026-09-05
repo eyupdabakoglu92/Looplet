@@ -1,5 +1,14 @@
-/// LOOPLET level-authoring CLI (F06). Scaffold entrypoint — commands are
-/// implemented in F06.
-void main(List<String> args) {
-  print('looplet authoring CLI — not yet implemented (F06)');
+import 'dart:io';
+
+import 'package:args/command_runner.dart';
+import 'package:looplet_authoring/looplet_authoring.dart';
+
+Future<void> main(List<String> args) async {
+  try {
+    final code = await buildRunner().run(args) ?? 0;
+    exit(code);
+  } on UsageException catch (e) {
+    stderr.writeln(e);
+    exit(64);
+  }
 }

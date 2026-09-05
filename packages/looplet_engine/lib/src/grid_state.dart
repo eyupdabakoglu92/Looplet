@@ -135,6 +135,11 @@ final class GridState {
 
   /// Pure step. Never throws for a rejected move — returns `applied == false`
   /// with the unchanged state. See `architecture.md` "Shift algorithm".
+  ///
+  /// The [config] parameter is kept for call-site clarity and API stability, but
+  /// every config read goes through the stored `_config` so there is a single
+  /// source of truth. Callers must pass a config equivalent to the one this
+  /// state was built with.
   GridStep applyMove(Move move, EngineConfig config, WordValidator validator) {
     if (isSolved) {
       return GridStep(
@@ -143,7 +148,7 @@ final class GridState {
         rejectedReason: MoveRejectReason.puzzleComplete,
       );
     }
-    if (move.axis == MoveAxis.column && !config.columnMovesEnabled) {
+    if (move.axis == MoveAxis.column && !_config.columnMovesEnabled) {
       return GridStep(
         applied: false,
         state: this,
@@ -151,7 +156,7 @@ final class GridState {
       );
     }
     if (move.index < 0 ||
-        move.index >= config.gridSize ||
+        move.index >= _config.gridSize ||
         !move.axisDirectionMatches) {
       return GridStep(
         applied: false,
@@ -186,13 +191,13 @@ final class GridState {
       next[coord.row * _size + coord.col] = movableLetters[srcIndex];
     }
 
-    final nextThawed = _evaluateThaw(config, next, _thawed, validator);
-    final nextSolved = _evaluateWin(config, next);
+    final nextThawed = _evaluateThaw(_config, next, _thawed, validator);
+    final nextSolved = _evaluateWin(_config, next);
 
     return GridStep(
       applied: true,
       state: GridState._(
-        config,
+        _config,
         List<String>.unmodifiable(next),
         Set<GridCoord>.unmodifiable(nextThawed),
         nextSolved,

@@ -1,0 +1,3 @@
+{ "id": "smoke-tr-04", "puzzleType": "journey", "journeyLevelNumber": 4, "language": "tr",
+  "grid": ["DABCF", "XENİZ", "HJKLN", "PRTUV", "YZBCD"], "target": "DENİZ",
+  "locked": [], "frozen": [], "columns": true }

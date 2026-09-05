@@ -1,0 +1,3 @@
+{ "id": "smoke-tr-06", "puzzleType": "journey", "journeyLevelNumber": 6, "language": "tr",
+  "grid": ["BCDFG", "MHJKL", "XASAL", "PRTUV", "YZBCD"], "target": "MASAL",
+  "locked": [], "frozen": ["2,2"], "columns": true }

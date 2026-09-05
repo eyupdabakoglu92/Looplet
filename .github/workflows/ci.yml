@@ -39,6 +39,11 @@ jobs:
       - name: Test
         run: melos run test
 
+      - name: Content check
+        run: >-
+          melos exec --scope="looplet_authoring" --
+          "dart run bin/looplet_authoring.dart check ../../content --repo-root ../.."
+
       - name: Build Android App Bundle
         run: melos run build:app
 

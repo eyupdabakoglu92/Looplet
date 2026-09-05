@@ -1,0 +1,3 @@
+{ "id": "j-tr-triv", "puzzleType": "journey", "journeyLevelNumber": 2, "language": "tr",
+  "grid": ["MASAL", "BCDFG", "HJKLN", "PRTUV", "YZBCD"], "target": "MASAL",
+  "locked": [], "frozen": [], "columns": false }
