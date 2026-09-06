@@ -39,6 +39,18 @@ jobs:
       - name: Test
         run: melos run test
 
+      # F03 play-session integration_test suite. Best-effort per release.md §4
+      # ("failure is investigated, not auto-blocking"): the always-green mirror
+      # is app/test/play/play_session_runtime_test.dart (run by `melos run test`
+      # above). Headless flutter-tester is timing-sensitive for the drift-backed
+      # boot; the authoritative device-matrix run is `flutter test
+      # integration_test -d <emulator>`.
+      - name: Integration tests (play session — best-effort)
+        continue-on-error: true
+        run: >-
+          melos exec --scope="looplet_app" --
+          "flutter test integration_test/"
+
       - name: Content check
         run: >-
           melos exec --scope="looplet_authoring" --

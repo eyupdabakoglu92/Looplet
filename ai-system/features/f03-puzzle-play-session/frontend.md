@@ -237,11 +237,45 @@ Carried from `ui-design.md` §14 (non-blocking — sensible defaults are impleme
 
 ---
 
+## F03-FE9 — runtime-validation closure (2026-09-06)
+
+**Task:** close the `Runtime Validation Pending` gap (`qa.md §17`) — an `integration_test/` suite + CI wiring + a manual device confirmation list. No product-code change: F03's implementation was contract-compliant and QA found no defect. This is additive test infrastructure.
+
+### Files
+
+| File | Change | Why |
+| --- | --- | --- |
+| `app/test/play/play_session_runtime_test.dart` | **new** — 13 `flutter_test` widget tests covering `qa.md §17` scenarios 1–4 | the **fast, always-green** automated closure; runs in the existing `melos run test` / CI `verify` gate (no device needed). Uses `tester.view.physicalSize` for the 2 surface sizes, `pump(Duration)` for the real animation-window, `handleAppLifecycleStateChanged` for lifecycle, and a shared in-memory `AppDatabase` across a `pumpWidget(SizedBox)` "kill" for resume. |
+| `app/integration_test/play_session_test.dart` | **new** — the same 4 scenario groups on the `integration_test` binding | the on-device / device-matrix form (`flutter test integration_test -d <device>`). Headless `flutter test integration_test/` is slow + timing-sensitive for this app's drift-backed boot (the setup + snapshot read are real async futures that a single `pumpAndSettle` doesn't reliably await), so it is wired as a **best-effort, non-blocking** CI step per `release.md §4` ("failure is investigated, not auto-blocking until F03 lands"). |
+| `.github/workflows/ci.yml` | added an `Integration tests (play session — best-effort)` step to `verify` with `continue-on-error: true` | runs `flutter test integration_test/` after `melos run test` |
+| `melos.yaml` | added `test:integration` script | `flutter test integration_test/` for the app |
+
+### `qa.md §17` scenario coverage (in `play_session_runtime_test.dart`)
+
+| Scenario | Tests | What is proven end-to-end (real widget tree + gesture + animation pump) |
+| --- | --- | --- |
+| **1 — gesture → shift wiring at 2 surface sizes** (AC2/AC3/AC4) | `§17.1` × 6 (small `360×780` + large `430×932`) | a row-0 right swipe on `smoke-tr-01` drives `rowRight(0)` → engine → win → the completion sheet; a `(6,4)` sub-threshold drag → `MOVES` stays 0, no sheet; a vertical drag on a `columnMovesEnabled:false` puzzle → engine rejects → bounce → `MOVES` unchanged, no error surfaced. Identical behaviour at both sizes. |
+| **2 — 0 double-registered moves during the ~190 ms window** (AC5) | `§17.2` × 2 | after a settled shift starts, `pump(60 ms)` into the window then a **second** `dragFrom` → `MOVES` ticks **once** (the second is dropped, not queued); two `dragFrom`s each with a `pumpAndSettle` between → `MOVES == 2` (each counts only post-settle). |
+| **3 — kill / relaunch resume** (AC10) | `§17.3` × 3 | 3 moves → `pumpWidget(SizedBox)` (disposes the controller) → remount on the **same** `AppDatabase` → `MOVES` restored to 3; then Restart → remount → `MOVES` 0 (restart persisted). A repo-seeded `['R1']` / quota 2 / restarts 1 snapshot → the screen hydrates to `MOVES` 1. A repo-seeded `smoke-tr-06` snapshot with a bogus `thawedFrozenCells: ['2,2']` → after restore the tile at 2,2 renders **`TileStatus.frozen`**, not `thawed` (the cache is re-derived by replay, not trusted). |
+| **4 — app lifecycle** (`architecture.md §12`) | `§17.4` × 2 | `handleAppLifecycleStateChanged(paused)` while a pointer is held mid-drag → the gesture is cancelled, `MOVES` 0, no exception; `paused` fired 50 ms into a shift → the move commits **settled** (`MOVES` 1, not lost, not doubled) and survives a subsequent kill/relaunch; `resumed` is a safe no-op. |
+
+### Manual device / simulator confirmation list (for the next QA pass — `qa.md §17` 5–7, not automatable here)
+
+* **5 — win choreography + tile-state visuals:** the amber fill + the drawn L→R **seam bar** are legible with colour off / in greyscale (accessibility); the bounded ≤ ~600 ms sequence reads as "earned", not a wait; `smoke-tr-05` locked pivot renders the brass ring + pin glyph and never moves while its row rotates; `smoke-tr-06` frozen tile renders the frost fill + crystal border, is immovable, and plays the thaw cross-fade when its row forms a valid word.
+* **6 — portrait lock:** a device rotation attempt leaves the layout unchanged.
+* **7 — navigation:** the quiet back chevron pops to the caller via the button, the system back, and the edge-swipe gesture; it is hidden in `won` (the sheet's Close owns exit); a direct entry to `/play` with an empty stack falls back safely.
+
+### Gates
+
+`flutter analyze` (app, incl. `integration_test/`) + `dart analyze` (6 packages) clean; `dart format --output=none --set-exit-if-changed .` clean; `flutter test` (app) **112/112** green (99 + **13 new F03-FE9**), no regression; the 196 package tests unchanged → **308 workspace tests**. `flutter build ios --release --no-codesign` unaffected (no product-code change). The `integration_test/` suite is analyze-clean and wired into CI as best-effort; its authoritative device-matrix run is `flutter test integration_test -d <emulator>`.
+
+---
+
 # WORKFLOW HANDOFF SUGGESTION (NON-AUTHORITATIVE)
 
-* **Completed Tasks:** F03-FE1…FE8. The playable screen is implemented against `architecture.md` + `ui-design.md`; all automated gates green; iOS release build green.
-* **Remaining Tasks:** F03 QA — end-to-end **client** QA, `runtime` (device/simulator) mandatory per `architecture.md` §16 (gesture accuracy + 0 double-registered moves during animation + exact-one-cell + input-lock/no-queue + backgrounding + portrait lock + F08-snapshot resume + `ui-design.md` alignment).
-* **Blockers:** none. Six `Needs Tech Lead Clarification` items are non-blocking (defaults implemented); the two perf deviations (blur, breathing) are called out for a ruling.
+* **Completed Tasks:** F03-FE1…FE8 (the playable screen) + **F03-FE9** (the runtime-validation suite + CI wiring + the manual device list).
+* **Remaining Tasks:** F03 QA re-verify — confirm the `play_session_runtime_test.dart` suite covers the automatable `qa.md §17` slice (1–4), review the manual device list (5–7), and re-adjudicate the verdict. Then Tech Lead close.
+* **Blockers:** none. The 6 open clarifications were resolved by the Tech Lead into `architecture.md §18` before this task.
 * **Status Suggestion:** Ready for QA.
 
 ---
