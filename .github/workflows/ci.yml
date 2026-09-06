@@ -47,6 +47,31 @@ jobs:
       - name: Build Android App Bundle
         run: melos run build:app
 
+  infra:
+    name: infra · functions build + test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      # ubuntu-latest ships Node 20; no setup-node action needed (keeps the
+      # SHA-pinning surface minimal — see release.md §10).
+      - name: Node version
+        run: node --version
+
+      - name: Install functions deps
+        run: npm --prefix infra/functions ci
+
+      - name: Build functions (tsc)
+        run: npm --prefix infra/functions run build
+
+      - name: Test functions (offline skeleton; rules suites run when an emulator is present)
+        run: npm --prefix infra/functions test
+      # TODO(F08-BE5 / F08-DEVOPS): add a Firebase-emulator step
+      # (`firebase emulators:exec --only firestore,auth "npm test"`) so the
+      # @firebase/rules-unit-testing suites in test/rules.test.ts run in CI —
+      # per release.md §4. Needs firebase-tools + Java on the runner.
+
   ios-build:
     name: iOS release build (no codesign)
     runs-on: macos-14

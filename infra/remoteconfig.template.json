@@ -1,0 +1,28 @@
+{
+  "parameters": {
+    "daily_enabled": {
+      "defaultValue": { "value": "true" },
+      "description": "Master switch for the Daily Challenge (F07). Kill-switch per release.md §6.",
+      "valueType": "BOOLEAN"
+    },
+    "daily_sync_enabled": {
+      "defaultValue": { "value": "true" },
+      "description": "When false, DailyResultSyncService.drain() is a no-op (F08). Kill-switch per release.md §6/§9.",
+      "valueType": "BOOLEAN"
+    },
+    "share_enabled": {
+      "defaultValue": { "value": "true" },
+      "description": "Master switch for Daily Share (F13). Kill-switch per release.md §6.",
+      "valueType": "BOOLEAN"
+    },
+    "daily_manifest_url": {
+      "defaultValue": { "value": "" },
+      "description": "Points at the current Daily content pack manifest (F07). Empty placeholder until F07.",
+      "valueType": "STRING"
+    }
+  },
+  "parameterGroups": {},
+  "version": {
+    "description": "LOOPLET Remote Config — seeded by the infra/ DURUM 0 (F08)."
+  }
+}

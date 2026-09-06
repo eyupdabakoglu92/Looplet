@@ -7,19 +7,19 @@
 
 ## Current Status
 
-**In Progress — Contract LOCKED (2026-09-06). Scaffold + persistence-core phase.**
+**In Progress — `infra/` DURUM 0 scaffolded (2026-09-06). Backend + Frontend implementation next.**
 
 ---
 
 ## Current Owner
 
-Project Setup (F08.SETUP-0 — `infra/` Firebase DURUM 0) · Frontend/Mobile Developer may start F08-FE1…FE5 (Drift core, no Firebase) in parallel
+Tech Lead (reconcile the `infra/` scaffold + route Backend Developer / Frontend/Mobile Developer)
 
 ---
 
 ## Current Phase
 
-Contract finalized: `architecture.md` is **LOCKED** — `analysis.md` consumed, all four calls made (HTTPS **callable** `submitDailyResultV1`; **decoupled** `guestId` UUID / `firebaseUid`, `platform.md` §6 amended; **F06-style F08↔F07 split** confirmed; `infra/` DURUM 0 runs **parallel** with the Drift core). `Release Scope = production-readiness`; `release.md` §2 updated; `setup-manifest.md` gained the `infra/` DURUM 0 recipe; `platform.md` §6/§13 amended; F02 `restoreMoves` promoted to required; `connectivity_plus` approved. Delivery tasks opened (F08.SETUP-0, F08-BE1…BE5, F08-FE1…FE11, F08-QA1…QA10, F08-DEVOPS post-QA). Next: Project Setup runs the `infra/` DURUM 0.
+`infra/` Firebase DURUM 0 done (Project Setup, F08.SETUP-0): `infra/` config + `firestore.rules` (create-only) + `infra/functions/` TypeScript Cloud Functions package with a `submitDailyResultV1` **callable skeleton** (auth guard + soft App Check + typed contract; no validation/write logic — that is F08-BE2) + offline skeleton tests (6 green) + emulator-gated rules tests + CI `infra` job + `melos` `infra:build`/`infra:test` + `app/pubspec.yaml` Firebase client packages (`firebase_core`/`auth`/`firestore`/`functions`/`app_check`) + `connectivity_plus`. `melos run format:check` / `analyze` / `test` all green; `melos run infra:build` / `infra:test` green. **Manual prerequisite before any deploy/emulator-verified work:** create the real Firebase project + `flutterfire configure` (generates `firebase_options.dart` + platform config) + install `firebase-tools` in CI — see `infra/README.md` → "Not done yet".
 
 ---
 
@@ -36,7 +36,7 @@ Contract finalized: `architecture.md` is **LOCKED** — `analysis.md` consumed, 
 
 - [x] Task ID: F08.0-AN | Assigned Role: Technical Analyst | Status: Done | `analysis.md` delivered (sections 1–19); all 10 open items resolved. Consumed into `architecture.md` on 2026-09-06.
 - [x] Task ID: F08.CONTRACT-TL | Assigned Role: Tech Lead | Status: Done | `analysis.md` consumed into `architecture.md` → **LOCKED**. Calls made: (1) sync surface = HTTPS Callable `submitDailyResultV1`; (2) identity = **decouple** `guestId` (local UUID) from `firebaseUid` (server) — `platform.md` §6 amended; (3) F08↔F07 = F06-style split confirmed (F08 ships persistence core + sync + fake producer; F07 wires real producer); (4) `infra/` DURUM 0 runs **parallel** with the Drift core. `Release Scope = production-readiness`; `release.md` §2 + `platform.md` §6/§13 + `setup-manifest.md` (infra DURUM 0 recipe) + F02 `architecture.md` (`restoreMoves` required) amended. `connectivity_plus` approved. App Check = soft-enforce MVP (locked). Parked-item retry = bounded auto-retry once/app-start, max 3 lifetime (locked). `product-prd §51` server-side clock check = **not in MVP** (Tech Lead decision, no PO escalation — consistent with `platform.md` §6). Delivery tasks opened below.
-- [ ] Task ID: F08.SETUP-0 | Assigned Role: Project Setup | Status: **Open — NEXT** | `infra/` Firebase DURUM 0 per `setup-manifest.md → ## infra/ DURUM 0 Recipe`. Firebase project config + `firestore.rules` (create-only per `architecture.md`) + rules-unit-tests + Cloud Functions TS skeleton (`submitDailyResultV1` compiling skeleton, no logic) + emulator smoke test + Remote Config template (`daily_enabled`/`daily_sync_enabled`/`share_enabled`/`daily_manifest_url` placeholder) + CI jobs + `app/pubspec.yaml` Firebase client packages + `connectivity_plus` + `firebase_options.dart` (no `main.dart` init yet) + `melos` `infra:build`/`infra:test` scripts. App must still build (`flutter build ios --release --no-codesign`, `flutter build appbundle --release`).
+- [x] Task ID: F08.SETUP-0 | Assigned Role: Project Setup | Status: **Done (2026-09-06)** | `infra/` Firebase DURUM 0 scaffolded per `setup-manifest.md → ## infra/ DURUM 0 Recipe`. Created: `infra/firebase.json`, `.firebaserc` (placeholder project `looplet-mvp`), `firestore.rules` (create-only for `dailyResults/{lang}_{date}/entries/{uid}`; default-deny elsewhere), `firestore.indexes.json` (empty), `remoteconfig.template.json` (`daily_enabled`/`daily_sync_enabled`/`share_enabled`=true, `daily_manifest_url`=""), `infra/.gitignore`, `infra/README.md` (rewritten). `infra/functions/` (TypeScript, Node 20): `package.json` + `tsconfig.json` + `jest.config.js` + `src/{index,submitDailyResult,types}.ts` (`submitDailyResultV1` 2nd-gen `onCall` **skeleton** — auth guard + `enforceAppCheck:false` soft + typed wire contract; body throws `INTERNAL` with `TODO(F08-BE2)`) + `test/skeleton.test.ts` (6 offline tests green) + `test/rules.test.ts` (`@firebase/rules-unit-testing`, emulator-gated → skipped without `FIRESTORE_EMULATOR_HOST`). `npm ci && npm run build && npm test` green. CI: `infra` job added to `.github/workflows/ci.yml` (npm ci/build/test; emulator step left as `TODO(F08-BE5/F08-DEVOPS)`). `melos.yaml`: `infra:build` + `infra:test` scripts. `app/pubspec.yaml`: `firebase_core ^3.6.0`, `firebase_auth ^5.3.1`, `cloud_firestore ^5.4.4`, `cloud_functions ^5.1.3`, `firebase_app_check ^0.3.1+7`, `connectivity_plus ^6.0.5` (no `main.dart` init — F08-FE6). `flutter pub get` + `melos bootstrap` + `melos run format:check`/`analyze`/`test` all green; app `flutter analyze` + `flutter test` (4) green. **Version substitutions vs the recipe:** `firebase-functions ^6` (recipe `^5`, EOL), `firebase-admin ^13` (recipe `^12`), `@firebase/rules-unit-testing ^5` + `firebase ^12` dev-dep (recipe `^4`; `^4` peer-conflicts on `firebase@^11`). **Deferred (needs a real Firebase project + `firebase login` — not available in this environment):** `.firebaserc` real project id, `flutterfire configure` → `app/lib/firebase_options.dart` + `google-services.json` + `GoogleService-Info.plist`, `firebase-tools` in CI for the emulator suites, any `firebase deploy`. Documented in `infra/README.md`. Full native iOS/Android app build with the Firebase pods not run locally (CI / F08-FE9 verifies — consistent with the existing "Android `build:app` CI-only locally" posture).
 - [ ] Task ID: F08-FE1 | Assigned Role: Frontend/Mobile Developer | Status: Open (parallel with F08.SETUP-0 — no Firebase) | Drift schema: all `architecture.md → Persistence Schema` tables + `kv`; `AppDatabase` `schemaVersion = 1`; codegen.
 - [ ] Task ID: F08-FE2 | Assigned Role: Frontend/Mobile Developer | Status: Open (parallel) | `MigrationStrategy`: `onCreate` seeds defaults; `onUpgrade` step framework; **never-drop guard** on `personal_best`/`daily_streak`/`daily_entry`; a v1→v2 dummy migration + a migration test harness (seed old → upgrade → assert bests/streak/first-run intact); migration-throw → abort + recoverable, no wipe.
 - [ ] Task ID: F08-FE3 | Assigned Role: Frontend/Mobile Developer | Status: Open (parallel) | Repositories: `PlayerRepo`, `SettingsRepo`, `JourneyProgressRepo`, `PersonalBestRepo` (monotone ↓), `DailyRepo` (first-run immutability + attempts), `DailyStreakRepo` (store-only), `DailyPuzzleCache`, `ActiveSessionRepo`, `SyncQueueRepo` — all write-through + transactional.
@@ -79,7 +79,7 @@ Contract finalized: `architecture.md` is **LOCKED** — `analysis.md` consumed, 
 - [x] (F08.CONTRACT-TL) Tech Lead — done 2026-09-06. `architecture.md` LOCKED; 4 calls made; `Release Scope` set; `release.md` / `platform.md` §6+§13 / `setup-manifest.md` / F02 `architecture.md` amended; delivery tasks opened.
 
 ### Project Setup
-- [ ] (F08.SETUP-0) `infra/` Firebase DURUM 0 per `setup-manifest.md → ## infra/ DURUM 0 Recipe` + `app/` Firebase client wiring. **NEXT.**
+- [x] (F08.SETUP-0) `infra/` Firebase DURUM 0 + `app/` Firebase client wiring — **done 2026-09-06.** Scaffold + skeleton + tests + CI + melos scripts green. Real-Firebase-project steps deferred (see the Active Task Ledger entry + `infra/README.md`).
 
 ### Backend
 - [ ] (F08-BE2) `submitDailyResultV1` implementation. (F08-BE1 folded into F08.SETUP-0.)
@@ -115,10 +115,12 @@ Contract finalized: `architecture.md` is **LOCKED** — `analysis.md` consumed, 
 
 ## Blockers
 
-* **None.** Contract is LOCKED; all Tech Lead decision points from `analysis.md §15/§17` are resolved and recorded in `architecture.md` / `platform.md` / `release.md` / `setup-manifest.md`.
-* Sequencing (not a blocker): F08-FE6/FE7/FE8/FE9 need F08.SETUP-0 (infra) done; Track A (FE1–FE5, FE11) has no Firebase dependency and runs in parallel. FE4 needs the F02 `restoreMoves` additive API (small, F02-owned, bundled into FE4).
-* Cross-feature (not a blocker): F07 is `Not Started` and depends on F08; F08 delivers the sync path via a fake-producer test seam (`architecture.md → Scope Boundary F08 ↔ F07`), it does not wait for F07. `[OPEN — F07]` items (cache population trigger, retention values, real Daily producer, streak rule) are explicitly out of F08 scope.
-* Resolved and recorded: `product-prd §51` server-side streak/clock-integrity check → **not in the MVP** (Tech Lead decision, consistent with `platform.md` §6 — App Check soft-enforce + create-only rule are the only controls; no PO escalation needed).
+* **None hard.** Contract LOCKED; `infra/` scaffold done and green.
+* **Manual prerequisite (not blocking Track A / skeleton work; blocks deploy + emulator-verified BE):** a real Firebase project must be created and wired — `firebase use --add` (real id into `.firebaserc`), `flutterfire configure` from `app/` (→ `app/lib/firebase_options.dart` + `google-services.json` + `GoogleService-Info.plist`), enable Anonymous Auth + App Check (monitor), install `firebase-tools` + `FIREBASE_CI_TOKEN` in CI. Needs Firebase Console access + `firebase login` — not doable in the scaffold environment. Owner: user / DevOps-Release-Engineer, ideally before F08-BE2 emulator verification and required before `F08-DEVOPS`. See `infra/README.md` → "Not done yet".
+* Sequencing (not a blocker): F08-FE6/FE7/FE8/FE9 need the Firebase project wired; **Track A (F08-FE1…FE5, FE11) has no Firebase dependency and can start now.** FE4 bundles the F02 `restoreMoves` additive API.
+* `F08-BE2`/`BE3`/`BE4` can be **written** now against the skeleton + `architecture.md`; **emulator-green verification** needs `firebase-tools` (the manual prerequisite).
+* Cross-feature (not a blocker): F07 `Not Started`, depends on F08; F08 delivers the sync path via the fake-producer seam. `[OPEN — F07]` items are out of F08 scope.
+* Resolved/recorded: `product-prd §51` server-side clock check → not in the MVP.
 
 ---
 
@@ -150,58 +152,48 @@ Contract finalized: `architecture.md` is **LOCKED** — `analysis.md` consumed, 
 
 ## Last Update
 
-* Updated By: Tech Lead
+* Updated By: Project Setup
 * Timestamp: 2026-09-06
-* Summary: **F08.CONTRACT-TL done — `architecture.md` LOCKED.** `analysis.md` consumed; 4 calls made (HTTPS callable `submitDailyResultV1`; decoupled `guestId`/`firebaseUid` with a `platform.md` §6 amendment; F06-style F08↔F07 split confirmed; `infra/` DURUM 0 parallel with the Drift core). `Release Scope = production-readiness` (`release.md` §2 amended). `platform.md` §6 + §13 amended (identity decouple; App Check soft-enforce locked; Drift schema + callable pointers). `setup-manifest.md` gained the `infra/` DURUM 0 recipe. F02 `architecture.md` — `restoreMoves` promoted to required. `connectivity_plus` approved. App Check soft-enforce + parked-item retry policy locked. `product-prd §51` server-side clock check ruled out of the MVP (no PO escalation). Delivery tasks opened: F08.SETUP-0 (Project Setup, next), F08-FE1…FE11, F08-BE2…BE5, F08-QA1…QA10, F08-DEVOPS (post-QA). Parallel-work strategy set (Track A no-Firebase FE || Track B infra+BE). Nothing committed to git.
+* Summary: **F08.SETUP-0 done — `infra/` Firebase DURUM 0 scaffolded.** `infra/`: `firebase.json`, `.firebaserc` (placeholder), `firestore.rules` (create-only for `dailyResults/{lang}_{date}/entries/{uid}` + default-deny), `firestore.indexes.json`, `remoteconfig.template.json` (4 keys), `.gitignore`, `README.md` rewritten. `infra/functions/` (TypeScript, Node 20): `submitDailyResultV1` 2nd-gen `onCall` **skeleton** (auth guard + `enforceAppCheck:false` soft + typed wire contract in `types.ts`; body throws `INTERNAL` / `TODO(F08-BE2)`); `test/skeleton.test.ts` 6 offline tests green; `test/rules.test.ts` (`@firebase/rules-unit-testing`, emulator-gated). `npm ci && build && test` green. CI: `infra` job added (emulator step = `TODO(F08-BE5/F08-DEVOPS)`). `melos.yaml`: `infra:build` + `infra:test`. `app/pubspec.yaml`: `firebase_core`/`firebase_auth`/`cloud_firestore`/`cloud_functions`/`firebase_app_check` + `connectivity_plus` (no `main.dart` init — F08-FE6). `melos run format:check`/`analyze`/`test` + `infra:build`/`infra:test` + `melos bootstrap` + app `flutter analyze`/`test` (4) all green. Version substitutions vs the recipe recorded in the F08.SETUP-0 ledger entry. **Deferred (needs a real Firebase project + `firebase login`, unavailable in this environment):** `.firebaserc` real id, `flutterfire configure` → `firebase_options.dart` + platform config, `firebase-tools` in CI, any deploy — see `infra/README.md`. Not committed to git.
 
 ---
 
 ## Next Role
 
-Project Setup
+Tech Lead
 
 ---
 
 ## Next Action
 
-### Project Setup — F08.SETUP-0
+### Tech Lead — reconcile the `infra/` scaffold + route implementation
 
 ```text
-Run the infra/ Firebase DURUM 0. This is a separate one-time Project Setup run (not Steps 1-7).
+Reconcile F08.SETUP-0 and route Backend + Frontend into the F08 delivery tasks.
 
-Authority: project-authority/setup-manifest.md -> "## infra/ DURUM 0 Recipe (Firebase — triggered by F08)"
-(the step list); features/f08-offline-persistence-and-sync/architecture.md -> "Firebase Sync Surface" (the
-create-only rule + callable contract the rules/skeleton must match), "Dependency Edges" (the exact Firebase client
-package set), "App Init Sequence" (Project Setup does NOT add main.dart init — F08-FE6 owns it); project-authority/
-platform.md §3/§6 (TypeScript Node 20, 2nd-gen callable, single MVP Firebase project, App Check soft-enforce);
-project-authority/release.md §4 (CI jobs) / §7 (FIREBASE_CI_TOKEN name only).
+Authority: this orchestration.md (F08.SETUP-0 ledger entry + Blockers), the scaffolded infra/ files,
+infra/README.md ("Not done yet"), features/f08-.../architecture.md (LOCKED), release.md, platform.md.
 
-Deliverables (see the recipe for the full step list):
-1. infra/ project files: firebase.json, .firebaserc, firestore.rules (create-only for
-   dailyResults/{lang}_{date}/entries/{uid} per architecture.md), firestore.indexes.json (empty),
-   remoteconfig.template.json (daily_enabled / daily_sync_enabled / share_enabled = true; daily_manifest_url = "").
-   Replace infra/README.md stub with a real overview.
-2. infra/functions/ TS Firebase Functions package: package.json + tsconfig.json + src/index.ts exporting a 2nd-gen
-   submitDailyResultV1 CALLABLE SKELETON (auth guard + enforceAppCheck:false + TODO body returning a typed INTERNAL
-   — NO validation/write logic; that is Backend Developer F08-BE2). One emulator smoke test (unauthenticated call
-   rejected). npm run build + npm test green.
-3. @firebase/rules-unit-testing spec: allow-create-own / deny-create-other / deny-update / deny-delete / deny-read —
-   green in the emulator.
-4. CI wiring in .github/workflows/ci.yml (release.md §4): infra/functions npm ci && build && test; rules tests;
-   gated on infra/** changes; actions pinned to SHA.
-5. app/pubspec.yaml: add firebase_core ^3, firebase_auth ^5, cloud_firestore ^5, firebase_app_check ^0.3,
-   cloud_functions ^5, connectivity_plus ^6 (nearest resolving versions; keep majors; record substitutions).
-   Generate firebase_options.dart via the FlutterFire CLI + platform config files. DO NOT initialize Firebase in
-   main.dart. Confirm flutter build ios --release --no-codesign AND flutter build appbundle --release still pass.
-6. melos.yaml: add infra:build / infra:test scripts. Do not add infra/functions to the Dart packages: globs.
-7. melos bootstrap; commit every pubspec.lock + infra/functions/package-lock.json.
+1. Reconcile F08.SETUP-0: confirm the scaffold matches architecture.md -> Firebase Sync Surface (callable name +
+   create-only rule shape) and Dependency Edges (Firebase client package set). Accept or adjust the recorded
+   version substitutions (firebase-functions ^6 vs recipe ^5; firebase-admin ^13 vs ^12; @firebase/
+   rules-unit-testing ^5 + firebase ^12 dev vs recipe ^4).
+2. Decide how the "manual Firebase-project prerequisite" is handled (create project + flutterfire configure +
+   firebase-tools in CI): (a) ask the user to do it now, (b) fold into F08-DEVOPS, or (c) a small follow-up task.
+   It does NOT block Track A or WRITING F08-BE2/BE3; it DOES block emulator-green verification + any deploy.
+3. Route implementation (recommended parallel):
+   - Frontend/Mobile Developer -> Track A: F08-FE1 (Drift schema) -> FE2 (migrations + never-drop guard + test
+     harness) -> FE3 (repositories) -> FE5 (elapsed helper) -> FE11 (toEngineConfig); FE4 bundles the additive
+     F02 restoreMoves(List<Move>) API.
+   - Backend Developer -> F08-BE2 (submitDailyResultV1 validation + create-only write + CREATED/ALREADY_SUBMITTED)
+     -> BE3 (finalize rules + rules-unit-tests) -> BE4 (emulator unit tests) -> BE5 (CI emulator step). BE
+     emulator verification waits on the Firebase project.
+   Set Next Role to whichever you sequence first.
+4. Sync feature-board.md + system-state.md: Active Owner -> Frontend/Mobile Developer (or Backend Developer);
+   Active Phase -> "F08 implementation (persistence core + sync callable)".
 
-If anything conflicts with platform.md / release.md / F08 architecture.md, stop and raise a Tech Lead blocker
-(do not resolve silently). Produce the Project Setup report. On completion set Next Role = Tech Lead
-(to reconcile the scaffold and route Backend Developer + Frontend/Mobile Developer into the F08-BE / F08-FE tasks).
+No UI Designer. QA (F08-QA1...QA10) after BE + FE. F08-DEVOPS (production-readiness) after QA.
 ```
-
-**Parallel note (not blocked by F08.SETUP-0):** Frontend/Mobile Developer may begin **Track A** now — F08-FE1 (Drift schema) → FE2 (migrations + guard) → FE3 (repositories) → FE5 (elapsed helper), plus FE11 (`toEngineConfig`). FE4 bundles the additive F02 `restoreMoves(List<Move>)` API (F02-owned review). These need no Firebase. If the user runs `Run Frontend/Mobile Developer` before Project Setup, that is a valid parallel start; `orchestration.md → Next Role` names Project Setup as the primary long-pole.
 
 ---
 
@@ -210,3 +202,4 @@ If anything conflicts with platform.md / release.md / F08 architecture.md, stop 
 * v1 (2026-09-06) — Tech Lead: F08 created and activated after F06 `Done`. P0, next on the critical path (`product-prd.md` §12.6 build order; feature-board priority). `prd.md` + initial `architecture.md` skeleton (LOCKED substrate + 10 PENDING-ANALYSIS items) + orchestration. Complexity COMPLEX → Technical Analyst pass (F08.0-AN → `analysis.md`). No UI Designer. DevOps/Release Engineer + Project Setup (`infra/` DURUM 0) expected. Routing: Technical Analyst → Tech Lead (finalize contract) → Project Setup → Backend + Frontend → QA → Tech Lead → DevOps/Release Engineer → Tech Lead. `feature-board.md` + `system-state.md` synced.
 * v2 (2026-09-06) — Technical Analyst: F08.0-AN done. `analysis.md` delivered (sections 1–19). All 10 open items resolved. Recommendations: HTTPS callable `submitDailyResultV1`; decouple local `guestId` from `firebaseUid` (flagged `platform.md §6` reconciliation); F06-style F08↔F07 split (persistence core + sync + fake producer now, F07 wires real producer); parallel `infra/` DURUM 0. Specified: Drift schema (§6.1), locked active-session snapshot JSON (§6.2), `sync_queue` state machine (§6.3), exactly-once + reconciliation (§4.6), callable contract (§5), task breakdown (§16). Contract risks + upstream `platform.md §6` conflict in §17. Current Owner → Tech Lead; Next Role → Tech Lead (F08.CONTRACT-TL).
 * v3 (2026-09-06) — Tech Lead: **F08.CONTRACT-TL done — `architecture.md` LOCKED.** `analysis.md` consumed. Calls: (1) HTTPS Callable `submitDailyResultV1`; (2) decouple `guestId` (local UUID) / `firebaseUid` (server) — `platform.md` §6 amended; (3) F06-style F08↔F07 split confirmed (F08 = persistence + sync + fake producer; F07 = real producer); (4) `infra/` DURUM 0 parallel with the Drift core. `Release Scope = production-readiness` (`release.md` §2 amended). `platform.md` §6 + §13 amended (identity decouple; App Check soft-enforce locked; Drift schema + callable pointers). `setup-manifest.md` gained the `infra/` DURUM 0 recipe + Workspace Targets update. F02 `architecture.md` — `restoreMoves(List<Move>)` promoted to required (additive). `connectivity_plus` approved. App Check soft-enforce + parked-item retry (bounded auto-retry, once/app-start, max 3 lifetime) locked. `product-prd §51` server-side clock check ruled out of the MVP. Delivery tasks opened: F08.SETUP-0 (Project Setup, NEXT), F08-FE1…FE11 (Frontend/Mobile Developer — Track A parallel now), F08-BE2…BE5 (Backend Developer), F08-QA1…QA10 (QA, post BE+FE), F08-DEVOPS (DevOps/Release Engineer, post-QA). Current Owner → Project Setup; Next Role → Project Setup (F08.SETUP-0). `feature-board.md` + `system-state.md` synced by the Tech Lead this turn.
+* v4 (2026-09-06) — Project Setup: **F08.SETUP-0 done — `infra/` Firebase DURUM 0 scaffolded.** `infra/` config (`firebase.json`, `.firebaserc` placeholder, `firestore.rules` create-only, `firestore.indexes.json`, `remoteconfig.template.json`, `.gitignore`, `README.md`) + `infra/functions/` TypeScript package (`submitDailyResultV1` 2nd-gen `onCall` skeleton — auth guard + soft App Check + typed wire contract; `TODO(F08-BE2)` body) + `test/skeleton.test.ts` (6 offline, green) + `test/rules.test.ts` (emulator-gated) + `jest.config.js`. `npm ci && build && test` green. CI `infra` job added (`.github/workflows/ci.yml`; emulator step deferred to `F08-BE5`/`F08-DEVOPS`). `melos.yaml` `infra:build`/`infra:test`. `app/pubspec.yaml` + Firebase client packages (`firebase_core ^3.6.0`, `firebase_auth ^5.3.1`, `cloud_firestore ^5.4.4`, `cloud_functions ^5.1.3`, `firebase_app_check ^0.3.1+7`) + `connectivity_plus ^6.0.5`. `flutter pub get` + `melos bootstrap` + `melos run format:check`/`analyze`/`test` + `melos run infra:build`/`infra:test` + app `flutter analyze`/`test` (4) all green. Version substitutions vs recipe: `firebase-functions ^6` (recipe `^5`), `firebase-admin ^13` (`^12`), `@firebase/rules-unit-testing ^5` + `firebase ^12` dev (`^4` peer-conflicts). Deferred (needs a real Firebase project + `firebase login`): `.firebaserc` real id, `flutterfire configure` → `firebase_options.dart` + platform config, `firebase-tools` in CI, deploy — recorded in `infra/README.md`. Current Owner → Tech Lead; Next Role → Tech Lead (reconcile scaffold + route Backend Developer + Frontend/Mobile Developer). Nothing committed to git.

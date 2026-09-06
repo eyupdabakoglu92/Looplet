@@ -39,3 +39,11 @@ scripts:
     run: >-
       melos exec --scope="looplet_authoring" --
       "dart run bin/looplet_authoring.dart check ../../content --repo-root ../.."
+
+  infra:build:
+    description: Compile the Firebase Cloud Functions (TypeScript → lib/). F08.
+    run: npm --prefix infra/functions ci && npm --prefix infra/functions run build
+
+  infra:test:
+    description: Run the Cloud Functions test suite (offline skeleton; rules suites need the emulator). F08.
+    run: npm --prefix infra/functions test
