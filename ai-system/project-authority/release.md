@@ -1,6 +1,6 @@
 # Project Release Authority — LOOPLET
 
-Last Updated: 2026-09-03
+Last Updated: 2026-09-06 (§2 — F08 fires the first Firebase-infra release gate)
 Owner: Tech Lead
 
 ---
@@ -18,7 +18,8 @@ Defines CI/CD gates, environments, store distribution, signing, privacy-manifest
 * Conditional rule:
   * **No release gate** for changes confined to pure-Dart packages or tooling with no client-distributable surface and no infra change (CI gates still run).
   * **Release gate required** when a change produces a new distributable app build, or touches Cloud Functions, Firestore rules, Remote Config, or content packs served to clients.
-* F01 (`dictionary-service`) Release Scope: `none` — it is an internal library module with no distributable surface. The first release gate fires when the first playable build is distributed to internal testing (expected around F03/F05).
+* F01 (`dictionary-service`), F02 (`grid-engine`), F06 (`puzzle-content-and-solver-tooling`) Release Scope: `none` — internal library / build-time tooling, no distributable surface (CI gates still run).
+* **F08 (`offline-persistence-and-sync`) Release Scope: `production-readiness`.** F08 is the **first Firebase deploy** for LOOPLET — it touches Cloud Functions (`submitDailyResultV1`), Firestore rules, and Remote Config, which per the §2 conditional rule requires a release gate. This is a **backend-only** gate (functions + rules + Remote Config to the Firebase project), separate from and earlier than the first **app-build** distribution gate (still expected around F03/F05). A `DevOps/Release Engineer` task opens after F08 QA passes; it must also cover rollback-readiness: functions redeploy-previous, the `daily_sync_enabled` kill-switch, and the fact that the Drift on-device forward migration has **no downgrade** (mitigation: migration tests + staged rollout + the never-drop guard).
 
 ---
 

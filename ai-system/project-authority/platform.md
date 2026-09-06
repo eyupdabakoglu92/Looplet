@@ -1,6 +1,6 @@
 # Project Platform Authority — LOOPLET
 
-Last Updated: 2026-09-06 (§3 + §11 — shared-enum carve-out extended to `PuzzleType` / `DifficultyLabel` at F06 close-out)
+Last Updated: 2026-09-06 (§3 + §11 shared-enum carve-out extended at F06 close-out; §6 guest-identity decouple + §13 Drift-schema/App-Check notes at F08 contract finalization)
 Owner: Tech Lead
 
 ---
@@ -124,7 +124,8 @@ Melos-managed monorepo. Domain packages import **no** Flutter.
 # 6. Auth / Session / Permissions
 
 * **No user-facing login in the MVP.** The player is always a guest (PRD §39).
-* Firebase Anonymous Auth provides an invisible, stable device identity (`guestId` = anonymous UID). **[Assumption]** this is not "login" in the PRD §39 sense — no credentials, no UI, no user action — and is used only for Firestore write-scoping and the analytics user id.
+* Firebase Anonymous Auth provides an invisible device identity used for Firestore write-scoping and the analytics user id. **[Assumption]** this is not "login" in the PRD §39 sense — no credentials, no UI, no user action.
+* **Identity model (amended 2026-09-06, F08 contract):** the anonymous UID and the durable guest key are **decoupled** — `firebaseUid` = the Firebase Anonymous UID (server identity: Firestore path segment + sync idempotency-key component; `null` until Auth completes); `guestId` = a **locally generated UUID v4**, persisted on first launch, stamped on every player-owned row, available offline before any network. Rationale: offline-first (PRD §5.4/§51) forbids gating local play/persistence on Anonymous Auth, which cannot complete offline on a first launch; the local UUID is also the cleaner anchor for future account adoption (`accountId` added alongside a retained `guestId`). Where earlier text here read "`guestId` = anonymous UID", read this decouple. See `features/f08-offline-persistence-and-sync/architecture.md` → Guest Identity Model.
 * Authorization (Firestore rules):
   * Content in Cloud Storage: public read.
   * `dailyResults/**`: a client may **create** only `entries/{its own uid}` and only if that document does not already exist (server-enforced first-run authority). No update, no delete, no cross-user read in the MVP.
@@ -196,6 +197,8 @@ Melos-managed monorepo. Domain packages import **no** Flutter.
 # 13. Open Technical Decisions (tracked)
 
 * **Solver algorithm (F06):** approach is set here — provable minimum via complete search of the 5×5 state space, build-time only, sharing `looplet_engine`. **Implementation: forward BFS** over `GridState.canonicalKey` with a visited set + parent map + a `SearchBudget` (maxDepth / maxNodes / timeBudget); the first `isSolved` state dequeued is the proven minimum (the goal is a *set* — any full target row). Amended 2026-09-05 (F06 analysis): bidirectional BFS is **not** used — the goal-is-a-set plus the irreversibility of frozen-tile thaw break meet-in-the-middle. IDA* remains a documented per-puzzle fallback only. Final form is locked in F06's `architecture.md`.
-* **App Check enforcement level (F07/F08):** soft-enforce for the MVP; hard-enforce decision deferred.
+* **App Check enforcement level:** **soft-enforce (monitor) for the MVP** — locked at F08 contract finalization (2026-09-06). Attestation failure on `submitDailyResultV1` / Firestore writes is logged, not blocked. Hard-enforce is a **post-MVP launch-hardening** item, not part of F07/F08.
+* **On-device persistence schema (F08):** Drift/SQLite; the concrete table set + migration policy + the `kv` active-session snapshot contract are **locked** in `features/f08-offline-persistence-and-sync/architecture.md` (Persistence Schema / Active-Session Snapshot Contract). Forward-only; store downgrade unsupported; `personal_best` / `daily_streak` / `daily_entry` first-run rows never dropped. Drift codegen (`build_runner`) IS run for this schema (the "codegen off for MVP" note in §3 is Riverpod-only).
+* **Daily offline-result sync surface (F08):** HTTPS Callable `submitDailyResultV1` (the "one RPC-style callable" from §4), not a direct client Firestore write. Contract locked in F08's `architecture.md`.
 * **Level editor surface (F06):** CLI-only for the MVP (`solve`/`playtest`/`export`/`check`/`fill`); a Flutter desktop editor is a Future Consideration. Locked 2026-09-05 in F06's `architecture.md`.
 * **Product-analytics depth (F12):** GA4 built-in funnels/retention are assumed sufficient for the §52 gate; a dedicated tool (PostHog/Amplitude) is a Future Consideration only if GA4 proves insufficient.

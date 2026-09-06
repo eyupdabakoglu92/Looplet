@@ -3,7 +3,7 @@
 > Status: OPERATIONAL. Project-specific scaffold/bootstrap recipe for the `Project Setup` role.
 > This file carries operation recipes and canonical commands only — no role or architecture authority.
 
-Last Updated: 2026-09-03
+Last Updated: 2026-09-06 (added the `infra/` Firebase DURUM 0 recipe for F08)
 Owner: Tech Lead
 
 ---
@@ -38,7 +38,7 @@ Owner: Tech Lead
 | `tools/looplet_authoring` | F06 level-authoring CLI | Yes (skeleton) | Dart executable package, depends on `looplet_engine` + `looplet_solver` + `looplet_content` |
 | `app` | Flutter application (iOS + Android, portrait) | Yes | depends on all `looplet_*` packages via path |
 | `content/` | versioned puzzle JSON artifacts | Yes (folder + README) | populated by F05/F06/F07, not by Project Setup |
-| `infra/` | Firebase project config + Cloud Functions (TypeScript) | No | provisioned as a **separate DURUM 0** when the first backend feature (F07/F08/F12) starts; Tech Lead re-triggers Project Setup then. Create `infra/README.md` stub only. |
+| `infra/` | Firebase project config + Cloud Functions (TypeScript) + Firestore rules + Remote Config | Yes (DURUM 0, on trigger) | **Triggered by F08 (2026-09-06).** Steps 1–7 created `infra/README.md` stub only; the full scaffold recipe is now **`## infra/ DURUM 0 Recipe (Firebase — triggered by F08)`** below. Run when F08's `orchestration.md → Next Role = Project Setup`. |
 
 Skeleton = compiling package with `pubspec.yaml`, a `lib/<name>.dart` barrel exporting a placeholder, and one passing `test/` smoke test. No feature logic.
 
@@ -125,6 +125,38 @@ For each: package layout as Step 2, correct `name`, dependency edges per Workspa
 * Commit all `pubspec.lock` files (root, every package, `app`) — required green by `release.md` §10.
 * If any listed dependency version does not resolve against the current stable Flutter/Dart, pick the nearest lower compatible version, keep the same major, and record the substitution in `frontend.md` / the Project Setup report — do **not** change majors or add alternative packages.
 * If a step conflicts with `platform.md` or `release.md`, stop and raise a Tech Lead blocker — do not choose silently.
+
+---
+
+## `infra/` DURUM 0 Recipe (Firebase — triggered by F08)
+
+> Status: OPERATIONAL as of 2026-09-06 (Tech Lead, F08 contract finalization). This is a **separate, one-time** Project Setup run, distinct from Steps 1–7. Trigger command: `Run Project Setup` while F08's `orchestration.md → Next Role = Project Setup`.
+
+Target directory: `infra/` at the repo root (currently a stub `infra/README.md`).
+
+### Global constraints
+
+* Firebase project: **one project for the MVP** (`looplet` or a name the user provides); a separate `production` project is a DevOps/Release Engineer decision at the release gate — do **not** create multiple projects here.
+* Cloud Functions language: **TypeScript, Node.js 20** (`platform.md` §3). 2nd-gen HTTPS callable.
+* No secret values in the repo — only names (`release.md` §7). `FIREBASE_CI_TOKEN` is referenced by CI, not stored.
+* Do **not** implement `submitDailyResultV1` business logic — Project Setup produces a **compiling skeleton** (handler that validates nothing yet / returns `INTERNAL`), one passing emulator smoke test, and the wiring. Backend Developer (F08-BE2) fills the logic against `features/f08-.../architecture.md`.
+* Firebase **client** config files (`firebase_options.dart`, `google-services.json`, `GoogleService-Info.plist`) are not secret and are committed (`release.md` §7).
+
+### Steps
+
+1. **`infra/` project files:** `firebase.json` (functions + firestore + emulators config), `.firebaserc` (project alias), `firestore.rules`, `firestore.indexes.json` (empty `{"indexes":[],"fieldOverrides":[]}` for now), `remoteconfig.template.json` with keys `daily_enabled` / `daily_sync_enabled` / `share_enabled` (default `true`) and `daily_manifest_url` (empty string placeholder). Replace `infra/README.md` stub content with a real overview.
+2. **`infra/functions/`:** `dart create`-equivalent for a TS Firebase Functions package — `package.json` (`firebase-functions` ^5, `firebase-admin` ^12, `typescript` ^5, `jest` or `vitest`), `tsconfig.json`, `src/index.ts` exporting a 2nd-gen `submitDailyResultV1` **callable skeleton** (auth-required guard + App Check `enforceAppCheck: false` (soft) + a `TODO` body returning a typed `INTERNAL` for now), `src/submitDailyResult.ts` stub, one `test/` smoke test that boots the function in the emulator and asserts an unauthenticated call is rejected. `npm run build` + `npm test` green.
+3. **`firestore.rules`:** implement the create-only rule for `dailyResults/{lang}_{date}/entries/{uid}` per `features/f08-.../architecture.md` → Firebase Sync Surface → Rules (`allow create` iff `request.auth.uid == uid` in path and `!exists`; `update`/`delete`/`read` `false`). Add a `@firebase/rules-unit-testing` spec (`infra/functions/test/rules.test.ts` or `infra/rules-test/`) covering allow-create-own / deny-create-other / deny-update / deny-read — green in the emulator.
+4. **CI wiring** (`.github/workflows/ci.yml`, per `release.md` §4): add jobs — `infra/functions` `npm ci && npm run build && npm test`; `@firebase/rules-unit-testing` run; both gated on `infra/**` changes. Pin any new action to a commit SHA.
+5. **App Firebase client wiring** (`app/`): add to `app/pubspec.yaml` — `firebase_core: ^3`, `firebase_auth: ^5`, `cloud_firestore: ^5`, `firebase_app_check: ^0.3`, `cloud_functions: ^5` (nearest resolving versions; keep majors; record substitutions in the Project Setup report). Generate `firebase_options.dart` via the FlutterFire CLI. Add `connectivity_plus: ^6` (Tech Lead-approved for F08). **Do not** initialize Firebase in `main.dart` yet — F08-FE6 owns the guarded init sequence; Project Setup only adds the dependencies + `firebase_options.dart` + platform config files so the app still builds (`flutter build ios --release --no-codesign` + `flutter build appbundle --release` green).
+6. **`melos.yaml`:** add scripts `infra:build` (`cd infra/functions && npm ci && npm run build`), `infra:test` (`cd infra/functions && npm test`). Do not add `infra/functions` to the Dart `packages:` globs (it is TS, not a Dart package).
+7. Run `melos bootstrap`; commit every `pubspec.lock` + `infra/functions/package-lock.json` (`release.md` §10).
+
+### Application rules
+
+* Same conflict-escalation rule as Steps 1–7: if this recipe conflicts with `platform.md` / `release.md` / F08's `architecture.md`, stop and raise a Tech Lead blocker.
+* Project Setup does not implement `submitDailyResultV1` validation/write logic or the client init sequence — those are F08-BE2 / F08-FE6.
+* If a listed package version does not resolve, pick the nearest lower compatible version, keep the major, record the substitution.
 
 ---
 
