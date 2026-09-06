@@ -11,7 +11,10 @@ import '../engine/move_shorthand.dart';
 import '../persistence/active_session_snapshot.dart';
 import '../persistence/elapsed_timer.dart';
 import '../persistence/repositories/active_session_repo.dart';
+import '../persistence/repositories/personal_best_repo.dart';
 import '../persistence/session_restore.dart';
+import '../rating/completion_result.dart';
+import '../rating/star_rating.dart';
 import 'gesture_resolver.dart';
 
 /// Screen phase (`architecture.md` §6). There is **no input queue** — a pointer
@@ -68,9 +71,13 @@ class PlaySessionController extends ChangeNotifier {
     GestureResolver resolver = const GestureResolver(),
     DateTime Function()? clock,
     ActiveSessionSnapshot? restoreFrom,
+    PersonalBestRepo? personalBestRepo,
+    String? guestId,
   }) : _validator = validator,
        _repo = activeSessionRepo,
        _resolver = resolver,
+       _personalBestRepo = personalBestRepo,
+       _guestId = guestId,
        _clock = clock ?? (() => DateTime.now().toUtc()) {
     final restored = _tryRestore(restoreFrom);
     if (restored != null) {
@@ -90,6 +97,7 @@ class PlaySessionController extends ChangeNotifier {
       // A restored-completed or authored-solved puzzle: land directly in `won`.
       _phase = PlaySessionPhase.won;
       _wonRow = _findWinningRow();
+      _beginCompletion();
     }
     if (!_hydratedFromSnapshot) {
       unawaited(_persist());
@@ -101,6 +109,8 @@ class PlaySessionController extends ChangeNotifier {
   final WordValidator _validator;
   final ActiveSessionRepo _repo;
   final GestureResolver _resolver;
+  final PersonalBestRepo? _personalBestRepo;
+  final String? _guestId;
   final DateTime Function() _clock;
 
   late final GridEngine _engine;
@@ -125,6 +135,31 @@ class PlaySessionController extends ChangeNotifier {
   /// For tests / `paused`-flush ordering; not needed for normal play.
   @visibleForTesting
   Future<void> get whenPersisted => _pendingWrite;
+
+  // --- F04 star rating / personal best ------------------------------------
+  CompletionResult? _completion;
+  bool _ratingUnavailable = false;
+  bool _ratingResolved = false;
+  Future<void> _ratingWork = Future<void>.value();
+
+  /// The F04 completion result once the puzzle is solved. `null` while playing,
+  /// and `null` for the defensive no-optimal case (see [ratingUnavailable]) —
+  /// the panel then falls back to a bare completion from [targetWord] /
+  /// [moveCount] (`architecture.md` §6).
+  CompletionResult? get completion => _completion;
+
+  /// `true` when the puzzle is solved but `optimalMoves < 1`, so no rating can
+  /// be computed (defensive — F06 guarantees this never happens for a shipped
+  /// puzzle). The panel shows the completion without stars / best.
+  bool get ratingUnavailable => _ratingUnavailable;
+
+  /// `true` once the personal-best read-back has settled (or was skipped). Until
+  /// then [completion] may carry the sentinel `personalBestMoves == 0`.
+  bool get ratingResolved => _ratingResolved;
+
+  /// Completes when the personal-best write + read-back settles. Tests only.
+  @visibleForTesting
+  Future<void> get whenRatingResolved => _ratingWork;
 
   List<List<String>> _displayLetters = const <List<String>>[];
   List<List<TileStatus>> _tileStatuses = const <List<TileStatus>>[];
@@ -314,6 +349,7 @@ class PlaySessionController extends ChangeNotifier {
       _activeLine = null;
       _timer.pause();
       unawaited(_persistCompletedThenClear());
+      _beginCompletion();
     } else {
       _phase = PlaySessionPhase.idle;
       _activeLine = null;
@@ -375,7 +411,104 @@ class PlaySessionController extends ChangeNotifier {
     _activeLine = null;
     _gridVersion += 1;
     _phase = PlaySessionPhase.idle;
+    // A fresh attempt: drop the previous completion so the next win recomputes.
+    _completion = null;
+    _ratingUnavailable = false;
+    _ratingResolved = false;
     _refreshDisplay();
+  }
+
+  // --- F04 win-path wiring (additive; no F03 contract change) --------------
+
+  /// On a win: compute the star rating (synchronous — depends only on
+  /// `moveCount` + `optimalMoves`), publish a preliminary [CompletionResult],
+  /// then resolve the personal-best line from F08's `PersonalBestRepo`
+  /// (`architecture.md` §6).
+  void _beginCompletion() {
+    final optimal = puzzle.optimalMoves;
+    final player = _engine.moveCount;
+
+    if (optimal < 1) {
+      // Defensive only — F06's export/check gate guarantees `optimalMoves`.
+      _ratingUnavailable = true;
+      _ratingResolved = true;
+      _completion = null;
+      debugPrint('play: rating_blocked_no_optimal (puzzle ${puzzle.id})');
+      return;
+    }
+
+    final stars = starsForResult(player: player, optimal: optimal);
+    _completion = CompletionResult(
+      levelId: puzzle.id,
+      source: source,
+      targetWord: puzzle.targetWord,
+      playerMoves: player,
+      optimalMoves: optimal,
+      stars: stars,
+      isPerfect: isPerfectResult(player: player, optimal: optimal),
+      // Sentinel until the read-back resolves (§6). `0` renders as "—".
+      personalBestMoves: 0,
+      bestIsPerfect: false,
+      bestOutcome: BestOutcome.firstClear,
+      ratingPersisted: false,
+    );
+    _ratingResolved = false;
+    _ratingWork = _resolvePersonalBest(
+      player: player,
+      optimal: optimal,
+      stars: stars,
+    );
+  }
+
+  /// Fire-and-forget with a **caught** failure (same posture as [_persist]).
+  /// Stars are already published; a storage failure degrades only the best line
+  /// to "—" and never blocks the panel.
+  Future<void> _resolvePersonalBest({
+    required int player,
+    required int optimal,
+    required int stars,
+  }) async {
+    final repo = _personalBestRepo;
+    final guestId = _guestId;
+
+    // Daily persistence is F07's; a missing repo/guest means an unwired caller
+    // (unit tests). Either way: stars stand, no best line.
+    if (repo == null || guestId == null || source != PuzzleSource.journey) {
+      _ratingResolved = true;
+      notifyListeners();
+      return;
+    }
+
+    try {
+      final prior = await repo.read(guestId, puzzle.id);
+      await repo.recordCompletion(
+        guestId: guestId,
+        levelId: puzzle.id,
+        moveCount: player,
+        stars: stars,
+        optimalMoves: optimal,
+        completedAtUtcMs: _nowMs(),
+      );
+      final post = await repo.read(guestId, puzzle.id);
+      _completion = _completion?.copyWith(
+        personalBestMoves: post?.bestMoveCount ?? player,
+        bestIsPerfect: post?.isPerfect ?? (player == optimal),
+        bestOutcome: bestOutcomeFor(
+          player: player,
+          priorBest: prior?.bestMoveCount,
+        ),
+        ratingPersisted: true,
+      );
+    } catch (error) {
+      debugPrint('play: best_persist_failed (non-fatal) — $error');
+      _completion = _completion?.copyWith(
+        personalBestMoves: 0,
+        bestOutcome: BestOutcome.firstClear,
+        ratingPersisted: false,
+      );
+    }
+    _ratingResolved = true;
+    notifyListeners();
   }
 
   // --- internals ---------------------------------------------------------------

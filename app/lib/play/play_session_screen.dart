@@ -4,12 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../persistence/persistence_providers.dart';
+import '../rating/completion_panel.dart';
+import '../rating/rating_strings.dart';
 import 'play_session_args.dart';
 import 'play_session_controller.dart';
 import 'play_session_providers.dart';
 import 'play_strings.dart';
 import 'play_theme.dart';
-import 'widgets/completion_sheet.dart';
 import 'widgets/moves_hud.dart';
 import 'widgets/play_stage.dart';
 import 'widgets/puzzle_board.dart';
@@ -88,6 +89,16 @@ class _LoadedPlaySessionState extends ConsumerState<_LoadedPlaySession>
   Future<void> _init() async {
     final repo = ref.read(activeSessionRepoProvider);
     final snapshot = await repo.read();
+    // F04: the personal-best store + guest id (F08). A guest row always exists
+    // after bootstrap; guard defensively so a lookup failure only costs the
+    // "best" line, never the panel.
+    final personalBestRepo = ref.read(personalBestRepoProvider);
+    String? guestId;
+    try {
+      guestId = await ref.read(currentGuestIdProvider.future);
+    } catch (error) {
+      debugPrint('play: guest id unavailable, best line disabled — $error');
+    }
     if (!mounted) return;
     final controller = PlaySessionController(
       puzzle: widget.setup.puzzle,
@@ -95,6 +106,8 @@ class _LoadedPlaySessionState extends ConsumerState<_LoadedPlaySession>
       validator: widget.setup.validator,
       activeSessionRepo: repo,
       restoreFrom: snapshot,
+      personalBestRepo: personalBestRepo,
+      guestId: guestId,
     )..attach();
     setState(() => _controller = controller);
   }
@@ -198,13 +211,13 @@ class _PlayBody extends StatelessWidget {
             );
           },
         ),
-        // Completion sheet + scrim.
+        // F04 completion panel + scrim (over F03's dimmed + receded board).
         IgnorePointer(
           ignoring: !won,
           child: AnimatedOpacity(
             opacity: won ? 1 : 0,
             duration: const Duration(milliseconds: 220),
-            child: const ColoredBox(color: Color(0x66000000)),
+            child: const ColoredBox(color: PlayTheme.sheetScrim),
           ),
         ),
         Positioned(
@@ -216,10 +229,13 @@ class _PlayBody extends StatelessWidget {
             duration: const Duration(milliseconds: 320),
             curve: PlayTheme.shiftCurve,
             child: won
-                ? CompletionSheet(
+                ? CompletionPanel(
                     strings: strings,
-                    word: controller.targetWord,
-                    moves: controller.moveCount,
+                    rating: RatingStrings.of(controller.lang),
+                    result: controller.completion,
+                    ratingUnavailable: controller.ratingUnavailable,
+                    bareWord: controller.targetWord,
+                    bareMoves: controller.moveCount,
                     onRetry: controller.retryFromCompletion,
                     onClose: () => _popToCaller(context),
                   )

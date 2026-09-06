@@ -35,6 +35,12 @@ class PlayTheme {
   static const Color muted = Color(0xFF8A88A0); // labels, chevron, Close
   static const Color danger = Color(0xFFE06A5A); // debug load error only
 
+  // --- completion panel / sheet (F03 seam → F04 realises) -----------------
+  static const Color sheetSurface = Color(0xFF191A2B); // raised dark panel
+  static const Color sheetHighlight = Color(0x14FFFFFF); // 1 px top edge
+  static const Color sheetRecess = Color(0xFF12131F); // inset comparison track
+  static const Color sheetScrim = Color(0x66000000); // ~40% over the dim board
+
   // --- geometry ----------------------------------------------------------------
   static const double boardWidthFraction =
       0.88; // of screen width (prd ~85–90%)

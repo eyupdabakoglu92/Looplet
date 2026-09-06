@@ -7,8 +7,8 @@ import 'package:looplet_app/persistence/app_database.dart';
 import 'package:looplet_app/persistence/persistence_providers.dart';
 import 'package:looplet_app/play/play_session_args.dart';
 import 'package:looplet_app/play/play_session_screen.dart';
-import 'package:looplet_app/play/widgets/completion_sheet.dart';
 import 'package:looplet_app/play/widgets/puzzle_board.dart';
+import 'package:looplet_app/rating/completion_panel.dart';
 import 'package:looplet_engine/looplet_engine.dart';
 
 List<Override> _overrides() => <Override>[
@@ -58,28 +58,22 @@ void main() {
   });
 
   testWidgets(
-    'a legal swipe that forms the target → completion sheet (AC2/AC8)',
+    'a legal swipe that forms the target → F04 completion panel (AC2/AC8)',
     (tester) async {
       await tester.pumpWidget(_app(_level01));
       await tester.pumpAndSettle();
 
       await _solveRow0(tester);
 
+      expect(find.byType(CompletionPanel), findsOneWidget);
       expect(find.text('ÇÖZÜLDÜ'), findsOneWidget);
       expect(find.text('Yeniden'), findsOneWidget);
       expect(find.text('Kapat'), findsOneWidget);
-      // MOVES ticked to 1 (HUD) — the sheet also shows a "1" stat, so scope it.
+      // smoke-tr-01 is optimal 1, solved in 1 → Perfect + first clear.
+      expect(find.text('HARİKA'), findsOneWidget);
       expect(
         find.descendant(
-          of: find.byType(CompletionSheet),
-          matching: find.text('1'),
-        ),
-        findsOneWidget,
-      );
-      // The formed word is shown in the sheet.
-      expect(
-        find.descendant(
-          of: find.byType(CompletionSheet),
+          of: find.byType(CompletionPanel),
           matching: find.text('MASAL'),
         ),
         findsOneWidget,
@@ -89,18 +83,18 @@ void main() {
     },
   );
 
-  testWidgets('Retry from the completion sheet resets the board (AC7)', (
+  testWidgets('Retry from the completion panel resets the board (AC7)', (
     tester,
   ) async {
     await tester.pumpWidget(_app(_level01));
     await tester.pumpAndSettle();
     await _solveRow0(tester);
-    expect(find.text('ÇÖZÜLDÜ'), findsOneWidget);
+    expect(find.byType(CompletionPanel), findsOneWidget);
 
     await tester.tap(find.text('Yeniden'));
     await tester.pumpAndSettle();
 
-    expect(find.text('ÇÖZÜLDÜ'), findsNothing);
+    expect(find.byType(CompletionPanel), findsNothing);
     expect(find.text('0'), findsOneWidget); // MOVES reset
     expect(
       find.byIcon(Icons.chevron_left_rounded),
@@ -119,7 +113,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('0'), findsOneWidget);
-    expect(find.text('ÇÖZÜLDÜ'), findsNothing);
+    expect(find.byType(CompletionPanel), findsNothing);
   });
 
   testWidgets('an unsupported source shows the load-error state', (

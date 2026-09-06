@@ -30,7 +30,7 @@ import 'package:looplet_app/persistence/repositories/active_session_repo.dart';
 import 'package:looplet_app/play/play_session_args.dart';
 import 'package:looplet_app/play/play_session_screen.dart';
 import 'package:looplet_app/play/widgets/board_tile.dart';
-import 'package:looplet_app/play/widgets/completion_sheet.dart';
+import 'package:looplet_app/rating/completion_panel.dart';
 import 'package:looplet_app/play/widgets/puzzle_board.dart';
 import 'package:looplet_core/looplet_core.dart' show TileStatus;
 import 'package:looplet_engine/looplet_engine.dart';
@@ -124,7 +124,7 @@ void main() {
           await tester.dragFrom(_rowStart(tester, 0), const Offset(140, 0));
           await tester.pumpAndSettle();
 
-          expect(find.byType(CompletionSheet), findsOneWidget);
+          expect(find.byType(CompletionPanel), findsOneWidget);
           expect(find.text('ÇÖZÜLDÜ'), findsOneWidget);
           await _unmount(tester);
         },
@@ -140,7 +140,7 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(_moves(tester), 0);
-        expect(find.byType(CompletionSheet), findsNothing);
+        expect(find.byType(CompletionPanel), findsNothing);
         await _unmount(tester);
       });
 
@@ -154,7 +154,7 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(_moves(tester), 0);
-        expect(find.byType(CompletionSheet), findsNothing);
+        expect(find.byType(CompletionPanel), findsNothing);
         await _unmount(tester);
       });
     }
