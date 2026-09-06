@@ -7,7 +7,9 @@
 
 ## Current Status
 
-**In Progress — QA re-verified 2026-09-06 → verdict `Approved with Notes`. Awaiting Tech Lead close-out.** Full chain delivered: contract LOCKED + `ui-design.md` (Direction A) + Frontend F03-FE1…FE8 + QA (`Runtime Validation Pending`) + Tech Lead reconciliation (DURUM 5; 6 clarifications → `architecture.md §18`) + **F03-FE9** (the runtime-validation closure — `app/test/play/play_session_runtime_test.dart` 13 `flutter_test` tests + `app/integration_test/play_session_test.dart` device form + CI wiring) + **QA re-verify**. **QA verdict `Approved with Notes`** (`qa.md` overwritten): no blocking issue, no required fix; **308/308 workspace tests** (incl. 13 F03-FE9), analyze/format clean, iOS release GREEN; full `architecture.md` contract + §18 clarifications honoured; all 11 ACs automated-covered; `ui-design.md` Direction A ~94/100, no rubric fail. The F03-FE9 suites close `qa.md §17` scenarios 1–4 (incl. the `prd.md §7` "0 double-registered moves during animation" metric, now automated-proven). **Notes (non-blocking):** (1) a 3-item manual device confirmation of `qa.md §17` 5–7 (seam-bar greyscale legibility + locked/frozen tile visuals + thaw; portrait lock on rotation; system/edge-swipe back) — QA env can't produce; Tech Lead to accept the deferral (recommend the F05 app-distribution smoke); (2) the `integration_test/` device-matrix run; (3) storage-full fault-injection test-debt (shared with F08 AC7); (4) `looplet_solver:56` pre-existing `info` lint (not F03). **Next: Tech Lead** — close-out (per DURUM 5 `Approved with Notes`: accept the notes, mark F03 `Done`, sync `feature-board.md` + `system-state.md`).
+**Done — 2026-09-06.** QA re-verify verdict `Approved with Notes` accepted by the Tech Lead (state-machine DURUM 5 → "Approved with Notes", notes genuinely non-blocking; `Release Scope = none` → normal closeout). Full chain: contract LOCKED + `ui-design.md` Direction A (~94/100) + Frontend F03-FE1…FE8 + QA (`Runtime Validation Pending`, no code defect) + Tech Lead DURUM 5 reconcile (6 clarifications → `architecture.md §18`) + **F03-FE9** (runtime-validation closure — `app/test/play/play_session_runtime_test.dart` 13 `flutter_test` tests = the fast always-green closure in `melos run test`; + `app/integration_test/play_session_test.dart` device form, best-effort CI step) + **QA re-verify → `Approved with Notes`**. **308/308 workspace tests; `flutter analyze` + `dart format --set-exit-if-changed` clean; `flutter build ios --release --no-codesign` GREEN.** Full `architecture.md` contract + §18 clarifications honoured; all 11 ACs automated-covered (incl. the `prd.md §7` "0 double-registered moves during animation" metric — automated-proven via `play_session_runtime_test.dart §17.2`); `ui-design.md` Direction A ~94/100, no `premium-ui-rubric.md` fail, no `design-doctrine.md §8` anti-pattern.
+**Accepted Notes (non-blocking; recorded — do not block `Done`):** (1) a **3-item manual device confirmation** of `qa.md §17` 5–7 (the amber seam bar legible with colour OFF / in greyscale [accessibility] + `smoke-tr-05` locked pin/ring + `smoke-tr-06` frost/crystal + thaw cross-fade; portrait lock survives a rotation attempt; the chevron/back on button + system + edge-swipe, hidden in `won`) → **folds into the first app-build distribution smoke** (~F05, the first feature that triggers a TestFlight/Play internal build); a physical iPhone is currently connected, so a quick ad-hoc pass is also possible if the user wants. (2) the `integration_test/play_session_test.dart` device-matrix run (`flutter test integration_test -d <emulator>`; CI step is best-effort `continue-on-error`). (3) storage-full / disk-write-failure fault-injection test-debt for the persist path (shared with F08 AC7; mechanism source-sound — a follow-up test). (4) `looplet_solver/lib/src/solver.dart:56` — one pre-existing `info`-level analyzer lint (not F03; `dart analyze` exits 0). Optional F06-touch cleanup.
+**Next: `Run UI Designer`** — the active feature is now **F04** (`star-rating-and-personal-best`), activated this turn.
 
 F03 is activated in parallel with **F08 parked** (`In Release`, deploy deferred by user decision to end-of-MVP). F08's engineering is complete and ready; F03 is the other branch of the `F06 → (F08, F03)` critical-path fork and needs no Firebase. See F08 `orchestration.md → Last Decision (DURUM 5.5)` for the parallelization rationale.
 
@@ -15,7 +17,7 @@ F03 is activated in parallel with **F08 parked** (`In Release`, deploy deferred 
 
 ## Current Owner
 
-Tech Lead
+— (F03 closed 2026-09-06). Active feature → **F04**.
 
 ---
 
@@ -90,19 +92,21 @@ Tech Lead
 
 ## Blockers
 
-* **No blocking issue, no required fix (QA re-verify 2026-09-06 → `Approved with Notes`).** Build gate PASS (analyze/format clean, **308/308 workspace tests** incl. 13 F03-FE9, iOS release build GREEN). Full `architecture.md` contract + §18 clarifications honoured; all 11 ACs automated-covered; `ui-design.md` Direction A ~94/100, no rubric fail. The F03-FE9 suites closed `qa.md §17` scenarios 1–4 (incl. the `prd.md §7` "0 double-registered moves during animation" metric).
-* **Open Notes (non-blocking — Tech Lead accepts at close-out; per DURUM 5 `Approved with Notes` these do not stop `Done`):**
-  1. A **3-item manual device confirmation** of `qa.md §17` 5–7 — the amber seam bar legible with colour OFF / in greyscale (accessibility) + `smoke-tr-05` locked pin/ring + `smoke-tr-06` frost/crystal + thaw cross-fade; portrait lock survives a rotation attempt; chevron/back on button + system + **edge-swipe**, hidden in `won`. The QA env has no device. Recommend folding into the first app-build distribution smoke (~F05) or a quick standalone device pass.
-  2. The `integration_test/play_session_test.dart` device-matrix run — `flutter test integration_test -d <emulator>` (CI step is best-effort `continue-on-error`; headless is slow/timing-sensitive).
-  3. Storage-full / disk-write-failure fault-injection test-debt (shared with F08 AC7) — mechanism source-sound; add in a follow-up.
-  4. `looplet_solver/lib/src/solver.dart:56` — one pre-existing `info`-level analyzer lint (not F03; `dart analyze` exits 0; package tests pass). Optional cleanup on the next F06 touch.
-* **6 open clarifications — RESOLVED (Tech Lead, 2026-09-06), written into `architecture.md §18`:** (a) no playing-screen CTA — LOCKED (board is the action; QA must not flag it); (b) F03 owns the first-pass locked/frozen tile *visuals* — no separate tile-state feature; (c) "no system header + quiet back chevron, hidden in terminal states" — locked for `/play`; the cross-screen family rule → F10; (d) `PlayStrings` accepted as the F03 localization seam; a `gen_l10n` layer → `[DEFERRED — F10-or-earlier]`; final TR strings → PO/localization; (e)+(f) the 2 perf deviations (recede blur → dim-only; breathing ambient omitted) — accepted for the MVP; a device-tier blur → post-MVP polish.
-* **Non-F03 observation:** `looplet_solver/lib/src/solver.dart:56` — one pre-existing `info`-level analyzer lint from an earlier session (`dart analyze` exits 0; CI unaffected). Optional cleanup on the next F06 touch — not an F03 concern.
-* **Not a blocker, noted:** real Journey/Daily entry (F05/F07), the real completion panel (F04), onboarding overlay (F09), audio/haptics (F11), analytics (F12) — downstream, out of F03 scope. Storage-full fault-injection test = residual test-debt (shared with F08 AC7).
+* **None.** F03 is `Done` (QA `Approved with Notes`, notes accepted). No blocking issue was ever found (no code defect at any stage). The accepted Notes are tracked in `## Current Status` + the Change Log — a 3-item manual device confirmation (`qa.md §17` 5–7) folded into the first app-distribution smoke, plus 3 non-blocking follow-ons.
 
 ---
 
 ## Last Decision
+
+* 2026-09-06 — Tech Lead (**F03 close-out — state-machine DURUM 5 → "Approved with Notes"**):
+  * **QA re-verify verdict `Approved with Notes` accepted.** `Required Fixes` empty, no blocking issue at any stage (no code defect was ever found). Build gate PASS (analyze/format clean, **308/308 workspace tests** incl. 13 F03-FE9, iOS release GREEN); full `architecture.md` contract + the §18 clarifications honoured; all 11 ACs automated-covered (incl. the `prd.md §7` "0 double-registered moves during animation in QA" metric — F03-FE9 `§17.2` proves it); `ui-design.md` Direction A ~94/100, no rubric fail. `Release Scope = none` → no release gate; normal closeout.
+  * **Notes judged genuinely non-blocking** (per DURUM 5 "Approved with Notes" → notlar non-blocking → Status = Done, notes to the change log):
+    1. The **3-item manual device confirmation** of `qa.md §17` 5–7 is a visual/OS confirmation with **no untested logic beneath it** — every state transition driving those visuals (win sequence, tile-state rendering, portrait lock, back navigation) is automated-covered. **Deferral accepted**; it folds into the **first app-build distribution smoke** (~F05 — the first feature that triggers a TestFlight/Play internal build; there is no device-QA vehicle before then). A physical iPhone is currently connected, so a quick ad-hoc pass is also available if the user wants one now.
+    2. `integration_test/play_session_test.dart` device-matrix run — tracked; CI step is best-effort `continue-on-error`; the always-green gate is `play_session_runtime_test.dart` in `melos run test`.
+    3. Storage-full fault-injection test-debt (shared with F08 AC7) — tracked follow-up; mechanism source-sound.
+    4. `looplet_solver:56` `info` lint — not F03; optional F06-touch cleanup.
+  * **F03 → `Done`.** `feature-board.md` + `system-state.md` synced. F08 unchanged (In Release / parked).
+  * **Next feature activated: F04 (`star-rating-and-personal-best`, P1).** Depends on F03 (`Done`) + F06 (`Done`, the stored `optimalMoves`); unblocks the P0 F05 (which needs the real completion panel with stars). F04 replaces F03's minimal seam completion sheet with the real panel (target word / player moves / optimal / stars / personal best / Retry / Next Level). Persistence is **largely pre-built by F08** (`personal_best` table + `PersonalBestRepo` — monotone-decrease, `isPerfect`, `firstCompletedAt`). Complexity: **not COMPLEX** (no Technical Analyst — 8 crisp Given/When/Then ACs, one existing entity, a pure star-computation core); **UI Designer required** (a results / reward-reveal panel — visual-critical, multi-state, premium bar); **no DevOps** (`Release Scope = none`). Created `features/f04-star-rating-and-personal-best/{prd.md, architecture.md, orchestration.md}`. Routing: **UI Designer (`ui-design.md`) → Frontend/Mobile Developer → QA → Tech Lead (close)**.
 
 * 2026-09-06 — QA (**F03 re-verify after F03-FE9 — verdict `Approved with Notes`**):
   * **Scope:** Client-Only + UI-Handoff re-verify. Security / release / iOS-platform compliance out of scope (justified in `qa.md §2`). The new best-effort CI `integration` step (`continue-on-error`) checked against `release.md §4` — compliant, not a deployment (`qa.md §6.7`).
@@ -160,65 +164,23 @@ Tech Lead
 
 ## Last Update
 
-* Updated By: QA
+* Updated By: Tech Lead
 * Timestamp: 2026-09-06
-* Summary: **F03 re-verified after F03-FE9 — verdict `Approved with Notes`** (`qa.md` overwritten). No blocking issue, no required fix. Build gate PASS — analyze/format clean; **308/308 workspace tests** (app 112 = 99 + 13 F03-FE9); iOS release build GREEN. The F03-FE9 suites closed `qa.md §17` scenarios 1–4 (incl. the `prd.md §7` "0 double-registered moves during animation" metric — now automated-proven); full `architecture.md` contract + §18 clarifications honoured; all 11 ACs automated-covered; `ui-design.md` Direction A ~94/100, no rubric fail. Notes (non-blocking): a 3-item manual device confirmation of `qa.md §17` 5–7 + 3 follow-ons (`integration_test/` device run; storage-full test-debt shared with F08 AC7; `looplet_solver:56` info lint). `Current Owner → Tech Lead`; `Next Role → Tech Lead`. `feature-board.md` / `system-state.md` not touched (Tech Lead syncs).
+* Summary: **F03 closed — `Done`** (DURUM 5 "Approved with Notes"; notes non-blocking + accepted). 308/308 workspace tests; analyze/format clean; iOS release GREEN. The 3-item manual device confirmation (`qa.md §17` 5–7) folds into the first app-distribution smoke (~F05); 3 non-blocking follow-ons tracked. `feature-board.md` + `system-state.md` synced. **F04 (`star-rating-and-personal-best`) activated** — `prd.md` + initial `architecture.md` + `orchestration.md` created; not COMPLEX (no Analyst); UI Designer required; no DevOps. `Current Owner → —` (F03); active feature → F04, `Next Role → UI Designer` (in F04's orchestration).
 
 ---
 
 ## Next Role
 
-Tech Lead
+— (F03 `Done`). The active feature is **F04**; its first role is **UI Designer** — see `features/f04-star-rating-and-personal-best/orchestration.md → Next Role`. Run: `Run UI Designer`.
 
 ---
 
 ## Next Action
 
-### Tech Lead — F03 close-out (post `Approved with Notes`) — ⬅ NEXT
+F03 is complete. All F03 delivery + QA + close-out is recorded above and in the Change Log. The 4 accepted Notes are tracked (Note 1 → the first app-distribution device smoke ~F05; Notes 2–4 → follow-on tracking).
 
-```text
-QA re-verify verdict is `Approved with Notes` (state-machine DURUM 5 → "Approved with Notes" branch).
-No blocking issue, no required fix. Build gate PASS (analyze/format clean, 308/308 workspace tests
-incl. 13 F03-FE9, iOS release GREEN). Full architecture.md contract + the §18 clarifications honoured;
-all 11 ACs automated-covered; ui-design.md Direction A ~94/100, no rubric fail. The F03-FE9 suites
-closed qa.md §17 scenarios 1–4 (incl. the prd.md §7 "0 double-registered moves during animation in
-QA" metric). Regression risk negligible (only test + CI-config files changed).
-
-Authority: features/f03-puzzle-play-session/qa.md (§17 verdict + §20 Tech Lead Note), architecture.md
-§16 + §18, prd.md §7, project-authority/release.md §2 (F03 Release Scope = none — no DevOps / release
-gate; normal closeout applies after an accepted `Approved with Notes`).
-
-Assess the Notes — all QA-judged non-blocking:
-  1. A 3-item MANUAL DEVICE confirmation of qa.md §17 5–7 (the QA env has no device):
-     5 — win-choreography readability + the amber seam bar legible with colour OFF / in GREYSCALE
-         (accessibility) + smoke-tr-05 locked pin/ring + smoke-tr-06 frost/crystal + thaw cross-fade;
-     6 — a device rotation attempt leaves the layout unchanged (portrait lock);
-     7 — the quiet back chevron pops to the caller via the button, the system back, AND the
-         edge-swipe gesture; hidden in `won`; direct entry to /play falls back safely.
-     → ACCEPT the deferral and record where it lands: recommend the first app-build distribution
-       smoke (~F05, the first feature that triggers a TestFlight/Play internal build) OR a quick
-       standalone device pass now. These are visual/OS confirmations with no untested logic beneath
-       them (all state transitions are automated-covered).
-  2. `integration_test/play_session_test.dart` device-matrix run — `flutter test integration_test
-     -d <emulator>`; the CI step is best-effort `continue-on-error`; not a gate. Track it.
-  3. Storage-full / disk-write-failure fault-injection test-debt for the persist path (shared with
-     F08 AC7) — mechanism source-sound; a follow-up test.
-  4. `looplet_solver/lib/src/solver.dart:56` — one pre-existing info-level analyzer lint (NOT F03;
-     `dart analyze` exits 0; package tests pass). Optional cleanup on the next F06 touch.
-
-Then per DURUM 5 "Approved with Notes" (notes are genuinely non-blocking):
-  - Status = Done. Record the Notes in the Change Log / decision history.
-  - Sync feature-board.md + system-state.md: F03 → Done; Active Owner → — ; the critical-path
-    successors can activate.
-  - Choose the next feature. Critical path is F01✓ → F02✓ → F06✓ → (F08 [In Release/parked], F03✓)
-    → F04 → F05 … . F04 (star-rating-and-personal-best, P1) depends on F03 + F06 (both ready) and
-    replaces F03's minimal completion sheet with the real stars/optimal/best/Retry/Next panel — the
-    natural next activation. (F05 Journey is P0 but also depends on F04-adjacent rating; F08 stays
-    parked pending the user's Blaze decision; F07 is gated on F08 Done.) Recommend activating F04
-    unless the user directs otherwise.
-```
-
-→ then `Run Tech Lead` closes F03 and activates the next feature.
+Active feature → **F04** (`features/f04-star-rating-and-personal-best/`). `Run UI Designer` for the completion-panel handoff (`ui-design.md`).
 
 ---
 
