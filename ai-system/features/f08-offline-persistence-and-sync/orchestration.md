@@ -7,21 +7,21 @@
 
 ## Current Status
 
-**In Progress — F08 implementation (persistence core + sync callable). `infra/` DURUM 0 done + reconciled.**
+**In Progress — Track A (persistence core) delivered. Track B (sync callable + rules) next.**
 
 ---
 
 ## Current Owner
 
-Frontend/Mobile Developer (Track A — persistence core) · Backend Developer (Track B — callable + rules, parallel)
+Backend Developer (Track B — fill the `submitDailyResultV1` callable + rules + emulator tests)
 
 ---
 
 ## Current Phase
 
-F08.SETUP-0 done + Tech-Lead-reconciled (2026-09-06). Contract LOCKED. Implementation in two parallel tracks:
-* **Track A (Frontend/Mobile Developer, no Firebase):** Drift schema → migrations + never-drop guard → repositories → elapsed helper → `toEngineConfig` → active-session snapshot (+ additive `GridEngine.restoreMoves`). `F08-FE1…FE5, FE11, FE4`; FE7/FE10 logic allowed.
-* **Track B (Backend Developer, emulator = fake project id):** fill the `submitDailyResultV1` callable → rules + rules-unit-tests → Functions emulator tests → CI emulator step. `F08-BE2…BE5`.
+Contract LOCKED; `infra/` DURUM 0 done + reconciled.
+* **Track A (Frontend/Mobile Developer) — DELIVERED 2026-09-06** (`frontend.md`): Drift `AppDatabase` (10 tables + `kv`, `schemaVersion 1`, seeded), forward-only migrations + `MigrationGuard` never-drop, all write-through repositories, `ActiveSessionSnapshot` (frozen keys) + corrupt-safe `ActiveSessionRepo` + `restoreSession`, `ElapsedTimer`, `toEngineConfig`, `DailyResultSyncService` (queue state machine + backoff + exactly-once + first-run-authoritative + parked bounded-retry, injectable sender), `FakeDailyResultProducer`. **263 workspace tests green** (app 67 = 4 + 63 new); `analyze`/`format:check`/`infra:build`/`infra:test` green. F02 `GridEngine.restoreMoves` was already present + tested — no F02 change.
+* **Track B (Backend Developer, emulator = fake project id) — NEXT:** fill the `submitDailyResultV1` callable → verify rules + rules-unit-tests → Functions emulator tests → CI emulator step. `F08-BE2…BE5`.
 * **`F08.FIREBASE-PROJECT`** (manual, owner: user): real Firebase project + `flutterfire configure` + Anonymous Auth/App Check enable + `firebase-tools`/`FIREBASE_CI_TOKEN` in CI. Blocks `F08-FE6/FE8/FE9` + `F08-DEVOPS` (the join phase), nothing before it.
 
 ---
@@ -40,17 +40,17 @@ F08.SETUP-0 done + Tech-Lead-reconciled (2026-09-06). Contract LOCKED. Implement
 - [x] Task ID: F08.0-AN | Assigned Role: Technical Analyst | Status: Done | `analysis.md` delivered (sections 1–19); all 10 open items resolved. Consumed into `architecture.md` on 2026-09-06.
 - [x] Task ID: F08.CONTRACT-TL | Assigned Role: Tech Lead | Status: Done | `analysis.md` consumed into `architecture.md` → **LOCKED**. Calls made: (1) sync surface = HTTPS Callable `submitDailyResultV1`; (2) identity = **decouple** `guestId` (local UUID) from `firebaseUid` (server) — `platform.md` §6 amended; (3) F08↔F07 = F06-style split confirmed (F08 ships persistence core + sync + fake producer; F07 wires real producer); (4) `infra/` DURUM 0 runs **parallel** with the Drift core. `Release Scope = production-readiness`; `release.md` §2 + `platform.md` §6/§13 + `setup-manifest.md` (infra DURUM 0 recipe) + F02 `architecture.md` (`restoreMoves` required) amended. `connectivity_plus` approved. App Check = soft-enforce MVP (locked). Parked-item retry = bounded auto-retry once/app-start, max 3 lifetime (locked). `product-prd §51` server-side clock check = **not in MVP** (Tech Lead decision, no PO escalation — consistent with `platform.md` §6). Delivery tasks opened below.
 - [x] Task ID: F08.SETUP-0 | Assigned Role: Project Setup | Status: **Done (2026-09-06)** | `infra/` Firebase DURUM 0 scaffolded per `setup-manifest.md → ## infra/ DURUM 0 Recipe`. Created: `infra/firebase.json`, `.firebaserc` (placeholder project `looplet-mvp`), `firestore.rules` (create-only for `dailyResults/{lang}_{date}/entries/{uid}`; default-deny elsewhere), `firestore.indexes.json` (empty), `remoteconfig.template.json` (`daily_enabled`/`daily_sync_enabled`/`share_enabled`=true, `daily_manifest_url`=""), `infra/.gitignore`, `infra/README.md` (rewritten). `infra/functions/` (TypeScript, Node 20): `package.json` + `tsconfig.json` + `jest.config.js` + `src/{index,submitDailyResult,types}.ts` (`submitDailyResultV1` 2nd-gen `onCall` **skeleton** — auth guard + `enforceAppCheck:false` soft + typed wire contract; body throws `INTERNAL` with `TODO(F08-BE2)`) + `test/skeleton.test.ts` (6 offline tests green) + `test/rules.test.ts` (`@firebase/rules-unit-testing`, emulator-gated → skipped without `FIRESTORE_EMULATOR_HOST`). `npm ci && npm run build && npm test` green. CI: `infra` job added to `.github/workflows/ci.yml` (npm ci/build/test; emulator step left as `TODO(F08-BE5/F08-DEVOPS)`). `melos.yaml`: `infra:build` + `infra:test` scripts. `app/pubspec.yaml`: `firebase_core ^3.6.0`, `firebase_auth ^5.3.1`, `cloud_firestore ^5.4.4`, `cloud_functions ^5.1.3`, `firebase_app_check ^0.3.1+7`, `connectivity_plus ^6.0.5` (no `main.dart` init — F08-FE6). `flutter pub get` + `melos bootstrap` + `melos run format:check`/`analyze`/`test` all green; app `flutter analyze` + `flutter test` (4) green. **Version substitutions vs the recipe:** `firebase-functions ^6` (recipe `^5`, EOL), `firebase-admin ^13` (recipe `^12`), `@firebase/rules-unit-testing ^5` + `firebase ^12` dev-dep (recipe `^4`; `^4` peer-conflicts on `firebase@^11`). **Deferred (needs a real Firebase project + `firebase login` — not available in this environment):** `.firebaserc` real project id, `flutterfire configure` → `app/lib/firebase_options.dart` + `google-services.json` + `GoogleService-Info.plist`, `firebase-tools` in CI for the emulator suites, any `firebase deploy`. Documented in `infra/README.md`. Full native iOS/Android app build with the Firebase pods not run locally (CI / F08-FE9 verifies — consistent with the existing "Android `build:app` CI-only locally" posture).
-- [ ] Task ID: F08-FE1 | Assigned Role: Frontend/Mobile Developer | Status: Open (parallel with F08.SETUP-0 — no Firebase) | Drift schema: all `architecture.md → Persistence Schema` tables + `kv`; `AppDatabase` `schemaVersion = 1`; codegen.
-- [ ] Task ID: F08-FE2 | Assigned Role: Frontend/Mobile Developer | Status: Open (parallel) | `MigrationStrategy`: `onCreate` seeds defaults; `onUpgrade` step framework; **never-drop guard** on `personal_best`/`daily_streak`/`daily_entry`; a v1→v2 dummy migration + a migration test harness (seed old → upgrade → assert bests/streak/first-run intact); migration-throw → abort + recoverable, no wipe.
-- [ ] Task ID: F08-FE3 | Assigned Role: Frontend/Mobile Developer | Status: Open (parallel) | Repositories: `PlayerRepo`, `SettingsRepo`, `JourneyProgressRepo`, `PersonalBestRepo` (monotone ↓), `DailyRepo` (first-run immutability + attempts), `DailyStreakRepo` (store-only), `DailyPuzzleCache`, `ActiveSessionRepo`, `SyncQueueRepo` — all write-through + transactional.
-- [ ] Task ID: F08-FE4 | Assigned Role: Frontend/Mobile Developer | Status: Open (needs F02 `restoreMoves` + `toEngineConfig`) | Active-session snapshot: serialize/deserialize per `architecture.md → Active-Session Snapshot Contract` (frozen keys); `save()` on state-change boundary; `read()` + validation + corrupt-recovery; `clearActiveSession()`; restore path rebuilding `GridEngine` via `toEngineConfig(puzzle)` + `restoreMoves` + re-derived `thawedCells`. **Includes the F02 `restoreMoves(List<Move>)` additive API** (F02-owned review).
-- [ ] Task ID: F08-FE5 | Assigned Role: Frontend/Mobile Developer | Status: Open (parallel) | Monotonic elapsed helper: `Stopwatch` accumulator, persisted `elapsedMsAccumulated`, resume-safe; guard test — no wall clock for elapsed.
-- [ ] Task ID: F08-FE6 | Assigned Role: Frontend/Mobile Developer | Status: Open (gated on F08.SETUP-0) | App-init sequence per `architecture.md → App Init Sequence`: open DB → migrate → seed → read snapshot → (async, non-blocking) Firebase init + App Check + Anonymous sign-in (persist `firebaseUid` on success) → construct session-level sync service → `drain()`. Migration-failure recoverable error screen (only F08-owned UI).
-- [ ] Task ID: F08-FE7 | Assigned Role: Frontend/Mobile Developer | Status: Open (gated on F08.SETUP-0) | `DailyResultSyncService` (session-level singleton): `enqueue`; `connectivity_plus` listener; `drain()` state machine (`pending`/`inFlight`/`synced`/`parked` + `awaitingAuth`); exponential backoff (base 30s, ×2, cap 6h, ±20% jitter); attempt cap 10 → `parked`; stale-`inFlight` sweep (>20s); parked bounded auto-retry (once/app-start, max 3 lifetime); `daily_entry.syncStatus` mirror in the same transaction; no-op while `daily_sync_enabled == false`; wired to lifecycle (`paused` flush, `resumed` drain). **Not** screen-owned.
-- [ ] Task ID: F08-FE8 | Assigned Role: Frontend/Mobile Developer | Status: Open (gated on F08.SETUP-0 + F08-BE2) | Callable client binding for `submitDailyResultV1` + response→queue-transition mapping (`CREATED`/`ALREADY_SUBMITTED` → `synced`; `INVALID_PAYLOAD`/`UNSUPPORTED_LANGUAGE` → `parked`; `INTERNAL`/transport → retryable); typed error handling; client pre-enqueue payload assertion.
-- [ ] Task ID: F08-FE9 | Assigned Role: Frontend/Mobile Developer | Status: Open (paired with F08.SETUP-0) | Firebase package wiring finalization in `app/` + guarded offline-tolerant init; `connectivity_plus` integration. (Package adds happen in F08.SETUP-0; this task confirms the app runs with them.)
-- [ ] Task ID: F08-FE10 | Assigned Role: Frontend/Mobile Developer | Status: Open | **Fake daily-result producer** (`enqueueFakeDailyResult(...)` behind a debug/test flag): fabricate a `daily_entry` + enqueue a sync item so the queue + reconciliation + callable path are exercised end-to-end without F07. Removed/replaced by F07.
-- [ ] Task ID: F08-FE11 | Assigned Role: Frontend/Mobile Developer | Status: Open (parallel) | `toEngineConfig(Puzzle) → EngineConfig` free function in `app/` (the F06-flagged consumer helper; shared with F05).
+- [x] Task ID: F08-FE1 | Assigned Role: Frontend/Mobile Developer | Status: **Done (2026-09-06)** | `app/lib/persistence/app_database.dart` (+ `.g.dart`, committed) — all 10 contract tables with exact contract names + `kv`; composite PKs; `textEnum` for `syncStatus`/`state`; `schemaVersion = 1`; `_seedDefaults()` (onCreate transaction) seeds one `player` (v4 UUID `guestId`, null `firebaseUid`) + `settings`/`journey_progress`/`daily_streak` defaults + `store_meta` kv. `AppDatabase.forTesting(NativeDatabase.memory())`. 6 tests.
+- [x] Task ID: F08-FE2 | Assigned Role: Frontend/Mobile Developer | Status: **Done** | `migration_guard.dart` — `MigrationGuard.guardPlayerData` snapshots + re-checks row counts of `personal_best`/`daily_entry`/`daily_streak`, throws `MigrationDataLossError` (→ `onUpgrade` rollback) on any shrink. `AppDatabase.migration` = guarded `for v in from..to` step switch (zero steps at v1; `// case 1:` placeholder). Store downgrade documented unsupported; migration-throw = abort-without-partial-apply (no silent wipe). 4 tests incl. "throws when a protected row is deleted".
+- [x] Task ID: F08-FE3 | Assigned Role: Frontend/Mobile Developer | Status: **Done** | `repositories/*.dart` — `PlayerRepo`, `SettingsRepo`, `JourneyProgressRepo` (CSV union + `highestUnlockedLevel = max(current, level+1)`), `PersonalBestRepo` (monotone ↓, `isPerfect`, `firstCompletedAt` preserved), `DailyRepo` (first-run immutable + `attemptNo`-incrementing `daily_attempt` rows + `setSyncStatus` mirror; returns `DailyCompletionOutcome`), `DailyStreakRepo` (store-only), `DailyPuzzleCache` (put/get/`evictOlderThan`), `ActiveSessionRepo`, `SyncQueueRepo`. All write-through; multi-step ops transactional. 9 repo tests.
+- [x] Task ID: F08-FE4 | Assigned Role: Frontend/Mobile Developer | Status: **Done** | `active_session_snapshot.dart` (frozen JSON keys; `fromJson` validates all contract rules incl. `moveCount == appliedMoves.length` + token parse + coord format → `SnapshotFormatException`), `active_session_repo.dart` (`kv['active_session']` single-row upsert; `read()` catches decode/format → log `save_corrupt_recovered` + `clear()` + null; durable tables untouched), `session_restore.dart` (`restoreSession` → `toEngineConfig` → `GridEngine` → `restoreMoves(parseMoveList(...))` → `RestoredSession`; re-derives `thawedCells`; id-mismatch / rejected-move → `SessionRestoreException`). **F02 `GridEngine.restoreMoves(List<Move>)` was already present + tested** (prior session; Tech Lead promoted it to "required" this cycle) — no F02 change; 83 F02 tests unchanged + green. 17 snapshot + 5 restore tests.
+- [x] Task ID: F08-FE5 | Assigned Role: Frontend/Mobile Developer | Status: **Done** | `elapsed_timer.dart` — `ElapsedTimer` `Stopwatch` accumulator + `.resumed(accumulatedMs)`; no wall clock for elapsed; negative → assert. 4 tests.
+- [ ] Task ID: F08-FE6 | Assigned Role: Frontend/Mobile Developer | Status: Open — **gated on `F08.FIREBASE-PROJECT`** | App-init sequence per `architecture.md → App Init Sequence`: open DB → migrate → seed → read snapshot → (async, non-blocking) Firebase init + App Check + Anonymous sign-in (persist `firebaseUid` on success) → construct session-level sync service → `drain()`. Migration-failure recoverable error screen (only F08-owned UI). Wire into `app/lib/main.dart`.
+- [x] Task ID: F08-FE7 | Assigned Role: Frontend/Mobile Developer | Status: **Done (logic; emulator e2e joins with Track B)** | `daily_result_sync_service.dart` — `DailyResultSyncService` session-level: `enqueueFirstRun` (queue row + entry `queued`, same txn; idempotency key `{firebaseUid}|{lang}|{dailyDate}` or null → `awaitingAuth`); `drain()` (kill-switch no-op; stale-`inFlight` sweep >20s; key backfill; `inFlight` → `sender` → `CREATED`/`ALREADY_SUBMITTED` ⇒ `synced` + entry mirror; `retryable` ⇒ `pending` + `attemptCount++` + exp backoff base 30s ×2 cap 6h ±20% jitter; cap 10 or `nonRetryable` ⇒ `parked` + entry mirror); `reviveParkedOnAppStart` bounded to 3 lifetime. `SyncSender` + `connectivityRegained` injected (real ones = FE8/FE9). 14 tests incl. exactly-once + first-run-authoritative + awaitingAuth + stale-reclaim.
+- [ ] Task ID: F08-FE8 | Assigned Role: Frontend/Mobile Developer | Status: Open — **gated on `F08.FIREBASE-PROJECT` + F08-BE2** | Real `SyncSender` binding to the `submitDailyResultV1` callable (`cloud_functions`) + typed error → `SyncSendResult` mapping (mapping logic already implemented + tested in FE7 against a fake sender); client pre-enqueue payload assertion (present in `enqueueFirstRun`/`DailyResultPayload`).
+- [ ] Task ID: F08-FE9 | Assigned Role: Frontend/Mobile Developer | Status: Open — **gated on `F08.FIREBASE-PROJECT`** | Construct `DailyResultSyncService` as an app-scoped singleton with the real sender + a `connectivity_plus` regain stream; guarded offline-tolerant `Firebase.initializeApp`; confirm the app builds + runs with the Firebase pods (iOS/Android).
+- [x] Task ID: F08-FE10 | Assigned Role: Frontend/Mobile Developer | Status: **Done** | `fake_daily_result_producer.dart` — `FakeDailyResultProducer.produce(...)` records a completion via `DailyRepo` and, on `firstRun`, calls `enqueueFirstRun`. `assert(false)` + no-op in release. F07 replaces it against the same `enqueueFirstRun`. 1 test (first → firstRun + 1 queue row; repeat → replay + no new row).
+- [x] Task ID: F08-FE11 | Assigned Role: Frontend/Mobile Developer | Status: **Done** | `content/puzzle_engine_config.dart` — `toEngineConfig(Puzzle) → EngineConfig` free function in `app/`; `looplet_content` stays `looplet_core`-only; propagates `EngineConfigError`. Shared with F05. 2 tests. (Also: `engine/move_shorthand.dart` — app-local shorthand parse/format; ~40-line duplication of the `tools` copy flagged in `frontend.md §4` for a future dedupe.)
 - [ ] Task ID: F08.FIREBASE-PROJECT | Assigned Role: user (DevOps/Release Engineer fallback) | Status: Open — manual, out-of-band | Create the real Firebase project + `firebase login` + `firebase use --add` (real id → `infra/.firebaserc`) + `flutterfire configure` from `app/` (→ `app/lib/firebase_options.dart` + `google-services.json` + `GoogleService-Info.plist`, all committed — not secret, `release.md` §7) + enable Anonymous Auth + App Check (monitor). Prerequisite for F08-FE6/FE8/FE9 and F08-DEVOPS; NOT for Track A or F08-BE2/BE3/BE4 (emulator uses a fake project id). See `infra/README.md` → "Not done yet".
 - [x] Task ID: F08-BE1 | Assigned Role: Project Setup | Status: folded into F08.SETUP-0 | `infra/` scaffold (see F08.SETUP-0).
 - [ ] Task ID: F08-BE2 | Assigned Role: Backend Developer | Status: Open — **ready now** (fills the F08.SETUP-0 skeleton; emulator uses a fake project id) | Implement `submitDailyResultV1` in `infra/functions/src/submitDailyResult.ts`: auth guard (kept), App Check soft-enforce (kept), full payload validation (`architecture.md → Firebase Sync Surface` — `lang ∈ {tr,en}`, `dailyDate` regex, `dailyId` non-empty, `optimalMoves ≥ 1`, `optimalMoves ≤ moves`, `durationMs ≥ 0`, `stars ∈ 1..3`, `completedAtUtcMs > 0`), create-only Firestore write at `dailyResults/{lang}_{dailyDate}/entries/{uid}` (`DailyResultDoc` shape in `types.ts`), return `{status: "CREATED"|"ALREADY_SUBMITTED", recordedAt}`; typed `HttpsError` for `INVALID_PAYLOAD`/`UNSUPPORTED_LANGUAGE`/`INTERNAL`. Keep `test/skeleton.test.ts` green (update the 2 "reaches INTERNAL" assertions to the real behaviour) + add `test/submitDailyResult.test.ts` (emulator, via `firebase-functions-test` + Firestore emulator).
@@ -95,17 +95,19 @@ F08.SETUP-0 done + Tech-Lead-reconciled (2026-09-06). Contract LOCKED. Implement
 - [ ] (F08-BE5) CI wiring for `infra/`.
 
 ### Frontend
-- [ ] (F08-FE1) Drift schema + `AppDatabase`.
-- [ ] (F08-FE2) Migrations + never-drop guard + migration test harness.
-- [ ] (F08-FE3) Repositories (write-through, transactional).
-- [ ] (F08-FE4) Active-session snapshot serialize/restore + F02 `restoreMoves` additive API.
-- [ ] (F08-FE5) Monotonic elapsed helper.
-- [ ] (F08-FE6) App-init sequence + migration-error screen.
-- [ ] (F08-FE7) `DailyResultSyncService` (session-level; queue state machine; backoff; parked retry; kill-switch).
-- [ ] (F08-FE8) Callable client binding + response mapping.
-- [ ] (F08-FE9) Firebase package wiring finalization + guarded init.
-- [ ] (F08-FE10) Fake daily-result producer test seam.
-- [ ] (F08-FE11) `toEngineConfig(Puzzle)` consumer helper.
+- [x] (F08-FE1) Drift schema + `AppDatabase` — done.
+- [x] (F08-FE2) Migrations + never-drop guard + migration test harness — done.
+- [x] (F08-FE3) Repositories (write-through, transactional) — done.
+- [x] (F08-FE4) Active-session snapshot serialize/restore — done (F02 `restoreMoves` was already present + tested).
+- [x] (F08-FE5) Monotonic elapsed helper — done.
+- [ ] (F08-FE6) App-init sequence + migration-error screen — **gated on `F08.FIREBASE-PROJECT`**.
+- [x] (F08-FE7) `DailyResultSyncService` (session-level; queue state machine; backoff; parked retry; kill-switch) — done (logic; real sender/connectivity = FE8/FE9).
+- [ ] (F08-FE8) Callable client binding — **gated on `F08.FIREBASE-PROJECT` + F08-BE2** (response-mapping logic already done in FE7).
+- [ ] (F08-FE9) Firebase init finalization + app-scoped singleton wiring — **gated on `F08.FIREBASE-PROJECT`**.
+- [x] (F08-FE10) Fake daily-result producer test seam — done.
+- [x] (F08-FE11) `toEngineConfig(Puzzle)` consumer helper — done.
+
+_Track A delivered (`frontend.md`). FE6/FE8/FE9 remain, gated on `F08.FIREBASE-PROJECT`._
 
 ### QA
 - [ ] (F08-QA1…QA10) Full matrix per `architecture.md → QA Focus`. Opens when BE + FE complete.
@@ -124,7 +126,7 @@ F08.SETUP-0 done + Tech-Lead-reconciled (2026-09-06). Contract LOCKED. Implement
 
 ## Blockers
 
-* **None hard.** Contract LOCKED; `infra/` scaffold done and green; F08.SETUP-0 reconciled 2026-09-06 (Tech Lead).
+* **None hard.** Contract LOCKED; `infra/` scaffold done + reconciled; **Track A delivered green** (263 workspace tests).
 * **Manual prerequisite → task `F08.FIREBASE-PROJECT` (opened, owner: user, DevOps/Release Engineer fallback).** Create the real Firebase project in the Firebase Console + `firebase login` + `firebase use --add` (real id into `infra/.firebaserc`) + `flutterfire configure` from `app/` (→ `app/lib/firebase_options.dart` + `google-services.json` + `GoogleService-Info.plist`) + enable Anonymous Auth + enable App Check in **monitor** mode. Not doable in the agent environment. Scope of impact:
   * **Blocks:** `F08-FE6` (app `Firebase.initializeApp` needs `firebase_options.dart`), `F08-FE8` / `F08-FE9` (callable client + init), `F08-DEVOPS` (deploy). Required before the **join** phase.
   * **Does NOT block:** Track A (`F08-FE1…FE5`, `FE11`) — no Firebase at all. `F08-BE2/BE3/BE4` — the Firestore emulator + `@firebase/rules-unit-testing` run against **any (fake) project id**; they need only `firebase-tools` installed (an npm global — a code/CI task, `F08-BE5`), not a real project. `F08-FE7` / `F08-FE10` logic can be written against the skeleton (their end-to-end emulator verification joins with BE).
@@ -166,83 +168,25 @@ F08.SETUP-0 done + Tech-Lead-reconciled (2026-09-06). Contract LOCKED. Implement
 
 ## Last Update
 
-* Updated By: Tech Lead
+* Updated By: Frontend/Mobile Developer
 * Timestamp: 2026-09-06
-* Summary: **F08.SETUP-0 reconciled + accepted; implementation routed.** Scaffold matches the LOCKED contract (rules, callable skeleton, Firebase client package set, Remote Config keys); gates green; version substitutions (`firebase-functions ^6` / `firebase-admin ^13` / `@firebase/rules-unit-testing ^5`) accepted. Manual Firebase-project work split into `F08.FIREBASE-PROJECT` (owner: user) — blocks only `F08-FE6/FE8/FE9` + `F08-DEVOPS`; Track A + `F08-BE2/BE3/BE4` proceed against the emulator (fake project id). **Next Role = Frontend/Mobile Developer** (Track A: `F08-FE1 → FE2 → FE3 → FE5 → FE11 → FE4` incl. the additive F02 `restoreMoves`). Backend Developer runs Track B (`F08-BE2…BE5`) in parallel. `feature-board.md` + `system-state.md` synced (Active Owner → Frontend/Mobile Developer). Nothing committed to git.
+* Summary: **F08 Track A delivered** (`frontend.md`). FE1 (Drift `AppDatabase` — 10 contract tables + `kv`, `schemaVersion 1`, onCreate seed), FE2 (`MigrationGuard` never-drop + guarded `onUpgrade` framework + migration-throw = no wipe), FE3 (all write-through transactional repositories), FE4 (`ActiveSessionSnapshot` frozen keys + corrupt-safe `ActiveSessionRepo` + `restoreSession` re-deriving `thawedCells`; F02 `GridEngine.restoreMoves` was already present + tested — no F02 change needed), FE5 (`ElapsedTimer` monotonic), FE11 (`toEngineConfig`), plus FE7 (`DailyResultSyncService` — queue state machine + exp backoff + exactly-once + first-run-authoritative + `awaitingAuth` + stale-`inFlight` reclaim + parked bounded auto-retry + kill-switch; injectable sender/connectivity) and FE10 (`FakeDailyResultProducer`). **263 workspace tests green** (app 67 = 4 pre-existing + 63 new); `melos run analyze` / `format:check` / `infra:build` / `infra:test` green; `app_database.g.dart` committed. Non-blocking notes (`frontend.md §4/§16`): move-shorthand ~40-line duplication vs `tools/looplet_authoring` (future dedupe); `uuid` package not added (hand-rolled v4). **FE6/FE8/FE9 remain — gated on `F08.FIREBASE-PROJECT`.** Nothing committed to git.
 
 ---
 
 ## Next Role
 
-Frontend/Mobile Developer
+Backend Developer
 
 ---
 
 ## Next Action
 
-### Frontend/Mobile Developer — F08 Track A (persistence core)
+### Frontend/Mobile Developer — F08 Track A (persistence core) — ✅ DELIVERED 2026-09-06
 
-```text
-Implement the F08 on-device persistence core in app/ (Drift). No Firebase — Track A has zero Firebase
-dependency. Backend Developer runs Track B (the callable + rules) in parallel.
+See `frontend.md`. FE1–FE5, FE7, FE10, FE11 complete; 263 workspace tests green. FE6 / FE8 / FE9 remain, gated on `F08.FIREBASE-PROJECT`.
 
-Authority: features/f08-offline-persistence-and-sync/architecture.md (LOCKED) — "Persistence Schema",
-"Active-Session Snapshot Contract" (frozen JSON keys), "Ownership & Lifecycle", "Resilience", "Validation
-Responsibility"; features/f08-.../prd.md (Acceptance Criteria, Edge Cases, Success Metrics);
-features/f02-grid-engine/architecture.md (GridEngine API + the restoreMoves addition); platform.md §5
-(Drift, write-through, forward-only, never-drop bests/streak, monotonic Stopwatch, guestId, kv snapshot),
-§11 (Turkish locale, no wall clock for durations).
-
-Tasks (in order; produce features/f08-.../frontend.md with task-to-code traceability + per-AC evidence):
-
-F08-FE1 — Drift AppDatabase, schemaVersion = 1. All tables in architecture.md -> Persistence Schema
-  (player, settings, journey_progress, personal_best, daily_entry, daily_attempt, daily_streak,
-  daily_puzzle_cache, sync_queue, kv). Run drift_dev codegen (build_runner). NO analytics_event_buffer
-  (F12). Player key = local UUID v4 guestId; firebaseUid nullable. No device-id keys anywhere.
-
-F08-FE2 — MigrationStrategy: onCreate seeds player + settings + journey_progress + daily_streak defaults
-  in one transaction. onUpgrade step framework + an explicit never-drop guard for personal_best /
-  daily_streak / daily_entry (assert row counts do not shrink; steps on those tables are add/transform
-  only). A v1->v2 dummy migration + a migration test harness (seed v1 -> upgrade -> assert
-  bests/streak/first-run intact). Migration-throw -> abort without partial apply, keep old DB, surface a
-  recoverable state (no silent wipe).
-
-F08-FE3 — Repositories, all write-through + transactional: PlayerRepo, SettingsRepo, JourneyProgressRepo,
-  PersonalBestRepo (bestMoveCount only decreases; isPerfect = best == optimal), DailyRepo (first-run
-  fields immutable once set; replays -> daily_attempt rows; no second sync_queue item for a key),
-  DailyStreakRepo (store-only — writes exactly what F07 will compute; F08 does NOT increment/reset),
-  DailyPuzzleCache (put/get/evictOlderThan — mechanism only), ActiveSessionRepo, SyncQueueRepo.
-
-F08-FE5 — Monotonic elapsed helper: Stopwatch accumulator, persisted elapsedMsAccumulated, resume adds a
-  fresh delta. Guard test: no DateTime.now() for elapsed.
-
-F08-FE11 — toEngineConfig(Puzzle) -> EngineConfig free function in app/ (the F06-flagged consumer helper;
-  shared with F05). looplet_content stays looplet_core-only.
-
-F08-FE4 — Active-session snapshot. FIRST add GridEngine.restoreMoves(List<Move>) to looplet_engine
-  (additive, non-breaking; identical result to replaying applyMove one-by-one; re-run the 83 F02 engine
-  tests + note it in frontend.md as an F02 amendment). Then: serialize/deserialize the snapshot per
-  architecture.md -> Active-Session Snapshot Contract with the EXACT frozen keys (snapshotVersion,
-  puzzleId, puzzleSource, lang, appliedMoves [F06 R/L/D/U shorthand — this IS the undo history, no
-  separate stack], moveCount, undosRemaining, restartCount, elapsedMsAccumulated, thawedFrozenCells,
-  status, startedAtUtcMs, lastPersistedAtUtcMs). save() on a state-change boundary (single kv-row
-  transaction). read() with full validation; corrupt -> discard active snapshot only, keep durable
-  tables, recover to a clean state, log. clearActiveSession(). Restore path: resolve puzzleId to a
-  Puzzle (use a test fixture / the F06 content/smoke/tr set — real content loading is F05/F07),
-  toEngineConfig -> GridEngine -> restoreMoves -> re-derive thawedCells (authority), restore counters +
-  elapsed.
-
-Also allowed here (logic only; emulator verification joins with Track B): F08-FE7 (DailyResultSyncService
-skeleton + queue state machine + backoff + parked retry + daily_entry.syncStatus mirror + no-op when
-daily_sync_enabled == false + session-level ownership) and F08-FE10 (enqueueFakeDailyResult test seam).
-
-DO NOT touch: F08-FE6 / FE8 / FE9 (need F08.FIREBASE-PROJECT — a real Firebase project + firebase_options.dart).
-
-Verify from repo root: melos run format:check && melos run analyze && melos run test
-On completion set Next Role = Backend Developer (if Track B not yet done) or Tech Lead.
-```
-
-### Backend Developer — F08 Track B (runs in parallel; user may `Run Backend Developer`)
+### Backend Developer — F08 Track B (NEXT)
 
 ```text
 Fill the submitDailyResultV1 skeleton + finalize the rules. The Firestore/Functions emulator runs against
@@ -265,8 +209,9 @@ F08-BE4 — test/submitDailyResult.test.ts (firebase-functions-test + Firestore 
 F08-BE5 — add the emulator step to the `infra` CI job (firebase emulators:exec ... "npm test"); pin any
   new action to a SHA.
 
-Produce features/f08-.../backend.md. On completion set Next Role = Tech Lead (or Frontend if Track A
-still open).
+Produce features/f08-.../backend.md. On completion set Next Role = Tech Lead.
+(Track A is DONE — the client is ready to consume the callable; only the join tasks FE6/FE8/FE9 remain
+and they are gated on F08.FIREBASE-PROJECT, not on Track B.)
 ```
 
 ---
@@ -278,3 +223,4 @@ still open).
 * v3 (2026-09-06) — Tech Lead: **F08.CONTRACT-TL done — `architecture.md` LOCKED.** `analysis.md` consumed. Calls: (1) HTTPS Callable `submitDailyResultV1`; (2) decouple `guestId` (local UUID) / `firebaseUid` (server) — `platform.md` §6 amended; (3) F06-style F08↔F07 split confirmed (F08 = persistence + sync + fake producer; F07 = real producer); (4) `infra/` DURUM 0 parallel with the Drift core. `Release Scope = production-readiness` (`release.md` §2 amended). `platform.md` §6 + §13 amended (identity decouple; App Check soft-enforce locked; Drift schema + callable pointers). `setup-manifest.md` gained the `infra/` DURUM 0 recipe + Workspace Targets update. F02 `architecture.md` — `restoreMoves(List<Move>)` promoted to required (additive). `connectivity_plus` approved. App Check soft-enforce + parked-item retry (bounded auto-retry, once/app-start, max 3 lifetime) locked. `product-prd §51` server-side clock check ruled out of the MVP. Delivery tasks opened: F08.SETUP-0 (Project Setup, NEXT), F08-FE1…FE11 (Frontend/Mobile Developer — Track A parallel now), F08-BE2…BE5 (Backend Developer), F08-QA1…QA10 (QA, post BE+FE), F08-DEVOPS (DevOps/Release Engineer, post-QA). Current Owner → Project Setup; Next Role → Project Setup (F08.SETUP-0). `feature-board.md` + `system-state.md` synced by the Tech Lead this turn.
 * v4 (2026-09-06) — Project Setup: **F08.SETUP-0 done — `infra/` Firebase DURUM 0 scaffolded.** `infra/` config (`firebase.json`, `.firebaserc` placeholder, `firestore.rules` create-only, `firestore.indexes.json`, `remoteconfig.template.json`, `.gitignore`, `README.md`) + `infra/functions/` TypeScript package (`submitDailyResultV1` 2nd-gen `onCall` skeleton — auth guard + soft App Check + typed wire contract; `TODO(F08-BE2)` body) + `test/skeleton.test.ts` (6 offline, green) + `test/rules.test.ts` (emulator-gated) + `jest.config.js`. `npm ci && build && test` green. CI `infra` job added (`.github/workflows/ci.yml`; emulator step deferred to `F08-BE5`/`F08-DEVOPS`). `melos.yaml` `infra:build`/`infra:test`. `app/pubspec.yaml` + Firebase client packages (`firebase_core ^3.6.0`, `firebase_auth ^5.3.1`, `cloud_firestore ^5.4.4`, `cloud_functions ^5.1.3`, `firebase_app_check ^0.3.1+7`) + `connectivity_plus ^6.0.5`. `flutter pub get` + `melos bootstrap` + `melos run format:check`/`analyze`/`test` + `melos run infra:build`/`infra:test` + app `flutter analyze`/`test` (4) all green. Version substitutions vs recipe: `firebase-functions ^6` (recipe `^5`), `firebase-admin ^13` (`^12`), `@firebase/rules-unit-testing ^5` + `firebase ^12` dev (`^4` peer-conflicts). Deferred (needs a real Firebase project + `firebase login`): `.firebaserc` real id, `flutterfire configure` → `firebase_options.dart` + platform config, `firebase-tools` in CI, deploy — recorded in `infra/README.md`. Current Owner → Tech Lead; Next Role → Tech Lead (reconcile scaffold + route Backend Developer + Frontend/Mobile Developer). Nothing committed to git.
 * v5 (2026-09-06) — Tech Lead: **F08.SETUP-0 reconciled + accepted; implementation routed.** Scaffold matches the LOCKED contract (create-only rules, callable skeleton, Firebase client package set, Remote Config keys); all gates green; version substitutions accepted (no contract impact). Manual Firebase-project work split into `F08.FIREBASE-PROJECT` (owner: user; DevOps/Release Engineer fallback) — blocks only `F08-FE6/FE8/FE9` + `F08-DEVOPS`; **not** Track A and **not** `F08-BE2/BE3/BE4` (emulator uses a fake project id). Routing: **Next Role = Frontend/Mobile Developer** → Track A (`F08-FE1 → FE2 → FE3 → FE5 → FE11 → FE4`, incl. the additive `GridEngine.restoreMoves(List<Move>)` in `looplet_engine`; FE7/FE10 logic allowed too). **Backend Developer** runs Track B (`F08-BE2 → BE3 → BE4 → BE5`) in parallel. Join (`FE6/FE8/FE9`) needs `F08.FIREBASE-PROJECT` + Track B. Then QA → Tech Lead → DevOps/Release Engineer → Tech Lead. No contract change; no scaffold re-QA. `feature-board.md` + `system-state.md` synced (Active Owner → Frontend/Mobile Developer).
+* v6 (2026-09-06) — Frontend/Mobile Developer: **F08 Track A delivered** (`frontend.md`). Completed F08-FE1 (Drift `AppDatabase` — 10 contract tables + `kv`, `schemaVersion 1`, onCreate seed), FE2 (`MigrationGuard` never-drop guard + guarded `onUpgrade` framework; migration-throw = abort, no wipe), FE3 (write-through transactional repositories: `Player`/`Settings`/`JourneyProgress`/`PersonalBest`(monotone)/`Daily`(first-run-immutable + attempts)/`DailyStreak`(store-only)/`DailyPuzzleCache`/`ActiveSession`/`SyncQueue`), FE4 (`ActiveSessionSnapshot` frozen keys + validation + corrupt-safe `ActiveSessionRepo` + `restoreSession` re-deriving `thawedCells`; **F02 `GridEngine.restoreMoves` was already implemented + tested by a prior session — no F02 change made**, 83 F02 tests unchanged), FE5 (`ElapsedTimer` monotonic, no wall clock), FE11 (`toEngineConfig(Puzzle)` in `app/`), FE7 (`DailyResultSyncService` — queue state machine + exp backoff base30s×2cap6h±20% + attempt cap 10 → `parked` + stale-`inFlight` reclaim + `awaitingAuth` backfill + parked bounded auto-retry(3) + `daily_entry.syncStatus` mirror + `daily_sync_enabled` kill-switch; injectable `SyncSender`/connectivity), FE10 (`FakeDailyResultProducer` debug seam). **263 workspace tests green** (app **67** = 4 + 63 new); `analyze`/`format:check`/`infra:build`/`infra:test` green; `app_database.g.dart` committed. Non-blocking (`frontend.md §4/§16`): move-shorthand ~40-line dup vs `tools/looplet_authoring`; `uuid` package not added (hand-rolled v4). **Remaining: FE6/FE8/FE9 — gated on `F08.FIREBASE-PROJECT`.** Current Owner → Backend Developer; Next Role → Backend Developer (Track B — fill the `submitDailyResultV1` callable + rules + emulator tests).
