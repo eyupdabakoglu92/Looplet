@@ -7,13 +7,13 @@
 
 ## Current Status
 
-**In Progress — ALL implementation done (FE1–FE11 + BE2–BE5); iOS release build green. Ready for QA.**
+**In QA — verdict: Runtime Validation Pending (2026-09-06).** No blocking code issue; all automated + build evidence green. The contract-mandated `runtime` (device/simulator) + `repeatable integration` (Firebase emulator) evidence could not be produced in the QA environment (no device, no JDK). → Tech Lead coordinates the pending validation.
 
 ---
 
 ## Current Owner
 
-QA (F08-QA1…QA10 — end-to-end, runtime + emulator + automated)
+Tech Lead (reconcile the Runtime Validation Pending verdict + route the pending validation)
 
 ---
 
@@ -24,7 +24,8 @@ Contract LOCKED; `infra/` DURUM 0 done + reconciled. **F08 implementation comple
 * **Track B (Backend Developer) — DELIVERED + accepted** (`backend.md`): `submitDailyResultV1` filled (validation matrix + create-only Firestore transaction + first-run-authoritative reconciliation + `HttpsError` mapping); `firestore.rules` verified compliant; emulator suites (`rules.test.ts`, `submitDailyResult.test.ts`) written + wired into the CI `infra` job via `npx firebase-tools emulators:exec`.
 * **Gates:** 263 workspace tests + `analyze` + `format:check` + `infra:build`/`infra:test` + offline `npm test` (18/13-emulator-skip) all green. Emulator suites are CI-verified only (no JDK in the dev env).
 * **`F08.FIREBASE-PROJECT` DONE (2026-09-06, verified by the Tech Lead).** Firebase project `looplet-712e5`; Android app `com.looplet.looplet_app` + iOS app `com.looplet.loopletApp` registered; `flutterfire configure` ran — `infra/.firebaserc`, `app/lib/firebase_options.dart`, `app/android/app/google-services.json` (+ Gradle `com.google.gms.google-services` wired in `settings.gradle.kts` + `app/build.gradle.kts`), `app/ios/Runner/GoogleService-Info.plist` (+ referenced in `project.pbxproj`) all present, consistent, and committed. Anonymous Auth enabled. App Check = **monitor** (never hard-enforce). **iOS production App Attest / DeviceCheck deferred** (no Apple Developer Program membership) — non-blocking because enforcement is OFF; `architecture.md → App Init Sequence` amended with the provider-selection rule (debug provider in dev, Play Integrity / App Attest in release, activation wrapped so failure is a logged no-op). `FIREBASE_CI_TOKEN` → `F08-DEVOPS`.
-* **Join delivered (2026-09-06)** — `F08-FE6` (`bootstrap.dart` + `main.dart` rewrite: local-gated splash → home / `_StoreErrorScreen`; best-effort async Firebase init + App Check provider selection + `signInAnonymously`), `F08-FE8` (`callable_sync_sender.dart` — real `httpsCallable('submitDailyResultV1')` sender + pure response/error → `SyncSendResult` mapping, 11 tests), `F08-FE9` (`sync_providers.dart` — app-scoped `dailyResultSyncServiceProvider` singleton + `connectivity_plus` regain stream + `_SessionLifecycle` observer). **268 workspace tests** + `analyze` + `format:check` + `infra:build`/`infra:test` green. **`flutter build ios --release --no-codesign` GREEN** with the Firebase pods (`pod install` 137s → `✓ Built Runner.app 53.2MB`). **NEXT: QA.**
+* **Join delivered (2026-09-06)** — `F08-FE6` (`bootstrap.dart` + `main.dart` rewrite: local-gated splash → home / `_StoreErrorScreen`; best-effort async Firebase init + App Check provider selection + `signInAnonymously`), `F08-FE8` (`callable_sync_sender.dart` — real `httpsCallable('submitDailyResultV1')` sender + pure response/error → `SyncSendResult` mapping, 11 tests), `F08-FE9` (`sync_providers.dart` — app-scoped `dailyResultSyncServiceProvider` singleton + `connectivity_plus` regain stream + `_SessionLifecycle` observer). **268 workspace tests** + `analyze` + `format:check` + `infra:build`/`infra:test` green. **`flutter build ios --release --no-codesign` GREEN** with the Firebase pods (`pod install` 137s → `✓ Built Runner.app 53.2MB`).
+* **QA done (2026-09-06) — verdict `Runtime Validation Pending`** (`qa.md`): no code defect, contract honored, all automated + build + security evidence green; the environment could not produce the contract-mandated `runtime` (device) + `repeatable integration` (Firebase emulator) proof. **NEXT: Tech Lead** — reconcile + route the pending validation (CI emulator confirm + a simulator/`F08-DEVOPS` on-device smoke).
 
 ---
 
@@ -59,7 +60,7 @@ Contract LOCKED; `infra/` DURUM 0 done + reconciled. **F08 implementation comple
 - [x] Task ID: F08-BE3 | Assigned Role: Backend Developer | Status: **Done — verified, no change** | `infra/firestore.rules` (as scaffolded) matches `architecture.md → Firebase Sync Surface → Rules`: `allow create: if request.auth != null && request.auth.uid == uid` on `dailyResults/{bucket}/entries/{uid}`; `update`/`delete`/`read` `false`; catch-all deny. `!exists(...)` from the contract text is implied by Firestore `create` semantics. `test/rules.test.ts` (6 emulator-gated cases: allow-create-own / deny-create-other / deny-unauth / deny-update / deny-delete / deny-read) covers the matrix.
 - [x] Task ID: F08-BE4 | Assigned Role: Backend Developer | Status: **Done** | `test/submitDailyResult.test.ts` (emulator-gated, `demo-looplet`): first authed → `CREATED` + doc written with exact fields; "better" replay → `ALREADY_SUBMITTED`, same `recordedAt`, **doc unchanged**; 4 repeats → all `ALREADY_SUBMITTED` + **one** doc; per-uid scoping (`alice`/`bob`); unauth → `unauthenticated` + no doc; invalid payload → `invalid-argument` + `details.code` + no doc; errors are `HttpsError`.
 - [x] Task ID: F08-BE5 | Assigned Role: Backend Developer | Status: **Done** | `.github/workflows/ci.yml` `infra` job — the TODO replaced with **"Test functions (Firebase emulator)"**: `working-directory: infra`, `npx --yes firebase-tools@15 emulators:exec --only firestore,auth --project demo-looplet "npm --prefix functions run test"` (un-skips `rules.test.ts` + `submitDailyResult.test.ts`; no committed `firebase-tools` dep, no extra SHA-pinned action — ubuntu-latest has a JDK). `package.json` `test:emulator` script mirrors it for local use. **Emulator suites are CI-verified only in this delivery — no JDK in the dev env** (analogous to Android `build:app` CI-only locally); offline `npm test` + `tsc` + `melos infra:build`/`infra:test` green.
-- [ ] Task ID: F08-QA1…QA10 | Assigned Role: QA | Status: Not opened (opens when BE + FE complete) | Per `architecture.md → QA Focus` — resume fidelity (runtime), offline Journey/Daily (runtime), exactly-once sync + first-run-authoritative (integration, emulator, via the fake producer), migration + corrupt-save + storage-full (automated), clock (automated+runtime), guest schema (automated), session-level ownership (runtime), rules (integration). Evidence: `runtime` + `repeatable integration` + `automated functional`.
+- [x] Task ID: F08-QA1…QA10 | Assigned Role: QA | Status: **Done (2026-09-06) — verdict: Runtime Validation Pending** | `qa.md` written. Backend Build Gate PASS (268/268 workspace + 18/18 infra offline + `analyze` + `format:check` + `infra:build`/`infra:test` + `flutter build ios --release --no-codesign` GREEN). Full [LOCKED] contract honored (schema, never-drop guard, frozen snapshot + re-derived thaw, `sync_queue` state machine + exactly-once + first-run-authoritative + session-level ownership + kill-switch, callable request/response/error + §8 validation + create-only transaction, create-only rules, amended App Check provider selection). Security §6.5 all PASS. **Not `Approved`** — `architecture.md → QA Focus` mandates `runtime` (device) + `repeatable integration` (Firebase emulator) evidence and the QA environment had neither a device/simulator nor a JDK (so `rules.test.ts` + `submitDailyResult.test.ts` could not run). Environment gap, not a code defect. Pending validation scenarios in `qa.md §17` + Tech Lead Note.
 - [ ] Task ID: F08-DEVOPS | Assigned Role: DevOps/Release Engineer | Status: Not opened (opens AFTER QA passes — state machine DURUM 5 → In Release) | `Release Scope = production-readiness`. Firebase Functions + rules deploy readiness (dry-run `firebase deploy --only functions,firestore:rules`), Remote Config push, prod Firebase project confirmation, `FIREBASE_CI_TOKEN` wiring, rollback-readiness (functions redeploy-previous + `daily_sync_enabled` kill-switch + "no Drift downgrade" documented), post-deploy smoke (`release.md` §8), `features/f08-.../release.md` verdict.
 
 ---
@@ -111,10 +112,10 @@ _Track B delivered (`backend.md`). Emulator suites are CI-verified only locally 
 - [x] (F08-FE10) Fake daily-result producer test seam — done.
 - [x] (F08-FE11) `toEngineConfig(Puzzle)` consumer helper — done.
 
-_**All Frontend tasks (FE1–FE11) delivered** (`frontend.md`, Pass 1 + Pass 2). 268 workspace tests green. Ready for QA._
+_**All Frontend tasks (FE1–FE11) delivered** (`frontend.md`). QA done → `Runtime Validation Pending` (`qa.md`)._
 
 ### QA
-- [ ] (F08-QA1…QA10) Full matrix per `architecture.md → QA Focus`. Opens when BE + FE complete.
+- [x] (F08-QA1…QA10) `qa.md` written — **Runtime Validation Pending**: no code defect, all automated + build evidence green; device + Firebase-emulator evidence not producible in the QA environment.
 
 ### DevOps / Release
 - [ ] (F08-DEVOPS) `production-readiness` — Firebase deploy readiness + rollback-readiness + smoke + `features/f08-.../release.md`. Opens **after QA**.
@@ -130,7 +131,10 @@ _**All Frontend tasks (FE1–FE11) delivered** (`frontend.md`, Pass 1 + Pass 2).
 
 ## Blockers
 
-* **None.** Contract LOCKED; **all F08 implementation delivered** — FE1–FE11 (`frontend.md`) + BE2–BE5 (`backend.md`); `F08.FIREBASE-PROJECT` done + verified. All gates green (**268 workspace tests** + `analyze`/`format:check` + offline `npm test` + `infra:build`/`infra:test`). **Ready for QA.**
+* **No code blocker.** Contract LOCKED; all F08 implementation delivered (FE1–FE11 + BE2–BE5); `F08.FIREBASE-PROJECT` done. All automated + build + security evidence green (268 workspace + 18 infra-offline tests, `analyze`, `format:check`, `infra:build`/`infra:test`, iOS release build).
+* **Runtime Validation Pending (QA verdict, `qa.md`)** — `architecture.md → QA Focus` mandates `runtime` (device/simulator) + `repeatable integration` (Firebase emulator) evidence; the QA environment had neither a device nor a JDK (so `test/rules.test.ts` + `test/submitDailyResult.test.ts` could not run). **Pending validation scenarios** (`qa.md §17`): (1) the CI `infra` emulator job (rules + callable create-only/reconciliation) green on the F08 branch; (2) kill/relaunch resume fidelity on a simulator (AC1/AC6); (3) lifecycle + connectivity `drain()` on a device; (4) offline Journey/Daily end-user flow — needs F03/F05 screens; (5) storage-full fault injection (AC7); (6) `F08-DEVOPS` post-deploy smoke (`release.md` §8 — covers 1, 2, 6). **Not `Approved` until these close.**
+* Deferred / non-blocking: iOS production App Check (App Attest/DeviceCheck) — `[OPEN — post-MVP]`, App Check is monitor-only. `FIREBASE_CI_TOKEN` + Android release Play Integrity SHA-256 → `F08-DEVOPS`.
+* Cross-feature (not a blocker): F07 wires the real Daily producer + Remote Config `daily_sync_enabled` read (replacing `FakeDailyResultProducer` + the `dailySyncEnabledProvider` seam).
 * **iOS release build verified** — `flutter build ios --release --no-codesign` GREEN: `pod install` (137s, all 6 Firebase/`connectivity_plus` pods) + Xcode build → `✓ Built build/ios/iphoneos/Runner.app (53.2MB)`. Android `build:app` stays CI-only locally (no Android SDK).
 * **Non-blocking, deferred:** iOS production App Check (App Attest / DeviceCheck) — no Apple Developer Program membership (Team ID / `.p8` missing). App Check is soft-enforce so a failed iOS attestation is a logged no-op; dev/simulator uses the debug provider. Tracked `[OPEN — post-MVP]` in `architecture.md`. Android release Play Integrity SHA-256 + `FIREBASE_CI_TOKEN` → `F08-DEVOPS`.
 * **Do not** enable App Check hard-enforce in the MVP (`platform.md` §13).
@@ -189,15 +193,15 @@ _**All Frontend tasks (FE1–FE11) delivered** (`frontend.md`, Pass 1 + Pass 2).
 
 ## Last Update
 
-* Updated By: Frontend/Mobile Developer
+* Updated By: QA
 * Timestamp: 2026-09-06
-* Summary: **F08 app-Firebase join delivered (FE6/FE8/FE9) — all F08 implementation is now complete.** New: `app/lib/bootstrap.dart` (`sealed AppBootstrap`, `appBootstrapProvider`, best-effort `_bootstrapFirebase`), `app/lib/persistence/callable_sync_sender.dart` (real callable `SyncSender` + pure `mapCallableSuccess`/`mapCallableErrorCode`), `app/lib/persistence/sync_providers.dart` (`firebaseFunctionsProvider`, `syncSenderProvider`, `dailySyncEnabledProvider` kill-switch seam, `connectivityRegainedProvider`, **app-scoped** `dailyResultSyncServiceProvider`). `app/lib/main.dart` rewritten — `ConsumerWidget` gating on `appBootstrapProvider` (splash → home / `_StoreErrorScreen` on migration failure, Retry = re-run bootstrap) + `_SessionLifecycle` observer draining on `paused`/`resumed`. App Check: debug provider in dev / Play Integrity + App Attest in release, `activate()` wrapped (failure = logged no-op) per the amended `architecture.md`. `widget_test.dart` updated (bootstrap-aware, in-memory DB + no-op sender + empty connectivity overrides); `callable_sync_sender_test.dart` (11 tests). **268 workspace tests** (app **72**) + `analyze` + `format:check` + `infra:build`/`infra:test` green. `flutter build ios --release --no-codesign` GREEN with the Firebase pods (`✓ Built Runner.app 53.2MB`). `frontend.md` "Pass 2" section added. `feature-board.md` + `system-state.md` to be synced by the Tech Lead. Nothing committed to git.
+* Summary: **F08 QA done — verdict `Runtime Validation Pending`** (`qa.md`). Backend Build Gate PASS: `melos run test` **268/268 workspace** + `infra:test` **18/18 offline** + `analyze` + `format:check` + `infra:build` + `flutter build ios --release --no-codesign` (Firebase pods) all GREEN. Full [LOCKED] contract honored (schema/keys, never-drop migration guard, frozen snapshot + re-derived thaw, `sync_queue` state machine + exactly-once + first-run-authoritative + session-level ownership + kill-switch, `submitDailyResultV1` request/response/error + `platform.md` §8 validation + create-only transaction, create-only Firestore rules, amended App Check provider selection). Security §6.5 — all PASS (IDOR / injection / exposure / mass-assignment / auth-bypass; no rate limiter is the locked MVP posture). **No blocking code issue, no required fix.** **Not `Approved`** because `architecture.md → QA Focus` mandates `runtime` (device/simulator) + `repeatable integration` (Firebase emulator) evidence and the QA environment had neither a device nor a JDK (so `rules.test.ts` + `submitDailyResult.test.ts` — CI-wired — could not run here). Environment gap, not a defect. 6 pending validation scenarios listed in `qa.md §17` + Tech Lead Note. `feature-board.md` + `system-state.md` synced by the Tech Lead. Nothing committed to git.
 
 ---
 
 ## Next Role
 
-QA
+Tech Lead
 
 ---
 
@@ -223,55 +227,41 @@ Project `looplet-712e5`; all 4 config files + Android Gradle wiring + iOS pbxpro
 
 See `frontend.md` "Pass 2". `bootstrap.dart` + `main.dart` (gate + App Check provider selection + lifecycle observer); `callable_sync_sender.dart` (real sender + mapping, 11 tests); `sync_providers.dart` (app-scoped singleton + connectivity). 268 workspace tests green; `flutter build ios --release --no-codesign` GREEN with the Firebase pods.
 
-### QA — F08 end-to-end (F08-QA1…QA10)
+### QA — F08 end-to-end — ✅ DONE 2026-09-06 → verdict **Runtime Validation Pending**
+
+See `qa.md`. Backend Build Gate PASS (268/268 workspace + 18/18 infra-offline + `analyze` + `format:check` + `infra:build` + iOS release build). Full [LOCKED] contract honored; Security §6.5 all PASS; no code defect, no required fix. Not `Approved` because the environment could not produce the contract-mandated `runtime` (device/simulator) + `repeatable integration` (Firebase emulator — no JDK) evidence.
+
+### Tech Lead — reconcile the Runtime Validation Pending verdict + route the pending validation
 
 ```text
-Verify F08 (persistence + offline + exactly-once sync). Scope: end-to-end — app persistence + Firebase
-emulator. Evidence classes: `runtime` (device/emulator) + `repeatable integration` (Firebase emulator) +
-`automated functional` (unit). NOT source-only — platform.md §10 requires runtime proof for resume + daily.
+QA verdict is Runtime Validation Pending (state-machine DURUM 5 → "Runtime Validation Pending"): blocking
+CODE issue yok, ancak architecture.md → QA Focus'un istediği runtime + Firebase-emulator kanıtı bu QA
+turunda üretilemedi (cihaz/simülatör yok, JDK yok → rules.test.ts + submitDailyResult.test.ts koşmadı).
 
-Authority: features/f08-offline-persistence-and-sync/architecture.md → "QA Focus" (the full matrix),
-"Active-Session Snapshot Contract", "sync_queue Contract", "Reconciliation Algorithm", "Resilience",
-"App Init Sequence" (App Check provider selection); prd.md (Acceptance Criteria AC1–AC12, Edge Cases,
-Success Metrics); frontend.md (Pass 1 + Pass 2) + backend.md (test evidence tables); platform.md §5/§6/§7.
+Authority: features/f08-.../qa.md (verdict + §17 "Pending Validation Scenarios" + Tech Lead Note),
+orchestration.md (this file), architecture.md (LOCKED), release.md §2/§4/§8.
 
-Run the automated suites yourself: `melos run format:check && melos run analyze && melos run test`
-(expect 268 workspace tests green) and `melos run infra:build && melos run infra:test`. If a JDK is
-available, also run the emulator suites: `cd infra && firebase emulators:exec --only firestore,auth
---project demo-looplet "npm --prefix functions run test"` (rules.test.ts + submitDailyResult.test.ts) —
-otherwise confirm they are CI-wired and note them as CI-verified.
-
-Runtime matrix (device or emulator):
-1. RESUME FIDELITY (AC1/AC6) — start a puzzle (use a content/smoke/tr fixture or F03-later), make N moves
-   incl. undo(s) + a restart + a thawed frozen tile; kill + relaunch → grid, moveCount, undosRemaining,
-   restartCount, elapsed, thawed state exactly restored. Tamper `kv['active_session'].thawedFrozenCells`
-   and confirm the restore RE-DERIVES it from the engine replay (not the cache).
-2. OFFLINE JOURNEY (AC2) — airplane mode → all levels load, a completion persists, relaunch offline → intact.
-3. OFFLINE DAILY (AC3) — pre-populate daily_puzzle_cache → Daily playable offline; empty cache + offline
-   → the "needs connection" path (F07 UI later); Journey unaffected.
-4. EXACTLY-ONCE SYNC (AC4/AC11) — via the FakeDailyResultProducer (debug flag) or a real Daily once F07
-   lands: complete offline → 1 sync_queue row + daily_entry.syncStatus=queued; reconnect → exactly 1
-   Firestore doc; force a mid-request drop → retry → still 1 doc; kill during inFlight → relaunch →
-   reclaimed → still 1 doc; toggle daily_sync_enabled=false → no send.
-5. FIRST-RUN-AUTHORITATIVE (AC5) — seed a server doc with an earlier run → sync a "better" local run →
-   server doc + local firstRun* both UNCHANGED, queue → synced. A 2nd local completion → daily_attempt
-   row, NO new queue item.
-6. MIGRATION + RESILIENCE (AC7/AC8/AC9) — automated: seed schema v1 (bests+streak+first-run) → upgrade →
-   all intact; guard throws on a protected-row delete; corrupt active_session → _StoreErrorScreen? no —
-   corrupt SNAPSHOT self-heals to menu (log save_corrupt_recovered); a MIGRATION failure → the recoverable
-   _StoreErrorScreen with Retry (data intact at old schema). Storage-full → non-destructive.
-7. CLOCK (AC10) — move device clock backward/forward mid-session → elapsed unaffected (monotonic).
-8. GUEST SCHEMA (AC12) — every player-owned row carries a non-null guestId (local UUID); no device-id key.
-9. SESSION-LEVEL OWNERSHIP (platform.md §7) — trigger a completion, dispose the screen that triggered it →
-   the sync still completes; the DailyResultSyncService is app-scoped, not screen-owned.
-10. APP CHECK + AUTH — debug builds use the debug provider; a failed/absent App Check token or a failed
-    signInAnonymously is a logged no-op, never blocks play or local persistence; sync items wait in
-    awaitingAuth until firebaseUid exists, then send once.
-11. RULES (integration) — dailyResults/** : allow create-own, deny create-other / unauth / update / delete
-    / read.
-
-Emit a QA verdict. Note the deferred iOS production App Check (post-MVP, non-blocking). Next Role after QA
-is always Tech Lead.
+1. Accept the verdict — no rework, no contract change. F08 code is contract-compliant and fully green on
+   automated + build + security evidence.
+2. Close the runtime gap. The pending scenarios (qa.md §17): (1) CI `infra` emulator job green on the F08
+   branch (rules + callable create-only/reconciliation); (2) kill/relaunch resume on a simulator (AC1/AC6);
+   (3) lifecycle + connectivity drain on a device; (4) offline Journey/Daily end-user flow — needs F03/F05
+   screens (defer to F05/F07 QA, no F08 code change); (5) storage-full fault injection (AC7); (6) F08-DEVOPS
+   post-deploy smoke (release.md §8 — naturally covers 1, 2, 6).
+   RECOMMENDED ROUTE: per DURUM 5 "Runtime Validation Pending", set Status = In Release, Current Owner =
+   DevOps/Release Engineer, and open the F08-DEVOPS task with the pending runtime scenarios folded into its
+   release-readiness smoke (release.md §8 already lists "submit a daily result + confirm the create-only
+   write" and "background+relaunch + confirm exact resume"). Then `Run DevOps/Release Engineer`.
+   ALT: if you want an explicit simulator/emulator QA pass first, coordinate that with the user, then
+   `Run QA` again before F08-DEVOPS.
+3. Deferred / non-blocking (do NOT let these hold F08): iOS production App Attest/DeviceCheck
+   ([OPEN — post-MVP], App Check monitor-only); FIREBASE_CI_TOKEN + Android release Play Integrity SHA-256
+   (F08-DEVOPS scope, release.md §7).
+4. Sync feature-board.md + system-state.md: F08 → In Progress / In Release (per your route); Active Owner →
+   DevOps/Release Engineer (or QA if you chose the ALT). Record the verdict in the Change Log / decision
+   history.
+5. F07 follow-ons (tracked, not F08 blockers): real Daily producer + Remote Config daily_sync_enabled read
+   replace FakeDailyResultProducer + the dailySyncEnabledProvider seam.
 ```
 
 → then `Run Tech Lead` → `Run DevOps/Release Engineer` (F08-DEVOPS, `production-readiness`) → `Run Tech Lead` (close).
@@ -290,3 +280,4 @@ is always Tech Lead.
 * v8 (2026-09-06) — Tech Lead: **Track A + Track B delivery reconciled + accepted.** `frontend.md` + `backend.md` both match the LOCKED `architecture.md` (schema/keys, frozen snapshot keys, never-drop guard, `sync_queue` state machine + backoff + exactly-once + first-run-authoritative + session-level ownership + kill-switch, callable shapes, `platform.md` §8 validation, create-only transaction, verified rules). Non-blocking notes accepted, no rework: move-shorthand ~40-line dup vs `tools/looplet_authoring`; hand-rolled UUID (no `uuid` package); emulator suites CI-verified only (no JDK in dev env — Android-build precedent). **No contract change.** F08 implementation complete; sole gate = `F08.FIREBASE-PROJECT` (user Firebase-Console action). **User chose to hold F08 as-is** (no parallel feature). F08 stays the single active feature (`In Progress`); resume at `Run Frontend/Mobile Developer` (FE6/FE8/FE9 join) after `F08.FIREBASE-PROJECT`. `feature-board.md` + `system-state.md` synced to the held state. Current Owner → — (held); Next Role → — (user manual step); resume role = Frontend/Mobile Developer.
 * v9 (2026-09-06) — Tech Lead (**Incident: `F08.FIREBASE-PROJECT` resolved**): the user completed the Firebase setup — project `looplet-712e5`, Android `com.looplet.looplet_app` + iOS `com.looplet.loopletApp` registered, `flutterfire configure` run, Anonymous Auth enabled, App Check in monitor mode. Tech Lead verified `infra/.firebaserc`, `app/lib/firebase_options.dart`, `app/android/app/google-services.json` (+ Gradle `com.google.gms.google-services` wired), `app/ios/Runner/GoogleService-Info.plist` (+ pbxproj refs) — all present, consistent, committed; `flutter analyze` clean. **Authority clarification:** App Check stays soft-enforce; `architecture.md → App Init Sequence` + `platform.md` §13 amended with provider selection (debug provider in dev; Play Integrity/App Attest in release; `activate()` wrapped so failure is a logged no-op). **iOS production App Attest/DeviceCheck deferred** — no Apple Developer Program membership; non-blocking (enforcement OFF) — tracked `[OPEN — post-MVP]`. Android release Play Integrity SHA-256 + `FIREBASE_CI_TOKEN` → `F08-DEVOPS`. Hard-enforce never enabled in the MVP. **`F08.FIREBASE-PROJECT` → Done; `F08-FE6/FE8/FE9` → READY.** Current Owner → Frontend/Mobile Developer; Next Role → Frontend/Mobile Developer (join: FE6 → FE8 → FE9 → QA). `feature-board.md` + `system-state.md` synced.
 * v10 (2026-09-06) — Frontend/Mobile Developer (**F08 join FE6/FE8/FE9 — all F08 implementation complete**): `app/lib/bootstrap.dart` (`sealed AppBootstrap`, `appBootstrapProvider` — local-gated: migrations via `PlayerRepo.current()`, snapshot warm; `_bootstrapFirebase` best-effort: guarded `Firebase.initializeApp` → `FirebaseAppCheck.activate(kReleaseMode ? playIntegrity/appAttest : debug/debug)` try/caught no-op → `signInAnonymously` → `setFirebaseUid` → `reviveParkedOnAppStart` + `drain`); `app/lib/main.dart` (`ConsumerWidget` gate: `_SplashScreen` → `_HomePlaceholder` / `_StoreErrorScreen`; `_SessionLifecycle` observer → `drain()` on paused/resumed); `app/lib/persistence/callable_sync_sender.dart` (`callableSyncSender` + pure `mapCallableSuccess`/`mapCallableErrorCode`, 11 tests); `app/lib/persistence/sync_providers.dart` (app-scoped `dailyResultSyncServiceProvider` singleton — `ref.onDispose` at app teardown only, never screen-owned — + `connectivityRegainedProvider` + `dailySyncEnabledProvider` kill-switch seam). App Check per the amended `architecture.md`. **268 workspace tests** (app 72) + `analyze` + `format:check` + `infra:build`/`infra:test` green. **`flutter build ios --release --no-codesign` GREEN** — `pod install` (all 6 Firebase/`connectivity_plus` pods) + Xcode build → `✓ Built Runner.app (53.2MB)`. `frontend.md` "Pass 2" section added. Current Owner → QA; Next Role → QA (F08-QA1…QA10). `feature-board.md` + `system-state.md` to be synced by the Tech Lead post-QA.
+* v11 (2026-09-06) — QA: **F08 QA done — verdict `Runtime Validation Pending`** (`qa.md`). Backend Build Gate PASS: `melos run test` 268/268 workspace + `infra:test` 18/18 offline + `analyze` + `format:check` + `infra:build` + `flutter build ios --release --no-codesign` (Firebase pods → `✓ Built Runner.app 53.2MB`) all GREEN. Full [LOCKED] contract honored (schema/keys, never-drop migration guard, frozen snapshot + re-derived thaw, `sync_queue` state machine + exactly-once + first-run-authoritative + session-level ownership + kill-switch, `submitDailyResultV1` request/response/error + `platform.md` §8 validation + create-only transaction, create-only Firestore rules, amended App Check provider selection). Security §6.5 all PASS (IDOR / injection / exposure / mass-assignment / auth-bypass; no rate limiter = locked MVP posture). **No blocking code issue, no required fix.** **Not `Approved`** — `architecture.md → QA Focus` mandates `runtime` (device/simulator) + `repeatable integration` (Firebase emulator) evidence; the QA environment had neither a device nor a JDK (so the CI-wired `rules.test.ts` + `submitDailyResult.test.ts` could not run here). Environment gap, not a defect. 6 pending validation scenarios in `qa.md §17` + Tech Lead Note (recommended route: fold into `F08-DEVOPS`'s `release.md` §8 smoke). Current Owner → Tech Lead; Next Role → Tech Lead (reconcile the pending verdict + route the pending validation; `feature-board.md` + `system-state.md` sync).
