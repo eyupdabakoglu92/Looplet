@@ -1,6 +1,7 @@
 # F08 — offline-persistence-and-sync: Architecture
 
-> Status: **CONTRACT AUTHORITY — LOCKED.** Finalized 2026-09-06 by the Tech Lead from `analysis.md` (F08.0-AN). Every prior `[PENDING ANALYSIS]` section is now `[LOCKED]`. Delivery artifacts and QA notes do not override the semantics here. The only remaining open values are the ones explicitly marked `[OPEN — F07]` / `[OPEN — DevOps]` and belong to a downstream feature/role, not to F08 implementation.
+> Status: **CONTRACT AUTHORITY — LOCKED.** Finalized 2026-09-06 by the Tech Lead from `analysis.md` (F08.0-AN). Every prior `[PENDING ANALYSIS]` section is now `[LOCKED]`. Delivery artifacts and QA notes do not override the semantics here. The only remaining open values are the ones explicitly marked `[OPEN — …]` and belong to a downstream feature/role, not to F08 implementation.
+> **Amended 2026-09-06 (Firebase-project incident):** "App Init Sequence → App Check provider selection" added — soft-enforce unchanged; debug provider in dev, Play Integrity / App Attest in release; iOS production App Attest deferred (no Apple Developer Program membership) and non-blocking because enforcement is OFF.
 > `orchestration.md` is execution authority; `platform.md` / `release.md` are project authority.
 
 ---
@@ -202,9 +203,23 @@ The DURUM 0 seeds the kill-switch keys `release.md` §6 requires: `daily_enabled
 
 1. Open `AppDatabase` → run migrations (`onCreate` seeds; `onUpgrade` steps + never-drop guard). Migration failure → recoverable error screen (the only F08-owned UI; plain text + retry; no design handoff).
 2. Read `kv['active_session']` (validate; corrupt → discard active only, continue).
-3. **Async, non-blocking:** `Firebase.initializeApp()` → App Check activation → Anonymous `signInAnonymously()` → on success persist `player.firebaseUid`. Failures here never block play or local persistence; the sync queue waits in `awaitingAuth`.
+3. **Async, non-blocking:** `Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform)` → **App Check activation** (see below) → Anonymous `signInAnonymously()` → on success persist `player.firebaseUid`. **Every step here is best-effort — a failure is caught and logged, never rethrown**; play + local persistence proceed, and the sync queue waits in `awaitingAuth` until a `firebaseUid` exists.
 4. Construct the session-level `DailyResultSyncService`; start the connectivity listener; `drain()` once.
 5. Hand control to the normal `go_router` tree (or the migration-error root if step 1 failed).
+
+### App Check provider selection [LOCKED — amended 2026-09-06]
+
+App Check is **soft-enforce / monitor** for the whole MVP (`platform.md` §6/§13) — a missing or failed attestation token **never blocks** `initializeApp`, `signInAnonymously`, or `submitDailyResultV1`. Given that, `FirebaseAppCheck.instance.activate(...)` uses:
+
+| Build | Android provider | Apple provider |
+| --- | --- | --- |
+| debug / profile / simulator / `flutter test` | `AndroidProvider.debug` | `AppleProvider.debug` |
+| release | `AndroidProvider.playIntegrity` | `AppleProvider.appAttest` |
+
+* The whole `activate(...)` call is wrapped so an activation error is logged and swallowed (init continues).
+* **iOS release App Attest / DeviceCheck is not configured** — the LOOPLET Apple account is not enrolled in the Apple Developer Program (no Team ID / `.p8` key). A release iOS build will attempt App Attest and its token acquisition will fail; because enforcement is OFF this is a logged no-op and the app is fully functional. Completing iOS production App Check is an **`[OPEN — post-MVP, after Apple Developer Program enrollment]`** follow-on, not an F08 blocker.
+* Android release Play Integrity needs the release-signing SHA-256 registered in the Firebase console — a launch-hardening / `F08-DEVOPS` concern (debug builds use the debug provider and don't need it).
+* **Hard-enforce is never enabled in the MVP.**
 
 ---
 
@@ -281,3 +296,5 @@ The DURUM 0 seeds the kill-switch keys `release.md` §6 requires: `daily_enabled
 * **[OPEN — DevOps/Release Engineer, post-QA]** deploy runbook, prod Firebase project, dry-run + smoke evidence, composite index decision.
 * **[OPEN — Tech Lead, low priority]** periodic backup copy of durable tables (default: no for the MVP).
 * **[OPEN — post-MVP]** App Check hard-enforce; leaderboard + its Firestore composite index.
+* **[OPEN — post-MVP, needs Apple Developer Program enrollment]** iOS production App Check (App Attest / DeviceCheck) configuration — Team ID + `.p8` auth key + Key ID. Not a blocker while App Check is soft-enforced; debug/dev uses the debug provider.
+* **[OPEN — F08-DEVOPS]** Android release Play Integrity: register the release-signing SHA-256 in the Firebase console; `FIREBASE_CI_TOKEN` repo secret (deferred here per the user).
