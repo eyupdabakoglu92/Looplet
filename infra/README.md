@@ -22,10 +22,10 @@ implemented by **F08-BE2** against
 | Path | What |
 | --- | --- |
 | `firebase.json` | functions + firestore + emulator config |
-| `.firebaserc` | project alias (`default` → placeholder `looplet-mvp`; set the real id with `firebase use --add`) |
+| `.firebaserc` | project alias (`default` → `looplet-712e5`) |
 | `firestore.rules` | `dailyResults/**` create-only for own uid; default-deny elsewhere |
 | `firestore.indexes.json` | empty (a composite index for a future leaderboard is deferred) |
-| `remoteconfig.template.json` | `daily_enabled` / `daily_sync_enabled` / `share_enabled` (true) + `daily_manifest_url` (placeholder) |
+| `remoteconfig.template.json` | `daily_enabled` / `daily_sync_enabled` / `share_enabled` (true) + `daily_manifest_url` (placeholder) — wired into `firebase.json` `remoteconfig.template` |
 | `functions/` | TypeScript (Node 20) Cloud Functions — `submitDailyResultV1` |
 
 ## Local development
@@ -43,17 +43,65 @@ npm test               # offline skeleton tests (emulator suites auto-skip)
 
 `melos run infra:build` / `melos run infra:test` run the above from the repo root.
 
-## Not done yet (manual, needs a real Firebase project + `firebase login`)
+## Deploy (F08-DEVOPS — `production-readiness`)
 
-The DURUM 0 stops at a compiling, testable skeleton. Before F08-BE / F08-FE6 /
-`F08-DEVOPS` can deploy or run the emulator suites end-to-end, someone with
-Firebase Console access must:
+Full readiness analysis + gate evidence:
+`ai-system/features/f08-offline-persistence-and-sync/release.md`.
 
-1. Create the Firebase project; put its id in `.firebaserc` (`firebase use --add`).
-2. Register the iOS + Android apps; run `flutterfire configure` from `app/` to
-   generate `app/lib/firebase_options.dart` + `google-services.json` +
-   `GoogleService-Info.plist` (these are **not secret** and are committed —
-   `release.md` §7).
-3. Enable Anonymous Auth and App Check (soft-enforce / monitor mode for the MVP).
-4. Install the Firebase CLI in CI and wire `FIREBASE_CI_TOKEN` (name already in
-   `release.md` §7) so the `infra` emulator + deploy jobs run for real.
+### Prerequisites (all required before the first deploy)
+
+1. **`looplet-712e5` must be on the Blaze (pay-as-you-go) plan.** 2nd-gen Cloud
+   Functions need `cloudbuild` / `artifactregistry` / `cloudfunctions` APIs,
+   which Spark cannot enable. `firebase deploy --only functions` fails on Spark
+   with an explicit upgrade prompt. Rules + Remote Config deploy fine on Spark.
+   Recommend a low budget alert — `submitDailyResultV1` is create-only, low-QPS,
+   `maxInstances: 10`.
+2. **Explicit Tech Lead approval** (`release.md` §12) — production deploy is
+   never the default.
+3. For an **automated** deploy workflow: `FIREBASE_CI_TOKEN` **or** a Google
+   Cloud service account (`roles/firebasedeploy` + `roles/cloudfunctions.developer`
+   + `roles/firebaserules.admin`) JSON key as `GOOGLE_APPLICATION_CREDENTIALS`.
+   `firebase login:ci` tokens are deprecated — prefer the service account.
+   A **manual** first deploy from an authenticated workstation needs neither.
+
+### Runbook (manual, authenticated operator)
+
+```sh
+cd infra
+
+# 1. Pre-deploy validation, no changes:
+firebase deploy --only functions,firestore:rules,remoteconfig \
+  --project looplet-712e5 --dry-run
+
+# 2. Rules + Remote Config first (no Blaze needed, reversible):
+firebase deploy --only firestore:rules,remoteconfig --project looplet-712e5
+
+# 3. Function (needs Blaze; first run enables the build APIs):
+firebase deploy --only functions --project looplet-712e5
+
+# 4. Verify:
+firebase functions:list --project looplet-712e5     # submitDailyResultV1 present
+```
+
+Region is pinned to `us-central1` (`functions/src/index.ts`). App Check stays in
+**monitor** — do not toggle enforce. Post-deploy smoke (S1–S7) is in
+`release.md` §8.
+
+### Rollback
+
+* Daily/sync regression → Remote Config `daily_sync_enabled = false` (client
+  `drain()` becomes a no-op; queued results are kept and sync later).
+* Bad function/rules → redeploy the previous commit (`firebase deploy --only …`).
+* On-device data → forward-fix only; never server-rolled-back. The Drift
+  migration is forward-only with a never-drop guard.
+
+### Emulator suites locally
+
+```sh
+cd infra
+firebase emulators:exec --only firestore,auth --project demo-looplet \
+  "npm --prefix functions run test"     # needs a JDK on PATH
+```
+
+CI runs this in the `infra` job (ubuntu ships a JDK); `demo-looplet` is a fully
+offline emulator project — no auth, no token.
