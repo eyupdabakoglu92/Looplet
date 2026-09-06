@@ -7,7 +7,7 @@
 
 ## Current Status
 
-**In Progress — Frontend delivered 2026-09-06.** Contract (`architecture.md`) LOCKED-substrate + `ui-design.md` (Direction A) delivered. **Frontend/Mobile Developer delivered F03-FE1…FE8** (`frontend.md`): the playable screen — `app/lib/play/**` (16 files) + `app_router.dart` (go_router; `MaterialApp.router`) + `home_screen.dart`. Ticker-free `PlaySessionController` state machine (idle/tracking/animatingShift/animatingBounce/won, **no input queue**); pure `GestureResolver` (threshold + dominant axis + tie-band→horizontal + one-cell); wrap-shift animation (190 ms, edge-mask + ghost) + rejected-move bounce; `MOVES`=`engine.moveCount` settled-only; 3-action Undo (dead + no prompt at 0); separated outline Restart (`restartCount++`, no confirm); write-through into the F08-frozen `ActiveSessionSnapshot` + hydrate via the F08 restore path; bounded ≤600 ms win → amber fill + **drawn L→R seam bar** (colour + shape) → minimal functional completion sheet (Retry/Close; F04 seam); `paused` cancels the gesture / commits a mid-shift move synchronously. **295 workspace tests green** (app 99 = +27 F03: 13 `gesture_resolver` + 11 `controller` + 5 `screen` widget); `flutter analyze` + `dart format --set-exit-if-changed` clean; **`flutter build ios --release --no-codesign` GREEN** (`✓ Built Runner.app 54.5MB`). 2 flagged perf deviations from `ui-design.md` (board-recede blur → dim-only; breathing ambient omitted) + 6 non-blocking Tech Lead clarifications. **Next: QA** (F03-QA — `runtime`-mandatory client QA).
+**In Progress — QA done 2026-09-06 → verdict `Runtime Validation Pending`.** Contract LOCKED-substrate + `ui-design.md` (Direction A) + Frontend F03-FE1…FE8 (`frontend.md`) delivered — the playable screen (`app/lib/play/**` 16 files + `app_router.dart` go_router + `home_screen.dart`). **QA (`qa.md`): no blocking code issue, no required fix.** Client-Only + UI-Handoff scope (security + release out of scope, justified). Build gate PASS — `flutter analyze` + `dart analyze` (6 pkg) + `dart format --set-exit-if-changed` clean; **295/295 workspace tests** (27 F03); `flutter build ios --release --no-codesign` GREEN (54.5MB). Full `architecture.md` contract honoured; all 11 ACs automated-covered; `ui-design.md` Direction A aligned (~94/100, no rubric fail, no doctrine anti-pattern). **Not `Approved`** — `architecture.md §16` mandates `runtime` (device/simulator) evidence ("Not source-only") + `prd.md §7` makes "0 double-registered moves during animation" / "gesture accuracy on a device matrix" hard success metrics; the QA env has no device/simulator session + no `integration_test` suite → `automated functional` + build only. Environment gap, not a defect (same posture as F08 QA). 8 pending validation scenarios (`qa.md §17`) + 6 open clarifications + 1 non-F03 note in the Tech Lead Note. **Next: Tech Lead** — reconcile the pending verdict + route the runtime closure (device/simulator pass or an `integration_test` suite; F03 has no release gate, `Release Scope = none`).
 
 F03 is activated in parallel with **F08 parked** (`In Release`, deploy deferred by user decision to end-of-MVP). F08's engineering is complete and ready; F03 is the other branch of the `F06 → (F08, F03)` critical-path fork and needs no Firebase. See F08 `orchestration.md → Last Decision (DURUM 5.5)` for the parallelization rationale.
 
@@ -15,7 +15,7 @@ F03 is activated in parallel with **F08 parked** (`In Release`, deploy deferred 
 
 ## Current Owner
 
-QA
+Tech Lead
 
 ---
 
@@ -47,7 +47,7 @@ QA
 - [x] Task ID: F03-FE6 | Assigned Role: Frontend/Mobile Developer | Status: **Done (2026-09-06)** | `_buildSeam`/`_buildBloom` in `puzzle_board.dart` + `widgets/completion_sheet.dart`; ≤600 ms `_win` choreography (amber fill + `ink-amber` + lift + drawn L→R seam bar + one bloom + 0.12 dim of other rows) → minimal sheet (kicker + word + `HAMLE` stat + dominant Retry + quiet Close). No rating logic.
 - [x] Task ID: F03-FE7 | Assigned Role: Frontend/Mobile Developer | Status: **Done (2026-09-06)** | controller `onAppPaused`/`onAppResumed`; `paused` → cancel a `tracking` gesture / `_finishShift()` a mid-animation move synchronously (settled, never torn) / pause timer / persist; `resumed` → restart timer for an unfinished session.
 - [x] Task ID: F03-FE8 | Assigned Role: Frontend/Mobile Developer | Status: **Done (2026-09-06)** | `play_strings.dart` (per-language `tr`/`en` table — no `gen_l10n`, assumption flagged); `ui-design.md` alignment pass; `flutter analyze` + `dart format --set-exit-if-changed` clean; `frontend.md` written with task-to-code traceability + test evidence.
-- [ ] Task ID: F03-QA1…QAn | Assigned Role: QA | Status: **Open — NEXT (2026-09-06)** | End-to-end client QA per `architecture.md §16` — `runtime` (device/simulator) mandatory (0 double-registered moves during animation; gesture accuracy on a small + a large device; exactly-one-cell for flick vs drag; input-lock no-queue; background mid-animation; portrait lock; resume via F08 snapshot) + `automated functional` (gesture→Move mapping, counters, state machine, snapshot serialization) + `ui-design.md` alignment.
+- [x] Task ID: F03-QA1…QAn | Assigned Role: QA | Status: **Done (2026-09-06) — verdict: Runtime Validation Pending** | `qa.md` written. Client-Only + UI-Handoff scope (security + release out of scope, justified). Build gate PASS: `flutter analyze` + `dart analyze` (6 pkg) + `dart format --set-exit-if-changed` clean; **295/295 workspace tests** (27 F03); `flutter build ios --release --no-codesign` GREEN (54.5MB). Full `architecture.md` contract honoured; all 11 ACs have automated coverage; `ui-design.md` Direction A aligned, ~94/100, no rubric fail / no doctrine anti-pattern. **No blocking code issue, no required fix.** **Not `Approved`** — `architecture.md §16` mandates `runtime` (device/simulator) + `repeatable integration` evidence ("Not source-only") and `prd.md §7` makes "0 double-registered moves during animation" + "gesture accuracy on a device matrix" hard success metrics; the QA env has no device/simulator session and no `integration_test` suite → evidence class is `automated functional` + build only. Environment gap, not a defect (same posture as F08 QA). 8 pending validation scenarios in `qa.md §17` + 6 open clarifications + 1 non-F03 observation (`looplet_solver` pre-existing `info`) in the Tech Lead Note.
 
 ---
 
@@ -75,20 +75,29 @@ QA
 - [x] (F03-FE1…FE8) delivered 2026-09-06 (`frontend.md`). Screen + gesture mapping + state machine/animation + HUD/Undo/Restart + persistence + completion sequence + backgrounding + localization. 295 workspace tests green; iOS release build GREEN. 6 non-blocking Tech Lead clarifications + 2 flagged perf deviations.
 
 ### QA
-- [ ] (F03-QA) end-to-end client QA — `runtime` (device/simulator) mandatory. **NEXT.**
+- [x] (F03-QA) end-to-end client QA — done 2026-09-06 (`qa.md`). Verdict **Runtime Validation Pending**: no blocking code issue; build gate PASS (analyze/format clean, 295/295 tests, iOS release GREEN); full contract + `ui-design.md` alignment; not `Approved` because `architecture.md §16` mandates device/simulator `runtime` evidence the QA env can't produce. 8 pending scenarios + 6 clarifications in `qa.md §17`/§20.
 
 ---
 
 ## Blockers
 
-* **None.** F02 (`Done`, contract locked) and the F08 on-device snapshot contract (`[LOCKED]`) are both available. F08's parked Firebase deploy is **not** a blocker — F03 uses only the on-device persistence layer + restore path, which are complete and functional.
-* **Content:** F03 QA uses the F06 5-puzzle smoke set via the debug puzzle entry. The full 30-level set (`F06-CONTENT`) is a separate follow-on and is **not** required for F03 QA.
-* **Not a blocker, noted:** real Journey/Daily entry (F05/F07), the real completion panel (F04), onboarding overlay (F09), audio/haptics (F11), analytics (F12) are all downstream and explicitly out of F03 scope.
+* **No code blocker.** F02 (`Done`, locked) + the F08 on-device snapshot contract (`[LOCKED]`) available; F08's parked Firebase deploy is irrelevant to F03. Build gate PASS (analyze/format clean, 295/295 workspace tests, iOS release build GREEN).
+* **Runtime Validation Pending (QA verdict, `qa.md`).** `architecture.md §16` mandates `runtime` (device/simulator) + `repeatable integration` evidence ("Not source-only"); `prd.md §7` makes "0 double-registered moves during animation in QA" + "gesture recognition ≥ target accuracy on the device matrix" hard success metrics. The QA environment has no device/simulator session and no `integration_test` suite. **8 pending validation scenarios** (`qa.md §17`): gesture accuracy on a device matrix; 0 double-count during the real ~190 ms window; kill/relaunch resume fidelity + tampered-cache re-derivation; lifecycle background/foreground; win choreography + locked/frozen tile visuals + seam-bar-without-colour; portrait lock on a rotating device; on-device navigation/back; (recommended) an `integration_test/` suite for the CI emulator. **No F03 rework** — environment gap, not a defect. **Root cause: none (validation-method).** Route: device/simulator pass **or** an `integration_test` suite; F03 has **no release gate** (`Release Scope = none`), so no `F08-DEVOPS`-style folding.
+* **6 open clarifications (non-blocking, defaults implemented — Tech Lead resolves at close-out):** `ui-design.md §14` ×4 (no playing-screen CTA; F03 owns first-pass locked/frozen tile visuals; shared-chrome rule timing; final microcopy + no `gen_l10n`) + 2 perf deviations (board-recede blur→dim; breathing ambient omitted).
+* **Non-F03 observation:** `looplet_solver/lib/src/solver.dart:56` — one pre-existing `info`-level analyzer lint from an earlier session (`dart analyze` exits 0; CI unaffected). Optional cleanup on the next F06 touch.
+* **Not a blocker, noted:** real Journey/Daily entry (F05/F07), the real completion panel (F04), onboarding overlay (F09), audio/haptics (F11), analytics (F12) — downstream, out of F03 scope. Storage-full fault-injection test = residual test-debt (shared with F08 AC7).
 
 ---
 
 ## Last Decision
 
+* 2026-09-06 — QA (**F03-QA done — verdict `Runtime Validation Pending`**):
+  * **Scope:** Client-Only + UI-Handoff Compliance. Security compliance out of scope (pure client UI, single actor, no auth, no cross-user data, no endpoint — justified in `qa.md §2`). Release compliance out of scope (`Release Scope = none`). iOS platform compliance out of scope (Flutter, not Unity; no new tracking SDK / IAP / privacy-manifest change).
+  * **Build gate PASS:** `flutter analyze` (app) + `dart analyze` (6 packages) + `dart format --output=none --set-exit-if-changed .` clean; **295/295 workspace tests** (27 F03: `gesture_resolver` 13, `play_session_controller` 11, `play_session_screen` widget 5); `flutter build ios --release --no-codesign` GREEN (`Runner.app 54.5MB`). Android `build:app` CI-only locally (established posture).
+  * **No blocking code issue, no required fix.** Full `architecture.md` contract honoured (§6 state machine + no queue, §7 gesture→Move incl. tie-band→horizontal, §8 MOVES/Undo/Restart, §9 F08 write-through + hydrate + `completed→clear()`, §10 bounded win + drawn seam bar + minimal panel, §11 190 ms shift + diegetic lock, §12 backgrounding, §13 route/chrome, §14 externalized strings, §15 validation split, §17 `Release Scope = none`). **All 11 ACs have ≥1 automated scenario.** `ui-design.md` Direction A implemented and holds the ~94/100 bar; no `premium-ui-rubric.md` fail condition; no `design-doctrine.md §8` anti-pattern. Regression risk LOW (only `main.dart` modified — the F08 `_SessionLifecycle` relocation is a strict correctness improvement).
+  * **Not `Approved`:** `architecture.md §16` explicitly requires `runtime` (device/simulator) + `repeatable integration` evidence and states "**Not `source-only`**"; `prd.md §7` makes "0 double-registered moves during animation in QA" + "gesture recognition ≥ target accuracy on the device matrix" hard success metrics. The QA environment has **no device/simulator session and no `integration_test` suite** → evidence class is `automated functional` + build only. **Environment gap, not an implementation defect** — the same posture as F08's QA (`Runtime Validation Pending`).
+  * **8 pending validation scenarios** in `qa.md §17` (gesture accuracy on a device matrix; 0 double-count during the real ~190 ms window; kill/relaunch resume + tampered-cache re-derivation; lifecycle background/foreground; win choreography + locked/frozen tile visuals + seam-bar-legible-without-colour; portrait lock on a rotating device; on-device navigation; a recommended `integration_test/` suite for the CI emulator). **Recommended route:** a device/simulator pass **or** Frontend adds an `integration_test/` suite (CI-emulator-runnable — `release.md §4` already lists `integration_test` as a best-effort gate "not auto-blocking until F03 lands"); then re-QA or accept the device evidence → `Run Tech Lead` to close. F03 has **no release gate** (`Release Scope = none`) — no `F08-DEVOPS`-style folding.
+  * Current Owner → Tech Lead; Next Role → Tech Lead (fixed for QA — reconcile the pending verdict + resolve the 6 open clarifications at close-out; `feature-board.md` + `system-state.md` sync).
 * 2026-09-06 — Frontend/Mobile Developer (**F03-FE1…FE8 delivered — the playable screen**):
   * **`frontend.md` written.** New: `app/lib/play/**` (16 files) + `app/lib/app_router.dart` (go_router — `MaterialApp.router`, `/` bootstrap gate + `/play`) + `app/lib/home_screen.dart` (placeholder + debug chip row). Modified: `app/lib/main.dart` (router + the F08 `_SessionLifecycle` observer relocated from wrapping `home:` to the router `builder:` — a **correctness improvement** now that routing exists: a session-level resource must not unmount on navigation, `platform.md §7`).
   * **Contract honoured verbatim** (`architecture.md §6/§7/§8/§9/§11/§13`): ticker-free `PlaySessionController` state machine (idle/tracking/animatingShift/animatingBounce/won) with **no input queue** (`beginDrag` ignored unless `idle`); pure `GestureResolver` (threshold 18 px, tie-band 0.15 → horizontal, one-cell, first-pointer); 190 ms wrap-shift (edge-mask + N+2 ghost tiles) + 140 ms rejected-move bounce; `MOVES = engine.moveCount` settled-only; 3-action Undo (dead control, no dialog/ad at 0); separated outline Restart (`restartCount++`, no confirm); write-through into the **F08-frozen** `ActiveSessionSnapshot` + hydrate via `restoreSession()`; `completed` snapshot + `clear()` on win; bounded ≤600 ms win → amber fill + **drawn L→R seam bar** (colour + shape) → minimal functional completion sheet (Retry dominant / Close quiet; no stars/best/Next — F04 seam); `paused` cancels a `tracking` gesture and commits a mid-shift move synchronously (never a torn snapshot).
@@ -113,71 +122,79 @@ QA
 
 ## Last Update
 
-* Updated By: Frontend/Mobile Developer
+* Updated By: QA
 * Timestamp: 2026-09-06
-* Summary: **F03-FE1…FE8 delivered — `frontend.md`.** The playable screen: `app/lib/play/**` (16) + `app_router.dart` (go_router) + `home_screen.dart`; `main.dart` → `MaterialApp.router` + F08 `_SessionLifecycle` relocated to the router `builder:`. Ticker-free `PlaySessionController` state machine (no queue) + pure `GestureResolver` + 190 ms wrap-shift + bounce + `MOVES` settled-only + 3-action Undo (dead at 0) + separated Restart + F08 write-through/hydrate + bounded win → drawn seam bar → minimal completion sheet + `paused` handling. `flutter analyze` + `format:check` clean; **295 workspace tests** (app 99, +27 F03); iOS release build GREEN. 2 flagged perf deviations from `ui-design.md` (blur→dim, no breathing) + 6 non-blocking Tech Lead clarifications. `Current Owner → QA`; `Next Role → QA`. `feature-board.md` / `system-state.md` not touched (Tech Lead syncs).
+* Summary: **F03-QA done — verdict `Runtime Validation Pending`** (`qa.md`). Client-Only + UI-Handoff scope (security + release out of scope, justified). Build gate PASS — analyze/format clean; **295/295 workspace tests** (27 F03); iOS release build GREEN. No blocking code issue, no required fix; full `architecture.md` contract honoured, all 11 ACs automated-covered, `ui-design.md` Direction A aligned (~94/100). Not `Approved` — `architecture.md §16` mandates device/simulator `runtime` evidence + `prd.md §7` hard success metrics ("0 double-registered moves during animation", "gesture accuracy on a device matrix") that the QA env (no device/simulator, no `integration_test`) can't produce. Environment gap, not a defect. 8 pending validation scenarios + 6 open clarifications + 1 non-F03 note. `Current Owner → Tech Lead`; `Next Role → Tech Lead`. `feature-board.md` / `system-state.md` not touched (Tech Lead syncs).
 
 ---
 
 ## Next Role
 
-QA
+Tech Lead
 
 ---
 
 ## Next Action
 
-### QA — F03-QA (end-to-end client QA) — ⬅ NEXT
+### Tech Lead — reconcile the `Runtime Validation Pending` verdict + resolve the open clarifications — ⬅ NEXT
 
 ```text
-Task: end-to-end QA of the F03 puzzle-play screen. CLIENT feature (no backend, no security surface).
-Evidence class: `runtime` (device/simulator) is MANDATORY per architecture.md §16 — NOT source-only.
-Plus `automated functional` (already delivered — 27 F03 tests) + `ui-design.md` alignment.
+QA verdict is Runtime Validation Pending (state-machine DURUM 5). No blocking CODE issue, no required
+fix. Build gate PASS (analyze/format clean, 295/295 workspace tests, iOS release build GREEN). Full
+architecture.md contract honoured; all 11 ACs automated-covered; ui-design.md Direction A aligned
+(~94/100, no rubric fail, no doctrine anti-pattern). The gap is validation-METHOD: architecture.md §16
+mandates `runtime` (device/simulator) + `repeatable integration` evidence ("Not source-only") and
+prd.md §7 makes "0 double-registered moves during animation in QA" + "gesture accuracy on the device
+matrix" hard success metrics; the QA env had no device/simulator session and no integration_test suite.
 
-Authority: features/f03-puzzle-play-session/architecture.md (§6 state machine, §7 gesture mapping,
-§8 MOVES/Undo/Restart, §9 persistence, §11 animation/input-lock, §12 backgrounding, §13 route/chrome,
-§16 QA Focus), features/f03-puzzle-play-session/prd.md (AC1–AC11 + §6 constraints + §7 success metrics),
-features/f03-puzzle-play-session/ui-design.md (§11 "must not be broken" list, §12 rubric),
-features/f03-puzzle-play-session/frontend.md (§17 test evidence, §16 open clarifications, §18 runtime-only list).
+Authority: features/f03-puzzle-play-session/qa.md (verdict + §17 pending scenarios + §20 Tech Lead Note),
+architecture.md §16, prd.md §7, ui-design.md §14, frontend.md §16, project-authority/release.md §2/§4
+(F03 Release Scope = none; integration_test is a best-effort CI gate "not auto-blocking until F03 lands").
 
-Backend Build Gate (re-verify): `flutter analyze` + `dart analyze` (6 packages) + `dart format
---output=none --set-exit-if-changed .` + full `flutter test` (295 workspace) + `flutter build ios
---release --no-codesign`. (`infra` is unchanged this feature.)
+1. Accept the verdict — no rework, no contract change. F03 code is contract-compliant and green on all
+   automated + build + UI-alignment evidence.
 
-RUNTIME scenarios (device or simulator — the F06 smoke set is reachable via the debug chip row on the
-placeholder home: L1 quick win / L2 two-move / L4 column-enabled / L5 locked pivot / L6 frozen tile):
-  1. AC1 — open: target word visible + visually SEPARATED from the grid; MOVES 0; Undo (3); Restart; grid ~85–90% width; portrait.
-  2. AC2/AC3 — a horizontal swipe past threshold shifts exactly that row one cell + MOVES +1; a vertical swipe shifts that column (on L4/L5/L6); dominant-axis + threshold correct on a SMALL and a LARGE device.
-  3. AC4 — a tap / tiny drag below threshold → no shift, MOVES unchanged. Measure, don't assume; sweep the threshold (GestureResolver.thresholdLogicalPx = 18) on the device matrix.
-  4. AC5 + success metric "0 double-registered moves during animation" — swipe during the ~190 ms shift → ignored, NOT queued, no double-count. This is THE headline runtime check.
-  5. AC11 — a transient target-word arrangement mid-animation does not win (only the settled state).
-  6. one-cell for a fast flick vs a slow drag; a swipe starting on the grid but ending off-screen still resolves; multi-touch → first pointer only.
-  7. AC6 — 3 undos then a 4th tap → nothing, NO dialog / ad / toast; the pip indicator reads 3→0.
-  8. AC7 — Restart → grid reset, MOVES 0, undos back to 3, NO confirm dialog; Restart cannot be hit while swiping the board (placement + divider).
-  9. AC8 — forming the target: input locks (diegetic — HUD dims, no spinner), winning row highlights with the amber fill AND the drawn L→R seam bar (confirm the seam is legible with colour off / greyscale — accessibility), bounded ≤~600 ms, then the minimal completion sheet (kicker + word + HAMLE stat + dominant Retry + quiet Close; NO stars/best/Next). Retry resets in place; Close pops to the caller.
-  10. AC9 — swipe-begin: the affected row/column gets a light lift + loop-rail highlight (shape+motion, not colour-only).
-  11. AC10 + architecture §12 — kill/relaunch mid-puzzle → grid, MOVES, undosRemaining, restartCount, elapsed exactly restored (via the F08 snapshot; thaw re-derived by replay — tamper `kv['active_session'].thawedFrozenCells` and confirm it is NOT trusted). Background mid-swipe → gesture cancelled cleanly. Background mid-animation → resolves to the settled end state on return; never a half-applied move.
-  12. §13 chrome — no system header; the quiet back chevron pops to the caller on button / system / gesture back; it is HIDDEN in the won state (the sheet's Close owns exit); rotation attempt → stays portrait.
-  13. Tile-state visuals (L5 locked = brass ring + pin glyph; L6 frozen = frost + crystal border; thaw cross-fade) — visual check; every special state has a NON-COLOUR cue.
+2. Close the runtime gap. F03 has NO release gate (Release Scope = none), so there is no F08-DEVOPS-style
+   folding — the runtime closure is direct. Two options (qa.md §17 / §20):
+   OPTION A (recommended, durable): route back to Frontend/Mobile Developer to add an `integration_test/`
+     suite (CI-emulator-runnable) covering qa.md §17 scenarios 1–4 (gesture accuracy + threshold sweep on
+     a couple of surface sizes; 0-double-count during the real 190 ms window; kill/relaunch resume;
+     background mid-swipe / mid-animation) + wire it into the CI `verify`/`integration` job. Then a short
+     manual device/simulator pass for the visual items (5–7: win choreography readability, locked/frozen
+     tile visuals, rotation, chevron/back). Then Run QA again → Run Tech Lead to close.
+   OPTION B (faster, less durable): a simulator/device QA pass for scenarios 1–7 (coordinate with the
+     user), then Run QA again → Run Tech Lead to close.
+   Per state-machine DURUM 5: if you take Option B and treat the device pass as the runtime closure,
+   record that decision; F03 stays In Progress until the evidence is attached and QA re-approves (or you
+   explicitly accept the device-pass evidence as closure).
 
-`ui-design.md` alignment: Direction A intent intact (spotlight stage, backlit tiles, loop-rail + wrap
-animation visible not a plain slide, outline-ghost target, diegetic lock, undo pips, separated outline
-Restart, minimal-but-crafted sheet). Note the 2 accepted perf deviations (blur→dim, no breathing) —
-frontend.md §11/§16; QA confirms they don't drop the screen below the premium bar / rubric fail conditions.
+3. Resolve the 6 open clarifications (qa.md §20 / ui-design.md §14 / frontend.md §16) — all non-blocking,
+   defaults already implemented:
+   (a) confirm "no primary CTA on the playing screen";
+   (b) confirm F03 owns the first-pass VISUAL treatment of locked/frozen tiles (or name the later owner);
+   (c) lock "no system header + quiet back chevron, hidden in terminal states" as a cross-screen chrome
+       rule now (F10) or leave it feature-local — F03 is the first in-flow screen, no sibling yet;
+   (d) final microcopy (HEDEF/HAMLE/ÇÖZÜLDÜ/Yeniden/Kapat/Geri) — PO/localization; and whether to schedule
+       a proper localization-layer (gen_l10n) task (PlayStrings is a per-language table seam);
+   (e)+(f) the 2 perf deviations from ui-design.md (board-recede blur → dim-only; breathing ambient
+       omitted) — accept, or require the blur behind a device-tier gate?
+   Write the decisions into architecture.md / this orchestration as appropriate.
 
-Not in scope: real Journey/Daily entry (F05/F07), F04 completion panel, F09 onboarding, F11 audio/haptics,
-F12 analytics — all downstream. AC2/AC3 end-user offline Journey play flow needs F05 — out of F03 QA.
+4. Non-F03: looplet_solver/lib/src/solver.dart:56 has one pre-existing info-level analyzer lint (not F03,
+   dart analyze exits 0). Optional cleanup on the next F06 touch — not an F03 concern.
 
-End: QA verdict → `Run Tech Lead` (fixed — QA always routes to Tech Lead). Tech Lead also resolves the
-6 open clarifications (frontend.md §16) at close-out.
+5. Sync feature-board.md + system-state.md: F03 status per your route (In Progress — runtime validation
+   pending / In QA); Active Owner accordingly; record the verdict in the decision history. F08 stays
+   In Release / parked (unchanged).
 ```
 
-→ then `Run QA` → `Run Tech Lead` (F03 close; resolve the `frontend.md §16` clarifications).
+→ then `Run Tech Lead` → (device pass or integration_test suite) → `Run QA` → `Run Tech Lead` (F03 close).
 
 ---
 
 ## Change Log
 
+* v4 (2026-09-06) — QA: **F03-QA done — verdict `Runtime Validation Pending`** (`qa.md`). Scope: Client-Only + UI-Handoff Compliance (Security compliance out of scope — pure client UI, single actor, no auth, no cross-user data, no endpoint; Release compliance out of scope — `Release Scope = none`; iOS platform compliance out of scope — Flutter not Unity). **Build gate PASS:** `flutter analyze` (app) + `dart analyze` (6 packages) + `dart format --output=none --set-exit-if-changed .` clean; **295/295 workspace tests** (27 new F03 — `gesture_resolver` 13, `play_session_controller` 11, `play_session_screen` widget 5); `flutter build ios --release --no-codesign` GREEN (`Runner.app 54.5MB`). **No blocking code issue, no required fix.** Full `architecture.md` contract honoured (§6 state machine + no queue, §7 gesture→Move + tie-band→horizontal, §8 MOVES/Undo/Restart, §9 F08 write-through + hydrate + `completed→clear()`, §10 bounded win + drawn seam bar + minimal panel, §11 190 ms shift + diegetic lock, §12 backgrounding, §13 route/chrome, §14 externalized strings, §15 validation split, §17 `Release Scope = none`); all 11 ACs have ≥1 automated scenario; `ui-design.md` Direction A implemented, holds the ~94/100 bar, no `premium-ui-rubric.md` fail condition, no `design-doctrine.md §8` anti-pattern; regression risk LOW (only `main.dart` modified — the F08 `_SessionLifecycle` relocation is a strict correctness improvement). **Not `Approved`** — `architecture.md §16` explicitly requires `runtime` (device/simulator) + `repeatable integration` evidence and states "Not source-only"; `prd.md §7` makes "0 double-registered moves during animation in QA" + "gesture recognition ≥ target accuracy on the device matrix" hard success metrics; the QA environment has no device/simulator session and no `integration_test` suite → evidence class is `automated functional` + build only. **Environment gap, not an implementation defect** (same posture as F08's QA). 8 pending validation scenarios (`qa.md §17`) + 6 open clarifications (`ui-design.md §14` ×4 + 2 perf deviations) + 1 non-F03 observation (`looplet_solver` pre-existing `info` lint) in `qa.md §20`. Recommended runtime closure: an `integration_test/` suite for scenarios 1–4 (CI-emulator-runnable; `release.md §4` lists it as a best-effort gate "not auto-blocking until F03 lands") + a short device pass for the visual items 5–7; F03 has no release gate. Current Owner → Tech Lead; Next Role → Tech Lead (fixed for QA — reconcile the pending verdict + resolve the 6 open clarifications; `feature-board.md` + `system-state.md` sync). Nothing committed to git.
 * v3 (2026-09-06) — Frontend/Mobile Developer: **F03-FE1…FE8 delivered — `frontend.md`.** The playable screen implemented against `architecture.md` + `ui-design.md`. New: `app/lib/play/**` (16 files — `play_theme`/`play_strings`/`play_session_args`/`gesture_resolver`/`debug_puzzle_library`/`play_session_controller`/`play_session_providers`/`play_session_screen` + `widgets/{play_stage,target_rail,board_tile,puzzle_board,moves_hud,undo_button,restart_button,completion_sheet}`) + `app/lib/app_router.dart` (go_router; `MaterialApp.router`; `/` bootstrap gate + `/play`; `StoreErrorScreen`) + `app/lib/home_screen.dart` (placeholder + debug chip row). Modified `app/lib/main.dart` (`MaterialApp.router`; the F08 `_SessionLifecycle` sync-drain observer relocated from wrapping `home:` to the router `builder:` — a correctness fix now that routing exists, `platform.md §7`; dark theme from `PlayTheme.colorScheme`). **Contract honoured verbatim** (`architecture.md §6/§7/§8/§9/§11/§13`): ticker-free `PlaySessionController` state machine with **no input queue**; pure `GestureResolver` (threshold 18 px, tie-band 0.15 → horizontal, one cell, first pointer); 190 ms wrap-shift (`ClipRRect` edge-mask + N+2 ghost tiles, `cubic-bezier(0.22,1,0.36,1)`) + 140 ms rejected-move bounce; `MOVES = engine.moveCount` settled-only + settle-tick; 3-action Undo with a pip indicator, dead + **no dialog/ad/toast** at 0; Restart reset + `restartCount++`, no confirm, divider-separated outline treatment right of Undo; write-through into the **F08-frozen** `ActiveSessionSnapshot` on every settled boundary + initial + hydrate via `restoreSession()` on matching `puzzleId`, `completed` + `clear()` on win; bounded ≤600 ms win → amber fill + `ink-amber` letters + lift + a **drawn L→R amber seam bar** (colour AND shape — the non-colour cue) + one bloom + 0.12 dim of other rows → minimal functional completion sheet (kicker + word + `HAMLE` stat + dominant Retry + quiet Close; NO stars/optimal/best/Next — F04 seam); `paused` cancels a `tracking` gesture and commits a mid-shift move synchronously (never a torn snapshot). Portrait-locked; no confirm dialogs; no system header + a quiet back chevron hidden in `won`. Localization via `PlayStrings` (`tr`/`en` table — no `gen_l10n`; assumption flagged). **2 flagged non-blocking deviations from `ui-design.md`** (perf on mid-tier): board-recede blur → dim-only (0.12); the optional breathing spotlight ambient omitted. **Gates:** `flutter analyze` (app + 6 packages) + `dart format --output=none --set-exit-if-changed .` clean; **295 workspace tests green** (app **99** = 4 pre-existing + 68 F08 + **27 new F03**: `gesture_resolver_test` 13, `play_session_controller_test` 11, `play_session_screen_test` 5); `infra` offline 18/18 (unchanged); **`flutter build ios --release --no-codesign` GREEN** (`✓ Built build/ios/iphoneos/Runner.app 54.5MB`). **6 `Needs Tech Lead Clarification` (all non-blocking, defaults implemented):** `ui-design.md §14` ×4 (no playing-screen CTA; F03 owns first-pass locked/frozen tile visuals; shared-chrome rule timing; final microcopy) + the 2 perf deviations. Current Owner → QA; Next Role → QA (F03-QA — end-to-end client, `runtime`-mandatory). `feature-board.md` / `system-state.md` not touched (Tech Lead syncs). Nothing committed to git.
 * v2 (2026-09-06) — UI Designer: **F03-UI delivered — `ui-design.md`.** Direction A ("Backlit board on a dark stage") selected over B ("warm tactile daylight board") per the doctrine's default-premium rule. Identity tied to the mechanic: spotlight stage + backlit-keycap tiles + a **loop-rail motif** + a **wrap animation** (edge-mask exit + opposite-edge emergence) + **outline-ghost target** (separated by scale + treatment + divider + air) + **won = amber fill + a drawn L→R seam bar** (colour AND shape → accessibility). Resolves the `architecture.md §18 [PENDING — UI]` list: 3-zone portrait layout (target/board/HUD) with fixed 28 pt gaps + board-first shrink; swipe-begin = row/col lift + directional rail ignite + 8 % dim (shape+motion cue); **diegetic input-lock** during the 190 ms shift (controls dim, board focuses — no spinner/modal); bounded ≤600 ms win sequence; shift envelope **170–210 ms** + `cubic-bezier(0.22,1,0.36,1)`; **minimal-but-crafted** completion sheet (kicker + amber word + one `HAMLE` stat + dominant Retry + quiet Close; no stars/best/Next — F04 replaces it); **"no system header + quiet back chevron top-left, hidden in `won`"** chrome (proposed as a cross-screen rule — Tech Lead to confirm); debug loading (stage + tile silhouettes, no spinner) + error (contained, dev-only). Colour tokens + 3 type roles + 4/8 spacing rhythm specified; locked = brass ring + pin glyph, frozen = frost texture + crystal border (non-colour cues). **Self-review 94/100** (target band), no rubric fail conditions. **Contract unchanged** — `architecture.md §6/§7/§8/§9/§11/§13` fully honoured. §14: 4 non-blocking Tech Lead clarifications (no playing-screen CTA; F03 owns first-pass locked/frozen tile visuals; shared-chrome rule timing; final microcopy). Current Owner → Frontend/Mobile Developer; Next Role → Frontend/Mobile Developer (F03-FE1…FE8). `feature-board.md` / `system-state.md` not touched (Tech Lead syncs). Nothing committed to git.
 * v1 (2026-09-06) — Tech Lead: **F03 created + activated.** P0, the other branch of the `F06 → (F08, F03)` critical-path fork; depends only on F02 (`Done`); no Firebase. Activated in parallel with **F08 parked** (`In Release` — user deferred the Firebase Blaze upgrade / first deploy to end-of-MVP; F08's engineering is complete and ready). `prd.md` derived from `product-prd.md` F03 section (AC1–AC11 + perf/a11y/animation constraints). Initial `architecture.md`: substrate LOCKED (consumed F02 + F08 contracts; screen state machine idle/tracking/animating/won with no input queue; gesture→`Move` mapping envelope with **tie band → favor horizontal** as the Tech Lead resolution of the product's open diagonal-tie question; MOVES = `engine.moveCount` settled-only; Undo = 3-action F03 quota with no prompt at 0; Restart = reset + `restartCount++`, no dialog, away from grid; write-through persistence into the F08-frozen snapshot shape + hydrate via the F08 restore path; completion sequence with a minimal functional panel as an F04 seam; 150–250 ms animation, full input lock, no queue; portrait-locked route `'/play'`; `runtime`-mandatory QA; `Release Scope = none`); `[PENDING — UI]` and `[PENDING — IMPL tuning]` items enumerated in §18. Complexity: **not COMPLEX** (no Technical Analyst); **UI Designer required**; **no DevOps/Release Engineer** (`Release Scope = none`). Routing: **UI Designer (F03-UI → `ui-design.md`)** → Frontend/Mobile Developer (F03-FE1…FE8) → QA → Tech Lead (close). `feature-board.md` + `system-state.md` synced (Active Feature → F03; F08 → In Release / parked). Nothing committed to git.
