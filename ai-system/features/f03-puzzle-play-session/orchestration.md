@@ -7,7 +7,7 @@
 
 ## Current Status
 
-**In Progress — UI handoff delivered 2026-09-06.** Initial contract (`architecture.md`) LOCKED-substrate by the Tech Lead; **`ui-design.md` delivered by the UI Designer** — Direction A ("Backlit board on a dark stage"), self-review 94/100, resolves the `architecture.md §18 [PENDING — UI]` list (screen layout + hierarchy, target-word separation, swipe-begin highlight, diegetic input-lock affordance, win-row highlight + non-colour seam-bar cue, bounded success animation, shift duration/curve envelope 170–210 ms, minimal-but-crafted completion sheet, "no title bar + quiet back chevron" chrome, debug loading/error states). Four non-blocking `Needs Tech Lead Clarification` items (sensible defaults chosen). **Next: Frontend/Mobile Developer** (F03-FE1…FE8).
+**In Progress — Frontend delivered 2026-09-06.** Contract (`architecture.md`) LOCKED-substrate + `ui-design.md` (Direction A) delivered. **Frontend/Mobile Developer delivered F03-FE1…FE8** (`frontend.md`): the playable screen — `app/lib/play/**` (16 files) + `app_router.dart` (go_router; `MaterialApp.router`) + `home_screen.dart`. Ticker-free `PlaySessionController` state machine (idle/tracking/animatingShift/animatingBounce/won, **no input queue**); pure `GestureResolver` (threshold + dominant axis + tie-band→horizontal + one-cell); wrap-shift animation (190 ms, edge-mask + ghost) + rejected-move bounce; `MOVES`=`engine.moveCount` settled-only; 3-action Undo (dead + no prompt at 0); separated outline Restart (`restartCount++`, no confirm); write-through into the F08-frozen `ActiveSessionSnapshot` + hydrate via the F08 restore path; bounded ≤600 ms win → amber fill + **drawn L→R seam bar** (colour + shape) → minimal functional completion sheet (Retry/Close; F04 seam); `paused` cancels the gesture / commits a mid-shift move synchronously. **295 workspace tests green** (app 99 = +27 F03: 13 `gesture_resolver` + 11 `controller` + 5 `screen` widget); `flutter analyze` + `dart format --set-exit-if-changed` clean; **`flutter build ios --release --no-codesign` GREEN** (`✓ Built Runner.app 54.5MB`). 2 flagged perf deviations from `ui-design.md` (board-recede blur → dim-only; breathing ambient omitted) + 6 non-blocking Tech Lead clarifications. **Next: QA** (F03-QA — `runtime`-mandatory client QA).
 
 F03 is activated in parallel with **F08 parked** (`In Release`, deploy deferred by user decision to end-of-MVP). F08's engineering is complete and ready; F03 is the other branch of the `F06 → (F08, F03)` critical-path fork and needs no Firebase. See F08 `orchestration.md → Last Decision (DURUM 5.5)` for the parallelization rationale.
 
@@ -15,7 +15,7 @@ F03 is activated in parallel with **F08 parked** (`In Release`, deploy deferred 
 
 ## Current Owner
 
-Frontend/Mobile Developer
+QA
 
 ---
 
@@ -39,15 +39,15 @@ Frontend/Mobile Developer
 
 - [x] Task ID: F03.CONTRACT-TL | Assigned Role: Tech Lead | Status: **Done (2026-09-06)** | `prd.md` + initial `architecture.md` produced. Substrate LOCKED; `[PENDING — UI]` / `[PENDING — IMPL tuning]` items enumerated in `architecture.md §18`. Complexity decided (not COMPLEX; UI Designer required; no DevOps). Routing set.
 - [x] Task ID: F03-UI | Assigned Role: UI Designer | Status: **Done (2026-09-06)** | `features/f03-puzzle-play-session/ui-design.md` delivered. Direction A ("Backlit board on a dark stage" — spotlight stage, backlit-keycap tiles, loop-rail motif, wrap animation, outline-ghost target, amber win-fill + drawn L→R seam bar). Self-review 94/100 (target band). Resolves the `architecture.md §18 [PENDING — UI]` list. §14 has 4 non-blocking Tech Lead clarifications (no primary CTA on the playing screen; F03 owns first-pass locked/frozen tile *visuals*; proposed shared "no title bar + quiet chevron" chrome; placeholder microcopy).
-- [ ] Task ID: F03-FE1 | Assigned Role: Frontend/Mobile Developer | Status: **Open — NEXT** | Screen scaffold + route `'/play'` + `PlaySessionArgs` + portrait lock + a debug puzzle entry that injects an F06 smoke-set `Puzzle` via `toEngineConfig`.
-- [ ] Task ID: F03-FE2 | Assigned Role: Frontend/Mobile Developer | Status: Open | Gesture recognizer → `Move` mapping per `architecture.md §7` (threshold `T`, dominant axis, tie band `B` favor-horizontal, one-cell, first-pointer-only, off-screen release). Pure, unit-tested mapping function separated from the widget.
-- [ ] Task ID: F03-FE3 | Assigned Role: Frontend/Mobile Developer | Status: Open | Screen state machine (idle / tracking / animating / won), 150–250 ms shift animation with full input lock and **no queue**, <50 ms release→anim latency, swipe-begin row/column highlight.
-- [ ] Task ID: F03-FE4 | Assigned Role: Frontend/Mobile Developer | Status: Open | `MOVES` HUD (= `engine.moveCount`, settled only), Undo (3-action quota, no-op + no prompt at 0), Restart (reset, no dialog, placed away from grid, `restartCount++`).
-- [ ] Task ID: F03-FE5 | Assigned Role: Frontend/Mobile Developer | Status: Open | Persistence integration per `architecture.md §9`: write-through `ActiveSessionRepo.save` after every settled move/undo/restart; hydrate on open via the F08 restore path; `status: completed` + `clearActiveSession()` on completion-panel open; `ElapsedTimer` pause/resume on lifecycle.
-- [ ] Task ID: F03-FE6 | Assigned Role: Frontend/Mobile Developer | Status: Open | Completion sequence (lock → win-row highlight with a non-color cue → bounded success animation → **minimal functional** completion panel: target word + player moves + Retry + Close; no rating logic — F04 seam).
-- [ ] Task ID: F03-FE7 | Assigned Role: Frontend/Mobile Developer | Status: Open | Backgrounding / interruption (`architecture.md §12`): cancel in-progress gesture on `paused`; resolve mid-animation to the settled end state on `resumed`; snapshot always settled.
-- [ ] Task ID: F03-FE8 | Assigned Role: Frontend/Mobile Developer | Status: Open | Localize `MOVES` + all strings; `ui-design.md` alignment; `analyze` + `format:check` + widget/unit tests green; append `frontend.md`.
-- [ ] Task ID: F03-QA1…QAn | Assigned Role: QA | Status: Open (after Frontend) | End-to-end client QA per `architecture.md §16` — `runtime` (device/simulator) mandatory (0 double-registered moves during animation; gesture accuracy on a small + a large device; exactly-one-cell for flick vs drag; input-lock no-queue; background mid-animation; portrait lock; resume via F08 snapshot) + `automated functional` (gesture→Move mapping, counters, state machine, snapshot serialization) + `ui-design.md` alignment.
+- [x] Task ID: F03-FE1 | Assigned Role: Frontend/Mobile Developer | Status: **Done (2026-09-06)** | `app_router.dart` (go_router `/` + `/play`, `MaterialApp.router`), `home_screen.dart` (debug chip row), `play_session_screen.dart`, `play_session_args.dart`, `debug_puzzle_library.dart` (5 F06 smoke puzzles as const maps — F05 replaces). Portrait lock kept in `main()`.
+- [x] Task ID: F03-FE2 | Assigned Role: Frontend/Mobile Developer | Status: **Done (2026-09-06)** | `gesture_resolver.dart` — pure `resolve()` + `trackingAxis()`; threshold 18 px, tie-band 0.15 favor-horizontal, one-cell, first-pointer-only; values exposed for QA device tuning. 13 unit tests.
+- [x] Task ID: F03-FE3 | Assigned Role: Frontend/Mobile Developer | Status: **Done (2026-09-06)** | `play_session_controller.dart` (`PlaySessionPhase` state machine, **no queue**) + `widgets/puzzle_board.dart` (190 ms wrap shift `cubic-bezier(0.22,1,0.36,1)` — edge-mask + N+2 ghost tiles; 140 ms rejected-move bounce; tracking lift + directional loop rails + 8% dim).
+- [x] Task ID: F03-FE4 | Assigned Role: Frontend/Mobile Developer | Status: **Done (2026-09-06)** | `widgets/moves_hud.dart` (tabular, settle-tick), `widgets/undo_button.dart` (pips; dead + no dialog/ad at 0), `widgets/restart_button.dart` (outline, spin, no confirm, divider-separated).
+- [x] Task ID: F03-FE5 | Assigned Role: Frontend/Mobile Developer | Status: **Done (2026-09-06)** | controller write-through `ActiveSessionRepo.save(_snapshot(...))` on every settled boundary + initial; F08-frozen keys; hydrate via `restoreSession()` on matching `puzzleId`; `completed` snapshot + `clear()` on win; `ElapsedTimer` pause/resume; no background work (F08 owns the drain). Persist failures caught (`persist_failed`).
+- [x] Task ID: F03-FE6 | Assigned Role: Frontend/Mobile Developer | Status: **Done (2026-09-06)** | `_buildSeam`/`_buildBloom` in `puzzle_board.dart` + `widgets/completion_sheet.dart`; ≤600 ms `_win` choreography (amber fill + `ink-amber` + lift + drawn L→R seam bar + one bloom + 0.12 dim of other rows) → minimal sheet (kicker + word + `HAMLE` stat + dominant Retry + quiet Close). No rating logic.
+- [x] Task ID: F03-FE7 | Assigned Role: Frontend/Mobile Developer | Status: **Done (2026-09-06)** | controller `onAppPaused`/`onAppResumed`; `paused` → cancel a `tracking` gesture / `_finishShift()` a mid-animation move synchronously (settled, never torn) / pause timer / persist; `resumed` → restart timer for an unfinished session.
+- [x] Task ID: F03-FE8 | Assigned Role: Frontend/Mobile Developer | Status: **Done (2026-09-06)** | `play_strings.dart` (per-language `tr`/`en` table — no `gen_l10n`, assumption flagged); `ui-design.md` alignment pass; `flutter analyze` + `dart format --set-exit-if-changed` clean; `frontend.md` written with task-to-code traceability + test evidence.
+- [ ] Task ID: F03-QA1…QAn | Assigned Role: QA | Status: **Open — NEXT (2026-09-06)** | End-to-end client QA per `architecture.md §16` — `runtime` (device/simulator) mandatory (0 double-registered moves during animation; gesture accuracy on a small + a large device; exactly-one-cell for flick vs drag; input-lock no-queue; background mid-animation; portrait lock; resume via F08 snapshot) + `automated functional` (gesture→Move mapping, counters, state machine, snapshot serialization) + `ui-design.md` alignment.
 
 ---
 
@@ -72,10 +72,10 @@ Frontend/Mobile Developer
 - [x] (F03-UI) `ui-design.md` — delivered 2026-09-06. Direction A; 94/100; resolves `architecture.md §18 [PENDING — UI]`. 4 non-blocking Tech Lead clarifications in §14.
 
 ### Frontend
-- [ ] (F03-FE1…FE8) screen + gesture mapping + state machine/animation + HUD/Undo/Restart + persistence integration + completion sequence + backgrounding + localization/tests, against `architecture.md` + `ui-design.md`. **NEXT.**
+- [x] (F03-FE1…FE8) delivered 2026-09-06 (`frontend.md`). Screen + gesture mapping + state machine/animation + HUD/Undo/Restart + persistence + completion sequence + backgrounding + localization. 295 workspace tests green; iOS release build GREEN. 6 non-blocking Tech Lead clarifications + 2 flagged perf deviations.
 
 ### QA
-- [ ] (F03-QA) end-to-end client QA — runtime mandatory. After Frontend.
+- [ ] (F03-QA) end-to-end client QA — `runtime` (device/simulator) mandatory. **NEXT.**
 
 ---
 
@@ -89,6 +89,13 @@ Frontend/Mobile Developer
 
 ## Last Decision
 
+* 2026-09-06 — Frontend/Mobile Developer (**F03-FE1…FE8 delivered — the playable screen**):
+  * **`frontend.md` written.** New: `app/lib/play/**` (16 files) + `app/lib/app_router.dart` (go_router — `MaterialApp.router`, `/` bootstrap gate + `/play`) + `app/lib/home_screen.dart` (placeholder + debug chip row). Modified: `app/lib/main.dart` (router + the F08 `_SessionLifecycle` observer relocated from wrapping `home:` to the router `builder:` — a **correctness improvement** now that routing exists: a session-level resource must not unmount on navigation, `platform.md §7`).
+  * **Contract honoured verbatim** (`architecture.md §6/§7/§8/§9/§11/§13`): ticker-free `PlaySessionController` state machine (idle/tracking/animatingShift/animatingBounce/won) with **no input queue** (`beginDrag` ignored unless `idle`); pure `GestureResolver` (threshold 18 px, tie-band 0.15 → horizontal, one-cell, first-pointer); 190 ms wrap-shift (edge-mask + N+2 ghost tiles) + 140 ms rejected-move bounce; `MOVES = engine.moveCount` settled-only; 3-action Undo (dead control, no dialog/ad at 0); separated outline Restart (`restartCount++`, no confirm); write-through into the **F08-frozen** `ActiveSessionSnapshot` + hydrate via `restoreSession()`; `completed` snapshot + `clear()` on win; bounded ≤600 ms win → amber fill + **drawn L→R seam bar** (colour + shape) → minimal functional completion sheet (Retry dominant / Close quiet; no stars/best/Next — F04 seam); `paused` cancels a `tracking` gesture and commits a mid-shift move synchronously (never a torn snapshot).
+  * **Authority reconciliation (2 deviations from `ui-design.md`, both flagged, non-blocking):** board-recede backdrop **blur → dim-only (0.12)** during `won` — mid-tier frame-rate budget (`prd.md §6`); the optional **breathing spotlight ambient omitted** — perf + deterministic tests. Visual intent preserved in both.
+  * **Gates:** `flutter analyze` (app + 6 packages) clean; `dart format --output=none --set-exit-if-changed .` clean; **295 workspace tests** (app **99** = 4 pre-existing + 68 F08 + 27 new F03 — 13 `gesture_resolver` + 11 `controller` + 5 `screen` widget); `infra` offline 18/18 (unchanged); **`flutter build ios --release --no-codesign` GREEN** (`✓ Built Runner.app 54.5MB`).
+  * **6 `Needs Tech Lead Clarification` (all non-blocking, defaults implemented):** the 4 from `ui-design.md §14` (no playing-screen CTA; F03 owns first-pass locked/frozen tile visuals; shared-chrome rule timing; final microcopy) + the 2 perf deviations above.
+  * Current Owner → QA; Next Role → QA (F03-QA — end-to-end client, `runtime`-mandatory).
 * 2026-09-06 — UI Designer (**F03-UI delivered — `ui-design.md`**):
   * **Direction A selected** — "Backlit board on a dark stage": deep atmospheric spotlight stage, the 5×5 board as the only bright/saturated cluster, **backlit-keycap tiles** (bone gradient + inner highlight + AO shadow + faint backlight), a **loop-rail motif** (fading luminous edge rails that ignite directionally on drag), a **wrap animation** (edge-mask exit + opposite-edge emergence — the shift *shows* the loop), the **target as outline-ghost tiles** (same silhouette, 44–48 % scale, separated by scale + treatment + divider glow + ≥28 pt air), and **won = amber fill + a drawn L→R seam bar** (colour AND shape → legible without colour). Direction B ("warm tactile daylight board") rejected as the more mid-segment read per the doctrine's default-premium rule.
   * **Resolves `architecture.md §18 [PENDING — UI]`:** 3-zone portrait layout (target / board / HUD) with fixed 28 pt gaps + a board-first shrink strategy; swipe-begin highlight = row/col lift + directional rail ignite + 8 % dim of the rest (shape+motion, not colour-only); **diegetic input-lock** during the 190 ms shift (controls dim, board focuses — no spinner, no modal); bounded ≤600 ms win sequence; shift duration envelope **170–210 ms** with `cubic-bezier(0.22,1,0.36,1)`; **minimal-but-crafted** completion sheet (kicker + amber word + one `HAMLE` stat + dominant Retry + quiet Close — no stars/best/Next; F04 replaces it); **"no system header, one quiet back chevron top-left, hidden in `won`"** chrome; debug loading (stage + tile silhouettes, no spinner) + error (contained, dev-only) states; locked = brass ring + pin glyph, frozen = frost texture + crystal border (non-colour cues). Colour tokens + type roles + spacing rhythm specified.
@@ -106,78 +113,71 @@ Frontend/Mobile Developer
 
 ## Last Update
 
-* Updated By: UI Designer
+* Updated By: Frontend/Mobile Developer
 * Timestamp: 2026-09-06
-* Summary: **F03-UI delivered — `ui-design.md`.** Direction A ("Backlit board on a dark stage"), self-review 94/100. Resolves the `architecture.md §18 [PENDING — UI]` list (3-zone portrait layout + shrink strategy; outline-ghost target separation; swipe-begin lift + directional rail highlight; diegetic input-lock during the 190 ms wrap shift; bounded ≤600 ms win with an amber fill + a drawn L→R seam bar as the non-colour cue; shift envelope 170–210 ms; minimal-but-crafted completion sheet; "no header + quiet back chevron, hidden in `won`" chrome; debug loading/error). Colour tokens + type roles + spacing rhythm specified. Contract unchanged. 4 non-blocking Tech Lead clarifications in §14. `Current Owner → Frontend/Mobile Developer`; `Next Role → Frontend/Mobile Developer`. `feature-board.md` / `system-state.md` not touched (Tech Lead syncs).
+* Summary: **F03-FE1…FE8 delivered — `frontend.md`.** The playable screen: `app/lib/play/**` (16) + `app_router.dart` (go_router) + `home_screen.dart`; `main.dart` → `MaterialApp.router` + F08 `_SessionLifecycle` relocated to the router `builder:`. Ticker-free `PlaySessionController` state machine (no queue) + pure `GestureResolver` + 190 ms wrap-shift + bounce + `MOVES` settled-only + 3-action Undo (dead at 0) + separated Restart + F08 write-through/hydrate + bounded win → drawn seam bar → minimal completion sheet + `paused` handling. `flutter analyze` + `format:check` clean; **295 workspace tests** (app 99, +27 F03); iOS release build GREEN. 2 flagged perf deviations from `ui-design.md` (blur→dim, no breathing) + 6 non-blocking Tech Lead clarifications. `Current Owner → QA`; `Next Role → QA`. `feature-board.md` / `system-state.md` not touched (Tech Lead syncs).
 
 ---
 
 ## Next Role
 
-Frontend/Mobile Developer
+QA
 
 ---
 
 ## Next Action
 
-### Frontend/Mobile Developer — F03-FE1…FE8 — ⬅ NEXT
+### QA — F03-QA (end-to-end client QA) — ⬅ NEXT
 
 ```text
-Task: implement the puzzle-play screen against features/f03-puzzle-play-session/architecture.md
-(interaction contract) + features/f03-puzzle-play-session/ui-design.md (visual + state handoff).
-Flutter / Riverpod / go_router per platform.md. Client-only; no backend; Release Scope = none.
+Task: end-to-end QA of the F03 puzzle-play screen. CLIENT feature (no backend, no security surface).
+Evidence class: `runtime` (device/simulator) is MANDATORY per architecture.md §16 — NOT source-only.
+Plus `automated functional` (already delivered — 27 F03 tests) + `ui-design.md` alignment.
 
-Authority order: architecture.md (behaviour contract — §6 state machine, §7 gesture→Move, §8
-MOVES/Undo/Restart, §9 persistence, §11 animation/input-lock, §12 backgrounding, §13 route/chrome,
-§15 validation, §16 QA focus) > ui-design.md (visual + state design; §11 "Must not be broken" list
-is binding, §11 "Flexible" list is yours to tune, §11 "Do not cheapen" is binding).
+Authority: features/f03-puzzle-play-session/architecture.md (§6 state machine, §7 gesture mapping,
+§8 MOVES/Undo/Restart, §9 persistence, §11 animation/input-lock, §12 backgrounding, §13 route/chrome,
+§16 QA Focus), features/f03-puzzle-play-session/prd.md (AC1–AC11 + §6 constraints + §7 success metrics),
+features/f03-puzzle-play-session/ui-design.md (§11 "must not be broken" list, §12 rubric),
+features/f03-puzzle-play-session/frontend.md (§17 test evidence, §16 open clarifications, §18 runtime-only list).
 
-Tasks (see Active Task Ledger F03-FE1…FE8):
-- FE1: screen scaffold + route '/play' + PlaySessionArgs{source, journeyLevel?} + portrait lock +
-  a debug puzzle entry that injects an F06 smoke-set Puzzle via toEngineConfig (behind a debug
-  affordance on the placeholder home; NOT a shipping nav path).
-- FE2: pure gesture→Move mapping function (threshold T, dominant axis, tie band B → favor horizontal,
-  exactly one cell, first pointer only, off-screen release) — separated from the widget, unit-tested.
-  T and B numbers are yours to pick within architecture.md §7 envelopes; document the chosen values
-  and expose them so QA can tune on device.
-- FE3: screen state machine (idle / tracking / animating / won), 150–250 ms shift (170–210 ms
-  recommended, cubic-bezier(0.22,1,0.36,1)) with FULL input lock and NO queue, <50 ms release→start,
-  the wrap animation (edge-mask exit + opposite-edge emergence — must be visible, not a plain slide),
-  swipe-begin row/col lift + directional loop-rail ignite + 8% dim of the rest.
-- FE4: MOVES HUD (= engine.moveCount, settled only, tabular, settle-tick), Undo (3-action quota, pip
-  indicator, at 0 → silent no-op, NO dialog/ad/toast), Restart (reset + restartCount++, NO confirm,
-  physically separated from Undo — gap ≥24pt + divider + outline treatment, right side, clear of the
-  board's swipe band).
-- FE5: persistence per architecture.md §9 — write-through ActiveSessionRepo.save after every settled
-  move/undo/restart (appliedMoves via app/lib/engine/move_shorthand.dart; thawedFrozenCells cache;
-  ElapsedTimer for elapsed); hydrate on open via the F08 restore path when a snapshot matches
-  puzzleId (silent, no "resuming" UI); status:completed snapshot + ActiveSessionRepo.clearActiveSession()
-  on completion-panel open; ElapsedTimer pause on paused/won, resume on resumed. F03 schedules NO
-  background work (F08's session-level lifecycle owns the paused flush + drain).
-- FE6: completion sequence — lock → winning-row amber fill + ink-amber letters + L→R stagger + the
-  drawn L→R amber seam bar (colour AND shape — NOT optional) → one restrained bloom → the MINIMAL
-  functional completion sheet (kicker + formed word + one HAMLE stat + dominant Retry + quiet Close;
-  NO stars/optimal/best/Next; NO rating logic — F04 seam). Retry = engine.restart() in place.
-- FE7: backgrounding (architecture.md §12) — cancel an in-progress gesture on paused; on resumed
-  resolve a mid-animation shift to its settled end state; the persisted snapshot is ALWAYS settled.
-- FE8: localize MOVES + all strings (externalized; TR primary; use placeholder keys HEDEF/HAMLE/
-  ÇÖZÜLDÜ/Yeniden/Kapat pending PO/loc); ui-design.md alignment pass; melos run analyze +
-  format:check + test (widget + unit) green; append frontend.md with task-to-code traceability,
-  authority reconciliation, preserved behaviour, and task-level test evidence.
+Backend Build Gate (re-verify): `flutter analyze` + `dart analyze` (6 packages) + `dart format
+--output=none --set-exit-if-changed .` + full `flutter test` (295 workspace) + `flutter build ios
+--release --no-codesign`. (`infra` is unchanged this feature.)
 
-Non-goals (do NOT build): real Journey/Daily entry (F05/F07), the real completion panel (F04),
-onboarding overlay (F09), SFX/haptics (F11), analytics events (F12). Locked/frozen tile VISUALS:
-render them per ui-design.md §7 first-pass (brass ring + pin glyph / frost texture + crystal border)
-— F02 owns the behaviour, F05/F06 author placement.
+RUNTIME scenarios (device or simulator — the F06 smoke set is reachable via the debug chip row on the
+placeholder home: L1 quick win / L2 two-move / L4 column-enabled / L5 locked pivot / L6 frozen tile):
+  1. AC1 — open: target word visible + visually SEPARATED from the grid; MOVES 0; Undo (3); Restart; grid ~85–90% width; portrait.
+  2. AC2/AC3 — a horizontal swipe past threshold shifts exactly that row one cell + MOVES +1; a vertical swipe shifts that column (on L4/L5/L6); dominant-axis + threshold correct on a SMALL and a LARGE device.
+  3. AC4 — a tap / tiny drag below threshold → no shift, MOVES unchanged. Measure, don't assume; sweep the threshold (GestureResolver.thresholdLogicalPx = 18) on the device matrix.
+  4. AC5 + success metric "0 double-registered moves during animation" — swipe during the ~190 ms shift → ignored, NOT queued, no double-count. This is THE headline runtime check.
+  5. AC11 — a transient target-word arrangement mid-animation does not win (only the settled state).
+  6. one-cell for a fast flick vs a slow drag; a swipe starting on the grid but ending off-screen still resolves; multi-touch → first pointer only.
+  7. AC6 — 3 undos then a 4th tap → nothing, NO dialog / ad / toast; the pip indicator reads 3→0.
+  8. AC7 — Restart → grid reset, MOVES 0, undos back to 3, NO confirm dialog; Restart cannot be hit while swiping the board (placement + divider).
+  9. AC8 — forming the target: input locks (diegetic — HUD dims, no spinner), winning row highlights with the amber fill AND the drawn L→R seam bar (confirm the seam is legible with colour off / greyscale — accessibility), bounded ≤~600 ms, then the minimal completion sheet (kicker + word + HAMLE stat + dominant Retry + quiet Close; NO stars/best/Next). Retry resets in place; Close pops to the caller.
+  10. AC9 — swipe-begin: the affected row/column gets a light lift + loop-rail highlight (shape+motion, not colour-only).
+  11. AC10 + architecture §12 — kill/relaunch mid-puzzle → grid, MOVES, undosRemaining, restartCount, elapsed exactly restored (via the F08 snapshot; thaw re-derived by replay — tamper `kv['active_session'].thawedFrozenCells` and confirm it is NOT trusted). Background mid-swipe → gesture cancelled cleanly. Background mid-animation → resolves to the settled end state on return; never a half-applied move.
+  12. §13 chrome — no system header; the quiet back chevron pops to the caller on button / system / gesture back; it is HIDDEN in the won state (the sheet's Close owns exit); rotation attempt → stays portrait.
+  13. Tile-state visuals (L5 locked = brass ring + pin glyph; L6 frozen = frost + crystal border; thaw cross-fade) — visual check; every special state has a NON-COLOUR cue.
 
-End: Current Owner → QA; Next Role → QA (F03-QA — end-to-end client, runtime mandatory).
+`ui-design.md` alignment: Direction A intent intact (spotlight stage, backlit tiles, loop-rail + wrap
+animation visible not a plain slide, outline-ghost target, diegetic lock, undo pips, separated outline
+Restart, minimal-but-crafted sheet). Note the 2 accepted perf deviations (blur→dim, no breathing) —
+frontend.md §11/§16; QA confirms they don't drop the screen below the premium bar / rubric fail conditions.
+
+Not in scope: real Journey/Daily entry (F05/F07), F04 completion panel, F09 onboarding, F11 audio/haptics,
+F12 analytics — all downstream. AC2/AC3 end-user offline Journey play flow needs F05 — out of F03 QA.
+
+End: QA verdict → `Run Tech Lead` (fixed — QA always routes to Tech Lead). Tech Lead also resolves the
+6 open clarifications (frontend.md §16) at close-out.
 ```
 
-→ then `Run QA` → `Run Tech Lead` (F03 close; also resolve the 4 `ui-design.md §14` clarifications).
+→ then `Run QA` → `Run Tech Lead` (F03 close; resolve the `frontend.md §16` clarifications).
 
 ---
 
 ## Change Log
 
+* v3 (2026-09-06) — Frontend/Mobile Developer: **F03-FE1…FE8 delivered — `frontend.md`.** The playable screen implemented against `architecture.md` + `ui-design.md`. New: `app/lib/play/**` (16 files — `play_theme`/`play_strings`/`play_session_args`/`gesture_resolver`/`debug_puzzle_library`/`play_session_controller`/`play_session_providers`/`play_session_screen` + `widgets/{play_stage,target_rail,board_tile,puzzle_board,moves_hud,undo_button,restart_button,completion_sheet}`) + `app/lib/app_router.dart` (go_router; `MaterialApp.router`; `/` bootstrap gate + `/play`; `StoreErrorScreen`) + `app/lib/home_screen.dart` (placeholder + debug chip row). Modified `app/lib/main.dart` (`MaterialApp.router`; the F08 `_SessionLifecycle` sync-drain observer relocated from wrapping `home:` to the router `builder:` — a correctness fix now that routing exists, `platform.md §7`; dark theme from `PlayTheme.colorScheme`). **Contract honoured verbatim** (`architecture.md §6/§7/§8/§9/§11/§13`): ticker-free `PlaySessionController` state machine with **no input queue**; pure `GestureResolver` (threshold 18 px, tie-band 0.15 → horizontal, one cell, first pointer); 190 ms wrap-shift (`ClipRRect` edge-mask + N+2 ghost tiles, `cubic-bezier(0.22,1,0.36,1)`) + 140 ms rejected-move bounce; `MOVES = engine.moveCount` settled-only + settle-tick; 3-action Undo with a pip indicator, dead + **no dialog/ad/toast** at 0; Restart reset + `restartCount++`, no confirm, divider-separated outline treatment right of Undo; write-through into the **F08-frozen** `ActiveSessionSnapshot` on every settled boundary + initial + hydrate via `restoreSession()` on matching `puzzleId`, `completed` + `clear()` on win; bounded ≤600 ms win → amber fill + `ink-amber` letters + lift + a **drawn L→R amber seam bar** (colour AND shape — the non-colour cue) + one bloom + 0.12 dim of other rows → minimal functional completion sheet (kicker + word + `HAMLE` stat + dominant Retry + quiet Close; NO stars/optimal/best/Next — F04 seam); `paused` cancels a `tracking` gesture and commits a mid-shift move synchronously (never a torn snapshot). Portrait-locked; no confirm dialogs; no system header + a quiet back chevron hidden in `won`. Localization via `PlayStrings` (`tr`/`en` table — no `gen_l10n`; assumption flagged). **2 flagged non-blocking deviations from `ui-design.md`** (perf on mid-tier): board-recede blur → dim-only (0.12); the optional breathing spotlight ambient omitted. **Gates:** `flutter analyze` (app + 6 packages) + `dart format --output=none --set-exit-if-changed .` clean; **295 workspace tests green** (app **99** = 4 pre-existing + 68 F08 + **27 new F03**: `gesture_resolver_test` 13, `play_session_controller_test` 11, `play_session_screen_test` 5); `infra` offline 18/18 (unchanged); **`flutter build ios --release --no-codesign` GREEN** (`✓ Built build/ios/iphoneos/Runner.app 54.5MB`). **6 `Needs Tech Lead Clarification` (all non-blocking, defaults implemented):** `ui-design.md §14` ×4 (no playing-screen CTA; F03 owns first-pass locked/frozen tile visuals; shared-chrome rule timing; final microcopy) + the 2 perf deviations. Current Owner → QA; Next Role → QA (F03-QA — end-to-end client, `runtime`-mandatory). `feature-board.md` / `system-state.md` not touched (Tech Lead syncs). Nothing committed to git.
 * v2 (2026-09-06) — UI Designer: **F03-UI delivered — `ui-design.md`.** Direction A ("Backlit board on a dark stage") selected over B ("warm tactile daylight board") per the doctrine's default-premium rule. Identity tied to the mechanic: spotlight stage + backlit-keycap tiles + a **loop-rail motif** + a **wrap animation** (edge-mask exit + opposite-edge emergence) + **outline-ghost target** (separated by scale + treatment + divider + air) + **won = amber fill + a drawn L→R seam bar** (colour AND shape → accessibility). Resolves the `architecture.md §18 [PENDING — UI]` list: 3-zone portrait layout (target/board/HUD) with fixed 28 pt gaps + board-first shrink; swipe-begin = row/col lift + directional rail ignite + 8 % dim (shape+motion cue); **diegetic input-lock** during the 190 ms shift (controls dim, board focuses — no spinner/modal); bounded ≤600 ms win sequence; shift envelope **170–210 ms** + `cubic-bezier(0.22,1,0.36,1)`; **minimal-but-crafted** completion sheet (kicker + amber word + one `HAMLE` stat + dominant Retry + quiet Close; no stars/best/Next — F04 replaces it); **"no system header + quiet back chevron top-left, hidden in `won`"** chrome (proposed as a cross-screen rule — Tech Lead to confirm); debug loading (stage + tile silhouettes, no spinner) + error (contained, dev-only). Colour tokens + 3 type roles + 4/8 spacing rhythm specified; locked = brass ring + pin glyph, frozen = frost texture + crystal border (non-colour cues). **Self-review 94/100** (target band), no rubric fail conditions. **Contract unchanged** — `architecture.md §6/§7/§8/§9/§11/§13` fully honoured. §14: 4 non-blocking Tech Lead clarifications (no playing-screen CTA; F03 owns first-pass locked/frozen tile visuals; shared-chrome rule timing; final microcopy). Current Owner → Frontend/Mobile Developer; Next Role → Frontend/Mobile Developer (F03-FE1…FE8). `feature-board.md` / `system-state.md` not touched (Tech Lead syncs). Nothing committed to git.
 * v1 (2026-09-06) — Tech Lead: **F03 created + activated.** P0, the other branch of the `F06 → (F08, F03)` critical-path fork; depends only on F02 (`Done`); no Firebase. Activated in parallel with **F08 parked** (`In Release` — user deferred the Firebase Blaze upgrade / first deploy to end-of-MVP; F08's engineering is complete and ready). `prd.md` derived from `product-prd.md` F03 section (AC1–AC11 + perf/a11y/animation constraints). Initial `architecture.md`: substrate LOCKED (consumed F02 + F08 contracts; screen state machine idle/tracking/animating/won with no input queue; gesture→`Move` mapping envelope with **tie band → favor horizontal** as the Tech Lead resolution of the product's open diagonal-tie question; MOVES = `engine.moveCount` settled-only; Undo = 3-action F03 quota with no prompt at 0; Restart = reset + `restartCount++`, no dialog, away from grid; write-through persistence into the F08-frozen snapshot shape + hydrate via the F08 restore path; completion sequence with a minimal functional panel as an F04 seam; 150–250 ms animation, full input lock, no queue; portrait-locked route `'/play'`; `runtime`-mandatory QA; `Release Scope = none`); `[PENDING — UI]` and `[PENDING — IMPL tuning]` items enumerated in §18. Complexity: **not COMPLEX** (no Technical Analyst); **UI Designer required**; **no DevOps/Release Engineer** (`Release Scope = none`). Routing: **UI Designer (F03-UI → `ui-design.md`)** → Frontend/Mobile Developer (F03-FE1…FE8) → QA → Tech Lead (close). `feature-board.md` + `system-state.md` synced (Active Feature → F03; F08 → In Release / parked). Nothing committed to git.
