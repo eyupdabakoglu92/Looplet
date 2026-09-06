@@ -1,5 +1,7 @@
 {
   "projects": {
-    "default": "looplet-mvp"
-  }
+    "default": "looplet-712e5"
+  },
+  "targets": {},
+  "etags": {}
 }

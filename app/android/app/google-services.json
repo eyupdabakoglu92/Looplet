@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "747382836746",
+    "project_id": "looplet-712e5",
+    "storage_bucket": "looplet-712e5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:747382836746:android:9e59ee3e7aae18a29459f3",
+        "android_client_info": {
+          "package_name": "com.looplet.looplet_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBBnjSA6OSaMtH_RX7dBrDSziZakueSG90"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

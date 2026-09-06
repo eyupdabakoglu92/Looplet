@@ -1,6 +1,6 @@
 # System State — LOOPLET
 
-Last Updated: 2026-09-06 (F06 closed; F08 contract LOCKED; `infra/` Firebase DURUM 0 done + reconciled; F08 in parallel implementation — Track A Frontend / Track B Backend)
+Last Updated: 2026-09-06 (F08 implementation complete — both tracks reconciled + accepted; HELD on `F08.FIREBASE-PROJECT`, a user Firebase-Console action; no parallel feature started, per the user)
 
 > Global workflow snapshot. Stack/runtime authority lives in `project-authority/platform.md`; release authority in `project-authority/release.md`. This file carries the current snapshot only.
 
@@ -72,25 +72,24 @@ Last Updated: 2026-09-06 (F06 closed; F08 contract LOCKED; `infra/` Firebase DUR
 
 ## Current Phase
 
-* F08 implementation — Track A (Drift persistence core, Frontend/Mobile Developer) + Track B (sync callable + rules, Backend Developer), in parallel
+* F08 implementation **complete** (both tracks delivered, reconciled, accepted) — **HELD on `F08.FIREBASE-PROJECT`** (a user Firebase-Console action). No parallel feature started (user's choice).
 
 ## Current Role
 
-* Frontend/Mobile Developer (Track A) · Backend Developer (Track B, parallel)
+* — (waiting on the user). Resume role: **Frontend/Mobile Developer** (F08-FE6/FE8/FE9 join).
 
 ## Current Reason
 
-* F08 contract LOCKED (F08.CONTRACT-TL, 2026-09-06): HTTPS Callable `submitDailyResultV1`; `guestId` (local UUID) decoupled from `firebaseUid` (`platform.md` §6 amended); F06-style F08↔F07 split (F08 ships persistence + sync + fake producer; F07 wires real producer); App Check soft-enforce (MVP); `Release Scope = production-readiness`. **`infra/` Firebase DURUM 0 done + Tech-Lead-reconciled (2026-09-06):** `infra/` config + `firestore.rules` (create-only) + TS Cloud Functions `submitDailyResultV1` skeleton + tests + CI `infra` job + `app/` Firebase client packages (`firebase_core`/`auth`/`firestore`/`functions`/`app_check`) + `connectivity_plus`; `melos run format:check`/`analyze`/`test`/`infra:build`/`infra:test` all green. Version substitutions accepted (`firebase-functions ^6`, `firebase-admin ^13`, `@firebase/rules-unit-testing ^5`). Now two **parallel tracks**: **Track A** = Frontend/Mobile Developer, Drift persistence core (schema → migrations + never-drop guard → repositories → elapsed helper → `toEngineConfig` → active-session snapshot + the additive `GridEngine.restoreMoves`), **no Firebase**; **Track B** = Backend Developer, fill the `submitDailyResultV1` callable + finalize rules + emulator tests + CI emulator step, **emulator runs against a fake project id**. **No UI Designer.** `F08-DEVOPS` (`production-readiness`) opens after QA.
+* F08's persistence layer + sync are fully implemented and contract-compliant: Track A (`frontend.md`) — Drift `AppDatabase` (10 contract tables + `kv`, `schemaVersion 1`, seeded), `MigrationGuard` never-drop, write-through repositories, `ActiveSessionSnapshot` + corrupt-safe `ActiveSessionRepo` + `restoreSession` (re-derives `thawedCells`), `ElapsedTimer`, `toEngineConfig`, `DailyResultSyncService` (queue state machine + exp backoff + exactly-once + first-run-authoritative + `awaitingAuth` + parked bounded-retry + `daily_sync_enabled` kill-switch; session-level, injectable sender/connectivity), `FakeDailyResultProducer`. Track B (`backend.md`) — `submitDailyResultV1` filled (full `platform.md` §8 validation + create-only Firestore transaction + `CREATED`/`ALREADY_SUBMITTED` reconciliation + `HttpsError` mapping), `firestore.rules` verified compliant, emulator suites (`rules.test.ts` + `submitDailyResult.test.ts`) written + wired into the CI `infra` job (`npx firebase-tools emulators:exec`). **263 workspace tests + `analyze` + `format:check` + `infra:build`/`infra:test` + offline `npm test` all green.** F02 `GridEngine.restoreMoves` was already present + tested — no F02 change. Non-blocking notes accepted (move-shorthand ~40-line dup vs `tools/looplet_authoring`; hand-rolled UUID; emulator suites CI-verified only — no JDK in the dev env). **Sole remaining gate:** `F08.FIREBASE-PROJECT` — a user must create the real Firebase project, run `flutterfire configure` (→ `app/lib/firebase_options.dart` + platform config), and enable Anonymous Auth + App Check (monitor). The user chose (2026-09-06) to hold F08 here rather than start F03 in parallel. **No UI Designer.** `F08-DEVOPS` (`production-readiness`) opens after QA.
 
 ## Last Completed Action
 
-* Tech Lead — 2026-09-06 — Reconciled + accepted F08.SETUP-0 (`infra/` scaffold matches the LOCKED contract; gates green; version substitutions accepted). Split the manual Firebase-project work into `F08.FIREBASE-PROJECT` (owner: user; DevOps/Release Engineer fallback) — blocks only the join (`F08-FE6/FE8/FE9`) + `F08-DEVOPS`, not Track A or `F08-BE2/BE3/BE4`. Routed: Next Role = Frontend/Mobile Developer (Track A); Backend Developer runs Track B in parallel. Synced `feature-board.md` + `system-state.md`.
+* Tech Lead — 2026-09-06 — Reconciled + accepted both F08 delivery artifacts (`frontend.md` Track A, `backend.md` Track B) against the LOCKED `architecture.md`: schema/keys, frozen snapshot keys, never-drop guard, `sync_queue` state machine + backoff + exactly-once + first-run-authoritative + session-level ownership + kill-switch, callable request/response/error shapes, `platform.md` §8 validation, create-only transaction, verified rules — all compliant. No rework, no contract change, no re-QA. Recorded the non-blocking notes. F08 held on `F08.FIREBASE-PROJECT` per the user's choice; synced `feature-board.md` + `system-state.md` to the held state.
 
 ## Next Expected Action
 
-* `Run Frontend/Mobile Developer` — F08 **Track A** per `features/f08-.../orchestration.md → Next Action`: `F08-FE1` Drift `AppDatabase` (all tables + `kv`, `schemaVersion = 1`) → `FE2` `MigrationStrategy` + never-drop guard + a v1→v2 migration test harness → `FE3` write-through transactional repositories → `FE5` monotonic elapsed helper → `FE11` `toEngineConfig(Puzzle)` → `FE4` active-session snapshot (frozen JSON keys) + the additive `GridEngine.restoreMoves(List<Move>)` in `looplet_engine` (re-run the 83 F02 engine tests). `FE7`/`FE10` logic optional here. **Not** `FE6/FE8/FE9` (need `F08.FIREBASE-PROJECT`). Verify: `melos run format:check && analyze && test`. Produce `features/f08-.../frontend.md`.
-* Parallel: `Run Backend Developer` — F08 **Track B**: `F08-BE2` fill the `submitDailyResultV1` callable (validation + create-only write + `CREATED`/`ALREADY_SUBMITTED` + typed errors) → `BE3` rules + rules-unit-tests green under the emulator → `BE4` Functions emulator tests → `BE5` CI emulator step. Emulator uses a fake project id — `F08.FIREBASE-PROJECT` not required. Produce `features/f08-.../backend.md`.
-* Out-of-band: `F08.FIREBASE-PROJECT` (owner: user) — create the real Firebase project + `flutterfire configure` + enable Anonymous Auth / App Check (monitor) + `firebase-tools`/`FIREBASE_CI_TOKEN` in CI. Needed before the join phase + `F08-DEVOPS`. See `infra/README.md` → "Not done yet".
+* **User (out-of-band):** complete `F08.FIREBASE-PROJECT` — create a Firebase project; `cd infra && firebase use --add` (commit `infra/.firebaserc`); register the iOS + Android apps; `cd app && flutterfire configure` (commit `app/lib/firebase_options.dart` + `google-services.json` + `GoogleService-Info.plist`); enable Authentication → Anonymous; enable App Check in **monitor** mode. (Optional now, required for deploy: add the `FIREBASE_CI_TOKEN` repo secret.) See `features/f08-.../orchestration.md → Next Action` for the exact checklist.
+* **Then resume:** `Run Frontend/Mobile Developer` — the F08 join: `F08-FE6` (app-init sequence in `app/lib/main.dart` — open DB → migrate → seed → read snapshot → async Firebase init + App Check + `signInAnonymously` → persist `firebaseUid` → construct the session-level `DailyResultSyncService` → `drain()`; migration-failure recoverable error screen), `F08-FE8` (real `SyncSender` binding: `httpsCallable('submitDailyResultV1')` + response→`SyncSendResult` mapping — mapping logic already tested), `F08-FE9` (app-scoped singleton + `connectivity_plus` regain stream; confirm `flutter build ios --release --no-codesign` passes with the Firebase pods). → `Run QA` (F08-QA1…QA10) → `Run Tech Lead` → `Run DevOps/Release Engineer` (F08-DEVOPS) → `Run Tech Lead` (close).
 
 ---
 
@@ -98,10 +97,11 @@ Last Updated: 2026-09-06 (F06 closed; F08 contract LOCKED; `infra/` Firebase DUR
 
 ## Portfolio Summary
 
-* 13 features. F01 `Done`, F02 `Done`, F06 `Done`. F08 `In Progress` (contract LOCKED; `infra/` DURUM 0 done + reconciled; parallel implementation — Track A Frontend / Track B Backend). F03, F04, F05, F07, F09–F13 `Not Started`.
+* 13 features. F01 `Done`, F02 `Done`, F06 `Done`. F08 `In Progress` — **implementation complete (both tracks), HELD on `F08.FIREBASE-PROJECT` (user manual step)**. F03, F04, F05, F07, F09–F13 `Not Started`.
 * Priority: P0 = F01✓, F02✓, F06✓, **F08**, F03, F05 · P1 = F04, F09, F10, F07, F12 · P2 = F11, F13.
 * Critical path: F01✓ → F02✓ → F06✓ → (**F08**, F03) → F04 → F05 → F09 → F10 → F07 → F13; F12 cross-cutting and release-blocking.
-* F08 routing: Frontend/Mobile Developer (Track A — Drift persistence core) + Backend Developer (Track B — sync callable + rules), parallel → QA → Tech Lead → DevOps/Release Engineer (`production-readiness`) → Tech Lead close. Out-of-band prerequisite `F08.FIREBASE-PROJECT` (owner: user) before the join + DevOps.
+* F08 resume: after the user completes `F08.FIREBASE-PROJECT` → `Run Frontend/Mobile Developer` (F08-FE6/FE8/FE9 join) → QA → Tech Lead → DevOps/Release Engineer (`production-readiness`) → Tech Lead close.
+* **F03 (puzzle-play-session, P0)** is the other unblocked branch of the F06 fork (depends only on F02✓, no Firebase). Not activated — the user chose to keep F08 as the single active feature rather than run F03 in parallel. It is the natural next activation once F08 closes (or if the user later opts to parallelize).
 * **`F06-CONTENT`** (full 30 Journey + ~60 Daily authoring) — an **open** Level-Designer follow-on split off from F06; still MVP scope; blocks F05 and F07 from reaching `Done` but did not block F06. Tech Lead schedules it when F05 / F07 need real content.
 
 ## Active Rework
@@ -110,11 +110,12 @@ Last Updated: 2026-09-06 (F06 closed; F08 contract LOCKED; `infra/` Firebase DUR
 
 ## Paused Features
 
-* None
+* None. (F08 is `In Progress` but **held** — implementation complete, awaiting the user's `F08.FIREBASE-PROJECT` step. Not marked "Paused" because no work was abandoned mid-task; it resumes at `Run Frontend/Mobile Developer`. Per the user, no other feature was started in the interim.)
 
 ## Blocked Features
 
-* None. Non-blocking note: production-quality curated Turkish corpus + target-word review is a Product Owner / content deliverable (F01 PRD Open Questions); F01 code proceeds on a provisional reviewed list.
+* **F08 join phase (`F08-FE6/FE8/FE9`) + QA + `F08-DEVOPS`** — blocked on `F08.FIREBASE-PROJECT` (a user Firebase-Console action: create project + `flutterfire configure` + Anonymous Auth + App Check monitor). F08's Track A + Track B implementation is done and green; this is an external-provisioning gate, not a code blocker.
+* Non-blocking note: production-quality curated Turkish corpus + target-word review is a Product Owner / content deliverable (F01 PRD Open Questions); F01 code proceeds on a provisional reviewed list. `F06-CONTENT` (full 30 Journey + ~60 Daily authoring) remains an open Level-Designer follow-on, prerequisite for F05 & F07 reaching `Done`.
 
 ---
 
