@@ -132,7 +132,7 @@ For each: package layout as Step 2, correct `name`, dependency edges per Workspa
 
 * Build: `melos run build:app`  _(→ `flutter build appbundle --release` in `app/`)_
 * Test: `melos run test`  _(→ `dart test` in every package with a `test/` dir + `flutter test` in `app/`)_
-* Boot / dev run: `melos exec --scope=app -- "flutter run"`
+* Boot / dev run: `melos exec --scope="looplet_app" -- "flutter run"`  _(or simply `cd app && flutter run`; melos scopes by package name `looplet_app`, not by directory)_
 * Extra verification: `melos run format:check && melos run analyze`
 * Bootstrap (run once after scaffold, and after any `pubspec.yaml` change): `melos bootstrap`
 

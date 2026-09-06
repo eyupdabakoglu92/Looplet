@@ -34,6 +34,38 @@ melos bootstrap          # resolve all package dependencies (run after any pubsp
 melos run format:check   # fail if code is not formatted
 melos run analyze        # static analysis (all packages + flutter analyze)
 melos run test           # unit tests (pure-Dart packages) + flutter test (app)
+melos run content:check  # validate committed puzzle artifacts under content/
 melos run build:app      # release Android App Bundle
-melos exec --scope="looplet_app" -- "flutter run"   # dev run
 ```
+
+## Run the app locally
+
+The Flutter app lives in `app/`. As of now it boots to a placeholder shell
+(a dark screen with "LOOPLET" centred) — the game and menu screens are still
+being built (features F03, F05, F09, F10). It compiles and runs; there is just
+nothing to play yet.
+
+```sh
+cd app
+
+# 1. Pick a target
+flutter devices            # list connected devices / running simulators
+open -a Simulator           # (macOS) boot an iOS simulator, then re-check devices
+#   Android: start an emulator from Android Studio, or `flutter emulators --launch <id>`
+
+# 2. Run
+flutter run                       # uses the only/attached device
+flutter run -d "iPhone 15"        # or target one explicitly by name/id
+```
+
+Notes:
+
+- **iOS Simulator** is the least-friction target (Xcode is already set up). A
+  physical iPhone needs Developer Mode on the device + a signing team in
+  `app/ios` (Xcode → Runner → Signing & Capabilities).
+- **Android** needs the Android SDK (Android Studio); it is not required for the
+  iOS/simulator path.
+- **Web** is not enabled — the app was scaffolded for `ios,android` only. Add it
+  with `flutter create --platforms=web .` from `app/` if you want `-d chrome`.
+- The authoring CLI (`tools/looplet_authoring`) is a separate build-time tool,
+  not the app: `cd tools/looplet_authoring && dart run bin/looplet_authoring.dart --help`.
