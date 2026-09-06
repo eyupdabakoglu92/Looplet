@@ -7,13 +7,13 @@
 
 ## Current Status
 
-**In Progress — Track A (persistence core) delivered. Track B (sync callable + rules) next.**
+**In Progress — Track A + Track B implementation delivered. Awaiting `F08.FIREBASE-PROJECT` → FE join → QA.**
 
 ---
 
 ## Current Owner
 
-Backend Developer (Track B — fill the `submitDailyResultV1` callable + rules + emulator tests)
+Tech Lead (reconcile `frontend.md` + `backend.md`; decide `F08.FIREBASE-PROJECT` handling)
 
 ---
 
@@ -53,10 +53,10 @@ Contract LOCKED; `infra/` DURUM 0 done + reconciled.
 - [x] Task ID: F08-FE11 | Assigned Role: Frontend/Mobile Developer | Status: **Done** | `content/puzzle_engine_config.dart` — `toEngineConfig(Puzzle) → EngineConfig` free function in `app/`; `looplet_content` stays `looplet_core`-only; propagates `EngineConfigError`. Shared with F05. 2 tests. (Also: `engine/move_shorthand.dart` — app-local shorthand parse/format; ~40-line duplication of the `tools` copy flagged in `frontend.md §4` for a future dedupe.)
 - [ ] Task ID: F08.FIREBASE-PROJECT | Assigned Role: user (DevOps/Release Engineer fallback) | Status: Open — manual, out-of-band | Create the real Firebase project + `firebase login` + `firebase use --add` (real id → `infra/.firebaserc`) + `flutterfire configure` from `app/` (→ `app/lib/firebase_options.dart` + `google-services.json` + `GoogleService-Info.plist`, all committed — not secret, `release.md` §7) + enable Anonymous Auth + App Check (monitor). Prerequisite for F08-FE6/FE8/FE9 and F08-DEVOPS; NOT for Track A or F08-BE2/BE3/BE4 (emulator uses a fake project id). See `infra/README.md` → "Not done yet".
 - [x] Task ID: F08-BE1 | Assigned Role: Project Setup | Status: folded into F08.SETUP-0 | `infra/` scaffold (see F08.SETUP-0).
-- [ ] Task ID: F08-BE2 | Assigned Role: Backend Developer | Status: Open — **ready now** (fills the F08.SETUP-0 skeleton; emulator uses a fake project id) | Implement `submitDailyResultV1` in `infra/functions/src/submitDailyResult.ts`: auth guard (kept), App Check soft-enforce (kept), full payload validation (`architecture.md → Firebase Sync Surface` — `lang ∈ {tr,en}`, `dailyDate` regex, `dailyId` non-empty, `optimalMoves ≥ 1`, `optimalMoves ≤ moves`, `durationMs ≥ 0`, `stars ∈ 1..3`, `completedAtUtcMs > 0`), create-only Firestore write at `dailyResults/{lang}_{dailyDate}/entries/{uid}` (`DailyResultDoc` shape in `types.ts`), return `{status: "CREATED"|"ALREADY_SUBMITTED", recordedAt}`; typed `HttpsError` for `INVALID_PAYLOAD`/`UNSUPPORTED_LANGUAGE`/`INTERNAL`. Keep `test/skeleton.test.ts` green (update the 2 "reaches INTERNAL" assertions to the real behaviour) + add `test/submitDailyResult.test.ts` (emulator, via `firebase-functions-test` + Firestore emulator).
-- [ ] Task ID: F08-BE3 | Assigned Role: Backend Developer | Status: Open — **ready now** | `infra/firestore.rules` already scaffolded (create-only own-uid, default-deny). Verify against `architecture.md`; `test/rules.test.ts` (`@firebase/rules-unit-testing`) is written and emulator-gated — make it run green under the Firestore emulator (allow-create-own, deny-create-other, deny-unauth, deny-update, deny-delete, deny-read).
-- [ ] Task ID: F08-BE4 | Assigned Role: Backend Developer | Status: Open (gated on F08-BE2) | Functions emulator unit tests: valid create → `CREATED`; duplicate → `ALREADY_SUBMITTED` (existing server doc unchanged); each validation failure → its code; missing auth → `unauthenticated`.
-- [ ] Task ID: F08-BE5 | Assigned Role: Backend Developer | Status: Open | CI: add a Firebase-emulator step to the `infra` job in `.github/workflows/ci.yml` (`firebase emulators:exec --only firestore,auth "npm test"` from `infra/`, needs `firebase-tools` + Java on the runner) so `test/rules.test.ts` + `test/submitDailyResult.test.ts` run for real (`release.md` §4). Any new GitHub Action (e.g. Java setup) pinned to a commit SHA.
+- [x] Task ID: F08-BE2 | Assigned Role: Backend Developer | Status: **Done (2026-09-06)** | `submitDailyResultV1` filled (`infra/functions/src/submitDailyResult.ts` + new `src/validate.ts`): auth guard (`unauthenticated`, pre-Firestore) → soft App-Check log → `validateSubmitDailyResult` (full `platform.md` §8 matrix → `HttpsError("invalid-argument", …, {code: INVALID_PAYLOAD|UNSUPPORTED_LANGUAGE})`) → Firestore **transaction** on `dailyResults/{lang}_{dailyDate}/entries/{uid}`: exists → `{ALREADY_SUBMITTED, recordedAt: existing}`; absent → `tx.create(DailyResultDoc)` + `recordedAt = Date.now()` → `{CREATED, recordedAt}`; create-race → re-read → `ALREADY_SUBMITTED`; other failure → `internal` (`code: INTERNAL`), logged, no leak. `test/skeleton.test.ts` updated (the 2 INTERNAL assertions → validation-path; + a 10-case `validateSubmitDailyResult` table). Offline `npm test` green.
+- [x] Task ID: F08-BE3 | Assigned Role: Backend Developer | Status: **Done — verified, no change** | `infra/firestore.rules` (as scaffolded) matches `architecture.md → Firebase Sync Surface → Rules`: `allow create: if request.auth != null && request.auth.uid == uid` on `dailyResults/{bucket}/entries/{uid}`; `update`/`delete`/`read` `false`; catch-all deny. `!exists(...)` from the contract text is implied by Firestore `create` semantics. `test/rules.test.ts` (6 emulator-gated cases: allow-create-own / deny-create-other / deny-unauth / deny-update / deny-delete / deny-read) covers the matrix.
+- [x] Task ID: F08-BE4 | Assigned Role: Backend Developer | Status: **Done** | `test/submitDailyResult.test.ts` (emulator-gated, `demo-looplet`): first authed → `CREATED` + doc written with exact fields; "better" replay → `ALREADY_SUBMITTED`, same `recordedAt`, **doc unchanged**; 4 repeats → all `ALREADY_SUBMITTED` + **one** doc; per-uid scoping (`alice`/`bob`); unauth → `unauthenticated` + no doc; invalid payload → `invalid-argument` + `details.code` + no doc; errors are `HttpsError`.
+- [x] Task ID: F08-BE5 | Assigned Role: Backend Developer | Status: **Done** | `.github/workflows/ci.yml` `infra` job — the TODO replaced with **"Test functions (Firebase emulator)"**: `working-directory: infra`, `npx --yes firebase-tools@15 emulators:exec --only firestore,auth --project demo-looplet "npm --prefix functions run test"` (un-skips `rules.test.ts` + `submitDailyResult.test.ts`; no committed `firebase-tools` dep, no extra SHA-pinned action — ubuntu-latest has a JDK). `package.json` `test:emulator` script mirrors it for local use. **Emulator suites are CI-verified only in this delivery — no JDK in the dev env** (analogous to Android `build:app` CI-only locally); offline `npm test` + `tsc` + `melos infra:build`/`infra:test` green.
 - [ ] Task ID: F08-QA1…QA10 | Assigned Role: QA | Status: Not opened (opens when BE + FE complete) | Per `architecture.md → QA Focus` — resume fidelity (runtime), offline Journey/Daily (runtime), exactly-once sync + first-run-authoritative (integration, emulator, via the fake producer), migration + corrupt-save + storage-full (automated), clock (automated+runtime), guest schema (automated), session-level ownership (runtime), rules (integration). Evidence: `runtime` + `repeatable integration` + `automated functional`.
 - [ ] Task ID: F08-DEVOPS | Assigned Role: DevOps/Release Engineer | Status: Not opened (opens AFTER QA passes — state machine DURUM 5 → In Release) | `Release Scope = production-readiness`. Firebase Functions + rules deploy readiness (dry-run `firebase deploy --only functions,firestore:rules`), Remote Config push, prod Firebase project confirmation, `FIREBASE_CI_TOKEN` wiring, rollback-readiness (functions redeploy-previous + `daily_sync_enabled` kill-switch + "no Drift downgrade" documented), post-deploy smoke (`release.md` §8), `features/f08-.../release.md` verdict.
 
@@ -89,10 +89,12 @@ Contract LOCKED; `infra/` DURUM 0 done + reconciled.
 - [ ] (F08.FIREBASE-PROJECT) Create + wire the real Firebase project — owner: user (DevOps/Release Engineer fallback). Blocks F08-FE6/FE8/FE9 + F08-DEVOPS; not Track A or F08-BE2/BE3/BE4. See the Active Task Ledger entry + `infra/README.md`.
 
 ### Backend
-- [ ] (F08-BE2) `submitDailyResultV1` implementation. (F08-BE1 folded into F08.SETUP-0.)
-- [ ] (F08-BE3) `firestore.rules` create-only + rules-unit-tests.
-- [ ] (F08-BE4) Functions emulator unit tests.
-- [ ] (F08-BE5) CI wiring for `infra/`.
+- [x] (F08-BE2) `submitDailyResultV1` implementation — done (`backend.md`).
+- [x] (F08-BE3) `firestore.rules` create-only + rules-unit-tests — verified (no change; test suite covers the matrix).
+- [x] (F08-BE4) Functions emulator behaviour tests — done (emulator-gated; CI-run).
+- [x] (F08-BE5) CI emulator step for `infra/` — done.
+
+_Track B delivered (`backend.md`). Emulator suites are CI-verified only locally (no JDK in the dev env)._
 
 ### Frontend
 - [x] (F08-FE1) Drift schema + `AppDatabase` — done.
@@ -126,10 +128,10 @@ _Track A delivered (`frontend.md`). FE6/FE8/FE9 remain, gated on `F08.FIREBASE-P
 
 ## Blockers
 
-* **None hard.** Contract LOCKED; `infra/` scaffold done + reconciled; **Track A delivered green** (263 workspace tests).
-* **Manual prerequisite → task `F08.FIREBASE-PROJECT` (opened, owner: user, DevOps/Release Engineer fallback).** Create the real Firebase project in the Firebase Console + `firebase login` + `firebase use --add` (real id into `infra/.firebaserc`) + `flutterfire configure` from `app/` (→ `app/lib/firebase_options.dart` + `google-services.json` + `GoogleService-Info.plist`) + enable Anonymous Auth + enable App Check in **monitor** mode. Not doable in the agent environment. Scope of impact:
-  * **Blocks:** `F08-FE6` (app `Firebase.initializeApp` needs `firebase_options.dart`), `F08-FE8` / `F08-FE9` (callable client + init), `F08-DEVOPS` (deploy). Required before the **join** phase.
-  * **Does NOT block:** Track A (`F08-FE1…FE5`, `FE11`) — no Firebase at all. `F08-BE2/BE3/BE4` — the Firestore emulator + `@firebase/rules-unit-testing` run against **any (fake) project id**; they need only `firebase-tools` installed (an npm global — a code/CI task, `F08-BE5`), not a real project. `F08-FE7` / `F08-FE10` logic can be written against the skeleton (their end-to-end emulator verification joins with BE).
+* **None hard.** Contract LOCKED; **Track A + Track B implementation delivered** (`frontend.md`, `backend.md`); 263 workspace tests + `infra:build`/`infra:test` green; `analyze`/`format:check` green.
+* **`F08.FIREBASE-PROJECT` (open, owner: user; DevOps/Release Engineer fallback)** — the sole remaining prerequisite before the join + QA. Create the real Firebase project + `firebase login` + `firebase use --add` (real id → `infra/.firebaserc`) + `flutterfire configure` from `app/` (→ `app/lib/firebase_options.dart` + `google-services.json` + `GoogleService-Info.plist`) + enable Anonymous Auth + App Check (monitor). Not doable in the agent environment.
+  * **Blocks:** `F08-FE6` / `F08-FE8` / `F08-FE9` (app Firebase init + real callable binding + app-scoped wiring) + `F08-DEVOPS` (deploy). QA needs FE6/FE8/FE9 done.
+  * **Already unblocked / done:** all of Track A + all of Track B. The emulator test suites (`test/rules.test.ts`, `test/submitDailyResult.test.ts`) run in **CI** via the new `infra` emulator step — **not run locally (no JDK in the dev env)**, analogous to Android `build:app` being CI-only locally.
 * Cross-feature (not a blocker): F07 `Not Started`, depends on F08; F08 delivers the sync path via the fake-producer seam. `[OPEN — F07]` items are out of F08 scope.
 * Resolved/recorded: `product-prd §51` server-side clock check → not in the MVP.
 
@@ -168,15 +170,15 @@ _Track A delivered (`frontend.md`). FE6/FE8/FE9 remain, gated on `F08.FIREBASE-P
 
 ## Last Update
 
-* Updated By: Frontend/Mobile Developer
+* Updated By: Backend Developer
 * Timestamp: 2026-09-06
-* Summary: **F08 Track A delivered** (`frontend.md`). FE1 (Drift `AppDatabase` — 10 contract tables + `kv`, `schemaVersion 1`, onCreate seed), FE2 (`MigrationGuard` never-drop + guarded `onUpgrade` framework + migration-throw = no wipe), FE3 (all write-through transactional repositories), FE4 (`ActiveSessionSnapshot` frozen keys + corrupt-safe `ActiveSessionRepo` + `restoreSession` re-deriving `thawedCells`; F02 `GridEngine.restoreMoves` was already present + tested — no F02 change needed), FE5 (`ElapsedTimer` monotonic), FE11 (`toEngineConfig`), plus FE7 (`DailyResultSyncService` — queue state machine + exp backoff + exactly-once + first-run-authoritative + `awaitingAuth` + stale-`inFlight` reclaim + parked bounded auto-retry + kill-switch; injectable sender/connectivity) and FE10 (`FakeDailyResultProducer`). **263 workspace tests green** (app 67 = 4 pre-existing + 63 new); `melos run analyze` / `format:check` / `infra:build` / `infra:test` green; `app_database.g.dart` committed. Non-blocking notes (`frontend.md §4/§16`): move-shorthand ~40-line duplication vs `tools/looplet_authoring` (future dedupe); `uuid` package not added (hand-rolled v4). **FE6/FE8/FE9 remain — gated on `F08.FIREBASE-PROJECT`.** Nothing committed to git.
+* Summary: **F08 Track B delivered** (`backend.md`). BE2 — `submitDailyResultV1` filled (`src/submitDailyResult.ts` + `src/validate.ts`): auth guard → soft App-Check log → full `platform.md` §8 validation matrix → Firestore **transaction** (create-only, first-run-authoritative: exists → `ALREADY_SUBMITTED` same `recordedAt`; absent → `tx.create` → `CREATED`; create-race → re-read → `ALREADY_SUBMITTED`; else `internal`/no leak). BE3 — `firestore.rules` verified compliant (no change); `test/rules.test.ts` covers the allow/deny matrix. BE4 — `test/submitDailyResult.test.ts` (emulator-gated): CREATED / ALREADY_SUBMITTED-doc-unchanged / one-doc-across-repeats / per-uid scoping / unauth-no-write / invalid-no-write / HttpsError. BE5 — `.github/workflows/ci.yml` `infra` job now runs the emulator suites (`npx firebase-tools@15 emulators:exec --project demo-looplet`; no committed dep, no new SHA-pinned action); `test:emulator` npm script. Offline `npm test` (18 pass / 13 emulator-skip) + `tsc` + `melos infra:build`/`infra:test` green. **Emulator suites CI-verified only** — no JDK in the dev env (like Android `build:app`). **FE6/FE8/FE9 remain — gated on `F08.FIREBASE-PROJECT`.** Nothing committed to git.
 
 ---
 
 ## Next Role
 
-Backend Developer
+Tech Lead
 
 ---
 
@@ -186,32 +188,39 @@ Backend Developer
 
 See `frontend.md`. FE1–FE5, FE7, FE10, FE11 complete; 263 workspace tests green. FE6 / FE8 / FE9 remain, gated on `F08.FIREBASE-PROJECT`.
 
-### Backend Developer — F08 Track B (NEXT)
+### Backend Developer — F08 Track B — ✅ DELIVERED 2026-09-06
+
+See `backend.md`. BE2–BE5 complete. `submitDailyResultV1` filled (validation + create-only transaction + first-run-authoritative reconciliation); rules verified; emulator suites written + wired into CI; offline `npm test` + `tsc` + `melos infra:build`/`infra:test` green. Emulator suites CI-verified only (no JDK locally).
+
+### Tech Lead — reconcile both delivery artifacts + decide `F08.FIREBASE-PROJECT` handling
 
 ```text
-Fill the submitDailyResultV1 skeleton + finalize the rules. The Firestore/Functions emulator runs against
-a FAKE project id — F08.FIREBASE-PROJECT is NOT required for Track B.
+Both tracks' implementation is delivered. Reconcile frontend.md + backend.md against architecture.md,
+then resolve the single remaining gate before QA.
 
-Authority: architecture.md -> "Firebase Sync Surface [LOCKED — HTTPS Callable]" (request/validation/
-response/error tables), "Reconciliation Algorithm", "Validation Responsibility"; platform.md §4 (error
-format + codes) / §8 (payload ranges) / §6 (create-only rule, App Check soft-enforce).
+Authority: features/f08-.../frontend.md, features/f08-.../backend.md, features/f08-.../architecture.md
+(LOCKED), features/f08-.../orchestration.md (this file), release.md, platform.md.
 
-F08-BE2 — infra/functions/src/submitDailyResult.ts: keep the auth guard + soft App Check; add full
-  payload validation; do the create-only Firestore write at dailyResults/{lang}_{dailyDate}/entries/{uid}
-  (DailyResultDoc shape); return { status: "CREATED" | "ALREADY_SUBMITTED", recordedAt }; typed HttpsError
-  for INVALID_PAYLOAD / UNSUPPORTED_LANGUAGE / INTERNAL. Update the 2 skeleton.test.ts assertions that
-  currently expect "internal".
-F08-BE3 — verify infra/firestore.rules vs architecture.md; make test/rules.test.ts green under the
-  Firestore emulator (it is already written + emulator-gated).
-F08-BE4 — test/submitDailyResult.test.ts (firebase-functions-test + Firestore emulator): valid -> CREATED;
-  duplicate -> ALREADY_SUBMITTED (server doc unchanged); each validation failure -> its code; no auth ->
-  unauthenticated.
-F08-BE5 — add the emulator step to the `infra` CI job (firebase emulators:exec ... "npm test"); pin any
-  new action to a SHA.
+1. Reconcile Track A (frontend.md): Drift schema table names/keys vs "Persistence Schema"; snapshot frozen
+   keys vs "Active-Session Snapshot Contract"; never-drop guard; DailyResultSyncService state machine +
+   backoff + exactly-once + first-run-authoritative + kill-switch vs "sync_queue Contract" +
+   "Reconciliation Algorithm" + "Ownership & Lifecycle". Note: F02 restoreMoves was already present +
+   tested — no F02 change. Non-blocking notes (frontend.md §4/§16): move-shorthand ~40-line dup vs tools/
+   looplet_authoring; uuid package not added (hand-rolled v4) — accept or open a cleanup follow-up.
+2. Reconcile Track B (backend.md): callable request/response/error shape vs "Firebase Sync Surface";
+   validation ranges vs platform.md §8; the create-only transaction + ALREADY_SUBMITTED reconciliation;
+   rules verified unchanged; CI emulator step (npx firebase-tools, no committed dep/new SHA-pinned action).
+   Note: emulator suites are CI-verified only (no JDK in the dev env) — accept as the Android-build
+   precedent, or require a local emulator run before QA.
+3. Decide F08.FIREBASE-PROJECT handling — it is now the ONLY thing between the current state and QA:
+   (a) ask the user to create the project + flutterfire configure now (recommended — unblocks FE6/FE8/FE9
+   immediately), or (b) fold it into a pre-QA checklist / F08-DEVOPS. Record the decision.
+4. If (a): after F08.FIREBASE-PROJECT lands, route Frontend/Mobile Developer for the join (F08-FE6 app-init
+   sequence + migration-error screen; F08-FE8 real SyncSender binding to submitDailyResultV1; F08-FE9
+   app-scoped singleton + connectivity_plus stream + guarded Firebase.initializeApp), then QA.
+5. Sync feature-board.md + system-state.md (Active Owner / phase).
 
-Produce features/f08-.../backend.md. On completion set Next Role = Tech Lead.
-(Track A is DONE — the client is ready to consume the callable; only the join tasks FE6/FE8/FE9 remain
-and they are gated on F08.FIREBASE-PROJECT, not on Track B.)
+No contract change expected. QA (F08-QA1...QA10) opens after FE6/FE8/FE9. F08-DEVOPS after QA.
 ```
 
 ---
@@ -224,3 +233,4 @@ and they are gated on F08.FIREBASE-PROJECT, not on Track B.)
 * v4 (2026-09-06) — Project Setup: **F08.SETUP-0 done — `infra/` Firebase DURUM 0 scaffolded.** `infra/` config (`firebase.json`, `.firebaserc` placeholder, `firestore.rules` create-only, `firestore.indexes.json`, `remoteconfig.template.json`, `.gitignore`, `README.md`) + `infra/functions/` TypeScript package (`submitDailyResultV1` 2nd-gen `onCall` skeleton — auth guard + soft App Check + typed wire contract; `TODO(F08-BE2)` body) + `test/skeleton.test.ts` (6 offline, green) + `test/rules.test.ts` (emulator-gated) + `jest.config.js`. `npm ci && build && test` green. CI `infra` job added (`.github/workflows/ci.yml`; emulator step deferred to `F08-BE5`/`F08-DEVOPS`). `melos.yaml` `infra:build`/`infra:test`. `app/pubspec.yaml` + Firebase client packages (`firebase_core ^3.6.0`, `firebase_auth ^5.3.1`, `cloud_firestore ^5.4.4`, `cloud_functions ^5.1.3`, `firebase_app_check ^0.3.1+7`) + `connectivity_plus ^6.0.5`. `flutter pub get` + `melos bootstrap` + `melos run format:check`/`analyze`/`test` + `melos run infra:build`/`infra:test` + app `flutter analyze`/`test` (4) all green. Version substitutions vs recipe: `firebase-functions ^6` (recipe `^5`), `firebase-admin ^13` (`^12`), `@firebase/rules-unit-testing ^5` + `firebase ^12` dev (`^4` peer-conflicts). Deferred (needs a real Firebase project + `firebase login`): `.firebaserc` real id, `flutterfire configure` → `firebase_options.dart` + platform config, `firebase-tools` in CI, deploy — recorded in `infra/README.md`. Current Owner → Tech Lead; Next Role → Tech Lead (reconcile scaffold + route Backend Developer + Frontend/Mobile Developer). Nothing committed to git.
 * v5 (2026-09-06) — Tech Lead: **F08.SETUP-0 reconciled + accepted; implementation routed.** Scaffold matches the LOCKED contract (create-only rules, callable skeleton, Firebase client package set, Remote Config keys); all gates green; version substitutions accepted (no contract impact). Manual Firebase-project work split into `F08.FIREBASE-PROJECT` (owner: user; DevOps/Release Engineer fallback) — blocks only `F08-FE6/FE8/FE9` + `F08-DEVOPS`; **not** Track A and **not** `F08-BE2/BE3/BE4` (emulator uses a fake project id). Routing: **Next Role = Frontend/Mobile Developer** → Track A (`F08-FE1 → FE2 → FE3 → FE5 → FE11 → FE4`, incl. the additive `GridEngine.restoreMoves(List<Move>)` in `looplet_engine`; FE7/FE10 logic allowed too). **Backend Developer** runs Track B (`F08-BE2 → BE3 → BE4 → BE5`) in parallel. Join (`FE6/FE8/FE9`) needs `F08.FIREBASE-PROJECT` + Track B. Then QA → Tech Lead → DevOps/Release Engineer → Tech Lead. No contract change; no scaffold re-QA. `feature-board.md` + `system-state.md` synced (Active Owner → Frontend/Mobile Developer).
 * v6 (2026-09-06) — Frontend/Mobile Developer: **F08 Track A delivered** (`frontend.md`). Completed F08-FE1 (Drift `AppDatabase` — 10 contract tables + `kv`, `schemaVersion 1`, onCreate seed), FE2 (`MigrationGuard` never-drop guard + guarded `onUpgrade` framework; migration-throw = abort, no wipe), FE3 (write-through transactional repositories: `Player`/`Settings`/`JourneyProgress`/`PersonalBest`(monotone)/`Daily`(first-run-immutable + attempts)/`DailyStreak`(store-only)/`DailyPuzzleCache`/`ActiveSession`/`SyncQueue`), FE4 (`ActiveSessionSnapshot` frozen keys + validation + corrupt-safe `ActiveSessionRepo` + `restoreSession` re-deriving `thawedCells`; **F02 `GridEngine.restoreMoves` was already implemented + tested by a prior session — no F02 change made**, 83 F02 tests unchanged), FE5 (`ElapsedTimer` monotonic, no wall clock), FE11 (`toEngineConfig(Puzzle)` in `app/`), FE7 (`DailyResultSyncService` — queue state machine + exp backoff base30s×2cap6h±20% + attempt cap 10 → `parked` + stale-`inFlight` reclaim + `awaitingAuth` backfill + parked bounded auto-retry(3) + `daily_entry.syncStatus` mirror + `daily_sync_enabled` kill-switch; injectable `SyncSender`/connectivity), FE10 (`FakeDailyResultProducer` debug seam). **263 workspace tests green** (app **67** = 4 + 63 new); `analyze`/`format:check`/`infra:build`/`infra:test` green; `app_database.g.dart` committed. Non-blocking (`frontend.md §4/§16`): move-shorthand ~40-line dup vs `tools/looplet_authoring`; `uuid` package not added (hand-rolled v4). **Remaining: FE6/FE8/FE9 — gated on `F08.FIREBASE-PROJECT`.** Current Owner → Backend Developer; Next Role → Backend Developer (Track B — fill the `submitDailyResultV1` callable + rules + emulator tests).
+* v7 (2026-09-06) — Backend Developer: **F08 Track B delivered** (`backend.md`). BE2 — `submitDailyResultV1` filled (`src/submitDailyResult.ts` + new `src/validate.ts`): auth guard (pre-Firestore `unauthenticated`) → soft App-Check log → full `platform.md` §8 validation matrix (→ `invalid-argument` + `details.code` `INVALID_PAYLOAD`/`UNSUPPORTED_LANGUAGE`) → Firestore **transaction** on `dailyResults/{lang}_{dailyDate}/entries/{uid}`: exists → `{ALREADY_SUBMITTED, recordedAt: existing}`; absent → `tx.create(DailyResultDoc)` + `recordedAt = Date.now()` → `{CREATED}`; create-race → re-read → `ALREADY_SUBMITTED`; else `internal` (`code: INTERNAL`), logged, no leak. `test/skeleton.test.ts` updated (2 INTERNAL assertions → validation-path; + 10-case `validateSubmitDailyResult` table). BE3 — `firestore.rules` verified compliant (no change; `!exists` implied by `create` semantics); `test/rules.test.ts` covers allow-create-own / deny-create-other / deny-unauth / deny-update / deny-delete / deny-read. BE4 — `test/submitDailyResult.test.ts` (emulator-gated, `demo-looplet`): CREATED + doc written; "better" replay → `ALREADY_SUBMITTED` same `recordedAt` + **doc unchanged**; 4 repeats → one doc; per-uid scoping; unauth → no write; invalid → no write; `HttpsError` (no raw leak). BE5 — `.github/workflows/ci.yml` `infra` job runs the emulator suites via `npx --yes firebase-tools@15 emulators:exec --project demo-looplet` (no committed dep, no new SHA-pinned action; ubuntu-latest has a JDK); `test:emulator` npm script. Offline `npm test` (18 pass / 13 emulator-skip) + `tsc` + `melos infra:build`/`infra:test` green. **Emulator suites CI-verified only — no JDK in the dev env** (Android-build precedent). Current Owner → Tech Lead; Next Role → Tech Lead (reconcile `frontend.md` + `backend.md`; decide `F08.FIREBASE-PROJECT` handling; route FE6/FE8/FE9 then QA).

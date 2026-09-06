@@ -65,12 +65,20 @@ jobs:
       - name: Build functions (tsc)
         run: npm --prefix infra/functions run build
 
-      - name: Test functions (offline skeleton; rules suites run when an emulator is present)
+      - name: Test functions (offline — validation + skeleton; emulator suites auto-skip)
         run: npm --prefix infra/functions test
-      # TODO(F08-BE5 / F08-DEVOPS): add a Firebase-emulator step
-      # (`firebase emulators:exec --only firestore,auth "npm test"`) so the
-      # @firebase/rules-unit-testing suites in test/rules.test.ts run in CI —
-      # per release.md §4. Needs firebase-tools + Java on the runner.
+
+      # Emulator run: un-skips test/rules.test.ts (@firebase/rules-unit-testing)
+      # and test/submitDailyResult.test.ts (create-only write + reconciliation).
+      # ubuntu-latest ships a JDK on PATH; firebase-tools comes via npx (no new
+      # committed dep, no extra SHA-pinned action). demo- project id ⇒ fully
+      # offline emulator, no auth. Per release.md §4.
+      - name: Test functions (Firebase emulator — rules + callable behaviour)
+        working-directory: infra
+        run: >-
+          npx --yes firebase-tools@15 emulators:exec
+          --only firestore,auth --project demo-looplet
+          "npm --prefix functions run test"
 
   ios-build:
     name: iOS release build (no codesign)

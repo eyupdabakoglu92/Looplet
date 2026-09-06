@@ -12,8 +12,9 @@
     "build:watch": "tsc --watch",
     "lint": "tsc --noEmit",
     "test": "jest --passWithNoTests",
-    "serve": "npm run build && firebase emulators:start --only functions,firestore",
-    "deploy": "firebase deploy --only functions,firestore:rules"
+    "test:emulator": "firebase --config ../firebase.json emulators:exec --only firestore,auth --project demo-looplet \"jest --passWithNoTests\"",
+    "serve": "npm run build && firebase --config ../firebase.json emulators:start --only functions,firestore",
+    "deploy": "firebase --config ../firebase.json deploy --only functions,firestore:rules"
   },
   "dependencies": {
     "firebase-admin": "^13.0.0",
