@@ -1,6 +1,6 @@
 # Project Platform Authority — LOOPLET
 
-Last Updated: 2026-09-05 (§13 solver approach amended per F06 analysis)
+Last Updated: 2026-09-06 (§3 + §11 — shared-enum carve-out extended to `PuzzleType` / `DifficultyLabel` at F06 close-out)
 Owner: Tech Lead
 
 ---
@@ -59,7 +59,7 @@ Melos-managed monorepo. Domain packages import **no** Flutter.
 /infra                      Firebase project config, Cloud Functions (TS), Firestore rules, Remote Config templates
 ```
 
-* Shared enums (`tileStatus`, `direction`, `difficultyLabel`, `puzzleType`) are defined once in `looplet_content` and reused by app, tooling, and (mirrored) Firestore docs.
+* Shared value enums (`MoveAxis`, `MoveDirection`, `TileStatus`, `GridCoord`, `PuzzleType`, `DifficultyLabel`) are defined once in `looplet_core` and **re-exported** by `looplet_content`, so `looplet_engine` / `looplet_solver` (which must not depend on `looplet_content`, per §3) can use them and downstream code still has one import site. Firestore docs mirror the same string values. (See §11 — carve-out extended 2026-09-06 with F06.)
 * The solver and the game share `looplet_engine` so shift/win/locked/frozen semantics have a single source of truth.
 
 ---
@@ -180,7 +180,7 @@ Melos-managed monorepo. Domain packages import **no** Flutter.
 * **Date/time:** UTC epoch millis internally; monotonic `Stopwatch` for durations; `dailyDate` is a device-local `YYYY-MM-DD`.
 * **Turkish locale (HARD RULE):** game and dictionary logic must never call Dart's default `String.toUpperCase()` / `toLowerCase()` on letters. Use the explicit Turkish case map in `looplet_core` (`İ↔i`, `I↔ı`, and `ç ğ ö ş ü` preserved). `İ` and `I` are distinct letters everywhere.
 * **Localization:** Flutter `gen-l10n` with ARB files; `tr` is the default locale, `en` is scaffolded; no hardcoded user-facing strings; the dictionary is keyed by language; RTL is out of scope for the MVP.
-* **Shared identifiers / enums:** *serialized* puzzle-schema enums (`difficultyLabel`, `puzzleType`) are defined once in `looplet_content`; Firestore docs mirror the same string values. *Engine primitive* value types (`MoveAxis`, `MoveDirection`, `TileStatus`, `GridCoord`) are defined in `looplet_core` — so `looplet_engine` (which must not depend on `looplet_content`, per §3) can use them — and `looplet_content` re-exports them so downstream code has one import site. (Carve-out added 2026-09-05 with F02 activation.)
+* **Shared identifiers / enums:** all shared value enums — *engine primitives* (`MoveAxis`, `MoveDirection`, `TileStatus`, `GridCoord`) **and** *serialized puzzle-schema* enums (`PuzzleType`, `DifficultyLabel`) — are defined once in `looplet_core` and **re-exported** by `looplet_content`. Rationale: `looplet_engine` and `looplet_solver` must not depend on `looplet_content` (§3), yet `looplet_engine` needs the primitives and `looplet_solver` needs `DifficultyLabel` for its `DifficultyScorer`; defining them in `looplet_core` keeps every dependency edge legal, and the `looplet_content` re-export gives downstream code (app, tooling, Firestore mirrors) one import site. Firestore docs mirror the same string values. (Engine-primitive carve-out added 2026-09-05 with F02; extended 2026-09-06 to the puzzle-schema enums with F06 — this supersedes the earlier "defined once in `looplet_content`" wording.)
 * **Determinism:** no runtime RNG anywhere in gameplay or content selection on device. Any shuffling/generation happens only in `tools/looplet_authoring` at authoring time.
 
 ---

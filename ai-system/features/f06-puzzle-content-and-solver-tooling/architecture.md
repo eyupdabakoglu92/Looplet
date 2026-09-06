@@ -1,6 +1,6 @@
 # F06 — puzzle-content-and-solver-tooling: Architecture
 
-> Status: CONTRACT AUTHORITY. Finalized 2026-09-05 from `analysis.md` (F06.0-AN). Delivery artifacts and QA notes do not override the semantics here. The `Open Technical Decisions` at the end are tunable *values*, not open *contracts* — implementation may start.
+> Status: CONTRACT AUTHORITY — LOCKED & CLOSED. Finalized 2026-09-05 from `analysis.md` (F06.0-AN); reconciled with delivery + QA at F06 close-out 2026-09-06 (enum location → `looplet_core`; `difficultyBreakdown` → required). Delivery artifacts and QA notes do not override the semantics here. The remaining `Open Technical Decisions` are tunable *values* owned by the `F06-CONTENT` follow-on, not open *contracts*.
 
 ---
 
@@ -25,7 +25,8 @@
 
 ## Dependency Edges [LOCKED]
 
-* `packages/looplet_content` → `looplet_core` **only**. Defines `Puzzle` + JSON + `PuzzleType` / `DifficultyLabel` enums + `PuzzleFormatException`. **Does not depend on `looplet_engine`.** `Puzzle` stores raw fields; a consumer that already depends on `looplet_engine` builds the `EngineConfig`. `Puzzle.language` is a plain `String` validated against `{'tr', 'en'}`.
+* `packages/looplet_content` → `looplet_core` **only**. Defines `Puzzle` + JSON + `PuzzleFormatException`. **Does not depend on `looplet_engine`.** `Puzzle` stores raw fields; a consumer that already depends on `looplet_engine` builds the `EngineConfig`. `Puzzle.language` is a plain `String` validated against `{'tr', 'en'}`.
+  * **Enum location [reconciled 2026-09-06]:** `PuzzleType` and `DifficultyLabel` are defined in **`looplet_core`** and **re-exported** by `looplet_content` — the same carve-out as the F02 engine primitives (`platform.md` §3 + §11). This lets `looplet_solver` return a `DifficultyLabel` from its `DifficultyScorer` without taking a `looplet_content` dependency (solver → `looplet_engine` → `looplet_core` only). Downstream code imports them from `looplet_content` as before; the string values are unchanged. Supersedes the earlier "defined in `looplet_content`" wording here and in the JSON-shape / Difficulty sections below.
 * `packages/looplet_solver` → `looplet_engine` **only** (+ dev `test`). Takes a `WordValidator` (F01's port, defined in `looplet_engine`). **Does not depend on `looplet_dictionary`.**
 * `tools/looplet_authoring` → `looplet_engine` + `looplet_solver` + `looplet_content` + `looplet_dictionary` (for the `WordValidator` adapter) + `package:args` (Dart-team CLI arg parser — allowed here; this package is never shipped in the app). A Dart **executable** package.
 * The `app` never depends on `looplet_solver` or `tools/looplet_authoring`. The `app` depends on `looplet_content` (F05/F07/F08 load `Puzzle` artifacts).
@@ -34,7 +35,7 @@
 
 ## `Puzzle` Model [LOCKED]
 
-Every `Puzzle` artifact MUST carry: `schemaVersion` (int), `contentVersion` (String), `id` (String), `puzzleType` (`journey` | `daily`), `language` (`'tr'` | `'en'`), `grid` (list of row strings), `targetWord` (String), `lockedCells` + `frozenCells` (each a set of `"row,col"` strings), `columnMovesEnabled` (bool), **`optimalMoves` (int ≥ 0 — solver-verified; an artifact without it is invalid and cannot ship)**, `difficultyScore` (num), `difficultyLabel` (`easy`|`medium`|`hard`|`expert`). `journey` ⇒ `journeyLevelNumber` (1–30); `daily` ⇒ `dailyDate` (`YYYY-MM-DD`). `difficultyBreakdown` (object) is **optional** in the artifact — see Open Technical Decisions.
+Every `Puzzle` artifact MUST carry: `schemaVersion` (int), `contentVersion` (String), `id` (String), `puzzleType` (`journey` | `daily`), `language` (`'tr'` | `'en'`), `grid` (list of row strings), `targetWord` (String), `lockedCells` + `frozenCells` (each a set of `"row,col"` strings), `columnMovesEnabled` (bool), **`optimalMoves` (int ≥ 0 — solver-verified; an artifact without it is invalid and cannot ship)**, `difficultyScore` (num), `difficultyLabel` (`easy`|`medium`|`hard`|`expert`). `journey` ⇒ `journeyLevelNumber` (1–30); `daily` ⇒ `dailyDate` (`YYYY-MM-DD`). `difficultyBreakdown` (object) is **required** in every shipped artifact — resolved during F06.1 (it is consumed by `check` and by designers; omitting it is a `PuzzleFormatException`).
 
 ### JSON shape
 
@@ -61,7 +62,7 @@ Every `Puzzle` artifact MUST carry: `schemaVersion` (int), `contentVersion` (Str
 * `grid` — row strings, 5 single letters each (authored casing). Maps to `EngineConfig(initialGrid: [for r in grid] r.split(''), ...)`.
 * `lockedCells` / `frozenCells` — `"row,col"` strings; parsed to `GridCoord`.
 * Unknown extra keys are **ignored** (forward-compatible, like F01's dictionary asset).
-* `Puzzle.fromJson(Map<String,Object?>)` throws `PuzzleFormatException` for: unsupported `schemaVersion`; missing/`null` `optimalMoves`; missing `grid` / `targetWord` / `id`; invalid `puzzleType` / `difficultyLabel` / `language`; malformed `"row,col"`; `journey` without `journeyLevelNumber` or `daily` without `dailyDate`.
+* `Puzzle.fromJson(Map<String,Object?>)` throws `PuzzleFormatException` for: unsupported `schemaVersion`; missing/`null` `optimalMoves`; missing `grid` / `targetWord` / `id`; invalid `puzzleType` / `difficultyLabel` / `language`; malformed `"row,col"`; `journey` without `journeyLevelNumber` or `daily` without `dailyDate`; missing or non-object `difficultyBreakdown`.
 * `Puzzle.toJson()` round-trips losslessly (every field).
 
 ### `Puzzle` → `EngineConfig` [LOCKED]
@@ -212,4 +213,4 @@ The smoke set (≥ 5 Journey puzzles, one per §20 curve band, authored during F
 * Turkish letter-frequency table source + values — a ~29-entry `const` map in `tools/looplet_authoring`; pick a published table (TDK / BOUN corpus / standard). Level-Designer choice.
 * `--avoid-near-target` filter (edit-distance-1 from the puzzle's target) — implement it, default **off** for the MVP; the offensive-string guard is always on.
 * MVP Daily pool size (recommend ~60) + difficulty band (recommend medium/hard, not expert) — `F06-CONTENT`.
-* `difficultyBreakdown` in shipped artifacts — **recommend required** (useful for `check` and designers); confirm during F06.1.
+* ~~`difficultyBreakdown` in shipped artifacts~~ — **RESOLVED (F06.1, confirmed at F06 close-out 2026-09-06): required.** A missing / non-object `difficultyBreakdown` is a `PuzzleFormatException`. See the `Puzzle` Model section.
