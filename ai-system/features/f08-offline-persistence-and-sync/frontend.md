@@ -1,7 +1,8 @@
-# F08 — offline-persistence-and-sync: Frontend Delivery (Track A + FE7/FE10)
+# F08 — offline-persistence-and-sync: Frontend Delivery (Track A + FE7/FE10; then the FE6/FE8/FE9 join)
 
 Role: Frontend/Mobile Developer · Date: 2026-09-06
-Scope this pass: **Track A** (F08-FE1, FE2, FE3, FE4, FE5, FE11) + the parallel-allowed **FE7** (`DailyResultSyncService`) and **FE10** (fake producer). No Firebase — none of this touches `firebase_options.dart` / `Firebase.initializeApp`. FE6 / FE8 / FE9 are **not** in this pass (they need `F08.FIREBASE-PROJECT`).
+Pass 1 (Track A): **F08-FE1, FE2, FE3, FE4, FE5, FE11** + the parallel-allowed **FE7** (`DailyResultSyncService`) and **FE10** (fake producer). No Firebase.
+Pass 2 (the app-Firebase join, after `F08.FIREBASE-PROJECT` + Track B): **F08-FE6** (app-init sequence + App Check provider selection), **F08-FE8** (real callable `SyncSender`), **F08-FE9** (session-level singleton + connectivity + build check). See the **"Pass 2"** section below.
 
 ---
 
@@ -159,17 +160,75 @@ None blocking. Two items for awareness (also in §4):
 
 ---
 
+# =====================================================================
+# PASS 2 — the app-Firebase join (F08-FE6 / FE8 / FE9), 2026-09-06
+# =====================================================================
+
+`F08.FIREBASE-PROJECT` is done + verified (project `looplet-712e5`). Track B (`backend.md`) is delivered. This pass wires the (already built + tested) persistence + sync layer into the app's Firebase runtime.
+
+## P2.1 Impacted Files
+
+**Created — `app/lib/`:**
+
+* `bootstrap.dart` — `sealed AppBootstrap` (`AppBootstrapReady` / `AppBootstrapMigrationError`), `appBootstrapProvider` (`FutureProvider<AppBootstrap>`), and `_bootstrapFirebase(...)` (the best-effort Firebase chain).
+* `persistence/callable_sync_sender.dart` — `callableSyncSender(FirebaseFunctions)` → the real `SyncSender`; pure `mapCallableSuccess(Object?)` + `mapCallableErrorCode(String)`.
+* `persistence/sync_providers.dart` — `firebaseFunctionsProvider`, `syncSenderProvider`, `dailySyncEnabledProvider` (kill-switch seam), `connectivityRegainedProvider` (`Stream<bool>` from `connectivity_plus`), `dailyResultSyncServiceProvider` (the **app-scoped, session-level** singleton).
+
+**Updated — `app/lib/`:** `main.dart` — `LoopletApp` is now a `ConsumerWidget` gating on `appBootstrapProvider` (splash → home / `_StoreErrorScreen`); a single app-level `_SessionLifecycle` `WidgetsBindingObserver` drains the sync queue on `paused`/`resumed`.
+
+**Updated — `app/test/`:** `widget_test.dart` (bootstrap-aware, in-memory DB + no-op sender + empty connectivity overrides); **created** `test/persistence/callable_sync_sender_test.dart` (11 mapping assertions).
+
+## P2.2 Task-to-Code Traceability
+
+| Task | Status | Behavior |
+| --- | --- | --- |
+| **F08-FE6** app-init sequence + App Check provider selection | Complete | `appBootstrapProvider`: (1) forces migrations via `PlayerRepo.current()` — `MigrationDataLossError` (or any open/migrate failure) → `AppBootstrapMigrationError` → `_StoreErrorScreen` (the only F08-owned UI: "Couldn't open your saved data / Your progress is safe", Retry = `ref.invalidate(appBootstrapProvider)`); (2) warms `ActiveSessionRepo.read()` (a corrupt `kv['active_session']` self-heals to null there); (3) constructs the session-level `DailyResultSyncService`; (4) `unawaited(_bootstrapFirebase(...))` — **never gates the first frame**. `_bootstrapFirebase`: `Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform)` (guarded, `Firebase.apps.isEmpty` check) → `FirebaseAppCheck.instance.activate(androidProvider: kReleaseMode ? playIntegrity : debug, appleProvider: kReleaseMode ? appAttest : debug)` **wrapped in try/catch — a failure is a `debugPrint` no-op** (per `architecture.md → App Init Sequence`, amended; iOS release App Attest is expected to fail without an Apple Developer Program membership and that is fine because App Check is monitor-only) → `FirebaseAuth.instance.signInAnonymously()` → `PlayerRepo.setFirebaseUid(uid)` → `sync.reviveParkedOnAppStart()` + `sync.drain()`. Every step try/caught, logged, never rethrown. |
+| **F08-FE8** real callable `SyncSender` | Complete | `callableSyncSender(functions)` → `functions.httpsCallable('submitDailyResultV1').call(payload)` → `mapCallableSuccess(result.data)`; `on FirebaseFunctionsException` → `mapCallableErrorCode(e.code)`; any other throw → `SyncSendResult.retryable`. `mapCallableSuccess`: `CREATED` → `created`, `ALREADY_SUBMITTED` → `alreadySubmitted`, anything else → `retryable` (never drop). `mapCallableErrorCode`: `invalid-argument` → `nonRetryable`, all others (`internal`/`unavailable`/`deadline-exceeded`/`resource-exhausted`/`aborted`/`unauthenticated`/unknown) → `retryable`. The queue transitions this drives are already covered by `sync_test.dart` (FE7). |
+| **F08-FE9** session-level singleton + connectivity + build check | Complete (build: see P2.5) | `dailyResultSyncServiceProvider` — an app-scoped `Provider` (constructed once when the root `ProviderScope` builds it; `ref.onDispose(service.dispose)` at app termination; **never** watched/created by a screen — `platform.md` §7). Fed: `syncSenderProvider` (FE8), `dailySyncEnabledProvider` (kill-switch), `connectivityRegainedProvider` — a `broadcast` `StreamController` over `Connectivity().onConnectivityChanged` (v6 `List<ConnectivityResult>`) emitting `true` on any non-`none` result → the service's constructor `.listen`s it to `drain()`. `main.dart`'s `_SessionLifecycle` observer calls `drain()` on `paused` + `resumed` (write-through already persisted the data; this is the sync flush). `reviveParkedOnAppStart()` runs once inside `_bootstrapFirebase`. |
+
+## P2.3 Contract Compliance Check
+
+| Area | Result |
+| --- | --- |
+| App Init Sequence order (DB → migrate → snapshot → async Firebase → sync service → app tree) | **Preserved** — `appBootstrapProvider` + `_bootstrapFirebase`. |
+| Firebase steps best-effort / non-fatal | **Preserved** — every step try/caught + `debugPrint`, `unawaited` from the bootstrap. |
+| App Check provider selection (debug in dev, Play Integrity/App Attest in release; `activate()` failure = no-op) | **Preserved** — matches the 2026-09-06 `architecture.md` / `platform.md` §13 amendment. Hard-enforce never set. |
+| `DailyResultSyncService` session-level, never screen-owned | **Preserved** — app-scoped provider, `ref.onDispose` at app teardown only; no screen references it. |
+| Callable name `submitDailyResultV1` + response/error → `SyncSendResult` mapping | **Preserved** — matches `architecture.md → Firebase Sync Surface → client mapping`. |
+| `daily_sync_enabled` kill-switch | **Preserved (seam)** — `dailySyncEnabledProvider` defaults on; F07 wires the real Remote Config read (documented). |
+| Migration-failure UI (recoverable, no design handoff) | **Preserved** — `_StoreErrorScreen`, plain, Retry re-runs bootstrap. |
+
+## P2.4 Assumptions / Deferred
+
+* **Remote Config not wired** — `dailySyncEnabledProvider` is a `() async => true` seam; F07 (or a small follow-up) reads `daily_sync_enabled`. `firebase_remote_config` is not an app dependency yet (out of F08 scope; not adding an unapproved package).
+* **`connectivity_plus` in tests** — the widget test overrides `connectivityRegainedProvider` with `Stream<bool>.empty()`; the real provider is exercised at runtime / QA.
+
+## P2.5 Test Evidence (Pass 2)
+
+| Task / behavior | Test type | Scenario | File |
+| --- | --- | --- | --- |
+| FE8 success mapping | unit | `CREATED`→`created`; `ALREADY_SUBMITTED`→`alreadySubmitted`; unknown/missing/non-map status → `retryable` (never dropped) | `callable_sync_sender_test.dart` |
+| FE8 error mapping | unit | `invalid-argument` → `nonRetryable`; `internal`/`unavailable`/`deadline-exceeded`/`resource-exhausted`/`aborted`/`unauthenticated`/`unknown` → `retryable` | `callable_sync_sender_test.dart` |
+| FE6 bootstrap → home | widget | with an in-memory DB + no-op sender + empty connectivity: splash shows, then `pumpAndSettle` → home shell renders, **no** `_StoreErrorScreen`; Firebase init inside the provider is fire-and-forget and self-catches (no platform app) | `widget_test.dart` |
+| FE9 wiring | (source-reviewed — provider graph; app-scoped `Provider` + `ref.onDispose`; lifecycle observer in `main.dart`) | — | — |
+
+**Suite (Pass 1 + Pass 2):** `melos run analyze` clean; `melos run format:check` clean; `melos run test` green — **268 workspace tests** (looplet_app **72** = 4 pre-existing + 63 Track A + 5 Pass 2; engine 83, core 22, content 17, dictionary 32, solver 23, authoring 19). `melos run infra:build` / `infra:test` green.
+
+**Native build:** `flutter build ios --release --no-codesign` — **GREEN**: `pod install` (137s, all 6 Firebase + `connectivity_plus` pods) + Xcode release build → `✓ Built build/ios/iphoneos/Runner.app (53.2MB)`. Android `flutter build appbundle --release` not run locally (no Android SDK on this machine) — CI covers it, same as before.
+
+---
+
 # WORKFLOW HANDOFF SUGGESTION (NON-AUTHORITATIVE)
 
-* **Completed Tasks:** F08-FE1, FE2, FE3, FE4, FE5, FE11, FE7, FE10 (+ verified the pre-existing F02 `GridEngine.restoreMoves`).
-* **Remaining Tasks (this feature):** F08-BE2…BE5 (Backend Developer — Track B, in parallel; can start now, emulator uses a fake project id); F08-FE6 / FE8 / FE9 (gated on `F08.FIREBASE-PROJECT`); `F08.FIREBASE-PROJECT` (user); then QA, then DevOps/Release Engineer.
-* **Blockers:** none for this pass.
-* **Status Suggestion:** Track A delivered. Ready for Backend Developer to run Track B; the join phase (FE6/FE8/FE9 → QA) waits on `F08.FIREBASE-PROJECT`.
+* **Completed Tasks:** F08-FE1…FE11 (all Frontend tasks). Pass 1 = FE1–FE5, FE7, FE10, FE11; Pass 2 = FE6, FE8, FE9.
+* **Remaining Tasks (this feature):** QA (F08-QA1…QA10) → Tech Lead → DevOps/Release Engineer (F08-DEVOPS, `production-readiness`) → Tech Lead close.
+* **Blockers:** none. iOS release build GREEN with the Firebase pods (P2.5). iOS production App Check (App Attest/DeviceCheck) is a deferred `[OPEN — post-MVP]` — non-blocking (App Check is monitor-only).
+* **Status Suggestion:** Ready for QA.
 
 ---
 
 ## 19. Sonraki Komut
 
 ```
-Run Backend Developer
+Run QA
 ```
