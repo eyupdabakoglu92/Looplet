@@ -1,12 +1,12 @@
 # F05 — journey-progression: Architecture (Contract)
 
-> Status: **INITIAL CONTRACT BRIEF — NOT LOCKED.** F05 is **COMPLEX**; a Technical Analyst pass (`analysis.md`) resolves the `[PENDING — ANALYSIS]` items below, then the Tech Lead produces the locked `architecture.md` (state-machine DURUM 3) with `Release Scope` decided. Execution state is in `orchestration.md`.
+> Status: **LOCKED (2026-09-07, Tech Lead — DURUM 3).** `analysis.md` decisions D1–D8 consumed. Open: `[PENDING — UI]` (the UI Designer handoff — home surface + the 4–6 micro-tutorial overlay + the "all complete" state) and `[PENDING — F06-CONTENT]` (the 30 authored Journey levels — a human/content deliverable, hard prerequisite for F05 `Done`). Contract authority for F05. Execution state is in `orchestration.md`.
 
 ---
 
 ## 1. Purpose
 
-Define: the **Journey progression model** (30 linearly-unlocked levels, stars-don't-gate, no re-lock); the **bundled-content resolution path** (a Journey manifest → a `Puzzle` by level number, feeding F03's `playSessionSetupProvider`); the **CONTINUE** entry semantics against the F08 active-session snapshot; the **`Next Level`** wiring into F04's completion panel + the post-completion **unlock write**; the **per-level micro-tutorial** (column intro, levels 4–6); the **"all 30 complete"** terminal state; and the **minimal home surface** (CONTINUE + progress) that replaces the debug `HomeScreen`. F05 changes no F03/F04/F06/F08 contract — it **consumes** them and fills their `[PENDING — F05]` seams.
+Wire the isolated F03 play session into a **30-level linear campaign**. Define: the **level identity scheme**; the **bundled Journey content pack + manifest + resolver**; the **progression read-model** over F08's `journey_progress`; the **unlock write** on the F04 win path; the **CONTINUE / `Next Level` / terminal** navigation over `/` and `/play`; the **column micro-tutorial** (levels 4–6); the **minimal home surface** replacing the debug `HomeScreen`. F05 changes **no** F03/F04/F06/F08 contract — it consumes them and fills their `[PENDING — F05]` seams.
 
 ---
 
@@ -16,130 +16,235 @@ Define: the **Journey progression model** (30 linearly-unlocked levels, stars-do
 | --- | --- |
 | `product/product-prd.md` → F05 section + §6.1 F05 row + §5.1/§5.2 + §15 `JourneyProgress` + §41 KPIs | product contract |
 | `features/f05-journey-progression/prd.md` | feature scope + AC1–AC14 |
-| `features/f03-puzzle-play-session/architecture.md` → §13 route/nav + `PlaySessionArgs` | **consumed contract** — `/play`, `journeyLevel`, the win moment |
-| `features/f04-star-rating-and-personal-best/architecture.md` → §7 panel + §8 route (`Next Level` = `[PENDING — F05]`) | **consumed contract** — the `onNextLevel` seam + the win path |
-| `features/f06-.../architecture.md` → `Puzzle` model + `export`/`check` + difficulty labels | **consumed contract** — the content format + the 30 levels (`F06-CONTENT`) |
-| `app/lib/persistence/repositories/journey_progress_repo.dart` + `journey_progress` table (F08) | **consumed contract** — the unlock persistence (already built) |
-| `app/lib/persistence/active_session_snapshot.dart` → `journeyLevel` key + restore path (F08) | **consumed contract** — CONTINUE resume |
-| `project-authority/platform.md` | Flutter / Riverpod / go_router; asset bundling; localization pattern |
-| `project-authority/release.md` | `Release Scope` decision (content pack + first app-build distribution gate — `[PENDING — TL at DURUM 3]`) |
+| `features/f05-journey-progression/analysis.md` | Technical Analyst — D1–D8 consumed here |
+| `features/f03-puzzle-play-session/architecture.md` → §13 (route/nav) + `PlaySessionArgs` | **consumed** — `/play`, `journeyLevel`, the win moment, the F08 restore path |
+| `features/f04-star-rating-and-personal-best/architecture.md` → §7 (panel) + §8 (`Next Level` = `[PENDING — F05]`) | **consumed** — the `onNextLevel` seam + the win-path side-effect pattern |
+| `features/f06-.../architecture.md` → `Puzzle` model + `export`/`check` + difficulty labels | **consumed** — the content format + the 30 levels (`F06-CONTENT`) |
+| `app/lib/persistence/repositories/journey_progress_repo.dart` + `journey_progress` table (F08) | **consumed** — the unlock persistence (built) |
+| `app/lib/persistence/active_session_snapshot.dart` (F08) | **consumed** — CONTINUE resume; **F05 reads only, never writes/extends** |
+| `project-authority/platform.md` | Flutter / Riverpod / `go_router`; asset bundling; localization |
+| `project-authority/release.md` | `Release Scope` decision (see §13) |
 | `design/design-doctrine.md` + `design/premium-ui-rubric.md` | the home / progress / tutorial-overlay quality bar |
 
 ---
 
 ## 3. Substrate already built (consume, do not rebuild)
 
-* **Unlock persistence (F08):** `journey_progress` table — `highestUnlockedLevel` (int, default 1), `completedLevelsCsv` (text). `JourneyProgressRepo` — `markCompleted(guestId, levelNumber)` (transactional, linear unlock `N → N+1`, idempotent for progress), `read(guestId)`, `watch(guestId)` (a `Stream` — the progress UI can bind to it), `completedLevels(guestId)`. `journeyProgressRepoProvider` in `persistence_providers.dart`. **No schema change expected.**
-* **Play entry (F03):** route `/play`, `PlaySessionScreen(args: PlaySessionArgs)`, `PlaySessionArgs {PuzzleSource source, int? journeyLevel, String? debugPuzzleId}` — `journeyLevel` is defined but unused. `app_router.dart` `Routes.play` reads `state.extra as PlaySessionArgs`.
-* **Content resolution seam (F03):** `playSessionSetupProvider = FutureProvider.family<PlaySessionSetup, PlaySessionArgs>` currently handles only `debugPuzzleId` and `throw UnsupportedError` for other sources — **this is the `[PENDING — F05]` Journey branch**.
-* **Completion → Next Level seam (F04):** `CompletionPanel({..., VoidCallback? onNextLevel})` — `null` in F04 scope renders the disabled ghost pill. `play_session_screen.dart` builds the panel; F05 supplies `onNextLevel` + the unlock write.
-* **Engine config (F08):** `toEngineConfig(Puzzle)` in `app/lib/content/puzzle_engine_config.dart` — already consumed by `PlaySessionController`.
-* **Content format (F06):** `Puzzle` / `Puzzle.fromJson` (engine-free, `looplet_content`); `optimalMoves` guaranteed by the `export`/`check` gate; `difficultyLabel` ∈ {easy, medium, hard, expert}.
+* **Unlock persistence (F08):** `journey_progress` table — `highestUnlockedLevel` (int, default 1), `completedLevelsCsv` (text). `JourneyProgressRepo` — `markCompleted(guestId, levelNumber)` (transactional; `highest = max(existing, N+1)`; `completedLevels ∪= {N}`; idempotent for progress), `read(guestId)`, `watch(guestId)` (a `watchSingle` stream), `completedLevels(guestId)`. `journeyProgressRepoProvider`. **No schema change.**
+* **Play entry (F03):** route `/play`, `PlaySessionScreen(args: PlaySessionArgs)`, `PlaySessionArgs {PuzzleSource source, int? journeyLevel, String? debugPuzzleId}` — `journeyLevel` defined, currently unused. `app_router.dart` `Routes.play` reads `state.extra as PlaySessionArgs`.
+* **Content-resolution seam (F03):** `playSessionSetupProvider = FutureProvider.family<PlaySessionSetup, PlaySessionArgs>` — handles `debugPuzzleId`, `throw UnsupportedError` for other sources. **F05 fills the `journeyLevel != null` branch.**
+* **Completion → Next Level seam (F04):** `CompletionPanel({..., VoidCallback? onNextLevel})` — `null` in F04 scope → disabled ghost pill. `play_session_screen.dart` builds the panel. **F05 supplies `onNextLevel`.**
+* **Win-path side-effect pattern (F04):** `PlaySessionController` takes optional `personalBestRepo` + `guestId`; on win, `_resolvePersonalBest` does prior-read → `recordCompletion` → read-back → build `CompletionResult`, **fire-and-forget with a caught failure**, never blocking the panel. **F05 mirrors this for the unlock write (D3).**
+* **Engine config (F08):** `toEngineConfig(Puzzle)` in `app/lib/content/puzzle_engine_config.dart` — consumed by `PlaySessionController`.
+* **Content format (F06):** `Puzzle` / `Puzzle.fromJson` (engine-free, `looplet_content`); `optimalMoves` guaranteed by `export`/`check`; `difficultyLabel ∈ {easy, medium, hard, expert}`; `columnMovesEnabled`, `lockedCells`, `frozenCells` are content properties.
+* **`kv` table (F08):** generic `key` TEXT / `valueJson` TEXT. Already holds `active_session` + `store_meta`. **F05 adds one key (D2).**
+* **Language (F08/F10):** `SettingsRepo.read(guestId).language` — default `'tr'`.
 
 ---
 
-## 4. Journey Progression Model `[PENDING — ANALYSIS]` → LOCK at DURUM 3
+## 4. Level Identity [LOCKED — D1]
 
-Proposed (analysis to confirm / refine):
-
-* **Level id ↔ number.** Journey levels are `1..30`. The `Puzzle.id` for a Journey level and the `PlaySessionArgs.journeyLevel` int must map deterministically (proposal: `Puzzle.id == 'journey-<lang>-<NN>'`, `journeyLevelNumber == N`). The F04 `personal_best` key is `levelId` (`puzzle.id`) — must stay stable across content re-exports.
-* **Unlock state per level** (derived, not stored beyond `journey_progress`):
-  * `locked` — `N > highestUnlockedLevel`.
-  * `unlocked, not completed` — `N <= highestUnlockedLevel && N ∉ completedLevels`.
-  * `completed` — `N ∈ completedLevels`.
-  * `in-progress` — an F08 active-session snapshot exists with `status == inProgress && journeyLevel == N` (there is at most one active session).
-* **Unlock write.** On an F04 Journey completion (win): `JourneyProgressRepo.markCompleted(guestId, N)` — **before or after** the F04 `personal_best` write (order `[PENDING — ANALYSIS]`; both are independent local writes, fire-and-forget with a caught failure, same posture as F03's `_persist`). Idempotent — a replay of a completed level is a progress no-op.
-* **"Next" resolution.** From the completion panel of level N: `Next Level` → level `N+1` if `N < 30` and `N+1` content exists; if `N == 30` (or `N+1` content missing) → the "all levels complete" state. CONTINUE → the in-progress level if one exists, else `min(unlocked levels not in completedLevels)`, else (all 30 done) the "all complete" state.
-* **Terminal state.** All 30 in `completedLevels` → a graceful "all levels complete" surface (no crash, no dead CONTINUE). Replaying any completed level from that state is allowed.
+* **Journey level ⇄ id.** A Journey level `N ∈ 1..30` has `Puzzle.id == 'journey-<lang>-<NN>'` (zero-padded two digits, e.g. `journey-tr-07`) and `Puzzle.journeyLevelNumber == N`.
+* **This is a HARD CONSTRAINT on `F06-CONTENT`** — every authored Journey artifact + the manifest MUST use exactly this scheme. `Puzzle.id` is the durable key for:
+  * F04's `personal_best.levelId` (`levelId == puzzle.id`);
+  * F03's restore (`PlaySessionController._tryRestore` fires only when `snapshot.puzzleId == puzzle.id`).
+  Changing a shipped level's id orphans that player's best + any in-progress snapshot — permitted only pre-launch.
+* **Level-number helpers** (F05 code): `journeyLevelId(int n, String lang) → 'journey-<lang>-<NN>'` and `parseJourneyLevel(String puzzleId) → int?` (returns `null` for a non-`journey-<lang>-NN` id — e.g. a debug/daily id). Single source of truth for the mapping.
+* **The F08 active-session snapshot is NOT extended** — the in-progress Journey level is derived as `parseJourneyLevel(snapshot.puzzleId)` when `snapshot.puzzleSource == journey && snapshot.status == inProgress`.
 
 ---
 
-## 5. Bundled Content + Manifest `[PENDING — ANALYSIS]` → LOCK at DURUM 3
+## 5. Bundled Content + Manifest + Resolver [LOCKED — D5, D6, D7]
 
-* **Where do the 30 levels live?** Proposal: a bundled asset directory (`app/assets/journey/<lang>/journey-<lang>-NN.json`, each a F06 `export` artifact) + a `journey_manifest_<lang>.json` (`contentVersion`, ordered list of level ids + difficulty labels + a checksum). Registered in `app/pubspec.yaml` assets.
-* **Resolver.** A `JourneyContentRepo` (or extend `playSessionSetupProvider`) — `Future<Puzzle> loadLevel(int n, String lang)` reading the bundled JSON via `rootBundle`, `Puzzle.fromJson`, cached. `playSessionSetupProvider`'s `journeyLevel != null` branch calls it. **Corrupt / missing asset → a typed failure** the screen renders as F03's load-error (AC "corrupt asset → skip + log, rest of Journey playable").
-* **Build gate.** A content-manifest check (extends F06's `check` / a `melos content:check` step) — fails CI if `< 30` Journey levels for a shipping language, or a manifest/asset mismatch, or a level missing `optimalMoves`.
-* **`F06-CONTENT` dependency.** The 30 authored levels are **not yet produced** — F05 is built + QA'd against the **5-puzzle smoke set** mapped into a `journey-tr-01..05` manifest (or a documented subset). **F05 cannot reach `Done` until `F06-CONTENT` delivers the full 30** (and they land the difficulty-curve bands). This is the primary F05 blocker-to-Done; the analysis confirms the interim shape.
+### 5.1 Asset home [D5]
+
+* **Journey level artifacts + manifest are bundled app assets**, mirrored from the F06 `export` output:
+  * source of truth (authored, checked-in): `content/journey/<lang>/journey-<lang>-NN.json` + `content/journey/<lang>/journey_manifest_<lang>.json`;
+  * bundled into the app: `app/assets/journey/<lang>/…` (registered in `app/pubspec.yaml` `flutter: assets:`), kept in sync by a **`melos` mirror script** (`melos run content:sync` — copies `content/journey/**` → `app/assets/journey/**`) run in CI before `build`.
+* **`looplet_content` stays pure Dart** — the loader lives in the `app` layer (reads `rootBundle`, calls `Puzzle.fromJson`).
+
+### 5.2 Manifest schema
+
+```
+journey_manifest_<lang>.json
+{
+  "schemaVersion": 1,
+  "contentVersion": "<string>",
+  "lang": "tr",
+  "mode": "smoke" | "strict",          // "smoke" while F06-CONTENT is incomplete
+  "levels": [
+    { "n": 1, "id": "journey-tr-01", "asset": "journey/tr/journey-tr-01.json",
+      "difficultyLabel": "easy", "checksum": "<sha256 of the asset bytes>" },
+    …  // n contiguous from 1; 30 entries required when mode == "strict"
+  ]
+}
+```
+
+### 5.3 Resolver
+
+Fills `playSessionSetupProvider`'s `journeyLevel != null` branch (or a dedicated `journeyContentRepoProvider` the branch delegates to):
+
+1. resolve the active language — `SettingsRepo.read(guestId).language`, default `'tr'`;
+2. load + cache `journey_manifest_<lang>.json` (one parse per session; a `FutureProvider` or an in-memory map);
+3. look up `levels` where `n == journeyLevel`; **absent → throw `JourneyContentException`** (a typed failure);
+4. `rootBundle.loadString(<asset>)` → `jsonDecode` → `Puzzle.fromJson` (throws `PuzzleFormatException` on a malformed artifact);
+5. assert `puzzle.id == manifest.id`, `puzzle.journeyLevelNumber == n`; verify the `checksum` (optional but recommended);
+6. return `PlaySessionSetup(puzzle: puzzle, validator: <wordValidatorProvider.future>)`.
+
+* **Corrupt / missing asset or manifest entry** → the resolver future errors → F03's **existing load-error state** (`_LoadErrorBody`, `Geri` → `/`). The rest of the Journey still resolves (per-level failure, not a campaign crash).
+* **Caching:** per `(lang, n)`; 30 small artifacts; no eviction.
+
+### 5.4 Content-manifest build gate [D6]
+
+A new check — **`melos run content:check` extended** (F06's `check` / a `flutter test` asset test in `app`). Owner: **Frontend (F05-FE.GATE)** — analogous to F06's `content:check`, no DevOps.
+
+* Always (both modes): the manifest parses, `schemaVersion` known, `levels[n]` contiguous from 1, each `asset` resolves + `Puzzle.fromJson` succeeds, `puzzle.id == manifest.id == 'journey-<lang>-<NN>'`, `journeyLevelNumber == n`, `optimalMoves >= 1`, `checksum` matches.
+* **Band rules (structural):** `n ∈ 1..3` ⇒ `columnMovesEnabled == false` **and** `optimalMoves ∈ {3,4}`; `n ∈ 4..10` ⇒ `columnMovesEnabled == true`; `n ∈ 16..20` ⇒ `lockedCells` non-empty; `n ∈ 21..25` ⇒ `frozenCells` non-empty; `n ∈ 26..30` ⇒ both non-empty. (Levels 11–15 "temporary-displacement weight" is a difficulty-score property — validated by the `difficultyLabel` + `F06-CONTENT` playtest, not a hard structural check.)
+* **`mode == "smoke"`** (interim): the gate asserts consistency of whatever levels are present + logs the shortfall to `< 30`; **does not fail CI**.
+* **`mode == "strict"`** (when `F06-CONTENT` lands): `levels.length == 30` **required**; any violation **fails CI**. Flipping the mode is a one-field manifest edit + the gate reads it.
+
+### 5.5 Interim content [D7]
+
+Until `F06-CONTENT` delivers, F05 builds + QAs against a checked-in **`content/journey/tr/journey_manifest_tr.json` with `mode: "smoke"`** mapping the F06 smoke set to levels 1–5:
+
+| n | id | source smoke puzzle | exercises |
+| --- | --- | --- | --- |
+| 1 | `journey-tr-01` | `content/smoke/tr/level01.json` (`smoke-tr-01`, opt 1, rows-only) | levels 1–3 band, unlock 1→2 |
+| 2 | `journey-tr-02` | `smoke-tr-02` (opt 2, rows-only) | unlock 2→3 |
+| 3 | `journey-tr-03` | `smoke-tr-04` (opt 1) | unlock 3→4 |
+| 4 | `journey-tr-04` | `smoke-tr-05` (locked cell) | **4–6 band → the column micro-tutorial trigger**; locked-tile render |
+| 5 | `journey-tr-05` | `smoke-tr-06` (frozen cell) | 4–6 band; frozen-tile render; `Next Level` past the last available level → terminal |
+
+The 5 interim artifacts are **copies of the smoke JSON re-`id`'d to `journey-tr-0N`** (a `melos`/script step, or hand-authored copies committed under `content/journey/tr/`). `journeyLevelNumber` set to `n`. This lets F05 build + QA exercise: the resolver, unlock idempotency, CONTINUE resume, the 4–6 tutorial gate (levels 4–5), `Next Level` → terminal (from level 5, the last available). **F05 → `Done` requires the real 30 (`mode: "strict"`, gate green).**
 
 ---
 
-## 6. CONTINUE + Resume `[PENDING — ANALYSIS]`
+## 6. Progression Read-Model [LOCKED]
 
-* **Entry:** the minimal home surface's primary CTA. Resolves the target level (§4 "Next" resolution) → `context.push('/play', extra: PlaySessionArgs(source: journey, journeyLevel: N))`.
-* **Resume:** F03 + F08 already restore the active session by `puzzleId`. F05's job: ensure the `PlaySessionArgs.journeyLevel` it passes matches the snapshot's level so the restore path fires (F03 `_LoadedPlaySession._init()` reads the snapshot then constructs the controller with `restoreFrom:`). The content resolver must return the **same** `Puzzle` id the snapshot was written against.
-* **F09 seam:** brand-new player (no `completedLevels`, tutorial-not-done) → `[PENDING — F09]` (route into F09, which flows into Level 1). Until F09 exists, CONTINUE → Level 1 directly.
+Derived from `journey_progress` + a one-shot active-session snapshot read. No new storage.
 
----
+* `LevelState(n)` for `n ∈ 1..30`:
+  * `locked` ⇔ `n > highestUnlockedLevel`;
+  * `completed` ⇔ `n ∈ completedLevels`;
+  * `unlockedIncomplete` ⇔ `n <= highestUnlockedLevel && n ∉ completedLevels`;
+  * `inProgress` ⇔ an F08 snapshot exists with `puzzleSource == journey && status == inProgress && parseJourneyLevel(puzzleId) == n` (at most one).
+* `currentLevel` (for CONTINUE) = the `inProgress` level if any, else `min({n : unlockedIncomplete})`, else `null` (all 30 done → terminal).
+* `progressCount` = `|completedLevels ∩ {1..30}|` (clamp — ignore strays).
+* Exposed as a Riverpod provider bound to `JourneyProgressRepo.watch(guestId)` (live) + a read of `activeSessionRepoProvider.read()`.
 
-## 7. Per-Level Micro-Tutorial (column intro, levels 4–6) `[PENDING — ANALYSIS + UI]`
-
-* **Trigger:** first entry into the 4–6 band (proposal: first load of level 4). An acknowledged flag is **persisted** (a `kv` row or a `settings`/`journey_progress` column — `[PENDING — ANALYSIS]`; F08 owns the schema — if a new column is needed that is an F08 touch-point to flag).
-* **Behaviour:** a short, action-gated overlay teaching the column shift; dismiss on acknowledge; **re-shows on return until acknowledged** (AC11). Distinct from F09 onboarding.
-* **UI:** the overlay is a **UI Designer** deliverable (`ui-design.md`) — an action-gated coach-mark over the F03 board, consistent with F03's Direction A chrome.
-
----
-
-## 8. Home / Progress Surface `[PENDING — UI]`
-
-* Replaces the debug `HomeScreen` (`app/lib/home_screen.dart`). Content: LOOPLET wordmark, **CONTINUE** (primary CTA), a **journey progress indicator** ("N / 30" + a completed/unlocked visual, bound to `JourneyProgressRepo.watch`), the "all levels complete" state.
-* **Not** the full F10 menu (no DAILY, no Settings icon, no level-select map) — a minimal surface F10 re-homes. The debug level buttons are removed or moved behind a debug flag (`[IMPL]`).
-* Chrome / back behaviour: the home is the app root (`/`), no back affordance; `/play` → back returns here (F03's `_popToCaller`). `Release Scope`-permitting, this is the first screen a distributed build shows.
+**Consumers must handle all four `LevelState` values** (home tiles, the `Next Level` gate, CONTINUE).
 
 ---
 
-## 9. Route / Navigation Contract `[PENDING — ANALYSIS]` → LOCK at DURUM 3
+## 7. Unlock Write on the Win Path [LOCKED — D3]
 
-* **No new route** expected — F05 reuses `/` (home) and `/play`. If the "all complete" state or the tutorial needs its own route (vs an in-screen state), the analysis decides.
-* `Next Level` (F04 panel) → `context.pushReplacement('/play', extra: PlaySessionArgs(journeyLevel: N+1))` or `push` — replacement vs stacking is `[PENDING — ANALYSIS]` (stacking 30 `/play` routes is wrong; replacement or pop-then-push).
-* CONTINUE / `Next Level` / "all complete" back targets all resolve to `/` — no empty stack, no wrong-route.
-
----
-
-## 10. Persistence `[PENDING — ANALYSIS]`
-
-* **Store:** F08's `journey_progress` via `JourneyProgressRepo` — **no new table**. A **possible** new column for the 4–6 tutorial-acknowledged flag (or a `kv` row) — if so, an F08 forward-only migration touch-point (flag in the analysis; Tech Lead routes a tiny F08 amendment or uses `kv`).
-* **Key:** `(guestId)` — one `journey_progress` row per guest (seeded by F08).
-* **Write timing:** unlock on win (fire-and-forget, caught). No cross-user data, no network.
+* `PlaySessionController` gains **optional ctor params** `journeyProgressRepo` (F08's `JourneyProgressRepo`) + `journeyLevel` (`int?`) — mirroring F04's `personalBestRepo` + `guestId`. `_LoadedPlaySession._init()` (F03) passes `widget.args.journeyLevel` in (an additive line — no F03 contract change).
+* On win, in the existing win side-effect path (a sibling of `_resolvePersonalBest`, e.g. `_resolveJourneyProgress`): if `source == journey && journeyProgressRepo != null && guestId != null && journeyLevel != null` → `await journeyProgressRepo.markCompleted(guestId, journeyLevel)`, **fire-and-forget with a caught failure** (`try/catch` → `debugPrint('journey: unlock_persist_failed (non-fatal) — $error')`), **ordered after** the `personal_best` write is initiated (both are independent local writes; the fixed order only aids test assertions). **Never blocks the panel.**
+* **Idempotent** — `markCompleted` is a progress no-op on re-completion (Retry → re-solve). F05 adds no dedup.
+* A caught failure → the unlock is retried on the next completion of that level (or lost until then) — the same posture as F03's `_persist` / F04's `_resolvePersonalBest`. This is the **shared storage-full test-debt class** (F03 QA note 3 / F08 AC7 / F04 N3) — a fault-injection test is a tracked follow-on, not an F05 gate.
 
 ---
 
-## 11. Validation Responsibility `[PENDING — LOCK at DURUM 3]`
+## 8. CONTINUE / `Next Level` / Terminal Navigation [LOCKED — D4]
 
-* **F05:** the unlock rule (AC1/AC2/AC13 — stars-don't-gate, no re-lock), CONTINUE resolution (AC7/AC8/AC9), `Next Level` resolution + the N==30 terminal (AC12), the progress indicator accuracy (AC10), the 4–6 micro-tutorial gate + re-show (AC4/AC11), the bundled-content resolver + corrupt-asset degradation, offline load (AC14).
+* **Routes:** reuse `/` (home) and `/play`. **No new route.** The terminal "all complete" state and the tutorial overlay are **in-screen states**.
+* **CONTINUE** (home primary CTA): resolve `currentLevel` (§6). If `null` → render the terminal home variant in place. Else `context.push('/play', extra: PlaySessionArgs(source: journey, journeyLevel: currentLevel))`.
+* **`Next Level`** (fills F04's `CompletionPanel.onNextLevel`): let `n = <this session's journeyLevel>`. If `n != null && n < 30 && manifest has n+1` → `context.pushReplacement('/play', extra: PlaySessionArgs(source: journey, journeyLevel: n + 1))`. Else → `context.go('/')` (home → terminal variant). **`pushReplacement`** so the back stack never accumulates `/play` frames.
+* **Back:** unchanged from F03 — chevron hidden in `won`; `Close` / system / gesture back → `_popToCaller`, which **must resolve to `/`** (add a `context.go('/')` fallback when `!canPop`, e.g. a deep-link entry). From any Journey level, back lands on `/`.
+* **Route graph:** `/` ⇄ `/play` only. Every `/play` exit → `/`. No 30-deep stack. No wrong-route, no empty stack.
+* **`Next Level` on the last available interim level (5) or level 30** → terminal state (a valid action, never a dead no-op).
+
+---
+
+## 9. Column Micro-Tutorial (levels 4–6) [LOCKED — D2 for storage; `[PENDING — UI]` for the overlay]
+
+* **Trigger:** on `/play` load (after content resolves), if `journeyLevel ∈ {4,5,6}` **and** the ack flag is false → show the overlay.
+* **Behaviour:** an **action-gated** coach-mark over the F03 board — the player performs a column shift to dismiss. Persists `ack = true` **only** on the gated action completing (AC11). Distinct from F09 onboarding.
+* **Re-show (AC11):** quitting before the gated action leaves `ack = false` → the overlay re-shows on the next entry to any level in 4–6.
+* **Persisted flag [D2]:** a **`kv` row** — `key = 'journey_col_tutorial_ack'`, `valueJson = '{"ack": true, "atUtcMs": <int>}'`. **No F08 schema change.** A tiny `JourneyTutorialRepo` (or a generic `kv` accessor) reads/writes it. Single-guest today → a bare key; documented in the `kv` key registry (§14).
+* **Visual design** of the overlay (layout, coach-mark, gating affordance, chrome parity with F03 Direction A) is **`[PENDING — UI]`**.
+
+---
+
+## 10. Home Surface [LOCKED contract; `[PENDING — UI]` visual]
+
+* Replaces `app/lib/home_screen.dart` (currently a debug `Wrap` of `smoke-tr-*` buttons). The debug buttons move behind `kDebugMode` or are removed (`[IMPL — Frontend]`).
+* **Content (AC10):** LOOPLET wordmark; **CONTINUE** (primary CTA — §8); a **journey-progress indicator** ("`progressCount` / 30" + a completed/unlocked visual), bound to `JourneyProgressRepo.watch` (live-updates when a win commits, even after the player pops back to `/`).
+* **Terminal variant ("all 30 complete"):** a distinct home state — a completion message; CONTINUE hidden or repurposed ("Replay a level" — **UI Designer's call**, Open item). No crash, no dead button.
+* **Chrome:** `/` is the app root — **no back affordance**. Not the F10 menu (no DAILY, no Settings icon, no level-select map — F10 re-homes this surface).
+* **Strings:** F05 UI strings follow F03's interim per-language table pattern (`PlayStrings`-style). `gen_l10n` stays `[DEFERRED — F10-or-earlier]` (F03's clarification).
+
+---
+
+## 11. F09 Seam [LOCKED — D8]
+
+* F09 (`Not Started`) owns the pre-Level-1 onboarding. F05 ships the branch: `if (!onboardingComplete) → <[PENDING — F09] route into F09>  else → currentLevel resolution`, with `onboardingComplete` **hard-wired `true`** and a `// [PENDING — F09]` marker.
+* Interim behaviour: a brand-new player's CONTINUE → Level 1 directly.
+* F09 later supplies the real `onboardingComplete` signal (its own `kv` flag / `settings` column) and the route target.
+
+---
+
+## 12. Validation Responsibility [LOCKED]
+
+* **F05:** the unlock rule (AC1/AC2/AC13 — stars never gate, no re-lock); the `LevelState` derivation; CONTINUE / `Next Level` / terminal resolution (AC7/AC8/AC9/AC12); the progress-indicator accuracy (AC10); the 4–6 micro-tutorial gate + re-show + ack-persist (AC4/AC11); the bundled-content resolver + corrupt/missing-asset degradation; offline load (AC14); the content-manifest build gate.
 * **F08 `JourneyProgressRepo`:** the transactional idempotent unlock write.
-* **F06 / `F06-CONTENT`:** the 30 levels exist, land the curve bands (AC3/AC5/AC6), each carries `optimalMoves`.
-* **F03:** the play session + restore path. **F04:** the completion panel + `onNextLevel` seam + the win path.
+* **F06 / `F06-CONTENT`:** the 30 levels exist, follow the id scheme (§4), land the curve bands (AC3/AC5/AC6), each carry `optimalMoves`.
+* **F03:** the play session + the F08 restore path. **F04:** the completion panel + the `onNextLevel` seam + the win-path side-effect pattern.
 
 ---
 
-## 12. QA Focus `[PENDING — LOCK at DURUM 3]`
+## 13. Release / Deployment Impact [LOCKED — Tech Lead decision]
 
-* **Progression (`automated functional`):** unlock N → N+1 at 1★ / 3★; locked N+1 not openable; replay a completed level → no re-lock, no progress change; `markCompleted` idempotency via the real F08 repo + in-memory DB.
-* **CONTINUE / resume (`automated functional` + `runtime`):** in-progress level resumes at saved state (kill/relaunch — folds into F03's device smoke); no in-progress → lowest unlocked incomplete; all 30 done → "all complete" state, no crash.
-* **`Next Level` (`automated functional`):** panel of N → N+1 play session; panel of 30 → terminal state.
-* **Micro-tutorial (`automated functional` + `runtime`):** shows on first 4–6 entry; re-shows after force-quit until acknowledged; not shown again after acknowledge; not shown for levels 1–3 / 7+.
-* **Content resolver (`automated functional`):** resolve a Journey level by number → the right `Puzzle`; corrupt/missing asset → load-error, rest of Journey playable; offline (no network) → loads from bundle.
-* **`ui-design.md` alignment:** home CONTINUE/progress surface + tutorial overlay quality (doctrine + rubric); chrome parity with F03.
-* **Evidence class:** `automated functional` mandatory; `runtime` (device) for CONTINUE-resume feel + the tutorial + the home visuals — **this is the likely first app-build distribution device smoke** (F03 + F04 device follow-ons fold in). **Not `source-only`.**
-* Security compliance N/A (single actor, local-only progress, no endpoint) — justify in the QA scope line.
+* **`Release Scope` = `none`.** F05 adds **no** deploy / container / environment / server change. The Journey content pack is **bundled in the app binary** (same posture as F01's dictionary assets + F06's smoke content, both `Release Scope = none`). The one CI addition — the content-manifest build gate + the `content:sync` mirror step — is **directly analogous to F06's `content:check`** and is a **Frontend/tooling task (F05-FE.GATE), not a DevOps turn.** **No `DevOps/Release Engineer` for F05.**
+* **The first app-build distribution** (TestFlight / Play internal — needed for the Level 5 Reach / D1 / D7 KPIs, and where F03's 3-item manual device confirmation + F04's N4 reveal-feel device smoke land) is a **separate, deferred portfolio-level gate** ("first-app-distribution"), **parked** alongside F08's Firebase deploy: it needs an Apple Developer Program membership (the user has none — deferred) + Android Play Integrity SHA-256 (in the parked `F08-DEVOPS`). It is **NOT an F05 `Done` blocker**. F05 QA does `automated functional` (mandatory) + an optional ad-hoc device pass on the connected iPhone (no formal distribution).
+* CI code gates (`format:check` / `analyze` / `test` / `content:check` (extended) / `build:app` / `build ios`) still apply. Rollback for the content pack = ship the previous binary (no server component).
 
 ---
 
-## 13. Release / Deployment Impact `[PENDING — TL DECISION at DURUM 3]`
+## 14. `kv` Key Registry [LOCKED — housekeeping]
 
-* **`Release Scope` — likely NOT `none`.** F05 ships a **Journey content pack** (30 bundled level assets + manifest) and is plausibly the point where the first **playable app build is distributed** for the Level 5 Reach / D1 / D7 validation (F03 + F04 accepted their device smokes into "the first app-build distribution ~F05"). Candidate values: `container-build` N/A; more likely **`production-readiness`** for the app-distribution gate, or a narrower content-pack gate. **The Tech Lead locks this in the DURUM 3 contract after the analysis**, and — if `!= none` — opens a `DevOps/Release Engineer` task (`F05-DEVOPS`) for the app-build distribution runbook + the folded-in F03/F04 device smokes.
-* CI code gates (`format:check` / `analyze` / `test` / `content:check` / `build:app` / `build ios`) still apply; a new content-manifest check is proposed (§5).
+The shared F08 `kv` table now holds:
+
+| key | writer | shape | notes |
+| --- | --- | --- | --- |
+| `store_meta` | F08 bootstrap | `{"guestId":…, "createdAtUtcMs":…}` | seed metadata |
+| `active_session` | F03 (`ActiveSessionRepo`) | the frozen `ActiveSessionSnapshot` JSON | one row; F05 reads only |
+| `journey_col_tutorial_ack` | **F05** (`JourneyTutorialRepo`) | `{"ack": true, "atUtcMs": <int>}` | absence ⇔ not acknowledged |
+
+F05-FE adds `journey_col_tutorial_ack` here; any future `kv` key is added to this table (documented so keys don't collide).
 
 ---
 
-## 14. Open Items (for the Technical Analyst)
+## 15. QA Focus [LOCKED]
 
-* `[PENDING — ANALYSIS]` §4 — the level-id ↔ number mapping; the unlock-write ordering vs F04's `personal_best` write; the exact CONTINUE / `Next Level` / terminal resolution algorithm.
-* `[PENDING — ANALYSIS]` §5 — the bundled Journey manifest + asset layout + the resolver + the content-manifest build gate; the **interim shape** while `F06-CONTENT` is unfinished (map the 5-puzzle smoke set into `journey-tr-01..05` vs a documented stub).
-* `[PENDING — ANALYSIS]` §7 / §10 — where the 4–6 tutorial-acknowledged flag lives (a `kv` row vs a new `journey_progress` / `settings` column → an F08 touch-point).
-* `[PENDING — ANALYSIS]` §9 — `push` vs `pushReplacement` for `Next Level`; whether the terminal / tutorial states need their own routes.
-* `[PENDING — ANALYSIS]` — the F09 hand-off seam for a brand-new player (CONTINUE → F09 → Level 1) — F09 is `Not Started`, so a clean seam + an interim (CONTINUE → Level 1) is fine.
-* `[PENDING — UI]` (after the analysis) — the minimal home CONTINUE/progress surface + the 4–6 column micro-tutorial overlay + the "all levels complete" state, in `ui-design.md`, chrome parity with F03 Direction A.
-* `[PENDING — TL at DURUM 3]` §13 — `Release Scope` + whether `F05-DEVOPS` (first app-build distribution gate) opens.
-* `[PENDING — F06-CONTENT]` — the 30 authored levels landing the curve bands; **hard prerequisite for F05 `Done`**, not for F05 build/QA against the interim manifest.
-* `[DEFERRED — F09]` — pre-Level-1 onboarding. `[DEFERRED — F10]` — the full menu re-homes F05's minimal surface. `[DEFERRED — F11/F12]` — audio/haptics on unlock; `level_started`/`level_completed` analytics.
+* **Progression (`automated functional`):** unlock N→N+1 at 1★ **and** 3★ (AC1/AC13); locked N+1 not openable incl. direct entry (AC2); replay a completed level → no re-lock / no progress change; `markCompleted` idempotency against the **real F08 `JourneyProgressRepo`** + an in-memory DB.
+* **CONTINUE / resume:** in-progress → resumes at the exact saved state (kill/relaunch — via the F08 restore path; an ad-hoc device pass folds into the eventual first-app-distribution smoke) (AC7); no in-progress → lowest unlocked incomplete (AC8); all 30 → terminal, no crash (AC9).
+* **`Next Level` (`automated functional`):** panel of N (N<30, `n+1` present) → level N+1's `/play` via `pushReplacement`; panel of the last available level / level 30 → terminal (AC12).
+* **Micro-tutorial (`automated functional`):** shows on first 4–6 entry (AC4); re-shows after a simulated force-quit (ack flag still false) until the gated action (AC11); not again after ack; not shown for 1–3 or 7+.
+* **Content resolver (`automated functional`):** resolve by number → the right `Puzzle`; corrupt/missing asset or manifest entry → the F03 load-error state, the rest of the Journey playable; offline (no network) → loads from the bundle (AC14).
+* **Build gate:** a manifest with `mode:"strict"` + `< 30` / a missing asset / a band-rule violation → the gate **fails CI**; `mode:"smoke"` → logs + passes.
+* **`ui-design.md` alignment:** the home CONTINUE/progress/terminal surface + the 4–6 micro-tutorial overlay vs `ui-design.md`; chrome parity with F03 Direction A; `premium-ui-rubric.md` fail conditions absent (≥ 90).
+* **Regression:** the F03 play + F04 completion suites stay green; F04's `CompletionPanel` now-enabled `onNextLevel` path does not break its disabled-state tests; F04's per-outcome CTA-weighting tweak (§16) behaves.
+* **Evidence class:** `automated functional` **mandatory**. `runtime` (device) is **not** an F05 gate — it folds into the deferred first-app-distribution smoke; an optional ad-hoc iPhone pass may be recorded.
+* **Not `source-only`.** Security compliance N/A (single actor, local-only `journey_progress` + one `kv` flag, no auth, no endpoint) — justify in the QA scope line.
+
+---
+
+## 16. F04 `Next Level` CTA-Weighting Follow-on [LOCKED — in F05-UI + F05-FE scope]
+
+F04's forward note (`f04 frontend.md §4`): once `Next Level` is live, revisit the Retry-vs-Next-Level primary/secondary weighting **per outcome**. This is F05's to close (it is exactly when `Next Level` goes live):
+
+* **`ui-design.md` (F05-UI):** define the rule — proposal: `isPerfect` (3★) → **`Next Level` primary**, `Retry` secondary; sub-optimal (1–2★) → **`Retry` primary**, `Next Level` secondary. Applies to the existing `CompletionPanel`.
+* **`completion_panel.dart` (F05-FE):** an **additive** tweak — the panel picks the primary CTA from `CompletionResult.isPerfect` (the panel already has it). No F04 contract change; the 7 AC7 elements + the six variants are unchanged.
+* On a Journey **level 30** completion (or the last available interim level): `Next Level` still renders but routes to the terminal state (§8) — the weighting rule still applies to the button that's there.
+
+---
+
+## 17. Open Items
+
+* `[PENDING — UI]` (F05-UI → `ui-design.md`): the minimal home surface (LOOPLET wordmark + CONTINUE + the "`N` / 30" progress indicator + the "all 30 complete" terminal variant — CONTINUE hidden vs "Replay a level"); the **levels 4–6 column micro-tutorial overlay** (action-gated coach-mark over the F03 board, re-shows until acknowledged); the F04 `CompletionPanel` **per-outcome CTA-weighting rule** (§16); chrome / atmosphere parity with F03's `ui-design.md` Direction A; `premium-ui-rubric.md` ≥ 90.
+* `[PENDING — F06-CONTENT]` (**human / content deliverable — no canonical role; owner: Level Designer / user**): the 30 authored Journey levels + `journey_manifest_tr.json` with `mode: "strict"`, following the §4 id scheme + the §5.4 band rules, run through F06's `export`/`check`, committed under `content/journey/tr/`. **Hard prerequisite for F05 `Done`** — F05 code + QA proceed against the §5.5 interim (`mode: "smoke"`). Tracked in `features/f06-.../orchestration.md → Open Tasks → Content` and surfaced to the user this turn as an explicit decision (author now / defer F05 `Done`).
+* `[PENDING — F09]` — the pre-Level-1 onboarding hand-off (§11). F05 ships the seam with `onboardingComplete` hard-`true`.
+* `[DEFERRED — F10]` — the full menu re-homes F05's minimal home surface; F10 owns `settings` + multi-language + the language-switch-mid-progress story.
+* `[DEFERRED — F11/F12]` — audio/haptics on unlock; `level_started` / `level_completed` analytics (with the level number) are F12 seams.
+* `[DEFERRED — first-app-distribution]` — TestFlight / Play internal + the folded-in F03/F04 device smokes; parked alongside F08's Firebase deploy pending the user's paid-account decision. **Not an F05 gate.**
