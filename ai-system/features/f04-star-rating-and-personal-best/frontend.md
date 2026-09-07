@@ -182,12 +182,45 @@ No network. Persistence call: `PersonalBestRepo.recordCompletion(guestId, levelI
 
 ---
 
+## F04-FE6 — QA `Rejected` fix (2026-09-07)
+
+QA verdict `Rejected` on two Frontend-owned test issues (`qa.md §8` F04-QA-1 / F04-QA-2). No product-behaviour, `architecture.md`, or `ui-design.md` change — a lint-gate + test-coverage fix.
+
+| Task | Status | File(s) | What changed |
+| --- | --- | --- | --- |
+| **F04-QA-1** | Complete | `app/test/rating/completion_panel_test.dart` | Removed the redundant `import 'package:flutter/semantics.dart';` (line 3). `Semantics` / `SemanticsProperties` (via `.properties`) come from the `package:flutter/material.dart` import. **`flutter analyze` (app) now exits 0** (was exit 1 / `unnecessary_import`). *(Also removed a `package:flutter/foundation.dart` import added mid-fix — `debugPrint` is re-exported by `material.dart`.)* |
+| **F04-QA-2** | Complete | `app/test/rating/completion_panel_test.dart` | Added rendering coverage for the two previously-uncovered `CompletionPanel` variants (`architecture.md §7` / `§11` require all six): **(1) `noImprovement`** — widget test: seed a *better* prior `personal_best` (2 = optimal) for `smoke-tr-02`, then solve it in 3 (one wasted row-1 shift + two row-0 shifts) → asserts `2 / 3` star caption, no `HARİKA`, `+1` gap, **`daha iyi` tag present**, no `YENİ REKOR` / no `▲`, `Semantics` `SEN: 3` + `EN İYİ: 2`, and the `★` best-is-Perfect marker (best stays 2 == optimal). **(2) no-optimal bare fallback** — two tests: a widget test that overrides `playSessionSetupProvider` with a hand-built `Puzzle(optimalMoves: 0)` (helper `_noOptimalPuzzle()`, solvable in one row-0 shift) → asserts `CompletionPanel` shows `_BareBody` (`ÇÖZÜLDÜ` + `MASAL` + **`Puan yok`**, **no `3 / 3` / `HARİKA` / `OPTİMAL` / `EN İYİ`**), `Yeniden` + `SONRAKİ` still present; and a controller-level `test` (`debugPrint` captured) asserting `phase == won`, `ratingUnavailable == true`, `ratingResolved == true`, `completion == null` (before and after `whenRatingResolved`), and that `rating_blocked_no_optimal` was logged. |
+| N2 (opportunistic) | Complete | `app/test/rating/completion_panel_test.dart` | Tightened two existing tests: the `firstClear` test now asserts the **`İLK`** best-cell tag; the `matchedBest` test now asserts **no** best-cell tag (`İLK` / `daha iyi` both absent). Reduced-motion end-state assertion **not added** — after `pumpAndSettle` the one-shot reveal reaches the same end-state in both modes, so a meaningful assert would need frame-exact pumping; left as a trivial-but-uncovered code path (`_startOrSettle` → `_reveal.value = 1`). |
+
+**Not changed:** `CompletionPanel` / `PlaySessionController` / `star_rating.dart` (no behaviour touched); F03 contract; F08 persistence; **N1** (per Tech Lead decision the amber `_Spine` stays in place of F03's 1 px top-highlight); **N3** (write-failure fault-injection — separate tracked debt).
+
+### F04-FE6 gate results
+
+- `flutter analyze` (app + `integration_test/`): **No issues found** (0).
+- `flutter test` (app): **132 / 132** (was 129 + 3 new `completion_panel_test.dart` cases; **no regression** — the F03 play/runtime/screen suites and the star / personal-best suites are unchanged and green).
+- `dart test` (pure packages): unchanged — 196 / 196. Workspace total **328 / 328**.
+- `dart format --output=none --set-exit-if-changed .`: clean.
+- iOS release build: unaffected — F04-FE6 touched a single test file, no `lib/`, `pubspec.yaml`, plugin, or platform change since the F04-FE5 green `flutter build ios --release --no-codesign` (`Runner.app`, 54.6 MB).
+
+### F04-FE6 variant-matrix coverage (now complete)
+
+| Variant | Test |
+| --- | --- |
+| `firstClear` | `completion_panel_test.dart` "…every AC7 element" — asserts `EN İYİ: 1` + `İLK` tag |
+| `newBest` | `completion_panel_test.dart` "a beaten prior best → new best treatment" — `▲` + `YENİ REKOR` |
+| `matchedBest` | `completion_panel_test.dart` "Retry → solve again in 1 → matched best" — no tag |
+| `noImprovement` | `completion_panel_test.dart` "a worse-than-best result → noImprovement variant" — `daha iyi` + retained better best |
+| `Perfect` | `completion_panel_test.dart` "…every AC7 element" + "…matched best, still Perfect" — `HARİKA` + `=` |
+| no-optimal | `completion_panel_test.dart` "no-optimal puzzle → CompletionPanel renders the bare fallback" (widget) + "PlaySessionController with optimalMoves < 1 → …" (controller) |
+
+---
+
 # WORKFLOW HANDOFF SUGGESTION (NON-AUTHORITATIVE)
 
-- **Completed Tasks:** F04-FE1…FE5 — pure star function, `CompletionResult` + `BestOutcome` + `bestOutcomeFor`, additive win-path wiring in `PlaySessionController`, the real `CompletionPanel` (replaces `completion_sheet.dart`), `PlayTheme.sheet*` tokens, `RatingStrings`, and tests. `flutter analyze` clean; `flutter test` (app) 129 green, no regression; iOS release build green.
-- **Remaining Tasks:** F04-QA — end-to-end client QA per `architecture.md §11` (`automated functional` mandatory: star boundaries; personal-best logic vs the real repo; panel-state matrix; F03 integration) + `ui-design.md` alignment (chrome parity, reward-reveal is a moment, CTA hierarchy, `premium-ui-rubric.md`). `runtime` (device) for the reveal *feel* folds into F03's first-app-distribution smoke.
-- **Blockers:** none. Two `ui-design.md` clarification items resolved with the handoff's own defaults (surface tokens promoted; Next Level stays disabled) — recorded in §4 for Tech Lead review.
-- **Status Suggestion:** Ready for QA.
+- **Completed Tasks:** F04-FE1…FE5 (pure star function, `CompletionResult` + `BestOutcome` + `bestOutcomeFor`, additive win-path wiring in `PlaySessionController`, the real `CompletionPanel` replacing `completion_sheet.dart`, `PlayTheme.sheet*` tokens, `RatingStrings`, tests) **+ F04-FE6** (QA `Rejected` fix — removed the `unnecessary_import` reddening `flutter analyze`; added render coverage for the `noImprovement` + no-optimal `CompletionPanel` variants; tightened the `İLK` / `matchedBest` tag assertions). `flutter analyze` clean; `flutter test` (app) **132 green**, no regression; workspace 328/328; iOS release build unaffected/green.
+- **Remaining Tasks:** F04-QA re-verify — confirm F04-QA-1 (`flutter analyze` 0 issues) + F04-QA-2 (all six panel variants have a render test) are closed; full suite green; then Tech Lead close.
+- **Blockers:** none.
+- **Status Suggestion:** Ready for QA (re-verify).
 
 ---
 
