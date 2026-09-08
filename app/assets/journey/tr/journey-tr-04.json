@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "2026.09-interim",
+  "id": "journey-tr-04",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 4,
+  "language": "tr",
+  "grid": [
+    "SALMA",
+    "BCDFG",
+    "HJKLN",
+    "PRTUV",
+    "YZBCD"
+  ],
+  "targetWord": "MASAL",
+  "lockedCells": [
+    "3,3"
+  ],
+  "frozenCells": [],
+  "columnMovesEnabled": true,
+  "optimalMoves": 2,
+  "difficultyScore": 4.612,
+  "difficultyLabel": "medium",
+  "difficultyBreakdown": {
+    "o": 2,
+    "cNorm": 0.0,
+    "tdDegree": 1,
+    "locked": 1,
+    "frozen": 0,
+    "firstMoves": 1,
+    "distinctOptimalSolutions": 1
+  }
+}

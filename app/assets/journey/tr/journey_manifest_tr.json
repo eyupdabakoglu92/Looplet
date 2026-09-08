@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "2026.09-interim",
+  "lang": "tr",
+  "mode": "smoke",
+  "_note": "INTERIM — F06-CONTENT delivers the real 30 Journey levels + flips mode to \"strict\". The 5 entries here re-id the F06 smoke set (architecture.md §5.5). Some band rules (e.g. n<=3 rows-only) are knowingly not met in smoke mode.",
+  "levels": [
+    {
+      "n": 1,
+      "id": "journey-tr-01",
+      "asset": "tr/journey-tr-01.json",
+      "difficultyLabel": "easy",
+      "checksum": "d364ad26f17d8d0799f0e39094f3e56ce63112fa5a2b2e89525edc58bd249be7"
+    },
+    {
+      "n": 2,
+      "id": "journey-tr-02",
+      "asset": "tr/journey-tr-02.json",
+      "difficultyLabel": "easy",
+      "checksum": "d0d1576e951e25d39691448fc930cf7b5f27ef779cd6bc339bccd1142a7a7e09"
+    },
+    {
+      "n": 3,
+      "id": "journey-tr-03",
+      "asset": "tr/journey-tr-03.json",
+      "difficultyLabel": "easy",
+      "checksum": "ee8866aae3efcb5d9a5194ca364efda07fe6bcffaed5a153abb129720bff6cd7"
+    },
+    {
+      "n": 4,
+      "id": "journey-tr-04",
+      "asset": "tr/journey-tr-04.json",
+      "difficultyLabel": "medium",
+      "checksum": "6e318f6fb7b4112906fcca360390b3a3bbef34baccaed2f4caf2bfb6b266199e"
+    },
+    {
+      "n": 5,
+      "id": "journey-tr-05",
+      "asset": "tr/journey-tr-05.json",
+      "difficultyLabel": "easy",
+      "checksum": "f584e21510927b9410be1adc1f28b396738aa2d18eba5d66f234d7aa2fb9adf7"
+    }
+  ]
+}

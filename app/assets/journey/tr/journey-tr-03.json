@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "2026.09-interim",
+  "id": "journey-tr-03",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 3,
+  "language": "tr",
+  "grid": [
+    "DABCF",
+    "XENİZ",
+    "HJKLN",
+    "PRTUV",
+    "YZBCD"
+  ],
+  "targetWord": "DENİZ",
+  "lockedCells": [],
+  "frozenCells": [],
+  "columnMovesEnabled": true,
+  "optimalMoves": 1,
+  "difficultyScore": 0.813,
+  "difficultyLabel": "easy",
+  "difficultyBreakdown": {
+    "o": 1,
+    "cNorm": 0.0,
+    "tdDegree": 0,
+    "locked": 0,
+    "frozen": 0,
+    "firstMoves": 1,
+    "distinctOptimalSolutions": 1
+  }
+}

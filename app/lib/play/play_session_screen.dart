@@ -2,7 +2,14 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../app_router.dart';
+import '../journey/column_tutorial_overlay.dart';
+import '../journey/journey_content.dart';
+import '../journey/journey_nav.dart';
+import '../journey/journey_strings.dart';
+import '../journey/journey_tutorial.dart';
 import '../persistence/persistence_providers.dart';
 import '../rating/completion_panel.dart';
 import '../rating/rating_strings.dart';
@@ -43,12 +50,13 @@ class PlaySessionScreen extends ConsumerWidget {
 }
 
 void _popToCaller(BuildContext context) {
-  final nav = Navigator.of(context);
-  if (nav.canPop()) {
-    nav.pop();
+  // Every `/play` exit resolves to `/` (`f05 architecture.md §8`): pop if there
+  // is a caller, else (direct entry / a `pushReplacement` chain) go home.
+  final router = GoRouter.of(context);
+  if (router.canPop()) {
+    router.pop();
   } else {
-    // Direct entry (deep link / debug) with an empty stack — fall back home.
-    nav.maybePop();
+    context.go(Routes.home);
   }
 }
 
@@ -79,6 +87,10 @@ class _LoadedPlaySessionState extends ConsumerState<_LoadedPlaySession>
     with WidgetsBindingObserver {
   PlaySessionController? _controller;
 
+  /// F05 — the 4–6 column micro-tutorial (`architecture.md §9`). Resolved once
+  /// in [_init]: shown iff a Journey level in 4..6 AND the `kv` ack is unset.
+  bool _showColumnTutorial = false;
+
   @override
   void initState() {
     super.initState();
@@ -93,12 +105,30 @@ class _LoadedPlaySessionState extends ConsumerState<_LoadedPlaySession>
     // after bootstrap; guard defensively so a lookup failure only costs the
     // "best" line, never the panel.
     final personalBestRepo = ref.read(personalBestRepoProvider);
+    final journeyProgressRepo = ref.read(journeyProgressRepoProvider);
     String? guestId;
     try {
       guestId = await ref.read(currentGuestIdProvider.future);
     } catch (error) {
       debugPrint('play: guest id unavailable, best line disabled — $error');
     }
+
+    // F05 — the 4–6 column micro-tutorial gate.
+    final level = widget.args.journeyLevel;
+    var showTutorial = false;
+    if (widget.args.source == PuzzleSource.journey &&
+        level != null &&
+        level >= 4 &&
+        level <= 6) {
+      try {
+        showTutorial = !await ref
+            .read(journeyTutorialRepoProvider)
+            .isColumnTutorialAcknowledged();
+      } catch (_) {
+        showTutorial = true; // read failed → show it (mild over-prompt, safe)
+      }
+    }
+
     if (!mounted) return;
     final controller = PlaySessionController(
       puzzle: widget.setup.puzzle,
@@ -108,9 +138,58 @@ class _LoadedPlaySessionState extends ConsumerState<_LoadedPlaySession>
       restoreFrom: snapshot,
       personalBestRepo: personalBestRepo,
       guestId: guestId,
+      journeyProgressRepo: journeyProgressRepo,
+      journeyLevel: widget.args.journeyLevel,
     )..attach();
-    setState(() => _controller = controller);
+    setState(() {
+      _controller = controller;
+      _showColumnTutorial = showTutorial;
+    });
   }
+
+  Future<void> _dismissColumnTutorial() async {
+    if (!_showColumnTutorial) return;
+    setState(() => _showColumnTutorial = false);
+    try {
+      await ref.read(journeyTutorialRepoProvider).acknowledgeColumnTutorial();
+    } catch (error) {
+      debugPrint('journey: tutorial ack write failed (non-fatal) — $error');
+    }
+  }
+
+  /// F05 — `Next Level` handler for F04's `CompletionPanel.onNextLevel`
+  /// (`architecture.md §8`). `pushReplacement` to N+1, or `/` (→ terminal) when
+  /// there is no next level. `null` for a non-Journey session.
+  VoidCallback? _nextLevelHandler() {
+    final n = widget.args.journeyLevel;
+    if (widget.args.source != PuzzleSource.journey || n == null) return null;
+    return () async {
+      var manifestLen = journeyLevelCount;
+      try {
+        final manifest = await ref.read(journeyManifestProvider(_lang).future);
+        manifestLen = manifest.levels.length;
+      } catch (_) {
+        // manifest unavailable → treat as "no next level" → terminal
+        manifestLen = n;
+      }
+      if (!mounted) return;
+      final next = nextJourneyLevel(n, manifestLevelCount: manifestLen);
+      if (next == null) {
+        context.go(Routes.home);
+      } else {
+        context.pushReplacement(
+          Routes.play,
+          extra: PlaySessionArgs(
+            source: PuzzleSource.journey,
+            journeyLevel: next,
+          ),
+        );
+      }
+    };
+  }
+
+  // Launch language for the MVP (F10 owns switching).
+  static const String _lang = 'tr';
 
   @override
   void dispose() {
@@ -136,20 +215,39 @@ class _LoadedPlaySessionState extends ConsumerState<_LoadedPlaySession>
     if (c == null) return const _PlayScaffold(child: _LoadingBoard());
 
     final strings = PlayStrings.of(c.lang);
+    final onNext = _nextLevelHandler();
     return _PlayScaffold(
       child: AnimatedBuilder(
         animation: c,
-        builder: (context, _) => _PlayBody(controller: c, strings: strings),
+        builder: (context, _) {
+          final won = c.phase == PlaySessionPhase.won;
+          return Stack(
+            children: <Widget>[
+              _PlayBody(controller: c, strings: strings, onNextLevel: onNext),
+              if (_showColumnTutorial && !won)
+                ColumnTutorialOverlay(
+                  controller: c,
+                  strings: JourneyStrings.of(c.lang),
+                  onSatisfied: _dismissColumnTutorial,
+                ),
+            ],
+          );
+        },
       ),
     );
   }
 }
 
 class _PlayBody extends StatelessWidget {
-  const _PlayBody({required this.controller, required this.strings});
+  const _PlayBody({
+    required this.controller,
+    required this.strings,
+    this.onNextLevel,
+  });
 
   final PlaySessionController controller;
   final PlayStrings strings;
+  final VoidCallback? onNextLevel;
 
   @override
   Widget build(BuildContext context) {
@@ -238,6 +336,7 @@ class _PlayBody extends StatelessWidget {
                     bareMoves: controller.moveCount,
                     onRetry: controller.retryFromCompletion,
                     onClose: () => _popToCaller(context),
+                    onNextLevel: onNextLevel,
                   )
                 : const SizedBox.shrink(),
           ),

@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "2026.09-interim",
+  "id": "journey-tr-01",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 1,
+  "language": "tr",
+  "grid": [
+    "ASALM",
+    "BCDFG",
+    "HJKLN",
+    "PRTUV",
+    "YZBCD"
+  ],
+  "targetWord": "MASAL",
+  "lockedCells": [],
+  "frozenCells": [],
+  "columnMovesEnabled": false,
+  "optimalMoves": 1,
+  "difficultyScore": 0.813,
+  "difficultyLabel": "easy",
+  "difficultyBreakdown": {
+    "o": 1,
+    "cNorm": 0.0,
+    "tdDegree": 0,
+    "locked": 0,
+    "frozen": 0,
+    "firstMoves": 1,
+    "distinctOptimalSolutions": 1
+  }
+}

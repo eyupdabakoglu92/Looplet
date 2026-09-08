@@ -11,6 +11,7 @@ import '../engine/move_shorthand.dart';
 import '../persistence/active_session_snapshot.dart';
 import '../persistence/elapsed_timer.dart';
 import '../persistence/repositories/active_session_repo.dart';
+import '../persistence/repositories/journey_progress_repo.dart';
 import '../persistence/repositories/personal_best_repo.dart';
 import '../persistence/session_restore.dart';
 import '../rating/completion_result.dart';
@@ -73,11 +74,15 @@ class PlaySessionController extends ChangeNotifier {
     ActiveSessionSnapshot? restoreFrom,
     PersonalBestRepo? personalBestRepo,
     String? guestId,
+    JourneyProgressRepo? journeyProgressRepo,
+    int? journeyLevel,
   }) : _validator = validator,
        _repo = activeSessionRepo,
        _resolver = resolver,
        _personalBestRepo = personalBestRepo,
        _guestId = guestId,
+       _journeyProgressRepo = journeyProgressRepo,
+       _journeyLevel = journeyLevel,
        _clock = clock ?? (() => DateTime.now().toUtc()) {
     final restored = _tryRestore(restoreFrom);
     if (restored != null) {
@@ -111,6 +116,8 @@ class PlaySessionController extends ChangeNotifier {
   final GestureResolver _resolver;
   final PersonalBestRepo? _personalBestRepo;
   final String? _guestId;
+  final JourneyProgressRepo? _journeyProgressRepo;
+  final int? _journeyLevel;
   final DateTime Function() _clock;
 
   late final GridEngine _engine;
@@ -458,6 +465,30 @@ class PlaySessionController extends ChangeNotifier {
       optimal: optimal,
       stars: stars,
     );
+    // F05 — Journey unlock (`f05 architecture.md §7`): independent local write,
+    // fire-and-forget with a caught failure, after the `personal_best` write is
+    // initiated. Never blocks the panel.
+    unawaited(_resolveJourneyUnlock());
+  }
+
+  /// F05 — mark the completed Journey level and unlock the next
+  /// (`JourneyProgressRepo.markCompleted`, transactional + idempotent). Skipped
+  /// for a non-Journey session or an unwired caller (unit tests).
+  Future<void> _resolveJourneyUnlock() async {
+    final repo = _journeyProgressRepo;
+    final guestId = _guestId;
+    final level = _journeyLevel;
+    if (repo == null ||
+        guestId == null ||
+        level == null ||
+        source != PuzzleSource.journey) {
+      return;
+    }
+    try {
+      await repo.markCompleted(guestId, level);
+    } catch (error) {
+      debugPrint('journey: unlock_persist_failed (non-fatal) — $error');
+    }
   }
 
   /// Fire-and-forget with a **caught** failure (same posture as [_persist]).

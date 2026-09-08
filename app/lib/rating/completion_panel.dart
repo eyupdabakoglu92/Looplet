@@ -165,6 +165,7 @@ class _CompletionPanelState extends State<CompletionPanel>
             onRetry: widget.onRetry,
             onClose: widget.onClose,
             onNextLevel: widget.onNextLevel,
+            isPerfect: widget.result?.isPerfect ?? false,
           ),
         ],
       ),
@@ -800,6 +801,7 @@ class _Actions extends StatelessWidget {
     required this.onRetry,
     required this.onClose,
     required this.onNextLevel,
+    required this.isPerfect,
   });
 
   final PlayStrings strings;
@@ -808,8 +810,34 @@ class _Actions extends StatelessWidget {
   final VoidCallback onClose;
   final VoidCallback? onNextLevel;
 
+  /// `stars == 3` — drives the per-outcome CTA weighting (`ui-design.md §7.4`,
+  /// `f05 architecture.md §16`).
+  final bool isPerfect;
+
   @override
   Widget build(BuildContext context) {
+    // Exactly one amber pill per panel. `Next Level` becomes the primary only
+    // when it is BOTH the natural next action (Perfect) AND actually wired
+    // (F05 supplies a handler; the debug entry does not).
+    final canNext = onNextLevel != null;
+    final nextIsPrimary = isPerfect && canNext;
+
+    final primary = nextIsPrimary
+        ? _CtaPill(
+            label: rating.nextLevel,
+            onPressed: onNextLevel,
+            primary: true,
+          )
+        : _CtaPill(label: strings.retry, onPressed: onRetry, primary: true);
+    final secondary = nextIsPrimary
+        ? _CtaPill(label: strings.retry, onPressed: onRetry, primary: false)
+        : _CtaPill(
+            label: rating.nextLevel,
+            onPressed: onNextLevel,
+            primary: false,
+            disabledSuffix: canNext ? null : rating.soon,
+          );
+
     return Padding(
       padding: EdgeInsets.fromLTRB(
         28,
@@ -820,13 +848,9 @@ class _Actions extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          _RetryCta(label: strings.retry, onPressed: onRetry),
+          primary,
           const SizedBox(height: 10),
-          _NextLevelCta(
-            label: rating.nextLevel,
-            soon: rating.soon,
-            onPressed: onNextLevel,
-          ),
+          secondary,
           const SizedBox(height: 4),
           GestureDetector(
             behavior: HitTestBehavior.opaque,
@@ -846,73 +870,72 @@ class _Actions extends StatelessWidget {
   }
 }
 
-class _RetryCta extends StatelessWidget {
-  const _RetryCta({required this.label, required this.onPressed});
-
-  final String label;
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      label: label,
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: onPressed,
-        child: Container(
-          height: 54,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: <Color>[PlayTheme.amber, PlayTheme.amberLo],
-            ),
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: const <BoxShadow>[
-              BoxShadow(
-                color: Color(0x4DFFB020),
-                blurRadius: 20,
-                offset: Offset(0, 6),
-              ),
-            ],
-          ),
-          child: Text(
-            label,
-            style: const TextStyle(
-              fontSize: 17,
-              fontWeight: FontWeight.w700,
-              color: PlayTheme.inkAmber,
-              letterSpacing: 0.3,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Secondary CTA. In F04 scope [onPressed] is always `null` → a quiet ghost
-/// pill with a "· soon" affordance, inert (no toast / dialog). F05 wires it.
-class _NextLevelCta extends StatelessWidget {
-  const _NextLevelCta({
+/// One completion-panel CTA. `primary` → the amber filled pill (`Retry`'s F04
+/// treatment); otherwise a quiet ghost pill. A `null` `onPressed` on a
+/// non-primary pill renders it disabled with an optional `disabledSuffix`
+/// (`· yakında`) — the debug-entry path (F05 always supplies a handler).
+class _CtaPill extends StatelessWidget {
+  const _CtaPill({
     required this.label,
-    required this.soon,
     required this.onPressed,
+    required this.primary,
+    this.disabledSuffix,
   });
 
   final String label;
-  final String soon;
   final VoidCallback? onPressed;
+  final bool primary;
+  final String? disabledSuffix;
 
   @override
   Widget build(BuildContext context) {
     final enabled = onPressed != null;
+
+    if (primary) {
+      return Semantics(
+        button: true,
+        label: label,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: onPressed,
+          child: Container(
+            height: 54,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: <Color>[PlayTheme.amber, PlayTheme.amberLo],
+              ),
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: const <BoxShadow>[
+                BoxShadow(
+                  color: Color(0x4DFFB020),
+                  blurRadius: 20,
+                  offset: Offset(0, 6),
+                ),
+              ],
+            ),
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.w700,
+                color: PlayTheme.inkAmber,
+                letterSpacing: 0.3,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
     return Semantics(
       button: true,
       enabled: enabled,
-      label: enabled ? label : '$label — $soon',
+      label: enabled || disabledSuffix == null
+          ? label
+          : '$label — $disabledSuffix',
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: onPressed,
@@ -935,7 +958,7 @@ class _NextLevelCta extends StatelessWidget {
                   color: PlayTheme.muted.withValues(alpha: enabled ? 1 : 0.45),
                 ),
               ),
-              if (!enabled) ...<Widget>[
+              if (!enabled && disabledSuffix != null) ...<Widget>[
                 Text(
                   '  ·  ',
                   style: PlayTheme.microLabel.copyWith(
@@ -943,7 +966,7 @@ class _NextLevelCta extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  soon,
+                  disabledSuffix!,
                   style: PlayTheme.helper.copyWith(
                     fontSize: 11,
                     color: PlayTheme.muted.withValues(alpha: 0.45),

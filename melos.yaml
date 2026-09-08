@@ -40,6 +40,27 @@ scripts:
       melos exec --scope="looplet_authoring" --
       "dart run bin/looplet_authoring.dart check ../../content --repo-root ../.."
 
+  content:sync:
+    description: >-
+      Mirror the authored Journey content (content/journey/**) into the app
+      bundle (app/assets/journey/**) so `flutter build` picks it up (F05
+      architecture.md §5.1). A no-op until F06-CONTENT populates content/journey/;
+      the interim 5-level pack is hand-maintained directly under app/assets/journey/.
+    run: >-
+      bash -c 'set -e; if [ -d content/journey ]; then mkdir -p app/assets/journey;
+      rsync -a --delete content/journey/ app/assets/journey/;
+      echo "synced content/journey -> app/assets/journey"; else
+      echo "content/journey/ not present yet (interim pack is under app/assets/journey/) — skipped"; fi'
+
+  content:journey:
+    description: >-
+      F05 Journey content-manifest build gate (f05 architecture.md §5.4). Runs
+      inside `melos run test`. smoke mode logs a <30 shortfall; strict mode
+      fails.
+    run: >-
+      melos exec --scope="looplet_app" --
+      "flutter test test/journey/journey_manifest_gate_test.dart"
+
   test:integration:
     description: >-
       F03 play-session integration_test suite. Best-effort per release.md §4;

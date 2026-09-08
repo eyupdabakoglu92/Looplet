@@ -4,6 +4,8 @@ import 'package:looplet_content/looplet_content.dart';
 import 'package:looplet_engine/looplet_engine.dart';
 
 import '../engine/engine_providers.dart';
+import '../journey/journey_content.dart';
+import '../persistence/persistence_providers.dart';
 import 'debug_puzzle_library.dart';
 import 'play_session_args.dart';
 
@@ -35,9 +37,29 @@ final playSessionSetupProvider =
         return PlaySessionSetup(puzzle: puzzle, validator: validator);
       }
 
-      // F05 / F07 territory — no real content resolution exists yet.
+      // F05 — Journey: resolve the bundled level by number (`architecture.md
+      // §5.3`). A missing/corrupt manifest entry or asset throws
+      // `JourneyContentException`, which the `/play` screen renders as F03's
+      // load-error state (the rest of the Journey stays playable).
+      final level = args.journeyLevel;
+      if (args.source == PuzzleSource.journey && level != null) {
+        String lang = 'tr';
+        try {
+          final guestId = await ref.watch(currentGuestIdProvider.future);
+          lang = (await ref.watch(settingsRepoProvider).read(guestId)).language;
+        } catch (_) {
+          // No settings row (tests / first launch) — fall back to the launch
+          // language.
+        }
+        final puzzle = await ref
+            .watch(journeyContentRepoProvider)
+            .loadLevel(level, lang);
+        return PlaySessionSetup(puzzle: puzzle, validator: validator);
+      }
+
+      // F07 territory — Daily content resolution does not exist yet.
       throw UnsupportedError(
         'play session for source "${args.source.name}" is not wired yet '
-        '(F05 Journey / F07 Daily). Use the debug entry.',
+        '(F07 Daily). Use a Journey level or the debug entry.',
       );
     });
