@@ -9,13 +9,15 @@
 
 **In Progress — `architecture.md` LOCKED 2026-09-07 (Tech Lead DURUM 3).** Skeleton → `analysis.md` (D1–D8) → **contract LOCKED**: D1–D8 consumed into `architecture.md`; `[PENDING — ANALYSIS]` resolved. **`Release Scope = none`** (the Journey content pack is bundled in the binary — same posture as F01 dictionary assets / F06 smoke content; the content-manifest build gate is a Frontend/tooling task ≈ F06's `content:check`; **no `DevOps/Release Engineer` for F05**). The **first app-build distribution** (TestFlight/Play internal — needs the deferred Apple Developer Program + Play Integrity) is a **separate deferred portfolio gate**, parked alongside F08's Firebase deploy — **not an F05 `Done` blocker**. **`F06-CONTENT`** (the 30 authored Journey levels + a `mode:"strict"` manifest) is a **human/content deliverable (no canonical role; owner: Level Designer / user)** and the **hard prerequisite for F05 `Done`** — F05 code + QA proceed against the §5.5 interim `mode:"smoke"` manifest. **F04 `Next Level` CTA-weighting follow-on** folded into F05-UI + F05-FE scope (`architecture.md §16`). No F03/F04/F06/F08 contract change.
 
-**Next: UI Designer** (F05-UI → `ui-design.md`).
+**F05-UI done (2026-09-08).** `ui-design.md` delivered — Direction A **"The loop, filling"**: the home surface on F03's exact stage with a **30-tick progress ring** as the hero (`N / 30` tabular count at its centre, one continuous amber glow on the completed run, a bright current node, a `cyan` ring + breathing pulse when that level is in-progress), a dominant **CONTINUE** pill (F04's amber `_RetryCta` treatment) nested into the ring's bottom gap; the **"all 30 complete" terminal variant** (closed glowing ring + one restrained bloom + `TAMAMLANDI` + CONTINUE repurposed → `TEKRAR OYNA` → Level 1); the **4–6 column micro-tutorial overlay** (diegetic board-dim + a looping vertical-drag gesture ghost + F03's cyan loop-rails + one line of copy, **no button**, action-gated on a column-axis drag, re-shows until done, leaving via the chevron doesn't persist `ack`); the **F04 `CompletionPanel` CTA-weighting rule** (`architecture.md §16` resolved — 3★/`isPerfect` → the amber pill is `SONRAKİ` + ghost pill `YENİDEN`; 1–2★ / no-optimal → the amber pill stays `YENİDEN` + ghost pill `SONRAKİ`, now **enabled**, `· yakında` dropped; exactly one amber pill per panel; everything else in F04's panel untouched). Reuses F03's `PlayTheme` — **no new tokens**. Self-review 93/100. 4 non-blocking `Needs Tech Lead Clarification` items (terminal CONTINUE → Level 1 default; micro-tutorial gate strictness; wordmark type-only vs a logo asset; microcopy → PO/localization).
+
+**Next: Frontend/Mobile Developer** (F05-FE.CONTENT…TESTS).
 
 ---
 
 ## Current Owner
 
-UI Designer
+Frontend/Mobile Developer
 
 ---
 
@@ -37,8 +39,8 @@ UI Designer
 - [x] Task ID: F05.SKELETON-TL | Assigned Role: Tech Lead | Status: **Done (2026-09-07)** | `prd.md` + initial `architecture.md` contract **brief** produced (substrate enumerated; `[PENDING — ANALYSIS]` items listed). Complexity decided (COMPLEX; Technical Analyst first; UI Designer required; DevOps TBD at DURUM 3). Routing set.
 - [x] Task ID: F05.ANALYSIS-TA | Assigned Role: Technical Analyst | Status: **Done (2026-09-07)** | `analysis.md` delivered. Resolves `architecture.md §14 [PENDING — ANALYSIS]` with recommendations **D1–D8** (D1 id scheme `journey-<lang>-<NN>` ↔ `journeyLevelNumber`, no new F08 snapshot field; D2 tutorial-ack flag in the existing `kv` table — **no F08 schema change**; D3 unlock write injected into `PlaySessionController` mirroring F04's `personalBestRepo` pattern, fire-and-forget caught, after the `personal_best` write; D4 `Next Level` = `pushReplacement`, terminal + tutorial as in-screen states, no new routes; D5 app-layer `rootBundle` loader with assets in `app/assets/journey/<lang>/` mirrored from `content/`, keeping `looplet_content` pure Dart; D6 a content-manifest build gate with smoke/strict modes; D7 an interim `journey_manifest_tr.json` mapping the F06 smoke set to levels 1–5; D8 the F09 seam shipped with `onboardingComplete` hard-`true`). 3 items left for the Tech Lead at DURUM 3 (`Release Scope` / `F05-DEVOPS`; `F06-CONTENT` scheduling; the F04 `Next Level` weighting-swap scope). No upstream business-rule conflict (1★ → `Next Level` resolved by the PRD AC — **yes**). No F03/F04/F06/F08 contract change needed. Full task breakdown (F05-FE.CONTENT/GATE/PROGRESS/UNLOCK/NAV/HOME/TUTORIAL/STRINGS/TESTS) + QA scope in `analysis.md §16`.
 - [x] Task ID: F05.CONTRACT-TL | Assigned Role: Tech Lead | Status: **Done (2026-09-07)** | DURUM 3 — `architecture.md` **LOCKED**: D1–D8 consumed (§4 id scheme D1 as a hard constraint on `F06-CONTENT`; §5 D5/D6/D7 content pack + manifest + interim; §7 D3 unlock write; §8 D4 navigation; §9 D2 `kv` tutorial flag; §11 D8 F09 seam; §14 `kv` key registry; §16 the F04 `Next Level` CTA-weighting follow-on in F05-UI+FE scope). **`Release Scope = none`** (bundled content pack ≈ F01/F06 precedent; the content-manifest gate is a Frontend task; no DevOps). First-app-distribution = a separate deferred portfolio gate (parked with F08 deploy), not an F05 `Done` blocker. **`F06-CONTENT` scheduled** — surfaced to the user as an explicit decision (author the 30 levels now, or defer F05 `Done` like F08); tracked in `f06 orchestration.md → Open Tasks → Content` + F05 Blockers. UI brief written (see `## Next Action`). `feature-board.md` + `system-state.md` synced.
-- [ ] Task ID: F05-UI | Assigned Role: UI Designer | Status: **Open — NEXT** | `ui-design.md` — (1) the minimal **home surface** (LOOPLET wordmark + CONTINUE primary CTA + a "`N` / 30" journey-progress indicator + the **"all 30 complete" terminal variant** — CONTINUE hidden vs "Replay a level", your call), replacing the debug `HomeScreen`; (2) the **levels 4–6 column micro-tutorial overlay** — an action-gated coach-mark over the F03 board, re-shows until the gated column shift; (3) the **F04 `CompletionPanel` per-outcome CTA-weighting rule** (`architecture.md §16` — proposal: 3★/`isPerfect` → `Next Level` primary, 1–2★ → `Retry` primary; applies to the existing panel). Chrome / atmosphere parity with F03's `ui-design.md` Direction A; `design-doctrine.md` + `premium-ui-rubric.md` ≥ 90. No code. See the brief in `## Next Action`.
-- [ ] Task ID: F05-FE.CONTENT | Assigned Role: Frontend/Mobile Developer | Status: Open (after F05-UI) | The Journey manifest + interim `content/journey/tr/journey_manifest_tr.json` (`mode:"smoke"`, F06 smoke set → levels 1–5 per `architecture.md §5.5`) + the 5 re-`id`'d interim artifacts under `content/journey/tr/`; the app-layer resolver (fills `playSessionSetupProvider`'s `journeyLevel` branch — `rootBundle` load + `Puzzle.fromJson` + cache + `JourneyContentException` → F03 load-error); the `journeyLevelId` / `parseJourneyLevel` mapping helpers; register `app/assets/journey/**` + a `melos run content:sync` mirror step.
+- [x] Task ID: F05-UI | Assigned Role: UI Designer | Status: **Done (2026-09-08)** | `ui-design.md` delivered — Direction A "The loop, filling": home surface (F03 stage + a 30-tick progress ring hero with `N / 30` centre count + a dominant CONTINUE nested in the ring gap + a `cyan` in-progress resume node); the "all 30 complete" terminal variant (closed glowing ring + one bloom + `TAMAMLANDI` + CONTINUE → `TEKRAR OYNA` → Level 1); the 4–6 column micro-tutorial overlay (diegetic board-dim + a looping gesture ghost + F03's cyan rails + one line, no button, action-gated on a column-axis drag, re-shows until done); the F04 `CompletionPanel` CTA-weighting rule (`architecture.md §16` — 3★ → amber pill on `SONRAKİ`; 1–2★ → amber pill stays `YENİDEN`; `Next Level` always enabled, `· yakında` dropped; one amber pill per panel; rest of F04's panel untouched). Reuses F03 `PlayTheme` — no new tokens. Self-review 93/100. `architecture.md §17 [PENDING — UI]` resolved. 4 non-blocking Tech Lead clarification notes (§14).
+- [ ] Task ID: F05-FE.CONTENT | Assigned Role: Frontend/Mobile Developer | Status: **Open — NEXT** | The Journey manifest + interim `content/journey/tr/journey_manifest_tr.json` (`mode:"smoke"`, F06 smoke set → levels 1–5 per `architecture.md §5.5`) + the 5 re-`id`'d interim artifacts under `content/journey/tr/`; the app-layer resolver (fills `playSessionSetupProvider`'s `journeyLevel` branch — `rootBundle` load + `Puzzle.fromJson` + cache + `JourneyContentException` → F03 load-error); the `journeyLevelId` / `parseJourneyLevel` mapping helpers; register `app/assets/journey/**` + a `melos run content:sync` mirror step.
 - [ ] Task ID: F05-FE.GATE | Assigned Role: Frontend/Mobile Developer | Status: Open | The content-manifest build gate (extend `melos run content:check` / an `app` asset test) with `smoke` / `strict` modes per `architecture.md §5.4` (always: parse + id + `optimalMoves >= 1` + checksum; band rules; `strict` ⇒ `levels.length == 30` fails CI).
 - [ ] Task ID: F05-FE.PROGRESS | Assigned Role: Frontend/Mobile Developer | Status: Open | The progression read-model provider (`LevelState` per level + `currentLevel` + `progressCount`) over `JourneyProgressRepo.watch` + an `activeSessionRepo.read()` (`architecture.md §6`).
 - [ ] Task ID: F05-FE.UNLOCK | Assigned Role: Frontend/Mobile Developer | Status: Open | Inject `journeyProgressRepo` + `journeyLevel` into `PlaySessionController` (mirror F04's `personalBestRepo` + `guestId`); on win → `markCompleted(guestId, journeyLevel)` fire-and-forget caught, after the `personal_best` write (`architecture.md §7`). Plumb `PlaySessionArgs.journeyLevel` through `_LoadedPlaySession._init()` (additive).
@@ -74,10 +76,10 @@ UI Designer
 - [x] (F05.CONTRACT-TL) DURUM 3 — `architecture.md` LOCKED (D1–D8) 2026-09-07. `Release Scope = none`; no DevOps. `F06-CONTENT` surfaced to the user. F04 CTA-weighting follow-on folded into F05-UI + F05-FE.
 
 ### UI Design
-- [ ] (F05-UI) `ui-design.md` — home CONTINUE/progress/terminal + the 4–6 micro-tutorial overlay + the F04 `CompletionPanel` per-outcome CTA-weighting rule. **NEXT.**
+- [x] (F05-UI) `ui-design.md` — delivered 2026-09-08. Direction A "The loop, filling": home surface (F03 stage + 30-tick progress ring hero + dominant CONTINUE + cyan resume node) + "all 30 complete" terminal variant (→ `TEKRAR OYNA` Level 1) + the 4–6 column micro-tutorial overlay (diegetic, action-gated, no button) + the F04 `CompletionPanel` CTA-weighting rule (3★ → amber pill on `SONRAKİ`; 1–2★ → stays `YENİDEN`; `· yakında` dropped). No new tokens. 93/100. `architecture.md §17 [PENDING — UI]` resolved.
 
 ### Frontend
-- [ ] (F05-FE.CONTENT / .GATE / .PROGRESS / .UNLOCK / .NAV / .HOME / .TUTORIAL / .STRINGS+.TESTS) — against the LOCKED `architecture.md` + `ui-design.md`. After F05-UI.
+- [ ] (F05-FE.CONTENT / .GATE / .PROGRESS / .UNLOCK / .NAV / .HOME / .TUTORIAL / .STRINGS+.TESTS) — against the LOCKED `architecture.md` + `ui-design.md`. **NEXT.**
 
 ### QA
 - [ ] (F05-QA) end-to-end client QA per `architecture.md §15`. After Frontend.
@@ -127,8 +129,14 @@ UI Designer
 
 ## Last Update
 
-* Updated By: Tech Lead
-* Timestamp: 2026-09-07
+* Updated By: UI Designer
+* Timestamp: 2026-09-08
+* Summary: **F05-UI complete.** `ui-design.md` delivered — Direction A **"The loop, filling"** (chosen over Direction B "stacked minimal — wordmark / bar / button", which the rubric fails as generic). **Home surface** on F03's exact stage (`stage-0 → stage-1` gradient + radial spotlight + vignette): a **30-tick progress ring** as the hero — a ~300° arc, completed run in one continuous `amber` glow, a bright **current node**, a **`cyan` ring + slow breathing pulse when that level is in-progress** (the only `cyan` on the home); the count `N / 30` (tabular `paper` `N` + `muted` `/ 30` + a `SEVİYE` micro-label) sits at the ring's centre and **settle-ticks + pulses** when it changes (live via `JourneyProgressRepo.watch`); a dominant **CONTINUE** pill (F04's amber `_RetryCta` treatment, ~66–72 % width) **nested into the ring's bottom gap**, with a `Seviye {N}` caption (`· sürüyor` for a resumable level). **"All 30 complete" terminal variant:** the ring closes to full `amber` + one restrained bloom on entry, centre `30 / 30` + `TAMAMLANDI` kicker, CONTINUE **repurposed → `TEKRAR OYNA`** (→ Level 1, progress not reset) — never hidden/greyed. **4–6 column micro-tutorial overlay** (on `/play`): a dim layer (`#000` ~45 %) above the board / below F03's chevron, a **looping vertical-drag gesture ghost** + F03's **cyan loop-rails igniting** on its motion + **one line** of copy — **no button, no "Got it"**; clears **only** on a gesture F03 resolves to `MoveAxis.column` (applied or bounced); re-prompt (one emphatic ghost cycle + a copy pulse) on a row gesture / 6 s idle; leaving via the chevron does **not** persist `ack`; fade-out ~200 ms. **F04 `CompletionPanel` CTA-weighting rule** (`architecture.md §16` resolved): **exactly one amber `_RetryCta`-style pill per panel, primary, top of the stack** — **3★/`isPerfect` → the amber pill is `SONRAKİ`** + ghost pill `YENİDEN`; **1–2★ / no-optimal → the amber pill stays `YENİDEN`** + ghost pill `SONRAKİ` (**now enabled**, `· yakında` dropped); level 30 → per the star result, `Next Level` routes to the terminal state; everything else in F04's panel (star reveal, `N / 3`, triptych, markers, six variants, `Kapat`) **untouched**. Reduced-motion → static end-states (ghost static + arrow visible; ring fully drawn; count final; tutorial still gates on the column shift). Reuses F03's `PlayTheme` — **no new tokens**. Self-review **93/100** (target band; no fail conditions). `architecture.md §17 [PENDING — UI]` resolved. **4 non-blocking `Needs Tech Lead Clarification` items (§14):** (1) terminal CONTINUE → Level 1 (default chosen — a working CTA over a hidden one); (2) micro-tutorial gate strictness (column `endDrag` applied-or-bounced, default); (3) wordmark type-only vs a logo asset; (4) microcopy → PO/localization. `Current Owner → Frontend/Mobile Developer`; `Next Role → Frontend/Mobile Developer`. `feature-board.md` + `system-state.md` **not touched** (Tech Lead syncs global surfaces).
+
+---
+
+## Superseded — prior Last Update (Tech Lead, 2026-09-07 — F05.CONTRACT-TL)
+
 * Summary: **F05.CONTRACT-TL complete — `architecture.md` LOCKED (DURUM 3).** D1–D8 from `analysis.md` consumed: D1 id scheme `journey-<lang>-<NN>` ↔ `journeyLevelNumber` locked as a **hard constraint on `F06-CONTENT`** (`§4`; no new F08 snapshot field); D2 the 4–6 tutorial-ack flag → a **`kv` row** (`§9`, §14 `kv` key registry; **no F08 schema change**); D3 the unlock write injected into `PlaySessionController` (`§7`); D4 `Next Level` = `pushReplacement` + in-screen terminal/tutorial + back → `/` (`§8`); D5 app-layer `rootBundle` loader + `content:sync` mirror, `looplet_content` stays pure (`§5.1`); D6 the content-manifest gate `smoke`/`strict`, Frontend-owned (`§5.4`); D7 the interim `mode:"smoke"` manifest (F06 smoke → levels 1–5, `§5.5`); D8 the F09 seam hard-`true` (`§11`). **`Release Scope = none`** (`§13`) — bundled content pack ≈ F01/F06 precedent; the content-manifest gate is F05-FE.GATE; **no `DevOps/Release Engineer` for F05**. **First-app-build distribution** carved out as `[DEFERRED — first-app-distribution]` (parked with F08 deploy — needs the deferred Apple Developer Program + Play Integrity; F03/F04 device smokes land there) — **not an F05 `Done` blocker**. **`F06-CONTENT`** (30 authored levels + a `strict` manifest) = a human/content deliverable with **no canonical role** — **surfaced to the user** as an explicit decision (author now vs defer F05 `Done`, the F08 shape); F05 code + QA proceed against the interim manifest. **F04 `Next Level` CTA-weighting follow-on** folded into F05-UI + F05-FE (`§16` — 3★ → `Next Level` primary, 1–2★ → `Retry` primary; additive tweak to `completion_panel.dart`, no F04 contract change). **No F03/F04/F06/F08 contract change.** Ledger opened: F05-UI (NEXT) → F05-FE.CONTENT/.GATE/.PROGRESS/.UNLOCK/.NAV/.HOME/.TUTORIAL/.STRINGS+.TESTS → F05-QA → Tech Lead close. `Current Owner → UI Designer`; `Next Role → UI Designer`. `feature-board.md` + `system-state.md` synced (F05 `In Progress` / UI Designer; `Release Scope = none`; `F06-CONTENT` surfaced).
 
 ---
@@ -141,60 +149,98 @@ UI Designer
 
 ## Next Role
 
-UI Designer
+Frontend/Mobile Developer
 
 ---
 
 ## Next Action
 
-### UI Designer — F05-UI → `ui-design.md` — ⬅ NEXT
+### Frontend/Mobile Developer — F05-FE.CONTENT…TESTS — ⬅ NEXT
 
 ```text
-Task: produce features/f05-journey-progression/ui-design.md — three surfaces. No code.
+Task: implement F05 against features/f05-journey-progression/architecture.md (LOCKED) +
+features/f05-journey-progression/ui-design.md. No contract changes — every touch-point is a seam-fill;
+the F03 win-path change is ADDITIVE (mirror F04's `personalBestRepo` injection).
 
-Authority: features/f05-journey-progression/architecture.md (LOCKED — §8 navigation, §9 the
-micro-tutorial contract, §10 the home surface contract, §16 the F04 CTA-weighting follow-on, §17
-[PENDING — UI]), features/f05-.../prd.md (AC7–AC13 + §6 constraints + §7 "Level 5 Reach > 60%"),
-features/f03-puzzle-play-session/ui-design.md (Direction A — the app's established chrome:
-`stage-0/stage-1` gradient, radial spotlight, vignette, `PlayTheme` tokens, the `CompletionSheet`/
-`CompletionPanel` surface family), features/f04-.../ui-design.md (the `CompletionPanel` layout you
-are re-weighting), design/design-doctrine.md, design/premium-ui-rubric.md.
+F05-FE.CONTENT — the manifest + resolver + mapping (architecture.md §4, §5.1–5.3, §5.5):
+  - `journeyLevelId(int n, String lang) -> 'journey-<lang>-<NN>'` (zero-padded) + `parseJourneyLevel(
+    String puzzleId) -> int?` helpers — the single source of the number<->id mapping.
+  - the interim `content/journey/tr/journey_manifest_tr.json` (`mode:"smoke"`, schema per §5.2) +
+    the 5 interim artifacts `content/journey/tr/journey-tr-01..05.json` = COPIES of the smoke JSON
+    (`smoke-tr-01/02/04/05/06`) re-`id`'d to `journey-tr-0N` with `journeyLevelNumber = n` (per the
+    §5.5 table); register `app/assets/journey/**` in `app/pubspec.yaml`; add a `melos run
+    content:sync` script (copy `content/journey/**` -> `app/assets/journey/**`), run in CI before build.
+  - the app-layer resolver: fill `playSessionSetupProvider`'s `journeyLevel != null` branch (resolve
+    lang via `SettingsRepo`, default `tr`; load+cache the manifest; `rootBundle.loadString` the asset;
+    `Puzzle.fromJson`; assert id/number/checksum) -> `PlaySessionSetup`. A missing/corrupt manifest
+    entry or asset -> a typed `JourneyContentException` -> F03's existing load-error state.
 
-Must deliver:
-1. The MINIMAL HOME SURFACE (replaces app/lib/home_screen.dart — a debug screen). Content per
-   architecture.md §10 / prd.md AC10: LOOPLET wordmark; CONTINUE as the single dominant primary
-   CTA (routes to the current/next Journey level); a journey-progress indicator ("N / 30" + a
-   completed/unlocked visual, live). This is the first screen a real build shows — it must read as
-   an App-Store-featured puzzle game's home, NOT a placeholder. It is NOT the F10 menu (no DAILY,
-   no Settings icon, no level-select map). Chrome parity with F03 Direction A (same dark stage /
-   gradient / spotlight family). App root — no back affordance.
-2. The "ALL 30 COMPLETE" TERMINAL VARIANT of the home surface — a distinct, earned end-state
-   (a completion moment). Decide: is CONTINUE hidden, or repurposed as "Replay a level"? No crash,
-   no dead button. (analysis.md §15 Q6 — your call.)
-3. The LEVELS 4–6 COLUMN MICRO-TUTORIAL OVERLAY (architecture.md §9). An action-gated coach-mark
-   over the F03 board: it teaches the column shift, the player performs one column shift to dismiss,
-   it re-shows on every 4–6 entry until that gated action. Distinct from F09 onboarding. Chrome
-   consistent with F03's in-flow dark stage — a diegetic coach-mark, not a modal wall. Define the
-   states (shown / gating / dismissed) and how it points at the gesture.
-4. The F04 `CompletionPanel` PER-OUTCOME CTA-WEIGHTING RULE (architecture.md §16). `Next Level` is
-   now live. Proposal to confirm/refine: `isPerfect` (3 stars) -> `Next Level` is the primary
-   (amber pill) and `Retry` steps down; 1-2 stars -> `Retry` stays primary and `Next Level` is the
-   secondary/ghost pill. Applies to the EXISTING panel (F04's 7 elements + six variants unchanged) —
-   this is a weighting swap, not a redesign. Specify exactly which CTA is the amber pill in each case.
+F05-FE.GATE — the content-manifest build gate (architecture.md §5.4). Extend `melos run content:check`
+  (or an `app` asset test): always parse + id + `optimalMoves >= 1` + checksum + contiguous `n`; the
+  §5.4 band rules; `mode:"smoke"` logs the shortfall and passes; `mode:"strict"` requires
+  `levels.length == 30` and fails CI on any violation.
 
-Out of scope: the play mechanic / board (F03); the completion-panel content + star reveal (F04 —
-only the CTA weighting is yours); the full F10 menu; where authored content comes from (F06-CONTENT);
-audio/haptics (F11). Reuse F03's PlayTheme tokens.
+F05-FE.PROGRESS — the progression read-model (architecture.md §6): a provider exposing `LevelState(n)`
+  for n in 1..30 + `currentLevel` + `progressCount`, over `JourneyProgressRepo.watch(guestId)` (live)
+  + one `activeSessionRepo.read()` (parse the in-progress Journey level via `parseJourneyLevel`).
 
-End: Current Owner → Frontend/Mobile Developer; Next Role → Frontend/Mobile Developer (F05-FE.*).
+F05-FE.UNLOCK — the unlock write (architecture.md §7): add optional ctor params `journeyProgressRepo`
+  + `journeyLevel` to `PlaySessionController` (mirror F04's `personalBestRepo` + `guestId`); on win, in
+  a sibling of `_resolvePersonalBest`, if `source == journey && ... != null` -> `markCompleted(guestId,
+  journeyLevel)` fire-and-forget with a CAUGHT failure (`debugPrint('journey: unlock_persist_failed
+  …')`), ordered AFTER the `personal_best` write. Plumb `PlaySessionArgs.journeyLevel` through
+  `_LoadedPlaySession._init()` (an additive line). No F03 contract field changes.
+
+F05-FE.NAV — `Next Level` + CONTINUE + back (architecture.md §8, §16 + ui-design.md §4/§7.4):
+  - fill F04's `CompletionPanel.onNextLevel`: `n < 30 && manifest has n+1` -> `context.pushReplacement
+    ('/play', extra: PlaySessionArgs(source: journey, journeyLevel: n+1))`; else `context.go('/')`.
+  - CONTINUE (home): resolve `currentLevel` (§6) -> `context.push('/play', extra: …)`; `null` ->
+    render the terminal home variant in place.
+  - `!canPop` -> `context.go('/')` fallback on the `/play` chevron / system back.
+  - the F04 CTA-weighting tweak in `completion_panel.dart`: exactly one amber `_RetryCta`-style pill
+    per panel; 3★/`isPerfect` -> the amber pill renders `SONRAKİ` (+ ghost `YENİDEN`); 1–2★/no-optimal
+    -> the amber pill stays `YENİDEN` (+ ghost `SONRAKİ`, enabled — drop the `· yakında` suffix). Order:
+    primary on top. ADDITIVE — F04's 7 AC7 elements + six variants + star reveal + triptych untouched.
+
+F05-FE.HOME — replace `app/lib/home_screen.dart` with the minimal home per `ui-design.md` (F03 stage;
+  a `CustomPainter` 30-tick progress ring — ~300° arc / 60° bottom gap, completed run = one continuous
+  amber glow, a bright current node, a `cyan` ring + slow pulse when in-progress; the `N / 30` tabular
+  count at the ring centre with a settle-tick on change; a dominant CONTINUE pill nested in the ring
+  gap + a `Seviye {N}` caption; the "all 30 complete" terminal variant -> CONTINUE `TEKRAR OYNA` ->
+  Level 1). Debug buttons behind `kDebugMode`. No spinner. App root — no back.
+
+F05-FE.TUTORIAL — the 4–6 column micro-tutorial overlay per `ui-design.md §6/§7.3` (dim layer above the
+  board / below F03's chevron; a looping vertical-drag gesture ghost + F03's cyan loop-rails; one line
+  of copy; NO button); a `JourneyTutorialRepo` for the `kv` key `journey_col_tutorial_ack` (architecture
+  .md §9, §14); trigger on `/play` load when `journeyLevel in 4..6 && !ack`; clears + persists only on a
+  gesture F03 resolves to `MoveAxis.column` (applied or bounced); re-prompt on a row gesture / 6 s idle;
+  leaving via the chevron does NOT persist. Reduced-motion -> static end state (ghost static, arrow
+  visible), still gates on the column shift.
+
+F05-FE.STRINGS + F05-FE.TESTS — a `JourneyStrings` per-language table in F03's interim pattern (keys in
+  `ui-design.md §13`). Tests: unit (`journeyLevelId`/`parseJourneyLevel`; the progression read-model;
+  the resolver incl. corrupt-asset -> `JourneyContentException`; the manifest gate smoke/strict); widget
+  (home mid/new/in-progress/terminal + the settle-tick; the tutorial gate + re-show + ack-persist +
+  leave-doesn't-persist; `Next Level` -> N+1 `pushReplacement` / terminal; the CTA weighting per outcome
+  — one amber pill, correct label); integration vs the REAL `JourneyProgressRepo` + an in-memory DB
+  (unlock idempotency at 1★ and 3★; CONTINUE resume via the F08 restore path). `analyze` +
+  `format:check` clean; full `flutter test` green (NO regression to the F03 play + F04 completion
+  suites); `flutter build ios --release --no-codesign` green. Append `frontend.md`.
+
+Out of scope: the star numbers + panel content (F04 §4/§5 — only the CTA weighting); the authored 30
+levels (`F06-CONTENT`); audio/haptics (F11); analytics (F12). Reuse F03's `PlayTheme` tokens; no new
+colour tokens.
+
+End: Current Owner → QA; Next Role → QA (F05-QA — `architecture.md §15`).
 ```
 
-→ then `Run Frontend/Mobile Developer` (F05-FE.CONTENT…TESTS) → `Run QA` → `Run Tech Lead` (F05 close). **No DevOps** (`Release Scope = none`).
+→ then `Run QA` → `Run Tech Lead` (F05 close — `Done` iff QA `Approved`/acceptable **and** `F06-CONTENT` delivered + the strict gate green). **No DevOps** (`Release Scope = none`).
 
 ---
 
 ## Change Log
 
+* v4 (2026-09-08) — UI Designer: **F05-UI complete.** `ui-design.md` delivered — **Direction A "The loop, filling"** (chosen over Direction B "stacked minimal", which the rubric fails). **Home surface** on F03's exact stage: a **30-tick progress ring** as the hero (~300° arc / 60° bottom gap; completed run = **one continuous `amber` glow**, not per-tick; a bright **current node**; a **`cyan` ring + slow breathing pulse when that level is in-progress** — the only `cyan` on the home); the `N / 30` tabular count at the ring's centre + a `SEVİYE` micro-label, **settle-ticks + pulses on change** (live via `JourneyProgressRepo.watch`); a dominant **CONTINUE** pill (F04's amber `_RetryCta` treatment, ~66–72 % width) **nested into the ring's bottom gap** + a `Seviye {N}` caption (`· sürüyor` when resumable). **"All 30 complete" terminal variant:** the ring closes to full `amber` + one restrained bloom on entry; centre `30 / 30` + `TAMAMLANDI`; CONTINUE **repurposed → `TEKRAR OYNA`** (→ Level 1, progress not reset) — never hidden/greyed. **4–6 column micro-tutorial overlay** (on `/play`): a dim layer (`#000` ~45 %) above the board / below F03's chevron; a **looping vertical-drag gesture ghost** + F03's **cyan loop-rails igniting** on its motion; **one line** of copy; **no button, no "Got it"**. Clears **only** on a gesture F03 resolves to `MoveAxis.column` (applied or bounced); re-prompt (one emphatic ghost cycle + a copy pulse) on a row gesture / 6 s idle; leaving via the chevron does **not** persist `ack`; fade-out ~200 ms. **F04 `CompletionPanel` CTA-weighting rule** (`architecture.md §16` resolved): **exactly one amber `_RetryCta`-style pill per panel, primary, top of the stack** — **3★/`isPerfect` → the amber pill is `SONRAKİ`** + ghost pill `YENİDEN`; **1–2★ / no-optimal → the amber pill stays `YENİDEN`** + ghost pill `SONRAKİ` (**now enabled**, `· yakında` dropped); level 30 → per the star result, `Next Level` routes to the terminal state; everything else in F04's panel (star reveal, `N / 3`, triptych, markers, six variants, `Kapat`) **untouched** — a weighting + order swap on the two existing CTA widgets, not a redesign. Reduced-motion → static end-states (ghost static + arrow visible; ring fully drawn; count final; tutorial still gates on the column shift). Accessibility: the ring is one `Semantics` node ("`N` of 30 levels complete — current level `N+1`"); CONTINUE announces its target; the tutorial announces its hint line. Reuses F03's `PlayTheme` — **no new tokens**. Self-review **93/100** (target band; no `premium-ui-rubric.md` fail conditions). `architecture.md §17 [PENDING — UI]` resolved. **4 non-blocking `Needs Tech Lead Clarification` items (§14):** (1) terminal CONTINUE → Level 1 — default chosen (a working CTA over a hidden one); (2) micro-tutorial gate strictness — dismiss on a column `endDrag` applied-or-bounced (default; FE+QA may tune to applied-only); (3) wordmark type-only vs a logo asset; (4) TR microcopy → PO/localization (same track as F03/F04). `Current Owner → Frontend/Mobile Developer`; `Next Role → Frontend/Mobile Developer` (F05-FE.CONTENT…TESTS). `feature-board.md` / `system-state.md` untouched (Tech Lead syncs global surfaces). Nothing committed to git.
 * v3 (2026-09-07) — Tech Lead: **F05.CONTRACT-TL — `architecture.md` LOCKED (DURUM 3).** `analysis.md` consumed — **D1–D8 all → LOCKED** in `architecture.md`: **D1** id scheme `journey-<lang>-<NN>` ↔ `journeyLevelNumber` as a **hard constraint on `F06-CONTENT`** (`§4`; F08 snapshot **not** extended — in-progress level = `parseJourneyLevel(puzzleId)`); **D2** the 4–6 tutorial-ack flag → a **`kv` row** `journey_col_tutorial_ack` (`§9`) + a `kv` key registry (`§14`) — **no F08 schema change**; **D3** the unlock write **injected into `PlaySessionController`** (mirrors F04's `personalBestRepo`), fire-and-forget caught, after the `personal_best` write (`§7`); **D4** `Next Level` = `pushReplacement`, terminal + tutorial = in-screen states (no new routes), all back → `/` (`§8`); **D5** an app-layer `rootBundle` loader, assets in `app/assets/journey/<lang>/` mirrored from `content/` by `melos run content:sync`, `looplet_content` stays pure Dart (`§5.1`); **D6** the content-manifest build gate with `smoke`/`strict` modes, **Frontend-owned (F05-FE.GATE)** ≈ F06's `content:check` (`§5.4`); **D7** an interim `mode:"smoke"` `journey_manifest_tr.json` mapping the F06 smoke set (`smoke-tr-01/02/04/05/06`) to levels 1–5 (`§5.5`); **D8** the F09 seam shipped with `onboardingComplete` hard-`true` (`§11`). **`Release Scope = none`** (`§13`) — the Journey content pack is bundled in the binary (same posture as F01 dictionary assets + F06 smoke content, both `none`); the one CI addition (the content-manifest gate + a `content:sync` mirror) is a Frontend/tooling task, not a DevOps turn → **no `DevOps/Release Engineer` for F05**. **First-app-build distribution** carved out as `[DEFERRED — first-app-distribution]` — a separate portfolio gate parked alongside F08's Firebase deploy (needs the deferred Apple Developer Program membership + Android Play Integrity SHA-256); F03's 3-item manual device confirmation + F04's N4 reveal-feel device smoke land there; **not an F05 `Done` blocker**. **`F06-CONTENT`** (the 30 authored Journey levels + a `mode:"strict"` manifest following `§4`/`§5.4`) = a **human/content deliverable with no canonical role** (owner: Level Designer / user) — **surfaced to the user** as an explicit decision (author the 30 levels now, parallel to F05 build; or accept F05 reaching "code-complete / QA-passed against interim content" and F05 `Done` waiting — the F08 shape). Tracked in `f06 orchestration.md → Open Tasks → Content` + F05 Blockers. **F04 `Next Level` CTA-weighting follow-on** (F04's `frontend.md §4` forward note) folded into **F05-UI + F05-FE** scope (`§16` — proposal: 3★/`isPerfect` → `Next Level` primary; 1–2★ → `Retry` primary; an **additive** tweak to `completion_panel.dart`, no F04 contract change, the 7 AC7 elements + six variants unchanged). **No F03/F04/F06/F08 contract change** across F05. **No upstream business-rule conflict** (1★ → `Next Level` = **yes**, per the PRD's own AC). Ledger opened: **F05-UI (NEXT)** → F05-FE.CONTENT / .GATE / .PROGRESS / .UNLOCK / .NAV / .HOME / .TUTORIAL / .STRINGS+.TESTS → F05-QA (`architecture.md §15`) → Tech Lead close. Routing: **UI Designer → Frontend/Mobile Developer → QA → Tech Lead close** (no DevOps). `Current Owner → UI Designer`; `Next Role → UI Designer`. `feature-board.md` + `system-state.md` synced (F05 `In Progress` / UI Designer; `Release Scope = none`; `F06-CONTENT` surfaced to the user; F04 `Done`, F08 In Release / parked — unchanged). Nothing committed to git.
 * v2 (2026-09-07) — Technical Analyst: **F05.ANALYSIS-TA complete.** `analysis.md` delivered — resolves `architecture.md §14 [PENDING — ANALYSIS]` with **D1–D8** (D1 id scheme `journey-<lang>-<NN>` ↔ `journeyLevelNumber`, no new F08 snapshot field — in-progress level parsed from `puzzleId`; D2 the 4–6 tutorial-ack flag in the existing **`kv`** table → **no F08 schema change** (alt = a `journey_progress` column + a forward-only migration); D3 the unlock write **injected into `PlaySessionController`** mirroring F04's `personalBestRepo` pattern, fire-and-forget caught, after the `personal_best` write (alt = a screen-level reaction); D4 `Next Level` = **`pushReplacement`**, terminal + tutorial = **in-screen states** (no new routes), all back paths → `/`; D5 an **app-layer `rootBundle` loader** with assets in `app/assets/journey/<lang>/` mirrored from `content/` (keeps `looplet_content` pure Dart; alt = bundle in `looplet_content`); D6 a **content-manifest build gate** with smoke/strict modes; D7 an **interim `journey_manifest_tr.json`** mapping the F06 smoke set (`smoke-tr-01/02/04/05/06`) to levels 1–5 for F05 build+QA; D8 the **F09 seam** shipped with `onboardingComplete` hard-`true`). **3 items deliberately left for the Tech Lead at DURUM 3** (`analysis.md §15` Open Questions 4/5/7): `Release Scope` + whether `F05-DEVOPS` opens (F05 is the plausible first app-build distribution gate; F03's 3-item manual device confirmation + F04's N4 reveal feel fold into that smoke); `F06-CONTENT` scheduling (hard prerequisite for F05 `Done`, not for build/QA against the interim manifest); the F04 `Next Level` weighting-swap scope. **No upstream business-rule conflict** — the one open PRD question (1★ → `Next Level`) is resolved by the PRD's own AC (**yes**, stars never gate); no PO escalation. **No F03/F04/F06/F08 contract change needed** — F05 is a pure consumer + seam-fill. **Contract risks flagged for the Tech Lead:** the id scheme (D1) is load-bearing for `personal_best` (F04) + snapshot resume (F03/F08) → must be written into `architecture.md` as a hard constraint on `F06-CONTENT`; the shared `kv` table wants a documented key registry. Full task breakdown (`analysis.md §16` — F05-FE.CONTENT/GATE/PROGRESS/UNLOCK/NAV/HOME/TUTORIAL/STRINGS/TESTS + QA scope). `Current Owner → Tech Lead` (F05.CONTRACT-TL); `Next Role → Tech Lead`. `feature-board.md` + `system-state.md` untouched (Technical Analyst does not sync global surfaces). Nothing committed to git.
 * v1 (2026-09-07) — Tech Lead: **F05 created + activated** after F04 → `Done` (QA re-verify `Approved with Notes`). P0; next on the critical path (`§12.6` `… F03, F05 …`); unblocked by F04 (the real stars/best completion panel) + F03 (`Done`) + F06 (`Done`, toolchain). `prd.md` derived from `product-prd.md` F05 section + §6.1 F05 row + §5.1/§5.2 user flows + §41 KPIs (AC1–AC14 — linear unlock stars-don't-gate; the 1–3 / 4–6 / 7–10 / 11–15 / 16–20 / 21–25 / 26–30 curve bands; CONTINUE resume via the F08 restore path; the "all 30 complete" terminal; `Next Level` = F05's handler for F04's `[PENDING — F05]` seam; the 4–6 column micro-tutorial re-show-until-acknowledged; offline Journey). Initial `architecture.md` **contract brief** (NOT LOCKED): §3 enumerates the substrate already built (F08 `journey_progress` + `JourneyProgressRepo`; F03 `/play` + `PlaySessionArgs.journeyLevel` + F08 restore; F04 `CompletionPanel.onNextLevel` seam + win path; F06 `Puzzle` + `toEngineConfig` + `export`/`check`); §4–§10 propose the progression model / bundled-content manifest+resolver / CONTINUE / micro-tutorial / home surface / routing / persistence; §14 lists the `[PENDING — ANALYSIS]` items. **Complexity: COMPLEX** (state-machine conceptuality; cross-feature dependency on the **unfinished `F06-CONTENT`**; a new bundled-content manifest/resolver; unsafe-assumption decisions — level-id↔number mapping, unlock-write ordering, route strategy, tutorial-flag location, F09 seam) → **Technical Analyst pass first**. **UI Designer required** (home CONTINUE/progress surface + column micro-tutorial overlay + "all complete" state). **DevOps TBD at F05.CONTRACT-TL** (F05 likely triggers the first app-build distribution gate + a Journey content pack → probably `Release Scope != none`; F03's 3-item manual device confirmation + F04's N4 device feel fold into the F05-era smoke). **`F06-CONTENT` is the hard prerequisite for F05 `Done`** — F05 builds/QAs against the 5-puzzle smoke set mapped into an interim manifest. Changes **no** F03/F04/F06/F08 contract (seam-fills + possibly one tiny F08 migration for the tutorial-acknowledged flag). Routing: **Technical Analyst → Tech Lead (DURUM 3 contract) → UI Designer → Frontend/Mobile Developer → QA → (DevOps if gated) → Tech Lead close.** `feature-board.md` + `system-state.md` synced (F04 → `Done`; F05 → `In Progress` / Technical Analyst; F08 unchanged / parked). Nothing committed to git.
