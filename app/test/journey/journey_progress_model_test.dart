@@ -1,5 +1,8 @@
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:looplet_app/journey/journey_content.dart'
+    show journeyLevelCount;
+import 'package:looplet_app/journey/journey_nav.dart';
 import 'package:looplet_app/journey/journey_progress.dart';
 import 'package:looplet_app/persistence/active_session_snapshot.dart';
 import 'package:looplet_app/persistence/app_database.dart';
@@ -124,4 +127,71 @@ void main() {
       expect(m.progressCount, 1);
     },
   );
+
+  // AC2 (`architecture.md §12` clarification): F05 has no navigation path that
+  // resolves to a `locked` level — the home's CONTINUE only ever targets
+  // `continueTarget`, and `Next Level` only advances to an earned `N+1`. There
+  // is no runtime guard (no MVP surface can request an arbitrary level — the
+  // level-select surface + guard are `[DEFERRED — F10]`); this proves the "no
+  // navigation to a locked level" guarantee holds by construction, across the
+  // new / mid / in-progress / terminal + last-available states.
+  test('no F05 navigation target is ever a `locked` level', () async {
+    void assertSafeTargets(JourneyProgressModel m, {required int manifestLen}) {
+      // CONTINUE — the only `LevelState`-driven navigation on the home.
+      final target = m.continueTarget;
+      if (target != null) {
+        expect(
+          m.stateOf(target),
+          isNot(LevelState.locked),
+          reason: 'CONTINUE resolved to a locked level ($target)',
+        );
+      } else {
+        expect(m.allComplete, isTrue); // null ⇔ terminal
+      }
+      // `Next Level` is only ever shown on the completion panel of a level the
+      // player JUST solved — so `markCompleted(n)` has fired and `n+1` is
+      // unlocked. From every completed level, its `Next Level` target is either
+      // an unlocked level or null (terminal), never a locked one.
+      for (var n = 1; n <= journeyLevelCount; n++) {
+        if (m.stateOf(n) != LevelState.completed) continue;
+        final next = nextJourneyLevel(n, manifestLevelCount: manifestLen);
+        if (next != null) {
+          expect(
+            m.stateOf(next),
+            isNot(LevelState.locked),
+            reason:
+                'Next Level from completed $n reached a locked level ($next)',
+          );
+        }
+      }
+    }
+
+    Future<JourneyProgressModel> current({
+      ActiveSessionSnapshot? snapshot,
+    }) async => buildJourneyProgressModel(
+      row: await repo.read(guestId),
+      activeSnapshot: snapshot,
+    );
+
+    // new (0 completed)
+    assertSafeTargets(await current(), manifestLen: 5);
+
+    // mid (1..3 completed)
+    for (final n in <int>[1, 2, 3]) {
+      await repo.markCompleted(guestId, n);
+    }
+    assertSafeTargets(await current(), manifestLen: 5);
+
+    // in-progress (level 4 resumable) + last-available boundary (manifest = 4)
+    assertSafeTargets(
+      await current(snapshot: _journeySnapshot('journey-tr-04')),
+      manifestLen: 4,
+    );
+
+    // terminal (all 30 completed)
+    for (var n = 4; n <= 30; n++) {
+      await repo.markCompleted(guestId, n);
+    }
+    assertSafeTargets(await current(), manifestLen: 30);
+  });
 }

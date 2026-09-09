@@ -1,15 +1,17 @@
-// F05-FE.GATE — the Journey content-manifest build gate (f05 architecture.md
-// §5.4). Loads the REAL bundled `assets/journey/tr/` pack via `rootBundle` and
-// validates it. `smoke` mode only logs a <30 shortfall; `strict` mode requires
-// exactly 30. Runs inside `melos run test` / `melos run content:journey`.
+// F05-FE.GATE — the Journey content-manifest build gate (`architecture.md
+// §5.4`). Loads the REAL bundled `assets/journey/tr/` pack via `rootBundle` and
+// runs `runJourneyManifestGate` — the same gate implementation
+// `journey_manifest_strict_test.dart` exercises against synthetic
+// smoke / strict manifests (the `mode:"strict"` failure path). Runs inside
+// `melos run test` / `melos run content:journey`.
 
 import 'dart:convert';
 
-import 'package:crypto/crypto.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:looplet_app/journey/journey_content.dart';
-import 'package:looplet_content/looplet_content.dart';
+
+import 'journey_gate_support.dart';
 
 Future<void> main() async {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -22,6 +24,9 @@ Future<void> main() async {
     jsonDecode(raw) as Map<String, Object?>,
   );
 
+  Future<String> readAsset(String assetKey) =>
+      rootBundle.loadString('assets/journey/$assetKey');
+
   test('manifest schema + contiguity', () {
     expect(manifest.schemaVersion, JourneyManifest.currentSchemaVersion);
     expect(manifest.lang, lang);
@@ -31,69 +36,46 @@ Future<void> main() async {
     }
   });
 
-  test(
-    'strict mode ⇒ exactly 30 levels (smoke mode only logs the shortfall)',
-    () {
-      if (manifest.isStrict) {
-        expect(
-          manifest.levels.length,
-          journeyLevelCount,
-          reason: 'strict Journey manifest must ship all 30 levels',
-        );
-      } else {
-        if (manifest.levels.length < journeyLevelCount) {
-          // ignore: avoid_print
-          print(
-            'journey content gate (smoke): ${manifest.levels.length}/'
-            '$journeyLevelCount levels — F06-CONTENT delivers the rest.',
-          );
-        }
-      }
-    },
-  );
+  test('the gate passes for the bundled pack; strict ⇒ 30 (smoke ⇒ logs the '
+      'shortfall)', () async {
+    final report = await runJourneyManifestGate(
+      manifest,
+      readAsset: readAsset,
+      lang: lang,
+    );
 
-  test(
-    'every manifest level resolves to a valid Puzzle with a stable id',
-    () async {
-      for (final entry in manifest.levels) {
-        final assetRaw = await rootBundle.loadString(
-          'assets/journey/${entry.asset}',
-        );
+    expect(
+      report.passed,
+      isTrue,
+      reason: 'bundled Journey pack failed the gate: ${report.violations}',
+    );
 
-        // checksum (when the manifest declares one)
-        if (entry.checksum != null) {
-          final digest = sha256.convert(utf8.encode(assetRaw)).toString();
-          expect(
-            digest,
-            entry.checksum,
-            reason: 'checksum drift for ${entry.asset}',
-          );
-        }
+    if (manifest.isStrict) {
+      expect(manifest.levels.length, journeyLevelCount);
+      expect(report.shortfall, 0);
+    } else if (report.shortfall > 0) {
+      // ignore: avoid_print
+      print(
+        'journey content gate (smoke): ${manifest.levels.length}/'
+        '$journeyLevelCount levels — F06-CONTENT delivers the rest.',
+      );
+    }
+  });
 
-        final puzzle = Puzzle.fromJson(
-          jsonDecode(assetRaw) as Map<String, Object?>,
-        );
-        expect(puzzle.id, entry.id, reason: 'id mismatch for level ${entry.n}');
-        expect(
-          puzzle.id,
-          journeyLevelId(entry.n, lang),
-          reason: 'level ${entry.n} does not follow journey-$lang-NN',
-        );
-        expect(puzzle.journeyLevelNumber, entry.n);
-        expect(
-          puzzle.optimalMoves,
-          greaterThanOrEqualTo(1),
-          reason: 'level ${entry.n} must carry a solver-verified optimal',
-        );
-      }
-    },
-  );
+  test('every manifest level follows the journey-<lang>-NN id scheme', () async {
+    // Puzzle parse / id / journeyLevelNumber / optimalMoves / checksum are all
+    // asserted inside `runJourneyManifestGate` above; re-state the id scheme
+    // here for readability.
+    for (final entry in manifest.levels) {
+      expect(entry.id, journeyLevelId(entry.n, lang));
+      expect(entry.asset, startsWith('$lang/'));
+    }
+  });
 
   test('band rules (strict-only hard check; smoke-mode advisory)', () {
-    // Only meaningful once the full 30 land; skip in smoke mode where the
-    // interim pack knowingly re-ids the smoke set.
+    // Deferred: the strict-mode structural band assertions land with
+    // F06-CONTENT — they need the real 30 authored levels (`architecture.md
+    // §5.4`). In smoke mode the interim pack knowingly re-ids the F06 smoke set.
     if (!manifest.isStrict) return;
-    // (Deferred: the strict-mode structural band assertions land with
-    // F06-CONTENT — see f05 architecture.md §5.4.)
   });
 }

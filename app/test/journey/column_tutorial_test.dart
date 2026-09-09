@@ -41,6 +41,26 @@ Map<String, Object?> _level4Json() => <String, Object?>{
   'difficultyBreakdown': const <String, Object?>{},
 };
 
+// A band 1–3 level (rows only) — used to prove the tutorial does NOT show
+// outside the 4–6 band.
+Map<String, Object?> _level1Json() => <String, Object?>{
+  'schemaVersion': 1,
+  'contentVersion': 'test',
+  'id': 'journey-tr-01',
+  'puzzleType': 'journey',
+  'journeyLevelNumber': 1,
+  'language': 'tr',
+  'grid': const <String>['ASALM', 'BCDFG', 'HJKLN', 'PRTUV', 'YZBCD'],
+  'targetWord': 'MASAL',
+  'lockedCells': const <String>[],
+  'frozenCells': const <String>[],
+  'columnMovesEnabled': false,
+  'optimalMoves': 1,
+  'difficultyScore': 1,
+  'difficultyLabel': 'easy',
+  'difficultyBreakdown': const <String, Object?>{},
+};
+
 Map<String, Object?> _manifestJson() => <String, Object?>{
   'schemaVersion': 1,
   'contentVersion': 'test',
@@ -70,10 +90,11 @@ class _MapAssetSource implements JourneyAssetSource {
 
 final JourneyAssetSource _source = _MapAssetSource(<String, String>{
   'tr/journey_manifest_tr.json': jsonEncode(_manifestJson()),
+  'tr/journey-tr-01.json': jsonEncode(_level1Json()),
   'tr/journey-tr-04.json': jsonEncode(_level4Json()),
 });
 
-Widget _app(AppDatabase db) => ProviderScope(
+Widget _app(AppDatabase db, {int level = 4}) => ProviderScope(
   overrides: <Override>[
     appDatabaseProvider.overrideWithValue(db),
     wordValidatorProvider.overrideWith(
@@ -81,9 +102,9 @@ Widget _app(AppDatabase db) => ProviderScope(
     ),
     journeyAssetSourceProvider.overrideWithValue(_source),
   ],
-  child: const MaterialApp(
+  child: MaterialApp(
     home: PlaySessionScreen(
-      args: PlaySessionArgs(source: PuzzleSource.journey, journeyLevel: 4),
+      args: PlaySessionArgs(source: PuzzleSource.journey, journeyLevel: level),
     ),
   ),
 );
@@ -111,8 +132,8 @@ void _reduceMotion(WidgetTester tester) {
   addTearDown(tester.view.reset);
 }
 
-Future<void> _boot(WidgetTester tester, AppDatabase db) async {
-  await tester.pumpWidget(_app(db));
+Future<void> _boot(WidgetTester tester, AppDatabase db, {int level = 4}) async {
+  await tester.pumpWidget(_app(db, level: level));
   await tester.pumpAndSettle();
   expect(find.byType(PuzzleBoard), findsOneWidget);
 }
@@ -161,22 +182,54 @@ void main() {
     expect(find.byType(ColumnTutorialOverlay), findsNothing);
   });
 
-  testWidgets('leaving the level without the column move does not persist an '
-      'ack', (tester) async {
+  testWidgets('not shown for a Journey level outside the 4–6 band', (
+    tester,
+  ) async {
     _reduceMotion(tester);
     final db = AppDatabase.forTesting(NativeDatabase.memory());
     addTearDown(db.close);
 
-    await _boot(tester, db);
-    expect(find.byType(ColumnTutorialOverlay), findsOneWidget);
-
-    // Tear the screen down (navigate away) with the gate unmet.
-    await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pumpAndSettle();
-
+    await _boot(tester, db, level: 1);
+    expect(find.byType(ColumnTutorialOverlay), findsNothing);
     expect(
       await JourneyTutorialRepo(db).isColumnTutorialAcknowledged(),
       isFalse,
     );
+  });
+
+  testWidgets('force-quit before the gated move → re-shows on the next 4–6 '
+      'entry (AC11)', (tester) async {
+    _reduceMotion(tester);
+    final db = AppDatabase.forTesting(NativeDatabase.memory());
+    addTearDown(db.close);
+
+    // First entry: overlay shown, player quits without a column move.
+    await _boot(tester, db, level: 4);
+    expect(find.byType(ColumnTutorialOverlay), findsOneWidget);
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pumpAndSettle();
+    expect(
+      await JourneyTutorialRepo(db).isColumnTutorialAcknowledged(),
+      isFalse,
+    );
+
+    // Second entry (same guest / DB): the overlay re-shows.
+    await _boot(tester, db, level: 4);
+    expect(find.byType(ColumnTutorialOverlay), findsOneWidget);
+
+    // …and a column drag now clears it for good.
+    await tester.dragFrom(_cell(tester, 2, 2), const Offset(0, 140));
+    await tester.pumpAndSettle();
+    expect(find.byType(ColumnTutorialOverlay), findsNothing);
+    expect(
+      await JourneyTutorialRepo(db).isColumnTutorialAcknowledged(),
+      isTrue,
+    );
+
+    // Third entry: acknowledged → never again.
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pumpAndSettle();
+    await _boot(tester, db, level: 4);
+    expect(find.byType(ColumnTutorialOverlay), findsNothing);
   });
 }

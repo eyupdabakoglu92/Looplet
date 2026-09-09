@@ -207,4 +207,53 @@ Gate results:
 Run QA
 ```
 
-Current Owner → QA. Next Role → QA (F05-QA — end-to-end client QA per `architecture.md §15`).
+Current Owner → QA. Next Role → QA (F05-QA re-verify per `orchestration.md → Next Action`).
+
+---
+
+## F05-FE2 — QA `Rejected` rework (2026-09-09)
+
+Closes the F05-QA `Rejected` verdict (`qa.md`). Both blocking items were **missing tests** — the `lib/` implementation, the LOCKED contract, and the `ui-design.md` handoff were sound (Tech Lead DURUM 5 reconcile, `orchestration.md → Next Action`). Also applied the Tech Lead rulings on the non-blocking notes.
+
+### Impacted files
+
+**Created**
+- `app/test/journey/journey_gate_support.dart` — `runJourneyManifestGate(manifest, {readAsset, lang})` → `JourneyGateReport(violations, shortfall)`. ONE gate implementation (`architecture.md §5.4`): strict ⇒ exactly 30 levels; every `asset` resolves + parses as a `Puzzle`; `puzzle.id == entry.id == journeyLevelId(n, lang)`; `journeyLevelNumber == n`; `optimalMoves >= 1`; declared sha256 `checksum` matches. Structural band rules stay `[PENDING — F06-CONTENT]`. Not a suite (no `_test` suffix).
+- `app/test/journey/journey_manifest_strict_test.dart` — **F05-QA-2**. 5 cases feeding synthetic manifests through `runJourneyManifestGate`: `strict + < 30` → **FAILS** (violation names the shortfall); `strict + an unresolvable asset` → **FAILS**; `strict + exactly 30 valid` → **PASSES**; `smoke + < 30` → **PASSES**, `shortfall` only reported; `smoke + a broken asset` → **FAILS** (consistency is enforced in both modes).
+- `app/test/journey/journey_next_level_test.dart` — **F05-QA-1**. A real `GoRouter` (`/` stub + `/play` → `PlaySessionScreen`) over a 2-level interim manifest: solve level 1 → tap `SONRAKİ` → lands on level 2's `/play`, `routeLog == [1, 2]`, `GoRouter.of(ctx).canPop() == false` (⇒ `pushReplacement`, not `push`); solve level 2 (the last available) → tap `SONRAKİ` → `context.go('/')` → the terminal home stub, `routeLog == [2]` (never a level 3).
+
+**Updated**
+- `app/lib/home_screen.dart` — **N2 + N6**. `_JourneyRing` `StatelessWidget → StatefulWidget` (`TickerProviderStateMixin`): `_pulse` (2000 ms, `repeat(reverse: true)` ⇒ a ≈4 s in-out breath) drives the in-progress node; `_bloom` (620 ms, one-shot `forward()`) drives the terminal entry bloom. `_syncMotion()` (called from `initState` + `didUpdateWidget`) starts/stops them from the model; **reduced motion** (`accessibilityFeatures.disableAnimations`) → `_pulse` steady + `_bloom.value = 1` (no bloom drawn) — `ui-design.md §13`. `_JourneyRingPainter` gains `pulse` / `bloom` (default 0): the current node's tip-dot + cyan ring scale ±6 % / fade with `pulse`; a single restrained `#FFE9C2` halo over the closed ring fades out with `bloom`; `shouldRepaint` extended. `_ContinueCta` gains `maxWidth`; the pill is now `(maxWidth * 0.68).clamp(220, 320)` wide (`ui-design.md §7.2` 66–72 %) instead of a fixed 240.
+- `app/test/journey/journey_manifest_gate_test.dart` — rewritten to call `runJourneyManifestGate` on the REAL bundled pack (same 4 test names' intent; the checksum / id / optimal assertions now live inside the shared gate). Still the `melos run content:journey` gate.
+- `app/test/journey/journey_home_test.dart` — **N1**. New case "an in-progress Journey level → `Seviye 2 · sürüyor` caption, CONTINUE resumes that level" (seeds `journey_progress` + an `ActiveSessionRepo` in-progress snapshot for `journey-tr-02`; asserts the caption, the `1 / 30 … — Seviye 2` ring `Semantics`, and CONTINUE → `journeyLevel: 2`). All four home tests now set `FakeAccessibilityFeatures(disableAnimations: true)` so the `_pulse` `repeat()` never blocks `pumpAndSettle` and the terminal bloom is instant.
+- `app/test/journey/column_tutorial_test.dart` — **N3 + N4**. Added a band 1–3 level asset (`journey-tr-01`) + a `level` param on `_app` / `_boot`. New cases: "not shown for a Journey level outside the 4–6 band" (`journeyLevel: 1` → no `ColumnTutorialOverlay`); "force-quit before the gated move → re-shows on the next 4–6 entry (AC11)" (mount L4 → overlay shown → tear down without a column move → ack still `false` → re-mount L4 → overlay shown again → a column drag clears it + persists → re-mount → gone).
+- `app/test/journey/journey_progress_model_test.dart` — **AC2**. New case "no F05 navigation target is ever a `locked` level": across new / mid / in-progress / terminal + the last-available boundary, `continueTarget` is never a `locked` level (and `null` only in the terminal state), and `Next Level` from every **completed** level resolves to a non-locked level or `null`.
+
+### Task-to-fix traceability
+
+| Item | Status | Fix |
+| --- | --- | --- |
+| **F05-QA-1** (AC12 — `Next Level` tap → navigation untested) | **Closed** | `journey_next_level_test.dart` — trigger→outcome tests through a real `GoRouter` + `PlaySessionScreen`: `pushReplacement` to N+1 with `canPop() == false`; last-available → `context.go('/')` → terminal. `nextJourneyLevel` unit coverage retained but no longer the only evidence (`architecture.md §15`). |
+| **F05-QA-2** (strict-mode gate never executed) | **Closed** | `journey_gate_support.dart` + `journey_manifest_strict_test.dart` — one shared `runJourneyManifestGate`, exercised by BOTH the real-bundle gate test and 5 synthetic strict/smoke cases (strict + `<30` / missing asset → rejects). Structural band rules stay a documented `[PENDING — F06-CONTENT]` stub. |
+| **N2** (in-progress breathing pulse + terminal entry bloom not implemented) | **Closed** | `_JourneyRing` + `_JourneyRingPainter` — `_pulse` (≈4 s breath) + `_bloom` (one-shot); reduced-motion static end-state; a `journey_home_test.dart` reduced-motion assertion is implicit (all home tests run with `disableAnimations: true` and settle). |
+| **N1** (in-progress home variant not widget-tested) | **Closed** | `journey_home_test.dart` in-progress case (caption + `Semantics` + CONTINUE target). |
+| **N3** (no negative-band tutorial assertion) | **Closed** | `column_tutorial_test.dart` "not shown … outside the 4–6 band". |
+| **N4** (AC11 re-show not chained) | **Closed** | `column_tutorial_test.dart` "force-quit … re-shows on the next 4–6 entry" — mount → teardown → re-mount → re-shows → column-drag clears → re-mount → gone. |
+| **N6** (CONTINUE pill width < 66–72 %) | **Closed** | `_ContinueCta` pill width = `(maxWidth * 0.68).clamp(220, 320)`. |
+| **AC2** (`architecture.md §12`/§15 — no nav to a locked level) | **Closed (test)** | `journey_progress_model_test.dart` "no F05 navigation target is ever a `locked` level" (new / mid / in-progress / terminal + last-available). Per the Tech Lead ruling: **no runtime guard** — direct entry to an arbitrary `journeyLevel` is unreachable in the MVP (`[DEFERRED — F10]`, `architecture.md §17`). |
+| **N5** (no locked-level direct-entry guard) | **Accepted "unreachable by construction"** (Tech Lead ruling) — no resolver guard added; the AC2 test above is the proof. |
+| **N7** (end-to-end 1★ unlock solve) | **Not added (optional).** `_resolveJourneyUnlock` is star-agnostic by construction (it never reads the star result); `journey_unlock_flow_test.dart` proves the write fires + idempotency, and `completion_cta_weighting_test.dart` proves `SONRAKİ` is enabled at 1–2★. A dedicated 1★ solve would need a contrived puzzle for no added coverage. |
+
+### Gate results (F05-FE2)
+
+- `flutter analyze` (app) — **No issues found!**
+- `dart format --output=none --set-exit-if-changed .` (app + `packages` + `tools`) — clean.
+- `flutter test` (app) — **176 passed** (was 166; +10 net new — F05-QA-1 ×2, F05-QA-2 ×5 (one `journey_manifest_gate_test` test folded), N1 ×1, N3 ×1, N4 ×1, AC2 ×1). No regression to the F03 play / F04 completion suites (F04's debug-entry disabled-`SONRAKİ` + `· yakında` assertions still pass). `test/journey/` alone: **41 passed**.
+- pure-package `dart test` — all green (`looplet_core` 22 · `_dictionary` 32 · `_engine` 83 · `_content` 17 · `_solver` 23 · `looplet_authoring` 19).
+- `flutter build ios --release --no-codesign` — **Built `build/ios/iphoneos/Runner.app` (54.7 MB)**.
+
+### Notes
+
+- **N2 reduced-motion / determinism:** the `_pulse` controller uses `repeat(reverse: true)` (never settles), so any widget test that mounts `HomeScreen` with an in-progress or terminal model MUST run under `FakeAccessibilityFeatures(disableAnimations: true)` — `journey_home_test.dart` does this for all four cases. `widget_test.dart` (bootstraps the real `HomeScreen`) is unaffected: a freshly-seeded DB has no active session and 0 completions, so neither controller animates.
+- **`journey_next_level_test.dart` terminal case** covers the `nextJourneyLevel → null → context.go('/')` path, which is the same code path level 30 takes; `journey_ids_test.dart` unit-covers `nextJourneyLevel(30, …) == null`. A trigger→outcome test against a real 30-level manifest still waits for `F06-CONTENT`.
+- **Interim CONTINUE edge (known, `[PENDING — F06-CONTENT]`):** a player who completes all 5 interim levels but is not at 30/30 gets `continueTarget = 6`, which the resolver cannot load (the interim manifest has 5 levels) → F03's load-error state. Resolves once `F06-CONTENT` ships the real 30. Not an F05-FE2 fix (the `continueTarget` derivation is content-agnostic by `architecture.md §6`).

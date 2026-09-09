@@ -55,7 +55,12 @@ class HomeScreen extends ConsumerWidget {
                         model: model,
                       ),
                       SizedBox(height: ringSize * 0.06),
-                      _ContinueCta(lang: lang, strings: strings, model: model),
+                      _ContinueCta(
+                        lang: lang,
+                        strings: strings,
+                        model: model,
+                        maxWidth: constraints.maxWidth,
+                      ),
                       if (kDebugMode) ...<Widget>[
                         const SizedBox(height: 28),
                         const _DebugRow(),
@@ -100,7 +105,7 @@ class _Wordmark extends StatelessWidget {
   }
 }
 
-class _JourneyRing extends StatelessWidget {
+class _JourneyRing extends StatefulWidget {
   const _JourneyRing({
     required this.size,
     required this.strings,
@@ -112,25 +117,102 @@ class _JourneyRing extends StatelessWidget {
   final JourneyProgressModel? model;
 
   @override
+  State<_JourneyRing> createState() => _JourneyRingState();
+}
+
+class _JourneyRingState extends State<_JourneyRing>
+    with TickerProviderStateMixin {
+  // The in-progress node's slow breathing (a full in-out breath ≈ 4 s) and the
+  // one-shot bloom when the ring enters the "all 30 complete" state
+  // (`ui-design.md §7.1`, §11). Reduced motion → static end-states (§13).
+  late final AnimationController _pulse;
+  late final AnimationController _bloom;
+  bool _reduceMotion = false;
+
+  bool get _inProgress =>
+      widget.model?.inProgressLevel != null &&
+      !(widget.model?.allComplete ?? false);
+  bool get _done => widget.model?.allComplete ?? false;
+
+  @override
+  void initState() {
+    super.initState();
+    _reduceMotion = WidgetsBinding
+        .instance
+        .platformDispatcher
+        .accessibilityFeatures
+        .disableAnimations;
+    _pulse = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2000),
+    );
+    _bloom = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 620),
+    );
+    _syncMotion();
+  }
+
+  void _syncMotion() {
+    if (_inProgress && !_reduceMotion) {
+      if (!_pulse.isAnimating) _pulse.repeat(reverse: true);
+    } else {
+      _pulse.stop();
+      _pulse.value = 0;
+    }
+    if (_done) {
+      if (_reduceMotion) {
+        _bloom.value = 1; // settled — no bloom drawn
+      } else if (_bloom.status == AnimationStatus.dismissed) {
+        _bloom.forward();
+      }
+    } else {
+      _bloom.value = 0;
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant _JourneyRing oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _syncMotion();
+  }
+
+  @override
+  void dispose() {
+    _pulse.dispose();
+    _bloom.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final model = widget.model;
     final count = model?.progressCount ?? 0;
     final done = model?.allComplete ?? false;
     final current = done ? null : model?.continueTarget;
     final inProgress = model?.inProgressLevel != null;
 
     return Semantics(
-      label: strings.progressSemantics(count, current),
+      label: widget.strings.progressSemantics(count, current),
       child: SizedBox(
-        width: size,
-        height: size,
-        child: CustomPaint(
-          painter: _JourneyRingPainter(
-            progressCount: count,
-            currentLevel: current,
-            currentInProgress: inProgress,
+        width: widget.size,
+        height: widget.size,
+        child: AnimatedBuilder(
+          animation: Listenable.merge(<Listenable>[_pulse, _bloom]),
+          builder: (context, child) => CustomPaint(
+            painter: _JourneyRingPainter(
+              progressCount: count,
+              currentLevel: current,
+              currentInProgress: inProgress,
+              // 0 (reduced motion / not in-progress) → steady node.
+              pulse: (_inProgress && !_reduceMotion) ? _pulse.value : 0.0,
+              // 1 at entry → 0 once settled; drawn only in the terminal state.
+              bloom: done ? (1.0 - _bloom.value) : 0.0,
+            ),
+            child: child,
           ),
           child: Center(
-            child: _RingCentre(strings: strings, model: model),
+            child: _RingCentre(strings: widget.strings, model: model),
           ),
         ),
       ),
@@ -210,11 +292,19 @@ class _JourneyRingPainter extends CustomPainter {
     required this.progressCount,
     required this.currentLevel,
     required this.currentInProgress,
+    this.pulse = 0.0,
+    this.bloom = 0.0,
   });
 
   final int progressCount;
   final int? currentLevel;
   final bool currentInProgress;
+
+  /// 0..1 breathing phase for the in-progress node (0 ⇔ steady / reduced motion).
+  final double pulse;
+
+  /// 0..1 one-shot terminal bloom intensity (0 ⇔ none; drawn only at 30 / 30).
+  final double bloom;
 
   // 300° sweep, 60° gap centred on the bottom.
   static const double _startDeg = 120; // clockwise from lower-left
@@ -255,6 +345,20 @@ class _JourneyRingPainter extends CustomPainter {
           ..color = const Color(0xFFFFE9C2).withValues(alpha: 0.10)
           ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 12),
       );
+      // Terminal: one restrained bloom over the whole closed ring on entry.
+      if (bloom > 0.001 && endIdx == _ticks - 1) {
+        canvas.drawArc(
+          Rect.fromCircle(center: centre, radius: radius),
+          start,
+          sweep,
+          false,
+          Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = tickLen + 10
+            ..color = const Color(0xFFFFE9C2).withValues(alpha: 0.16 * bloom)
+            ..maskFilter = MaskFilter.blur(BlurStyle.normal, 14 + 18 * bloom),
+        );
+      }
       final donePaint = Paint()
         ..style = PaintingStyle.stroke
         ..strokeCap = StrokeCap.round
@@ -280,22 +384,26 @@ class _JourneyRingPainter extends CustomPainter {
         centre.dx + (radius + tickLen * 0.5) * math.cos(a),
         centre.dy + (radius + tickLen * 0.5) * math.sin(a),
       );
+      // The in-progress node breathes ≈ ±6 % around its resting size / cyan
+      // opacity; `pulse == 0` (steady / reduced motion) leaves it at rest.
+      final breath = currentInProgress ? pulse : 0.0;
+      final dotScale = 1.0 + 0.06 * breath;
       canvas.drawCircle(
         tip,
-        5,
+        5 * dotScale,
         Paint()
           ..color = PlayTheme.amber
           ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4),
       );
-      canvas.drawCircle(tip, 4, Paint()..color = PlayTheme.amber);
+      canvas.drawCircle(tip, 4 * dotScale, Paint()..color = PlayTheme.amber);
       if (currentInProgress) {
         canvas.drawCircle(
           tip,
-          7.5,
+          7.5 * dotScale,
           Paint()
             ..style = PaintingStyle.stroke
             ..strokeWidth = 1.5
-            ..color = PlayTheme.cyan,
+            ..color = PlayTheme.cyan.withValues(alpha: 0.7 + 0.3 * breath),
         );
       }
     }
@@ -317,7 +425,9 @@ class _JourneyRingPainter extends CustomPainter {
   bool shouldRepaint(_JourneyRingPainter old) =>
       old.progressCount != progressCount ||
       old.currentLevel != currentLevel ||
-      old.currentInProgress != currentInProgress;
+      old.currentInProgress != currentInProgress ||
+      old.pulse != pulse ||
+      old.bloom != bloom;
 }
 
 class _ContinueCta extends StatelessWidget {
@@ -325,11 +435,15 @@ class _ContinueCta extends StatelessWidget {
     required this.lang,
     required this.strings,
     required this.model,
+    required this.maxWidth,
   });
 
   final String lang;
   final JourneyStrings strings;
   final JourneyProgressModel? model;
+
+  /// Available layout width — the pill spans ~68 % of it (`ui-design.md §7.2`).
+  final double maxWidth;
 
   @override
   Widget build(BuildContext context) {
@@ -340,6 +454,7 @@ class _ContinueCta extends StatelessWidget {
     final target = done ? 1 : (model?.continueTarget ?? 1);
     final label = done ? strings.replayLabel : strings.continueLabel;
     final inProgress = !done && model?.inProgressLevel == target;
+    final pillWidth = (maxWidth * 0.68).clamp(220.0, 320.0).toDouble();
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -358,7 +473,7 @@ class _ContinueCta extends StatelessWidget {
             ),
             child: Container(
               height: 54,
-              width: 240,
+              width: pillWidth,
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 gradient: const LinearGradient(

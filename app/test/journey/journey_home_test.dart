@@ -1,6 +1,7 @@
 // F05-FE.HOME — the journey home surface (`ui-design.md` "The loop, filling").
 // Renders the LOOPLET wordmark, the 30-tick progress ring, and the single
-// CONTINUE CTA, and CONTINUE routes to the resolved next level.
+// CONTINUE CTA; CONTINUE routes to the resolved next level. Covers the
+// new / mid / in-progress / terminal variants.
 
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
@@ -8,8 +9,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:looplet_app/home_screen.dart';
+import 'package:looplet_app/persistence/active_session_snapshot.dart';
 import 'package:looplet_app/persistence/app_database.dart';
 import 'package:looplet_app/persistence/persistence_providers.dart';
+import 'package:looplet_app/persistence/repositories/active_session_repo.dart';
 import 'package:looplet_app/persistence/repositories/journey_progress_repo.dart';
 import 'package:looplet_app/persistence/repositories/player_repo.dart';
 import 'package:looplet_app/play/play_session_args.dart';
@@ -23,6 +26,18 @@ void main() {
     lastPlayArgs = null;
   });
   tearDown(() => db.close());
+
+  // The in-progress node breathes via a repeating controller; disabling
+  // animations keeps `pumpAndSettle` deterministic and makes the terminal
+  // bloom instant (`ui-design.md §13`).
+  void reduceMotion(WidgetTester tester) {
+    tester.platformDispatcher.accessibilityFeaturesTestValue =
+        const FakeAccessibilityFeatures(disableAnimations: true);
+    addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
+    tester.view.physicalSize = const Size(390, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+  }
 
   Widget buildApp() {
     final router = GoRouter(
@@ -52,16 +67,33 @@ void main() {
     });
   }
 
-  Future<void> seedCompleted(int upTo) async {
+  Future<String> seedCompleted(int upTo) async {
     final guestId = await PlayerRepo(db).currentGuestId();
     for (var n = 1; n <= upTo; n++) {
       await JourneyProgressRepo(db).markCompleted(guestId, n);
     }
+    return guestId;
   }
+
+  ActiveSessionSnapshot journeySnapshot(String puzzleId) =>
+      ActiveSessionSnapshot(
+        puzzleId: puzzleId,
+        puzzleSource: PuzzleSource.journey,
+        lang: 'tr',
+        appliedMoves: const <String>['R1'],
+        undosRemaining: 3,
+        restartCount: 0,
+        elapsedMsAccumulated: 4200,
+        thawedFrozenCells: const <String>[],
+        status: ActiveSessionStatus.inProgress,
+        startedAtUtcMs: 1757145000000,
+        lastPersistedAtUtcMs: 1757145004200,
+      );
 
   testWidgets('a new player → 0 / 30 ring, CONTINUE resolves to level 1', (
     tester,
   ) async {
+    reduceMotion(tester);
     await tester.pumpWidget(buildApp());
     await tester.pumpAndSettle();
 
@@ -84,6 +116,7 @@ void main() {
 
   testWidgets('mid progression → count reflects clears, CONTINUE targets the '
       'next gap', (tester) async {
+    reduceMotion(tester);
     await seedCompleted(3);
 
     await tester.pumpWidget(buildApp());
@@ -101,9 +134,33 @@ void main() {
     expect(lastPlayArgs?.journeyLevel, 4);
   });
 
+  testWidgets('an in-progress Journey level → "· sürüyor" caption, CONTINUE '
+      'resumes that level', (tester) async {
+    reduceMotion(tester);
+    final guestId = await seedCompleted(1); // level 1 done → level 2 unlocked
+    await ActiveSessionRepo(db).save(journeySnapshot('journey-tr-02'));
+    // sanity: the snapshot is for this guest's active session
+    expect(guestId, isNotEmpty);
+
+    await tester.pumpWidget(buildApp());
+    await tester.pumpAndSettle();
+
+    expect(find.text('DEVAM ET'), findsOneWidget);
+    expect(find.text('Seviye 2 · sürüyor'), findsOneWidget);
+    expect(
+      hasSemanticsLabel(tester, '1 / 30 seviye tamamlandı — Seviye 2'),
+      isTrue,
+    );
+
+    await tester.tap(find.text('DEVAM ET'));
+    await tester.pumpAndSettle();
+    expect(lastPlayArgs?.journeyLevel, 2);
+  });
+
   testWidgets('all 30 complete → terminal ring + REPLAY from level 1', (
     tester,
   ) async {
+    reduceMotion(tester);
     await seedCompleted(30);
 
     await tester.pumpWidget(buildApp());
