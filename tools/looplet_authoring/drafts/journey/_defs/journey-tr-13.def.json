@@ -1,0 +1,17 @@
+{
+  "id": "journey-tr-13",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 13,
+  "language": "tr",
+  "grid": [
+    "ŞÇBMM",
+    "PUPOM",
+    "PGÜEÇ",
+    "ÖALUN",
+    "SKDKY"
+  ],
+  "target": "KALEM",
+  "locked": [],
+  "frozen": [],
+  "columns": true
+}

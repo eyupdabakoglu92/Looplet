@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "draft",
+  "id": "journey-tr-05",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 5,
+  "language": "tr",
+  "grid": [
+    "ZUÇEK",
+    "BÜOLŞ",
+    "HALUT",
+    "ÜRŞAG",
+    "DGGGŞ"
+  ],
+  "targetWord": "BULUT",
+  "lockedCells": [],
+  "frozenCells": [],
+  "columnMovesEnabled": true,
+  "optimalMoves": 3,
+  "difficultyScore": 2.708,
+  "difficultyLabel": "easy",
+  "difficultyBreakdown": {
+    "o": 3,
+    "cNorm": 0.0278,
+    "tdDegree": 0,
+    "locked": 0,
+    "frozen": 0,
+    "firstMoves": 2,
+    "distinctOptimalSolutions": 3
+  }
+}

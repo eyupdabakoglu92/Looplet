@@ -1,0 +1,17 @@
+{
+  "id": "journey-tr-12",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 12,
+  "language": "tr",
+  "grid": [
+    "DITYZ",
+    "LADŞŞ",
+    "HIZYB",
+    "EGZKA",
+    "ZKAĞA"
+  ],
+  "target": "KAĞIT",
+  "locked": [],
+  "frozen": [],
+  "columns": true
+}

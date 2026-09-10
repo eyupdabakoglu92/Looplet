@@ -1,0 +1,17 @@
+{
+  "id": "journey-tr-05",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 5,
+  "language": "tr",
+  "grid": [
+    "ZUÇEK",
+    "BÜOLŞ",
+    "HALUT",
+    "ÜRŞAG",
+    "DGGGŞ"
+  ],
+  "target": "BULUT",
+  "locked": [],
+  "frozen": [],
+  "columns": true
+}

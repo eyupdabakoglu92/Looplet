@@ -1,0 +1,19 @@
+{
+  "id": "journey-tr-23",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 23,
+  "language": "tr",
+  "grid": [
+    "DEÇSL",
+    "ORAKS",
+    "ESAÇK",
+    "MBZÖÖ",
+    "ÜDRAT"
+  ],
+  "target": "SOKAK",
+  "locked": [],
+  "frozen": [
+    "2,1"
+  ],
+  "columns": true
+}

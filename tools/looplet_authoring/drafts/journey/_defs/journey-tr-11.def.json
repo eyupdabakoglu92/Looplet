@@ -1,0 +1,17 @@
+{
+  "id": "journey-tr-11",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 11,
+  "language": "tr",
+  "grid": [
+    "RAZAP",
+    "DÇBÇİ",
+    "EÜUOK",
+    "İLGEM",
+    "SKZÖZ"
+  ],
+  "target": "KABAK",
+  "locked": [],
+  "frozen": [],
+  "columns": true
+}

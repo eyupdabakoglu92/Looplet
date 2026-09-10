@@ -1,0 +1,17 @@
+{
+  "id": "journey-tr-14",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 14,
+  "language": "tr",
+  "grid": [
+    "PISSİ",
+    "KİUTN",
+    "ŞEZKŞ",
+    "TNYPÜ",
+    "ÜMYTA"
+  ],
+  "target": "KİTAP",
+  "locked": [],
+  "frozen": [],
+  "columns": true
+}

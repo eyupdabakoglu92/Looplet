@@ -1,0 +1,23 @@
+{
+  "id": "journey-tr-29",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 29,
+  "language": "tr",
+  "grid": [
+    "BOÇOT",
+    "ZSMNH",
+    "NLDPD",
+    "ÜREIK",
+    "GAIAİ"
+  ],
+  "target": "ZAMAN",
+  "locked": [
+    "1,2",
+    "1,0"
+  ],
+  "frozen": [
+    "3,4",
+    "3,3"
+  ],
+  "columns": true
+}

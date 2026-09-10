@@ -1,0 +1,19 @@
+{
+  "id": "journey-tr-18",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 18,
+  "language": "tr",
+  "grid": [
+    "LİSLZ",
+    "ÖÇAGS",
+    "MROMA",
+    "SBHTİ",
+    "HNEÖÖ"
+  ],
+  "target": "ORMAN",
+  "locked": [
+    "2,1"
+  ],
+  "frozen": [],
+  "columns": true
+}

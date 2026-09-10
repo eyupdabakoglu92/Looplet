@@ -1,0 +1,17 @@
+{
+  "id": "journey-tr-09",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 9,
+  "language": "tr",
+  "grid": [
+    "ÖOIİO",
+    "ÖZÜZD",
+    "UENEZ",
+    "ÖKGÇD",
+    "SEUŞO"
+  ],
+  "target": "DENİZ",
+  "locked": [],
+  "frozen": [],
+  "columns": true
+}

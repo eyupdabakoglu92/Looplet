@@ -1,0 +1,17 @@
+{
+  "id": "journey-tr-10",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 10,
+  "language": "tr",
+  "grid": [
+    "ARIBI",
+    "DYIÜB",
+    "UMÜHB",
+    "EIRUN",
+    "FRROE"
+  ],
+  "target": "FIRIN",
+  "locked": [],
+  "frozen": [],
+  "columns": true
+}

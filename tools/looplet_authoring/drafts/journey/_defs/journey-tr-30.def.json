@@ -1,0 +1,23 @@
+{
+  "id": "journey-tr-30",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 30,
+  "language": "tr",
+  "grid": [
+    "ZÇŞŞN",
+    "IENRI",
+    "REMHH",
+    "ÜADHL",
+    "RKİOÇ"
+  ],
+  "target": "ZEMİN",
+  "locked": [
+    "0,0",
+    "0,4"
+  ],
+  "frozen": [
+    "2,3",
+    "2,4"
+  ],
+  "columns": true
+}

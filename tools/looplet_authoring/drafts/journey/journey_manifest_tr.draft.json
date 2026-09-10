@@ -1,0 +1,218 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "draft",
+  "lang": "tr",
+  "mode": "smoke",
+  "levels": [
+    {
+      "n": 1,
+      "id": "journey-tr-01",
+      "asset": "tr/journey-tr-01.json",
+      "difficultyLabel": "easy",
+      "checksum": "sha256:e4726a9dfad6b3de43d8c8572bb994348787a3aaf8c690b5259e3eea660f70e7"
+    },
+    {
+      "n": 2,
+      "id": "journey-tr-02",
+      "asset": "tr/journey-tr-02.json",
+      "difficultyLabel": "easy",
+      "checksum": "sha256:29f6df0d604d3bfaf9fe69eb2eb4f00c1db5c5b3abd986a27f123873cb92b562"
+    },
+    {
+      "n": 3,
+      "id": "journey-tr-03",
+      "asset": "tr/journey-tr-03.json",
+      "difficultyLabel": "easy",
+      "checksum": "sha256:e1a209dabed05b18c7ce4eeb479fae2f23757741f76d7323db0045a3e17fc50b"
+    },
+    {
+      "n": 4,
+      "id": "journey-tr-04",
+      "asset": "tr/journey-tr-04.json",
+      "difficultyLabel": "easy",
+      "checksum": "sha256:012282b97820d96c7ed35e4fc66a6d524b4fbd7e86910cd09fabcf2698ca8e52"
+    },
+    {
+      "n": 5,
+      "id": "journey-tr-05",
+      "asset": "tr/journey-tr-05.json",
+      "difficultyLabel": "easy",
+      "checksum": "sha256:b8636c73625e480e945ac7c544c879177ea6704be3784e8f3ab46491cb1dd346"
+    },
+    {
+      "n": 6,
+      "id": "journey-tr-06",
+      "asset": "tr/journey-tr-06.json",
+      "difficultyLabel": "easy",
+      "checksum": "sha256:9186cad982932da2c0970c4a7adbd2585f4d1e27cd2122b7e87b979a47e25a66"
+    },
+    {
+      "n": 7,
+      "id": "journey-tr-07",
+      "asset": "tr/journey-tr-07.json",
+      "difficultyLabel": "easy",
+      "checksum": "sha256:12a4728a8c933418fa35fc43bbcce670fcf5924e966399f2f1c587dd822e2ce9"
+    },
+    {
+      "n": 8,
+      "id": "journey-tr-08",
+      "asset": "tr/journey-tr-08.json",
+      "difficultyLabel": "easy",
+      "checksum": "sha256:4cec49dcd0f49cd1737a33c38fc35ca33ab7903bbd2130494c651c636e8547ba"
+    },
+    {
+      "n": 9,
+      "id": "journey-tr-09",
+      "asset": "tr/journey-tr-09.json",
+      "difficultyLabel": "easy",
+      "checksum": "sha256:1c87ec03fe4686f2fdb6133b8e83d813fde66af35789a8e1085fe6ae056f827c"
+    },
+    {
+      "n": 10,
+      "id": "journey-tr-10",
+      "asset": "tr/journey-tr-10.json",
+      "difficultyLabel": "easy",
+      "checksum": "sha256:8ede2e87dadbca7c6870334d0ea834b01bc36d5378966ca43f0185b87c7a2a07"
+    },
+    {
+      "n": 11,
+      "id": "journey-tr-11",
+      "asset": "tr/journey-tr-11.json",
+      "difficultyLabel": "medium",
+      "checksum": "sha256:90efd9c31db19b08c62b78b528b7889227fda040ac19439131d1678207e215b8"
+    },
+    {
+      "n": 12,
+      "id": "journey-tr-12",
+      "asset": "tr/journey-tr-12.json",
+      "difficultyLabel": "medium",
+      "checksum": "sha256:12211b569ab14eb975d88b64e0c6b115a7c909dccc68e2cb4d0319cfdfe506cf"
+    },
+    {
+      "n": 13,
+      "id": "journey-tr-13",
+      "asset": "tr/journey-tr-13.json",
+      "difficultyLabel": "easy",
+      "checksum": "sha256:95a6af3778024ac04cc05be10125d4ec27dbe1ed84fbc74e8a8cebf36d33e06b"
+    },
+    {
+      "n": 14,
+      "id": "journey-tr-14",
+      "asset": "tr/journey-tr-14.json",
+      "difficultyLabel": "medium",
+      "checksum": "sha256:8423d3837502be4ada1fae94b34d59b113a6b953524060f04ae48116805998c8"
+    },
+    {
+      "n": 15,
+      "id": "journey-tr-15",
+      "asset": "tr/journey-tr-15.json",
+      "difficultyLabel": "medium",
+      "checksum": "sha256:eba8d5a31333658c8ebc6738e5240804f40a5d1b0513208e16211a089fc6b9c1"
+    },
+    {
+      "n": 16,
+      "id": "journey-tr-16",
+      "asset": "tr/journey-tr-16.json",
+      "difficultyLabel": "medium",
+      "checksum": "sha256:309d94bd9e090cfa272ab39e2f544e50b216a61ed9c16b8dc4c402cd8206e7ac"
+    },
+    {
+      "n": 17,
+      "id": "journey-tr-17",
+      "asset": "tr/journey-tr-17.json",
+      "difficultyLabel": "medium",
+      "checksum": "sha256:a30b620f05d4c355ed307d98f61e186c747b4626892cae7d737d61e442da259b"
+    },
+    {
+      "n": 18,
+      "id": "journey-tr-18",
+      "asset": "tr/journey-tr-18.json",
+      "difficultyLabel": "medium",
+      "checksum": "sha256:cd165f8afca2d43d10cabf963d057faf0615c5bc52dbc95091c0ed480a888c19"
+    },
+    {
+      "n": 19,
+      "id": "journey-tr-19",
+      "asset": "tr/journey-tr-19.json",
+      "difficultyLabel": "medium",
+      "checksum": "sha256:3bbb1e5d7e4305615d4c00bda4e89c1f8ecd59651c4cb7e885d4d914b42da8e9"
+    },
+    {
+      "n": 20,
+      "id": "journey-tr-20",
+      "asset": "tr/journey-tr-20.json",
+      "difficultyLabel": "medium",
+      "checksum": "sha256:7bc909fdd8d498bd92750c8ac154001b9d3b8a01e6297587f42624910fb469db"
+    },
+    {
+      "n": 21,
+      "id": "journey-tr-21",
+      "asset": "tr/journey-tr-21.json",
+      "difficultyLabel": "medium",
+      "checksum": "sha256:06536937125be2c1e2a81a04480fea9ff8a8f1914f71f83d760d083b18b19359"
+    },
+    {
+      "n": 22,
+      "id": "journey-tr-22",
+      "asset": "tr/journey-tr-22.json",
+      "difficultyLabel": "medium",
+      "checksum": "sha256:c45bef928dd4aea9eabc4714f4cb41c6331c98b631c7fa565374afe8b095f2e5"
+    },
+    {
+      "n": 23,
+      "id": "journey-tr-23",
+      "asset": "tr/journey-tr-23.json",
+      "difficultyLabel": "medium",
+      "checksum": "sha256:28e50d6b42c574f433e9b8889a0b2c81eb578e3d754a5b9db6297bf08a6a160f"
+    },
+    {
+      "n": 24,
+      "id": "journey-tr-24",
+      "asset": "tr/journey-tr-24.json",
+      "difficultyLabel": "medium",
+      "checksum": "sha256:3503e27331fac829085ef856d4967304123ce76151f7c1eb9892fb7821150541"
+    },
+    {
+      "n": 25,
+      "id": "journey-tr-25",
+      "asset": "tr/journey-tr-25.json",
+      "difficultyLabel": "medium",
+      "checksum": "sha256:869fd60aa2fc945d9c13152aa0f60b91347c90a630fd38b5b5a14d2a84217835"
+    },
+    {
+      "n": 26,
+      "id": "journey-tr-26",
+      "asset": "tr/journey-tr-26.json",
+      "difficultyLabel": "hard",
+      "checksum": "sha256:4aea969a465b19a578b0deadfea225a2bdeccdc1768b0a25280c058d0626f96a"
+    },
+    {
+      "n": 27,
+      "id": "journey-tr-27",
+      "asset": "tr/journey-tr-27.json",
+      "difficultyLabel": "hard",
+      "checksum": "sha256:69c20cf327117b8509ce8119419f7426b941b27d24919c6256b655b181c929e6"
+    },
+    {
+      "n": 28,
+      "id": "journey-tr-28",
+      "asset": "tr/journey-tr-28.json",
+      "difficultyLabel": "hard",
+      "checksum": "sha256:21b3056d9f16aaa096bbf9121ba18c59ed8308270a30701847962af558ff1a35"
+    },
+    {
+      "n": 29,
+      "id": "journey-tr-29",
+      "asset": "tr/journey-tr-29.json",
+      "difficultyLabel": "hard",
+      "checksum": "sha256:8c600391fe39b4fee2808d4989842bc2efde62dbcb205eef92679d30fe79672c"
+    },
+    {
+      "n": 30,
+      "id": "journey-tr-30",
+      "asset": "tr/journey-tr-30.json",
+      "difficultyLabel": "hard",
+      "checksum": "sha256:3c16d638fe42f450b1b8fd57246724666e341b0451466ec7dcb2805233c94c67"
+    }
+  ]
+}

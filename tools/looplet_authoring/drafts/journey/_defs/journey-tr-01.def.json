@@ -1,0 +1,17 @@
+{
+  "id": "journey-tr-01",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 1,
+  "language": "tr",
+  "grid": [
+    "ANASL",
+    "OPMİS",
+    "ÜOİİE",
+    "MKÇÜZ",
+    "MYİRE"
+  ],
+  "target": "ASLAN",
+  "locked": [],
+  "frozen": [],
+  "columns": false
+}

@@ -1,0 +1,19 @@
+{
+  "id": "journey-tr-17",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 17,
+  "language": "tr",
+  "grid": [
+    "RANGH",
+    "MGDKO",
+    "ŞŞRAİ",
+    "MLKSM",
+    "RYHDR"
+  ],
+  "target": "MASAL",
+  "locked": [
+    "3,0"
+  ],
+  "frozen": [],
+  "columns": true
+}

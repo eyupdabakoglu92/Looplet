@@ -1,0 +1,19 @@
+{
+  "id": "journey-tr-16",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 16,
+  "language": "tr",
+  "grid": [
+    "İAKİT",
+    "MORIİ",
+    "PÖÜOÇ",
+    "RSNAT",
+    "PZRSZ"
+  ],
+  "target": "MAKAS",
+  "locked": [
+    "0,1"
+  ],
+  "frozen": [],
+  "columns": true
+}

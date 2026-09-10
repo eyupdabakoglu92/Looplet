@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "draft",
+  "id": "journey-tr-30",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 30,
+  "language": "tr",
+  "grid": [
+    "ZÇŞŞN",
+    "IENRI",
+    "REMHH",
+    "ÜADHL",
+    "RKİOÇ"
+  ],
+  "targetWord": "ZEMİN",
+  "lockedCells": [
+    "0,0",
+    "0,4"
+  ],
+  "frozenCells": [
+    "2,3",
+    "2,4"
+  ],
+  "columnMovesEnabled": true,
+  "optimalMoves": 5,
+  "difficultyScore": 8.479,
+  "difficultyLabel": "hard",
+  "difficultyBreakdown": {
+    "o": 5,
+    "cNorm": 0.0139,
+    "tdDegree": 0,
+    "locked": 2,
+    "frozen": 2,
+    "firstMoves": 3,
+    "distinctOptimalSolutions": 18
+  }
+}

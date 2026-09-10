@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "draft",
+  "id": "journey-tr-11",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 11,
+  "language": "tr",
+  "grid": [
+    "RAZAP",
+    "DÇBÇİ",
+    "EÜUOK",
+    "İLGEM",
+    "SKZÖZ"
+  ],
+  "targetWord": "KABAK",
+  "lockedCells": [],
+  "frozenCells": [],
+  "columnMovesEnabled": true,
+  "optimalMoves": 5,
+  "difficultyScore": 4.079,
+  "difficultyLabel": "medium",
+  "difficultyBreakdown": {
+    "o": 5,
+    "cNorm": 0.0056,
+    "tdDegree": 0,
+    "locked": 0,
+    "frozen": 0,
+    "firstMoves": 5,
+    "distinctOptimalSolutions": 40
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "draft",
+  "id": "journey-tr-08",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 8,
+  "language": "tr",
+  "grid": [
+    "DŞTLN",
+    "TAMİL",
+    "AKIHP",
+    "UINKK",
+    "TNKÖZ"
+  ],
+  "targetWord": "DAMLA",
+  "lockedCells": [],
+  "frozenCells": [],
+  "columnMovesEnabled": true,
+  "optimalMoves": 4,
+  "difficultyScore": 3.668,
+  "difficultyLabel": "easy",
+  "difficultyBreakdown": {
+    "o": 4,
+    "cNorm": 0.0142,
+    "tdDegree": 0,
+    "locked": 0,
+    "frozen": 0,
+    "firstMoves": 2,
+    "distinctOptimalSolutions": 8
+  }
+}

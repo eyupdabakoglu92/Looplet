@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "draft",
+  "id": "journey-tr-04",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 4,
+  "language": "tr",
+  "grid": [
+    "BLÇIZ",
+    "MIENO",
+    "PÜLNG",
+    "BDERİ",
+    "ŞALKD"
+  ],
+  "targetWord": "BALIK",
+  "lockedCells": [],
+  "frozenCells": [],
+  "columnMovesEnabled": true,
+  "optimalMoves": 4,
+  "difficultyScore": 3.119,
+  "difficultyLabel": "easy",
+  "difficultyBreakdown": {
+    "o": 4,
+    "cNorm": 0.0188,
+    "tdDegree": 0,
+    "locked": 0,
+    "frozen": 0,
+    "firstMoves": 5,
+    "distinctOptimalSolutions": 8
+  }
+}

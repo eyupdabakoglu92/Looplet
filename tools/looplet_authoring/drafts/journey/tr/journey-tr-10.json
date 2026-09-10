@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "draft",
+  "id": "journey-tr-10",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 10,
+  "language": "tr",
+  "grid": [
+    "ARIBI",
+    "DYIÜB",
+    "UMÜHB",
+    "EIRUN",
+    "FRROE"
+  ],
+  "targetWord": "FIRIN",
+  "lockedCells": [],
+  "frozenCells": [],
+  "columnMovesEnabled": true,
+  "optimalMoves": 4,
+  "difficultyScore": 2.784,
+  "difficultyLabel": "easy",
+  "difficultyBreakdown": {
+    "o": 4,
+    "cNorm": 0.0323,
+    "tdDegree": 0,
+    "locked": 0,
+    "frozen": 0,
+    "firstMoves": 7,
+    "distinctOptimalSolutions": 40
+  }
+}

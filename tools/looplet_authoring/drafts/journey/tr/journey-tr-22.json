@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "draft",
+  "id": "journey-tr-22",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 22,
+  "language": "tr",
+  "grid": [
+    "ZİÜYL",
+    "ZBÇIT",
+    "HZPEG",
+    "IEÜLU",
+    "USÖTŞ"
+  ],
+  "targetWord": "SEPET",
+  "lockedCells": [],
+  "frozenCells": [
+    "1,0"
+  ],
+  "columnMovesEnabled": true,
+  "optimalMoves": 4,
+  "difficultyScore": 4.85,
+  "difficultyLabel": "medium",
+  "difficultyBreakdown": {
+    "o": 4,
+    "cNorm": 0.0084,
+    "tdDegree": 0,
+    "locked": 0,
+    "frozen": 1,
+    "firstMoves": 2,
+    "distinctOptimalSolutions": 4
+  }
+}

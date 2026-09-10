@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "draft",
+  "id": "journey-tr-18",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 18,
+  "language": "tr",
+  "grid": [
+    "LİSLZ",
+    "ÖÇAGS",
+    "MROMA",
+    "SBHTİ",
+    "HNEÖÖ"
+  ],
+  "targetWord": "ORMAN",
+  "lockedCells": [
+    "2,1"
+  ],
+  "frozenCells": [],
+  "columnMovesEnabled": true,
+  "optimalMoves": 4,
+  "difficultyScore": 4.448,
+  "difficultyLabel": "medium",
+  "difficultyBreakdown": {
+    "o": 4,
+    "cNorm": 0.0077,
+    "tdDegree": 0,
+    "locked": 1,
+    "frozen": 0,
+    "firstMoves": 2,
+    "distinctOptimalSolutions": 2
+  }
+}

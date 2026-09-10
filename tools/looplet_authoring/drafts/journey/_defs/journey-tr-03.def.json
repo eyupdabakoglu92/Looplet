@@ -1,0 +1,17 @@
+{
+  "id": "journey-tr-03",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 3,
+  "language": "tr",
+  "grid": [
+    "ŞPMGR",
+    "ÇEBAH",
+    "NGİTO",
+    "GBKYE",
+    "İEYZM"
+  ],
+  "target": "BAHÇE",
+  "locked": [],
+  "frozen": [],
+  "columns": false
+}

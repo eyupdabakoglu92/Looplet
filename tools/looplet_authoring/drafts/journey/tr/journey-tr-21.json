@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "draft",
+  "id": "journey-tr-21",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 21,
+  "language": "tr",
+  "grid": [
+    "AYLYA",
+    "SŞÖMN",
+    "ANAÇP",
+    "EZGÖŞ",
+    "AİTOD"
+  ],
+  "targetWord": "SALON",
+  "lockedCells": [],
+  "frozenCells": [
+    "0,1"
+  ],
+  "columnMovesEnabled": true,
+  "optimalMoves": 5,
+  "difficultyScore": 5.47,
+  "difficultyLabel": "medium",
+  "difficultyBreakdown": {
+    "o": 5,
+    "cNorm": 0.0066,
+    "tdDegree": 0,
+    "locked": 0,
+    "frozen": 1,
+    "firstMoves": 4,
+    "distinctOptimalSolutions": 65
+  }
+}

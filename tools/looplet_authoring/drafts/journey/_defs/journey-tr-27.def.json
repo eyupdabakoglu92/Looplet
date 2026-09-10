@@ -1,0 +1,23 @@
+{
+  "id": "journey-tr-27",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 27,
+  "language": "tr",
+  "grid": [
+    "NAVİT",
+    "OİŞPI",
+    "UİLKZ",
+    "KUOBN",
+    "NLDÖA"
+  ],
+  "target": "TAVUK",
+  "locked": [
+    "0,2",
+    "0,1"
+  ],
+  "frozen": [
+    "4,0",
+    "4,1"
+  ],
+  "columns": true
+}

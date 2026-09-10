@@ -1,0 +1,23 @@
+{
+  "id": "journey-tr-26",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 26,
+  "language": "tr",
+  "grid": [
+    "TORBİ",
+    "ZYYOR",
+    "ÜYOZT",
+    "ÜROLL",
+    "LAHŞR"
+  ],
+  "target": "TARİH",
+  "locked": [
+    "0,2",
+    "0,0"
+  ],
+  "frozen": [
+    "2,2",
+    "2,3"
+  ],
+  "columns": true
+}

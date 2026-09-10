@@ -1,0 +1,17 @@
+{
+  "id": "journey-tr-15",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 15,
+  "language": "tr",
+  "grid": [
+    "TPIÜZ",
+    "HHOÇE",
+    "ŞİÇRN",
+    "LMŞÇL",
+    "GTTTÇ"
+  ],
+  "target": "LİMON",
+  "locked": [],
+  "frozen": [],
+  "columns": true
+}

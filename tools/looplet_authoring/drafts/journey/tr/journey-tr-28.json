@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "draft",
+  "id": "journey-tr-28",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 28,
+  "language": "tr",
+  "grid": [
+    "OAZAN",
+    "HOYIT",
+    "LZÇKM",
+    "ATNDR",
+    "HKÖDP"
+  ],
+  "targetWord": "YATAK",
+  "lockedCells": [
+    "0,1",
+    "0,3"
+  ],
+  "frozenCells": [
+    "4,2",
+    "4,4"
+  ],
+  "columnMovesEnabled": true,
+  "optimalMoves": 5,
+  "difficultyScore": 8.261,
+  "difficultyLabel": "hard",
+  "difficultyBreakdown": {
+    "o": 5,
+    "cNorm": 0.0038,
+    "tdDegree": 0,
+    "locked": 2,
+    "frozen": 2,
+    "firstMoves": 4,
+    "distinctOptimalSolutions": 15
+  }
+}

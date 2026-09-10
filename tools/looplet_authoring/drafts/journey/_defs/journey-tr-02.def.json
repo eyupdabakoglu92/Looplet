@@ -1,0 +1,17 @@
+{
+  "id": "journey-tr-02",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 2,
+  "language": "tr",
+  "grid": [
+    "ZDDOZ",
+    "İPHZR",
+    "HLIÜN",
+    "EMBAD",
+    "DKNHU"
+  ],
+  "target": "BADEM",
+  "locked": [],
+  "frozen": [],
+  "columns": false
+}

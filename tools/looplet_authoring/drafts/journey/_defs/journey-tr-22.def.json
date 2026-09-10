@@ -1,0 +1,19 @@
+{
+  "id": "journey-tr-22",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 22,
+  "language": "tr",
+  "grid": [
+    "ZİÜYL",
+    "ZBÇIT",
+    "HZPEG",
+    "IEÜLU",
+    "USÖTŞ"
+  ],
+  "target": "SEPET",
+  "locked": [],
+  "frozen": [
+    "1,0"
+  ],
+  "columns": true
+}

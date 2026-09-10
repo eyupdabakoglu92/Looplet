@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "draft",
+  "id": "journey-tr-19",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 19,
+  "language": "tr",
+  "grid": [
+    "UNÜPİ",
+    "UPSŞY",
+    "RKÖŞR",
+    "RRSİY",
+    "ŞMEHL"
+  ],
+  "targetWord": "RESİM",
+  "lockedCells": [
+    "3,3"
+  ],
+  "frozenCells": [],
+  "columnMovesEnabled": true,
+  "optimalMoves": 4,
+  "difficultyScore": 4.715,
+  "difficultyLabel": "medium",
+  "difficultyBreakdown": {
+    "o": 4,
+    "cNorm": 0.0342,
+    "tdDegree": 0,
+    "locked": 1,
+    "frozen": 0,
+    "firstMoves": 1,
+    "distinctOptimalSolutions": 1
+  }
+}

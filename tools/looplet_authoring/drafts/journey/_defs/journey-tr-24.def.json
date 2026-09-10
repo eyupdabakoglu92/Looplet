@@ -1,0 +1,19 @@
+{
+  "id": "journey-tr-24",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 24,
+  "language": "tr",
+  "grid": [
+    "UHZÖÇ",
+    "RHEKA",
+    "ÖUÜŞE",
+    "OŞEIŞ",
+    "IHGŞB"
+  ],
+  "target": "ŞEKER",
+  "locked": [],
+  "frozen": [
+    "0,1"
+  ],
+  "columns": true
+}

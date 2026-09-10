@@ -1,0 +1,17 @@
+{
+  "id": "journey-tr-08",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 8,
+  "language": "tr",
+  "grid": [
+    "DŞTLN",
+    "TAMİL",
+    "AKIHP",
+    "UINKK",
+    "TNKÖZ"
+  ],
+  "target": "DAMLA",
+  "locked": [],
+  "frozen": [],
+  "columns": true
+}

@@ -1,0 +1,19 @@
+{
+  "id": "journey-tr-20",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 20,
+  "language": "tr",
+  "grid": [
+    "EGTŞU",
+    "ŞDÇNY",
+    "KKOME",
+    "RRŞAÖ",
+    "NHZİK"
+  ],
+  "target": "ROMAN",
+  "locked": [
+    "3,3"
+  ],
+  "frozen": [],
+  "columns": true
+}

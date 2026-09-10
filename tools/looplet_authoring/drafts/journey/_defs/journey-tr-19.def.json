@@ -1,0 +1,19 @@
+{
+  "id": "journey-tr-19",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 19,
+  "language": "tr",
+  "grid": [
+    "UNÜPİ",
+    "UPSŞY",
+    "RKÖŞR",
+    "RRSİY",
+    "ŞMEHL"
+  ],
+  "target": "RESİM",
+  "locked": [
+    "3,3"
+  ],
+  "frozen": [],
+  "columns": true
+}

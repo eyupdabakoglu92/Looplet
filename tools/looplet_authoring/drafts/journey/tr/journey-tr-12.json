@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "draft",
+  "id": "journey-tr-12",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 12,
+  "language": "tr",
+  "grid": [
+    "DITYZ",
+    "LADŞŞ",
+    "HIZYB",
+    "EGZKA",
+    "ZKAĞA"
+  ],
+  "targetWord": "KAĞIT",
+  "lockedCells": [],
+  "frozenCells": [],
+  "columnMovesEnabled": true,
+  "optimalMoves": 5,
+  "difficultyScore": 4.446,
+  "difficultyLabel": "medium",
+  "difficultyBreakdown": {
+    "o": 5,
+    "cNorm": 0.0027,
+    "tdDegree": 0,
+    "locked": 0,
+    "frozen": 0,
+    "firstMoves": 3,
+    "distinctOptimalSolutions": 8
+  }
+}

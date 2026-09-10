@@ -1,0 +1,17 @@
+{
+  "id": "journey-tr-06",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 6,
+  "language": "tr",
+  "grid": [
+    "NTAÇB",
+    "AGİHL",
+    "DÜMŞH",
+    "NMLNU",
+    "ÜİAUZ"
+  ],
+  "target": "ÇANTA",
+  "locked": [],
+  "frozen": [],
+  "columns": true
+}

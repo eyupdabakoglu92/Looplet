@@ -1,0 +1,19 @@
+{
+  "id": "journey-tr-21",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 21,
+  "language": "tr",
+  "grid": [
+    "AYLYA",
+    "SŞÖMN",
+    "ANAÇP",
+    "EZGÖŞ",
+    "AİTOD"
+  ],
+  "target": "SALON",
+  "locked": [],
+  "frozen": [
+    "0,1"
+  ],
+  "columns": true
+}

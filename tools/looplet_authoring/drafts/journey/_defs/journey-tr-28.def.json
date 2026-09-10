@@ -1,0 +1,23 @@
+{
+  "id": "journey-tr-28",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 28,
+  "language": "tr",
+  "grid": [
+    "OAZAN",
+    "HOYIT",
+    "LZÇKM",
+    "ATNDR",
+    "HKÖDP"
+  ],
+  "target": "YATAK",
+  "locked": [
+    "0,1",
+    "0,3"
+  ],
+  "frozen": [
+    "4,2",
+    "4,4"
+  ],
+  "columns": true
+}
