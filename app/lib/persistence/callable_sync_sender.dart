@@ -7,10 +7,19 @@ import 'daily_result_sync_service.dart';
 /// mapping (below) mirrors `architecture.md → Firebase Sync Surface → client
 /// mapping`; the queue state transitions it drives are already covered by
 /// `sync_test.dart`.
-SyncSender callableSyncSender(FirebaseFunctions functions) {
-  final callable = functions.httpsCallable('submitDailyResultV1');
+///
+/// `functions` is a **getter**, not a resolved `FirebaseFunctions` — it is only
+/// called from inside the returned closure, at actual send-time, never at
+/// construction time. This matters: `FirebaseFunctions.instance` throws
+/// `[core/no-app]` if `Firebase.initializeApp()` hasn't completed yet, and this
+/// sender is built (via `syncSenderProvider`) before that init kicks off
+/// (`bootstrap.dart`'s `appBootstrapProvider` — see `sync_providers.dart` for
+/// the full story, F08-FE12). Deferring the call here means the catch-all below
+/// is what actually handles that case, exactly as its comment always intended.
+SyncSender callableSyncSender(FirebaseFunctions Function() functions) {
   return (Map<String, Object?> payload) async {
     try {
+      final callable = functions().httpsCallable('submitDailyResultV1');
       final result = await callable.call<Object?>(payload);
       return mapCallableSuccess(result.data);
     } on FirebaseFunctionsException catch (error) {

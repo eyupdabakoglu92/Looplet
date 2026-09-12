@@ -3,6 +3,34 @@ import 'package:looplet_app/persistence/callable_sync_sender.dart';
 import 'package:looplet_app/persistence/daily_result_sync_service.dart';
 
 void main() {
+  group('callableSyncSender — lazy functions getter (F08-FE12 regression)', () {
+    test('building the sender never evaluates the functions getter', () {
+      var evaluated = false;
+      // If this evaluated eagerly (the pre-fix `FirebaseFunctions` argument
+      // shape), it would throw right here instead of at send-time.
+      callableSyncSender(() {
+        evaluated = true;
+        throw StateError('functions() must not be called at construction time');
+      });
+      expect(evaluated, isFalse);
+    });
+
+    test(
+      'a getter that throws at send-time (e.g. Firebase not initialised yet, '
+      '[core/no-app]) is treated as transient/retryable, not a crash',
+      () async {
+        final sender = callableSyncSender(
+          () => throw StateError(
+            "No Firebase App '[DEFAULT]' has been created - "
+            'call Firebase.initializeApp()',
+          ),
+        );
+        final result = await sender(<String, Object?>{});
+        expect(result, SyncSendResult.retryable);
+      },
+    );
+  });
+
   group('mapCallableSuccess', () {
     test('CREATED → created', () {
       expect(

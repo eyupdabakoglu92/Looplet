@@ -232,3 +232,146 @@ None blocking. Two items for awareness (also in §4):
 ```
 Run QA
 ```
+
+---
+
+# F08-FE12 — Bugfix: app-boot Firebase ordering crash (2026-09-13)
+
+> Delivered against the Tech Lead incident brief in `orchestration.md → Active Task Ledger → F08-FE12` / `→ Next Action`. Root cause, fix, and required regression test were pre-specified by the Tech Lead's source-level investigation; this delivery implements and verifies it.
+
+## 1. Feature Summary
+
+Every cold launch of the real app crashed before the home screen ever rendered: `appBootstrapProvider` (`bootstrap.dart`) constructed `dailyResultSyncServiceProvider` — which eagerly resolved `FirebaseFunctions.instance` — **before** `Firebase.initializeApp()` had run, throwing `[core/no-app]` on every boot. Fixed by making the `FirebaseFunctions` access **lazy**: the getter is now only invoked at actual send-time, inside `callableSyncSender`'s closure, where the code's pre-existing "no-Firebase-app → retryable" catch-all already handles it correctly. Verified live on a real iOS simulator: the app now boots straight to the Home screen.
+
+---
+
+## 2. Impacted Files
+
+**Updated:**
+- `app/lib/persistence/sync_providers.dart`
+- `app/lib/persistence/callable_sync_sender.dart`
+- `app/test/persistence/callable_sync_sender_test.dart`
+
+**Created:**
+- `app/test/persistence/sync_providers_test.dart`
+
+---
+
+## 3. Task-to-Code Traceability
+
+- **Task ID:** F08-FE12
+- **Durum:** Complete
+- **Güncellenen dosyalar:** `sync_providers.dart`, `callable_sync_sender.dart`, `callable_sync_sender_test.dart`; yeni `sync_providers_test.dart`
+- **Uygulanan davranış:** `firebaseFunctionsProvider` artık çözülmüş bir `FirebaseFunctions` değil, bir `FirebaseFunctions Function()` getter döndürüyor (`sync_providers.dart`). `callableSyncSender` bu getter'ı yalnız döndürdüğü closure içinde, gönderim anında çağırıyor (`callable_sync_sender.dart`) — provider inşa anında hiçbir Firebase çağrısı yapılmıyor. Sonuç: `appBootstrapProvider`'ın `ref.watch(dailyResultSyncServiceProvider)` satırı artık `Firebase.initializeApp()` tamamlanmadan asla patlamıyor.
+
+---
+
+## 4. Authority Reconciliation
+
+Bu bir contract değişikliği değil — `architecture.md → App Init Sequence`'te tarif edilen adım **sırası değişmedi** (yerel DB → `dailyResultSyncServiceProvider` inşası → `unawaited(_bootstrapFirebase)`); sadece `dailyResultSyncServiceProvider`'ın inşası artık Firebase'e hiç dokunmuyor (daha önce yanlışlıkla dokunuyordu). Tech Lead'in brief'inde sunduğu (a)/(b) seçeneklerinden **(a) — lazy `FirebaseFunctions.instance`** uygulandı: daha küçük, tek dosyaya yakın bir değişiklik ve kodun zaten var olan "no-Firebase-app → retryable" catch-all'ının niyetini olduğu gibi tamamlıyor. `architecture.md`'de değişecek bir satır yok — Tech Lead'e raporlanacak bir sapma yok.
+
+---
+
+## 5. Root Cause (kanıtla)
+
+`app/lib/bootstrap.dart`:
+```dart
+final sync = ref.watch(dailyResultSyncServiceProvider);   // <- eskiden burada patlıyordu
+unawaited(_bootstrapFirebase(ref, sync));                  // <- Firebase.initializeApp() burada, bir satır GEÇ
+```
+`dailyResultSyncServiceProvider` → `syncSenderProvider` → `firebaseFunctionsProvider` eskiden `FirebaseFunctions.instance`'ı **provider inşa anında, senkron** olarak çağırıyordu. Bu getter `Firebase.app()`'i çözer ve `Firebase.initializeApp()` tamamlanmadıysa `[core/no-app]` fırlatır — hiçbir platform kanalı gerektirmeden, saf Dart tarafında. Bu throw `appBootstrapProvider`'ın try/catch'inin (yalnız iki yerel-DB `await`'ini sarmalıyor) **dışında** kalıyordu ve `_BootstrapGate`'in genel `error:` dalına (`StoreErrorScreen`) düşüyordu.
+
+**Neden hiç yakalanmamıştı:** `app/test/widget_test.dart` — gerçek `main()` ağacını boot eden TEK test — `syncSenderProvider`'ı doğrudan sahte bir `SyncSender` ile override ediyor (`syncSenderProvider.overrideWithValue((...) async => SyncSendResult.retryable)`). Bu, `firebaseFunctionsProvider`'a hiç uğramadan `dailyResultSyncServiceProvider`'ın inşasını tamamlıyor — yani tam olarak kırık olan zinciri baştan atlıyor. `sync_test.dart` da `DailyResultSyncService`'i `callableSyncSender` kullanmadan, elle yazılmış bir `sender` fonksiyonuyla kuruyor. Hiçbir test gerçek `firebaseFunctionsProvider`/`syncSenderProvider` zincirini, Firebase hiç initialize edilmemişken çalıştırmıyordu — tam da bu regresyon testini `sync_providers_test.dart` olarak ekledim.
+
+---
+
+## 6. Fix
+
+`sync_providers.dart`:
+```dart
+final firebaseFunctionsProvider = Provider<FirebaseFunctions Function()>(
+  (ref) => () => FirebaseFunctions.instance,
+);
+```
+`callable_sync_sender.dart`:
+```dart
+SyncSender callableSyncSender(FirebaseFunctions Function() functions) {
+  return (Map<String, Object?> payload) async {
+    try {
+      final callable = functions().httpsCallable('submitDailyResultV1');
+      ...
+    } catch (_) {
+      return SyncSendResult.retryable; // artık gerçekten ulaşılabilir
+    }
+  };
+}
+```
+`FirebaseFunctions.instance` artık yalnız gönderim anında, closure içinde çağrılıyor — provider inşa sırasında değil. Gönderim anına kadar `_bootstrapFirebase` normalde `Firebase.initializeApp()`'i çoktan tamamlamış oluyor; tamamlamamışsa bile closure'ın kendi catch-all'ı `retryable` döndürüyor (kuyruk öğesi kaybolmuyor) — kodun zaten taşıdığı "Transport / plugin / no-Firebase-app — transient, keep the item" niyeti artık gerçekten çalışıyor.
+
+---
+
+## 7. Contract Compliance Check
+
+- **Screen / route contract:** Preserved — `_BootstrapGate` / route yapısı değişmedi.
+- **App Init Sequence adım sırası (`architecture.md`):** Preserved — sıra aynı, yalnız `dailyResultSyncServiceProvider` artık Firebase'e erken dokunmuyor.
+- **`DailyResultSyncService` / `sync_queue` state machine:** Preserved — `callableSyncSender`'ın davranışı (başarı/hata eşlemesi) değişmedi, yalnız `FirebaseFunctions` erişim zamanı değişti.
+- **UI state / store state consistency:** Not Applicable (görsel değişiklik yok).
+- **Navigation / back / header behavior:** Not Applicable.
+
+---
+
+## 8. Behavior Preserved
+
+- `callableSyncSender`'ın başarı/hata → `SyncSendResult` eşlemesi (`mapCallableSuccess`/`mapCallableErrorCode`) hiç değişmedi — testleri aynen geçiyor.
+- `DailyResultSyncService`'in kuyruk state machine'i (`sync_test.dart`, `callableSyncSender`'a hiç dokunmuyor) etkilenmedi.
+- Gerçek cihazda Firebase başarıyla initialize olduğunda (asıl akış) davranış birebir aynı — tek fark, artık initialize olmadan önce bir çökme olmuyor.
+
+---
+
+## 9. Retro Bugfix Disiplini (zorunlu self-check)
+
+- **Kırık kullanıcı yolu (tek cümle):** Her soğuk uygulama açılışı, ana ekrana ulaşmadan önce `StoreErrorScreen` ile çöküyordu.
+- **Bu yolu tetikleyen tüm entry path'ler:** Tek path var — `main()` → `LoopletApp` → `appRouterProvider` → `_BootstrapGate` → `appBootstrapProvider`. Uygulamanın **tek** girişi bu; alternatif bir entry yok.
+- **Store alanları / action'lar:** `appBootstrapProvider`'ın kendisi bir Riverpod `FutureProvider`; okuduğu tek "durum" `Firebase.apps` (boş/dolu) ve yerel DB'nin açılabilirliği. Yazan action yok — bu bir inşa-zamanı sıralama hatası, bir mutation hatası değil.
+- **Etkilenmeyen branch'ler:** `AppBootstrapMigrationError` yolu (Drift migration hatası) hiç dokunulmadı — hâlâ aynı şekilde çalışıyor. `_bootstrapFirebase`'in kendi içindeki try/catch'ler (App Check, anonim giriş, sync drain) değişmedi.
+- **Kök neden kapatıldı mı, yoksa semptom mu maskelendi:** Kök neden kapatıldı — `FirebaseFunctions.instance`'a erken erişim tamamen ortadan kaldırıldı (maskeleme değil, örneğin sadece `appBootstrapProvider`'a bir try/catch eklemek gibi bir semptom-gizleme yapılmadı).
+
+**Self-check matrisi:**
+- ✅ **fresh session:** `sync_providers_test.dart` — `Firebase.apps` boşken `dailyResultSyncServiceProvider` fırlatmıyor; gerçek simülatörde ilk kurulumdan sonra ana ekrana ulaşıyor (ekran görüntüsü ile doğrulandı).
+- ✅ **persisted stale session:** Bu hata herhangi bir persist edilmiş state'e bağlı değildi (saf provider-inşa sıralaması); N/A ama etkilenmediği doğrulandı — `widget_test.dart` (in-memory DB, önceden var olan seed davranışı) hâlâ geçiyor.
+- ✅ **alternate entry path:** Uygulamanın tek girişi olduğu için N/A — kontrol edildi, başka bir `main()`/bootstrap yolu yok.
+- ✅ **actor / permission / user-state farkları:** N/A — bu katmanda actor/permission kavramı yok (tek yerel oyuncu, F08 kapsamı).
+
+---
+
+## 17. Test Evidence by Task
+
+| Task / davranış | Test türü | Kanıtlanan senaryo | Dosya |
+| --- | --- | --- | --- |
+| F08-FE12 kök neden regresyonu | unit (`ProviderContainer`, gerçek zincir) | `Firebase.apps` boşken **gerçek** `firebaseFunctionsProvider`/`syncSenderProvider` override edilmeden `dailyResultSyncServiceProvider` inşa ediliyor, fırlatmıyor | `sync_providers_test.dart` |
+| F08-FE12 gönderim-anı davranışı | unit | Gerçek `syncSenderProvider`'ın döndürdüğü sender, Firebase initialize edilmeden çağrıldığında `retryable` dönüyor (fırlatmıyor) | `sync_providers_test.dart` |
+| `callableSyncSender` lazy'liği | unit | Getter, sender **inşa edilirken** hiç çağrılmıyor (çağrılsaydı hemen fırlardı) | `callable_sync_sender_test.dart` |
+| `callableSyncSender` catch-all artık ulaşılabilir | unit | Gönderim anında fırlatan bir getter → `retryable` (çökme yok) | `callable_sync_sender_test.dart` |
+| Regresyon yok — mevcut eşleme testleri | unit | `mapCallableSuccess`/`mapCallableErrorCode` tüm vakalar aynen geçiyor | `callable_sync_sender_test.dart` (değişmedi) |
+| Regresyon yok — kuyruk state machine | unit | `sync_test.dart` (elle yazılmış sender, `callableSyncSender`'a dokunmuyor) aynen geçiyor | `sync_test.dart` |
+| Regresyon yok — mevcut boot widget testi | widget | `widget_test.dart` ("app bootstraps and shows the home shell") aynen geçiyor | `widget_test.dart` |
+| **Gerçek cihaz doğrulaması (zorunlu, brief'te istendi)** | runtime | `flutter run -d <iPhone 16 simulator>` ile gerçek boot: **öncesi** — `StoreErrorScreen` + `[core/no-app]`; **sonrası** — doğrudan Home ekranı (LOOPLET, 0/30 Journey halkası, DEVAM ET). Ekran görüntüsü bu sohbette paylaşıldı. | manuel simülatör çalıştırması |
+
+**Suite:** `flutter analyze` (app) clean; `dart format --output=none --set-exit-if-changed app` clean; `flutter test` (app) **181/181** (176 + 5 yeni test; regresyon yok). Pure-package suites (`looplet_core` 22, `looplet_engine` 83, `looplet_content` 17, `looplet_solver` 23, `looplet_dictionary` 32) yeniden çalıştırıldı — hepsi yeşil, bu paketlerden hiçbirine dokunulmadı.
+
+---
+
+# WORKFLOW HANDOFF SUGGESTION (NON-AUTHORITATIVE)
+
+* **Completed Tasks:** F08-FE12 (bugfix).
+* **Remaining Tasks:** Tech Lead reconcile → karar (ağırlığına göre bir QA re-verify turu mu, yoksa doğrudan kapanış mı) → F08-DEVOPS (Blaze/deploy) ayrı ve değişmeden parked kalıyor.
+* **Blockers:** yok.
+* **Status Suggestion:** Needs Tech Lead Review.
+
+---
+
+## 19. Sonraki Komut
+
+```
+Run Tech Lead
+```

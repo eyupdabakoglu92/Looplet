@@ -8,10 +8,21 @@ import 'callable_sync_sender.dart';
 import 'daily_result_sync_service.dart';
 import 'persistence_providers.dart';
 
-/// `submitDailyResultV1` transport. Overridable in tests / when Firebase is not
-/// yet initialised.
-final firebaseFunctionsProvider = Provider<FirebaseFunctions>(
-  (ref) => FirebaseFunctions.instance,
+/// `submitDailyResultV1` transport. **Lazy on purpose:** this provider hands out
+/// a getter, not a resolved `FirebaseFunctions` instance — `FirebaseFunctions
+/// .instance` is a FlutterFire call that throws `[core/no-app]` if
+/// `Firebase.initializeApp()` hasn't completed yet, and `appBootstrapProvider`
+/// constructs `dailyResultSyncServiceProvider` (which watches this) *before*
+/// kicking off Firebase init (`bootstrap.dart`'s `_bootstrapFirebase` runs
+/// after, `unawaited`). Resolving `.instance` here at provider-build time
+/// crashed the app-boot gate on every cold launch (F08-FE12). The getter is
+/// only ever invoked inside `callableSyncSender`'s returned closure, at actual
+/// send-time — by then Firebase init has normally finished, and if it hasn't,
+/// that closure's existing catch-all already treats "no Firebase app" as
+/// transient/retryable. Overridable in tests.
+final firebaseFunctionsProvider = Provider<FirebaseFunctions Function()>(
+  (ref) =>
+      () => FirebaseFunctions.instance,
 );
 
 /// The real callable-backed [SyncSender].
