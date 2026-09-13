@@ -70,7 +70,7 @@ F05 does **not** own: the play mechanic (F03), the star rating / completion pane
 ## 6. Constraints (from the product PRD)
 
 * Linear unlock: completing level N unlocks N+1; **stars do not gate**; replaying never re-locks.
-* The 30 levels + their difficulty labels are produced via **F06** (`F06-CONTENT`). The difficulty-curve bands (1–3 rows-only opt 3–4; 4–6 column intro; 7–10 rows+cols opt 4–6; 11–15 temp-displacement; 16–20 locked; 21–25 frozen; 26–30 locked+frozen) must be landed by the authored content.
+* The 30 levels + their difficulty labels are produced via **F06** (`F06-CONTENT`). The difficulty-curve bands (1–3 rows-only, `optimalMoves == 2` — corrected 2026-09-13, `3–4` was unachievable for a rows-only 5-letter 5×5; 4–6 column intro; 7–10 rows+cols opt 4–6; 11–15 temp-displacement; 16–20 locked; 21–25 frozen; 26–30 locked+frozen) must be landed by the authored content — see `architecture.md §5.4` for the locked spec and `f06 content-authoring-brief.md §4` for the shipped `2026.09-v1` pack's actual per-band values.
 * Per-level micro-tutorials (the column intro at 4–6) belong to F05 and are **distinct** from onboarding (F09).
 * The full Journey must be **playable offline** (bundled content; F08 local persistence).
 * The **solver never runs on device** — every level ships with a pre-computed `optimalMoves` (F06 gate).

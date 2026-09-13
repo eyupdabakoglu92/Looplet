@@ -325,7 +325,7 @@ Beklenen çıktı:
 
 * Given level N is completed with any star count, When the completion panel closes, Then level N+1 is unlocked.
 * Given level N is not completed, When the player attempts to open level N+1, Then it is unavailable.
-* Given levels 1–3, When played, Then column moves are disabled and only row shifts are available; optimal is 3–4 moves.
+* Given levels 1–3, When played, Then column moves are disabled and only row shifts are available; optimal is 2 moves. (Corrected 2026-09-13, Tech Lead + user decision, `f05 architecture.md §5.4`: `3–4` is unachievable for a rows-only 5×5 with a 5-letter target — the provable minimum is `min(k, 5-k) ≤ 2` for any single-row cyclic rotation.)
 * Given the player first enters the levels 4–6 band, When the level loads, Then a short column-shift tutorial is shown and column shifts become available.
 * Given levels 7–10, When played, Then rows and columns are both available with optimal 4–6.
 * Given levels 11–15 / 16–20 / 21–25 / 26–30, When played, Then respectively: heavier temporary-displacement puzzles / locked tiles / frozen tiles / locked+frozen combos, matching the source §20 curve.
