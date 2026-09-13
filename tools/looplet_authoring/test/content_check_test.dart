@@ -141,4 +141,42 @@ void main() {
     );
     expect(failures.join('\n'), contains('repeats within 30 days'));
   });
+
+  test(
+    'a Journey content manifest (levels shape) is recognised, not '
+    'mistaken for a Puzzle artifact (F06-CONTENT-PROMOTE regression)',
+    () async {
+      final good = await goodArtifact(tmp);
+      final content = Directory('${tmp.path}/content')..createSync();
+      final journeyDir = Directory('${content.path}/journey/tr')
+        ..createSync(recursive: true);
+      write(journeyDir, 'journey-tr-01.json', good);
+      write(journeyDir, 'journey_manifest_tr.json', <String, Object?>{
+        'schemaVersion': 1,
+        'contentVersion': '2026.09-v1',
+        'lang': 'tr',
+        'mode': 'strict',
+        'levels': <Map<String, Object?>>[
+          <String, Object?>{
+            'n': 1,
+            'id': good['id'],
+            'asset': 'tr/journey-tr-01.json',
+            'difficultyLabel': good['difficultyLabel'],
+            'checksum': 'sha256:not-checked-by-this-gate',
+          },
+        ],
+      });
+
+      final failures = await runContentCheck(
+        root: content.path,
+        repoRoot: _repoRoot,
+      );
+      // The manifest itself must not be flagged (e.g. "puzzleType must be a
+      // non-empty string") — only the real Puzzle rules apply, if any.
+      expect(
+        failures.where((f) => f.contains('journey_manifest_tr.json')),
+        isEmpty,
+      );
+    },
+  );
 }

@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "2026.09-v1",
+  "id": "journey-tr-23",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 23,
+  "language": "tr",
+  "grid": [
+    "DEÇSL",
+    "ORAKS",
+    "ESAÇK",
+    "MBZÖÖ",
+    "ÜDRAT"
+  ],
+  "targetWord": "SOKAK",
+  "lockedCells": [],
+  "frozenCells": [
+    "2,1"
+  ],
+  "columnMovesEnabled": true,
+  "optimalMoves": 4,
+  "difficultyScore": 4.662,
+  "difficultyLabel": "medium",
+  "difficultyBreakdown": {
+    "o": 4,
+    "cNorm": 0.0082,
+    "tdDegree": 0,
+    "locked": 0,
+    "frozen": 1,
+    "firstMoves": 3,
+    "distinctOptimalSolutions": 6
+  }
+}

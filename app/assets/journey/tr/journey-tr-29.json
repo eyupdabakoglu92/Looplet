@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "2026.09-v1",
+  "id": "journey-tr-29",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 29,
+  "language": "tr",
+  "grid": [
+    "BOÇOT",
+    "ZSMNH",
+    "NLDPD",
+    "ÜREIK",
+    "GAIAİ"
+  ],
+  "targetWord": "ZAMAN",
+  "lockedCells": [
+    "1,0",
+    "1,2"
+  ],
+  "frozenCells": [
+    "3,3",
+    "3,4"
+  ],
+  "columnMovesEnabled": true,
+  "optimalMoves": 5,
+  "difficultyScore": 8.659,
+  "difficultyLabel": "hard",
+  "difficultyBreakdown": {
+    "o": 5,
+    "cNorm": 0.0112,
+    "tdDegree": 0,
+    "locked": 2,
+    "frozen": 2,
+    "firstMoves": 2,
+    "distinctOptimalSolutions": 18
+  }
+}

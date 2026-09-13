@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "2026.09-v1",
+  "id": "journey-tr-17",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 17,
+  "language": "tr",
+  "grid": [
+    "RANGH",
+    "MGDKO",
+    "ŞŞRAİ",
+    "MLKSM",
+    "RYHDR"
+  ],
+  "targetWord": "MASAL",
+  "lockedCells": [
+    "3,0"
+  ],
+  "frozenCells": [],
+  "columnMovesEnabled": true,
+  "optimalMoves": 4,
+  "difficultyScore": 4.628,
+  "difficultyLabel": "medium",
+  "difficultyBreakdown": {
+    "o": 4,
+    "cNorm": 0.005,
+    "tdDegree": 0,
+    "locked": 1,
+    "frozen": 0,
+    "firstMoves": 1,
+    "distinctOptimalSolutions": 3
+  }
+}

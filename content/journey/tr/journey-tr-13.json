@@ -1,31 +1,31 @@
 {
   "schemaVersion": 1,
   "contentVersion": "2026.09-v1",
-  "id": "journey-tr-04",
+  "id": "journey-tr-13",
   "puzzleType": "journey",
-  "journeyLevelNumber": 4,
+  "journeyLevelNumber": 13,
   "language": "tr",
   "grid": [
-    "BLÇIZ",
-    "MIENO",
-    "PÜLNG",
-    "BDERİ",
-    "ŞALKD"
+    "ŞÇBMM",
+    "PUPOM",
+    "PGÜEÇ",
+    "ÖALUN",
+    "SKDKY"
   ],
-  "targetWord": "BALIK",
+  "targetWord": "KALEM",
   "lockedCells": [],
   "frozenCells": [],
   "columnMovesEnabled": true,
-  "optimalMoves": 4,
-  "difficultyScore": 3.119,
+  "optimalMoves": 5,
+  "difficultyScore": 3.893,
   "difficultyLabel": "easy",
   "difficultyBreakdown": {
-    "o": 4,
-    "cNorm": 0.0188,
+    "o": 5,
+    "cNorm": 0.0061,
     "tdDegree": 0,
     "locked": 0,
     "frozen": 0,
-    "firstMoves": 5,
-    "distinctOptimalSolutions": 8
+    "firstMoves": 6,
+    "distinctOptimalSolutions": 60
   }
 }

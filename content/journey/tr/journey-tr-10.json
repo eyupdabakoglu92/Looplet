@@ -1,31 +1,31 @@
 {
   "schemaVersion": 1,
   "contentVersion": "2026.09-v1",
-  "id": "journey-tr-04",
+  "id": "journey-tr-10",
   "puzzleType": "journey",
-  "journeyLevelNumber": 4,
+  "journeyLevelNumber": 10,
   "language": "tr",
   "grid": [
-    "BLÇIZ",
-    "MIENO",
-    "PÜLNG",
-    "BDERİ",
-    "ŞALKD"
+    "ARIBI",
+    "DYIÜB",
+    "UMÜHB",
+    "EIRUN",
+    "FRROE"
   ],
-  "targetWord": "BALIK",
+  "targetWord": "FIRIN",
   "lockedCells": [],
   "frozenCells": [],
   "columnMovesEnabled": true,
   "optimalMoves": 4,
-  "difficultyScore": 3.119,
+  "difficultyScore": 2.784,
   "difficultyLabel": "easy",
   "difficultyBreakdown": {
     "o": 4,
-    "cNorm": 0.0188,
+    "cNorm": 0.0323,
     "tdDegree": 0,
     "locked": 0,
     "frozen": 0,
-    "firstMoves": 5,
-    "distinctOptimalSolutions": 8
+    "firstMoves": 7,
+    "distinctOptimalSolutions": 40
   }
 }

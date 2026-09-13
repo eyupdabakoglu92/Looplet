@@ -1,31 +1,31 @@
 {
   "schemaVersion": 1,
   "contentVersion": "2026.09-v1",
-  "id": "journey-tr-04",
+  "id": "journey-tr-14",
   "puzzleType": "journey",
-  "journeyLevelNumber": 4,
+  "journeyLevelNumber": 14,
   "language": "tr",
   "grid": [
-    "BLÇIZ",
-    "MIENO",
-    "PÜLNG",
-    "BDERİ",
-    "ŞALKD"
+    "PISSİ",
+    "KİUTN",
+    "ŞEZKŞ",
+    "TNYPÜ",
+    "ÜMYTA"
   ],
-  "targetWord": "BALIK",
+  "targetWord": "KİTAP",
   "lockedCells": [],
   "frozenCells": [],
   "columnMovesEnabled": true,
-  "optimalMoves": 4,
-  "difficultyScore": 3.119,
-  "difficultyLabel": "easy",
+  "optimalMoves": 5,
+  "difficultyScore": 4.068,
+  "difficultyLabel": "medium",
   "difficultyBreakdown": {
-    "o": 4,
-    "cNorm": 0.0188,
+    "o": 5,
+    "cNorm": 0.0017,
     "tdDegree": 0,
     "locked": 0,
     "frozen": 0,
     "firstMoves": 5,
-    "distinctOptimalSolutions": 8
+    "distinctOptimalSolutions": 16
   }
 }

@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "2026.09-v1",
+  "id": "journey-tr-26",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 26,
+  "language": "tr",
+  "grid": [
+    "TORBİ",
+    "ZYYOR",
+    "ÜYOZT",
+    "ÜROLL",
+    "LAHŞR"
+  ],
+  "targetWord": "TARİH",
+  "lockedCells": [
+    "0,0",
+    "0,2"
+  ],
+  "frozenCells": [
+    "2,2",
+    "2,3"
+  ],
+  "columnMovesEnabled": true,
+  "optimalMoves": 5,
+  "difficultyScore": 8.112,
+  "difficultyLabel": "hard",
+  "difficultyBreakdown": {
+    "o": 5,
+    "cNorm": 0.0164,
+    "tdDegree": 0,
+    "locked": 2,
+    "frozen": 2,
+    "firstMoves": 5,
+    "distinctOptimalSolutions": 6
+  }
+}

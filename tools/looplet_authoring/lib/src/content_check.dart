@@ -42,6 +42,13 @@ Future<List<String>> runContentCheck({
       manifests[rel] = map;
       continue;
     }
+    if (map.containsKey('levels')) {
+      // A Journey content manifest (F05's schema — `schemaVersion`/`mode`/
+      // `lang`/`levels`). Not a Puzzle artifact and not a Daily assignments
+      // manifest; F05 owns its own structural gate for this shape
+      // (`journey_manifest_gate_test.dart`). Nothing to check here.
+      continue;
+    }
     try {
       puzzles[rel] = Puzzle.fromJson(map);
     } on PuzzleFormatException catch (e) {

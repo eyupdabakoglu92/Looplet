@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "2026.09-v1",
+  "id": "journey-tr-25",
+  "puzzleType": "journey",
+  "journeyLevelNumber": 25,
+  "language": "tr",
+  "grid": [
+    "GEİPD",
+    "KÜTÇA",
+    "ABTKT",
+    "AÇANİ",
+    "ZKPNL"
+  ],
+  "targetWord": "TABAK",
+  "lockedCells": [],
+  "frozenCells": [
+    "2,2"
+  ],
+  "columnMovesEnabled": true,
+  "optimalMoves": 4,
+  "difficultyScore": 4.651,
+  "difficultyLabel": "medium",
+  "difficultyBreakdown": {
+    "o": 4,
+    "cNorm": 0.0046,
+    "tdDegree": 0,
+    "locked": 0,
+    "frozen": 1,
+    "firstMoves": 3,
+    "distinctOptimalSolutions": 6
+  }
+}

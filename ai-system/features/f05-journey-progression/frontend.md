@@ -257,3 +257,112 @@ Closes the F05-QA `Rejected` verdict (`qa.md`). Both blocking items were **missi
 - **N2 reduced-motion / determinism:** the `_pulse` controller uses `repeat(reverse: true)` (never settles), so any widget test that mounts `HomeScreen` with an in-progress or terminal model MUST run under `FakeAccessibilityFeatures(disableAnimations: true)` — `journey_home_test.dart` does this for all four cases. `widget_test.dart` (bootstraps the real `HomeScreen`) is unaffected: a freshly-seeded DB has no active session and 0 completions, so neither controller animates.
 - **`journey_next_level_test.dart` terminal case** covers the `nextJourneyLevel → null → context.go('/')` path, which is the same code path level 30 takes; `journey_ids_test.dart` unit-covers `nextJourneyLevel(30, …) == null`. A trigger→outcome test against a real 30-level manifest still waits for `F06-CONTENT`.
 - **Interim CONTINUE edge (known, `[PENDING — F06-CONTENT]`):** a player who completes all 5 interim levels but is not at 30/30 gets `continueTarget = 6`, which the resolver cannot load (the interim manifest has 5 levels) → F03's load-error state. Resolves once `F06-CONTENT` ships the real 30. Not an F05-FE2 fix (the `continueTarget` derivation is content-agnostic by `architecture.md §6`).
+
+---
+
+# F06-CONTENT-PROMOTE — promote the accepted 30 Journey levels to shippable content (2026-09-13)
+
+> Delivered against the Tech Lead brief in `orchestration.md → Active Task Ledger → F06-CONTENT-PROMOTE` / `→ Next Action`. The human sign-off (accept-as-is) already happened — this is mechanical toolchain execution + gate-running. No puzzle content was hand-edited or re-tuned.
+
+## 1. Feature Summary
+
+Promoted the 30 accepted `F06-CONTENT-DRAFT` candidate grids into real, shippable Journey content: `content/journey/tr/` now holds the 30 `Puzzle` artifacts + a real `mode:"strict"` manifest; `melos run content:sync`'s existing (already-real) rsync mirrored them into `app/assets/journey/tr/`, automatically replacing the 5 interim smoke files. Along the way, found and fixed a genuine bug in `tools/looplet_authoring`'s `check` command — it had never been exercised against a real Journey manifest before and mis-classified it as a malformed `Puzzle`.
+
+---
+
+## 2. Impacted Files
+
+**Created:**
+- `content/journey/tr/journey-tr-01.json … -30.json` — the 30 shippable `Puzzle` artifacts (copied from the accepted drafts, `contentVersion` bumped to `"2026.09-v1"`).
+- `content/journey/tr/journey_manifest_tr.json` — the real manifest (`mode:"strict"`, 30 contiguous entries, sha256 checksums).
+- `app/assets/journey/tr/journey-tr-06.json … -30.json` — mirrored in by `content:sync`.
+
+**Updated (by `content:sync`'s rsync mirror):**
+- `app/assets/journey/tr/journey-tr-01.json … -05.json` — content changed from the interim re-`id`'d smoke copies to the real levels 1–5.
+- `app/assets/journey/tr/journey_manifest_tr.json` — `mode:"smoke"` (5 levels) → `mode:"strict"` (30 levels).
+
+**Deleted:**
+- `content/journey/tr/.gitkeep` — redundant now that the directory holds real content (was a placeholder for the empty dir since F06's original scaffold).
+
+**Fixed (toolchain bug, found while running Step 3 of the brief):**
+- `tools/looplet_authoring/lib/src/content_check.dart` — `runContentCheck` classified every `.json` under the scanned root as either a Daily manifest (has `assignments`) or a `Puzzle`; a Journey manifest (has `levels`, F05's own schema) matched neither and was force-parsed as a `Puzzle`, failing with `"puzzleType" must be a non-empty string`. This had never been caught because no Journey manifest had ever previously lived under `content/` (the interim pack was intentionally staged under `app/assets/journey/` only, specifically to avoid touching this gate — see `f05 architecture.md §5.1`/`frontend.md`'s earlier deviation note). Added a `map.containsKey('levels')` branch that skips the file (F05 owns Journey-manifest structural validation separately, via `journey_manifest_gate_test.dart`).
+- `tools/looplet_authoring/test/content_check_test.dart` — added a regression test proving a Journey-shaped manifest is recognised and not flagged.
+
+---
+
+## 3. Task-to-Code Traceability
+
+- **Task ID:** F06-CONTENT-PROMOTE
+- **Durum:** Complete
+- **Uygulanan davranış:**
+  1. Copied the 30 accepted drafts from `tools/looplet_authoring/drafts/journey/tr/` to `content/journey/tr/`, bumping `contentVersion` to `"2026.09-v1"` — no other field touched (grid/target/locked/frozen/optimalMoves/difficultyScore/Label/Breakdown all exactly as solver-verified by `F06-CONTENT-DRAFT`).
+  2. Built `content/journey/tr/journey_manifest_tr.json` (`mode:"strict"`, `contentVersion:"2026.09-v1"`, 30 entries, sha256 checksums computed against the final on-disk bytes).
+  3. Ran `tools/looplet_authoring`'s `check` against `content/` — hit + fixed the manifest-misclassification bug above; re-ran → `check: OK`.
+  4. Ran `content:sync`'s underlying command (`rsync -a --delete content/journey/ app/assets/journey/`) — confirmed it is already a real, working script (not a stub needing to be "made real"); it mirrored the 30 levels + manifest and auto-deleted the 5 interim files.
+  5. Ran F05's own manifest gate (`journey_manifest_gate_test.dart`) — the **strict branch now runs for real** against the real 30-level bundle for the first time: contiguity, checksum match, id/number match, `difficultyLabel` in the strict-mode band rule. **4/4 pass.**
+  6. Full regression: `flutter analyze` / `dart format --set-exit-if-changed` clean; `flutter test` (app) **181/181** (unchanged count — no existing test needed a content-specific change, see §4 below); all 5 pure-Dart package suites unchanged/green; `looplet_authoring`'s own `dart test` **20/20** (was 19, +1 for the `content_check.dart` regression test); `flutter build ios --release --no-codesign` green (`Runner.app`, 54.7 MB — same size as before, confirming the swap didn't bloat the bundle).
+  7. **Extra verification (not required by the brief, done for confidence given F08-FE12's lesson that a green build ≠ a working boot):** `flutter run` on a real iOS simulator — Home screen renders `0 / 30` correctly against the real strict manifest, no load error.
+
+---
+
+## 4. Authority Reconciliation
+
+- **Conflict Source:** `tools/looplet_authoring/lib/src/content_check.dart`'s manifest-type detection vs. reality — it silently assumed only two `.json` shapes could ever appear under `content/` (a `Puzzle` or a `{assignments: …}` Daily manifest), which was true only because no Journey manifest had ever been placed under `content/` before this promotion.
+- **Winning Authority:** `f05 architecture.md §5.4` (the content-manifest gate is F05-owned via `journey_manifest_gate_test.dart` for *structural* Journey-manifest rules) + F06's `check` is only meant to validate `Puzzle` artifacts + the Daily no-repeat window — never Journey-manifest structure. The fix aligns `content_check.dart`'s behavior with that existing division of responsibility (skip, don't validate) rather than inventing new Journey-manifest checks inside F06's tool.
+- **Uygulanan karar:** added a minimal `levels`-key recognition branch (mirrors the existing `assignments`-key branch) that skips the file entirely — no new validation logic, no behavior change to any existing rule.
+- **Downstream impact:** none for shipped app code (`tools/looplet_authoring` is never shipped). `melos run content:check` (and CI's use of it) now correctly passes once `content/journey/` exists — this was a **blocking bug** for the F05 `Done` path that had never been exercised until this promotion; it is now fixed and regression-tested.
+
+---
+
+## 5. Contract Compliance Check
+
+- **Screen / route contract:** Not Applicable (no app/lib code touched).
+- **`f05 architecture.md §5.4` content-manifest gate:** Preserved — schema/contiguity/checksum/id/band rules unchanged; the real bundle now exercises the strict branch for the first time.
+- **`f06 architecture.md` `check` contract:** Extended (minimally) — now correctly recognizes a Journey manifest shape as "not a Puzzle, not a Daily manifest, skip" rather than misclassifying it. No existing rule changed.
+- **Async authority / lifecycle / boundary semantics:** Not Applicable.
+
+---
+
+## 6. Behavior Preserved
+
+- `DailyResultSyncService`, F03 play, F04 completion, F08 persistence — untouched, still green (no code in those paths was touched).
+- Every existing Journey test that exercises the real bundle (`journey_manifest_gate_test.dart`) or synthetic fixtures (`journey_next_level_test.dart`, `column_tutorial_test.dart`, `journey_home_test.dart`, `journey_content_repo_test.dart`, etc.) — checked one-by-one via the full `flutter test` run; **none needed a content-specific change**. All Journey-behavior tests use either an injectable `JourneyAssetSource` fake or a synthetic manifest (per `architecture.md` D5's app-layer resolver design), not literal letters/words from the old interim smoke pack — confirming the resolver/gate/UI code was written against the *shape* of Journey content, not its specific values, exactly as intended.
+- `widget_test.dart` (the one test that boots the real `main()`/bundle) still passes — it only asserts the app reaches Home without a `StoreErrorScreen`, agnostic to Journey content.
+
+---
+
+## 7. Test Evidence by Task
+
+| Task / behavior | Test type | Scenario | File |
+| --- | --- | --- | --- |
+| Real 30-level `content/` tree passes F06's gate | `automated functional` (CLI) | `check` against `content/` (incl. `content/journey/tr/`, `content/smoke/tr/`) → `check: OK` | manual CLI run + `tools/looplet_authoring` `dart test` |
+| `content_check.dart` recognizes a Journey manifest, doesn't misparse it as a `Puzzle` | unit | Journey-shaped `{schemaVersion, contentVersion, lang, mode, levels}` alongside a real `Puzzle` artifact under a temp `content/` tree → no failure mentions the manifest file | `content_check_test.dart` (new test) |
+| F05's strict manifest gate against the real bundle | `automated functional` (real `rootBundle`) | schema+contiguity; **strict ⇒ 30** (was smoke ⇒ 5, now strict ⇒ 30, real pass — this branch had never run against real content before); every level's id scheme; band-rule labels | `journey_manifest_gate_test.dart` — 4/4 |
+| No existing Journey/F03/F04 behavior regressed | `automated functional` | Full `flutter test` (app) — same 181/181 as before the promotion | full suite run |
+| iOS bundle packages the real content | `runtime` (release build) | `flutter build ios --release --no-codesign` green, 54.7 MB (unchanged size) | manual build |
+| App actually boots against the real strict manifest | `runtime` (simulator, extra/optional) | `flutter run` on a real iOS simulator → Home renders `0 / 30`, no load error | manual simulator run (screenshot in the Tech Lead conversation) |
+
+---
+
+## 8. Test Notes
+
+- The checksum format bug (I initially wrote `"sha256:<hex>"`, matching the *draft* manifest's convention from `F06-CONTENT-DRAFT`'s generator) vs. what `journey_gate_support.dart` actually expects (a bare hex digest, `sha256.convert(utf8.encode(raw)).toString()`, no prefix) was caught immediately by Step 5's gate run (`checksum drift` on all 30 levels) and fixed before any gate was declared green — not a silent workaround.
+- Did not re-tune, re-balance, or hand-edit any grid/target/locked/frozen/optimalMoves value, per the brief's hard boundary — every artifact's puzzle data is byte-for-byte what `F06-CONTENT-DRAFT` generated and the Tech Lead's finding-(A)/(B) decisions accepted.
+- `tools/looplet_authoring/drafts/journey/` (the source drafts + `REVIEW.md`) left untouched, per the brief, as a record.
+
+---
+
+# WORKFLOW HANDOFF SUGGESTION (NON-AUTHORITATIVE)
+
+* **Completed Tasks:** F06-CONTENT-PROMOTE.
+* **Remaining Tasks:** Tech Lead reconcile (incl. the `content_check.dart` fix, which wasn't in the original brief) → `Run QA` (F05 strict-content pass) → `Run Tech Lead` (F05 → `Done`).
+* **Blockers:** none.
+* **Status Suggestion:** Ready for QA (pending Tech Lead reconcile).
+
+---
+
+## 19. Sonraki Komut
+
+```
+Run Tech Lead
+```

@@ -1,31 +1,31 @@
 {
   "schemaVersion": 1,
   "contentVersion": "2026.09-v1",
-  "id": "journey-tr-04",
+  "id": "journey-tr-08",
   "puzzleType": "journey",
-  "journeyLevelNumber": 4,
+  "journeyLevelNumber": 8,
   "language": "tr",
   "grid": [
-    "BLÇIZ",
-    "MIENO",
-    "PÜLNG",
-    "BDERİ",
-    "ŞALKD"
+    "DŞTLN",
+    "TAMİL",
+    "AKIHP",
+    "UINKK",
+    "TNKÖZ"
   ],
-  "targetWord": "BALIK",
+  "targetWord": "DAMLA",
   "lockedCells": [],
   "frozenCells": [],
   "columnMovesEnabled": true,
   "optimalMoves": 4,
-  "difficultyScore": 3.119,
+  "difficultyScore": 3.668,
   "difficultyLabel": "easy",
   "difficultyBreakdown": {
     "o": 4,
-    "cNorm": 0.0188,
+    "cNorm": 0.0142,
     "tdDegree": 0,
     "locked": 0,
     "frozen": 0,
-    "firstMoves": 5,
+    "firstMoves": 2,
     "distinctOptimalSolutions": 8
   }
 }

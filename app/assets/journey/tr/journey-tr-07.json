@@ -1,31 +1,31 @@
 {
   "schemaVersion": 1,
   "contentVersion": "2026.09-v1",
-  "id": "journey-tr-03",
+  "id": "journey-tr-07",
   "puzzleType": "journey",
-  "journeyLevelNumber": 3,
+  "journeyLevelNumber": 7,
   "language": "tr",
   "grid": [
-    "ŞPMGR",
-    "ÇEBAH",
-    "NGİTO",
-    "GBKYE",
-    "İEYZM"
+    "YSMHK",
+    "ÜZGPA",
+    "TOIÇP",
+    "URŞNÇ",
+    "PRATH"
   ],
-  "targetWord": "BAHÇE",
+  "targetWord": "ÇORAP",
   "lockedCells": [],
   "frozenCells": [],
-  "columnMovesEnabled": false,
-  "optimalMoves": 2,
-  "difficultyScore": 1.813,
+  "columnMovesEnabled": true,
+  "optimalMoves": 4,
+  "difficultyScore": 3.821,
   "difficultyLabel": "easy",
   "difficultyBreakdown": {
-    "o": 2,
-    "cNorm": 0.0,
+    "o": 4,
+    "cNorm": 0.0029,
     "tdDegree": 0,
     "locked": 0,
     "frozen": 0,
     "firstMoves": 1,
-    "distinctOptimalSolutions": 1
+    "distinctOptimalSolutions": 2
   }
 }

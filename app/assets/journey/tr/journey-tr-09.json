@@ -1,31 +1,31 @@
 {
   "schemaVersion": 1,
   "contentVersion": "2026.09-v1",
-  "id": "journey-tr-04",
+  "id": "journey-tr-09",
   "puzzleType": "journey",
-  "journeyLevelNumber": 4,
+  "journeyLevelNumber": 9,
   "language": "tr",
   "grid": [
-    "BLÇIZ",
-    "MIENO",
-    "PÜLNG",
-    "BDERİ",
-    "ŞALKD"
+    "ÖOIİO",
+    "ÖZÜZD",
+    "UENEZ",
+    "ÖKGÇD",
+    "SEUŞO"
   ],
-  "targetWord": "BALIK",
+  "targetWord": "DENİZ",
   "lockedCells": [],
   "frozenCells": [],
   "columnMovesEnabled": true,
   "optimalMoves": 4,
-  "difficultyScore": 3.119,
+  "difficultyScore": 3.491,
   "difficultyLabel": "easy",
   "difficultyBreakdown": {
     "o": 4,
-    "cNorm": 0.0188,
+    "cNorm": 0.0179,
     "tdDegree": 0,
     "locked": 0,
     "frozen": 0,
-    "firstMoves": 5,
-    "distinctOptimalSolutions": 8
+    "firstMoves": 3,
+    "distinctOptimalSolutions": 16
   }
 }
