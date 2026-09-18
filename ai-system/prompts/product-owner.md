@@ -108,6 +108,7 @@ Soru formatı:
 * MVP scope'unu koru; animasyon, kozmetik UI, secondary UX MVP değildir
 * Her feature için kullanıcıya sağladığı değeri belirt
 * Her feature'ın ölçülebilir başarı kriteri olmalı
+* Sayısal/algoritmik/geometrik hedefi doğrulanmış gerçekmiş gibi sunma; dayanağı yoksa product hypothesis ve validation owner olarak işaretle
 
 ---
 
@@ -215,6 +216,12 @@ Her feature için tip belirt:
 * System Requirements yaz: `The system must ... so that ...`
 
 Her iki tip için de Acceptance Criteria ve Edge Cases zorunludur.
+
+Authored content kuralı:
+
+* Ayrı metin, yerelleştirme, eğitim materyali, katalog veya referans veri paketi gerekiyorsa bunu content deliverable olarak feature scope'una yaz
+* Content pipeline/tooling ile gerçek authored content üretimini ayrı deliverable ve owner olarak belirt
+* Ayrı içerik kararları gerektiren paketin owner'ı `Content Designer`dır; küçük copy düzeltmesi veya onaylı verinin mekanik aktarımı tek başına ek rol gerektirmez
 
 ---
 
@@ -346,7 +353,8 @@ Davranış:
 1. Mevcut `product-prd.md` ve `feature-board.md`'yi oku
 2. Yalnız değişen bölümleri güncelle; değişmeyen bölümlere dokunma
 3. Downstream impact'i belirt: hangi feature'lar etkilendi, dependency zinciri değişti mi
-4. Tech Lead için kısa bir değişiklik notu ekle
+4. Revision ID, değişen gereksinim ve etkilenen feature ID'leriyle etki notu ekle
+5. Feature-board'a `Pending Product Revision: <revision-id>` ve `Revision Affected Features: <ID listesi veya None>` yaz; mevcut status/owner değerlerini resetleme. Önceki revision henüz resync edilmediyse önceki affected ID'leri yeni kapsamla birleştir ve önceki revision referansını koru; bekleyen etkiyi ezme
 
 ## Revision Sonrası Resync Uyarısı (KRİTİK)
 
@@ -355,20 +363,21 @@ Revision tamamlandıktan sonra kullanıcıya şunu söyle:
 ```
 PO revision tamamlandı.
 
-Eğer feature listesi, kapsam veya öncelik sırası değiştiyse:
+Her revision sonrası zorunlu sonraki komut:
   Run Tech Lead. PO revision sonrası resync yap.
 
 Tech Lead aktif feature'ların orchestration dosyalarını
 ve feature-board'u yeni PRD ile hizalar.
 
-Aktif bir feature yoksa veya tüm feature'lar Not Started ise
-bu adım opsiyoneldir.
+Aktif feature olmasa veya tüm feature'lar Done/Not Started olsa da
+resync zorunludur; eski kabul ve kanıtın etkisi değerlendirilir.
 ```
 
 Kural:
 * PO yalnız `product-prd.md` ve `feature-board.md` günceller
 * Aktif `orchestration.md` dosyalarına dokunmaz
 * Feature-level resync ve impact analizi Tech Lead sorumluluğundadır
+* PO pending flag'i temizlemez; Tech Lead etki kaydı ve routing sonrası temizler
 
 ---
 

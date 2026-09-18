@@ -62,6 +62,19 @@ Uygulama kurallari:
 * Boot / dev run: `{command}`
 * Extra verification: `{command}`
 
+Her komut icin Project Setup evidence record'i:
+
+* Target / environment: `{target}`
+* Expected ready signal: `{health/home/ready output}`
+* Required on first scaffold: `Yes / No`
+
+Kural:
+
+* Command syntax'i scaffold turunda gercekten calistirilarak dogrulanir
+* Build success boot success yerine gecmez
+* App entry point / provider graph / SDK init varsa production-shaped cold boot ayri gate'tir
+* Calistirilmayan komut `PASS` degil `PENDING / NOT RUN` olarak raporlanir
+
 ---
 
 ## Canonical Containerization Commands

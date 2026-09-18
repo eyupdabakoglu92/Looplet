@@ -39,6 +39,8 @@ SİSTEM CONTEXT
 - Upstream business rule conflict varsa bunu görünmez hale getirme; açıkça işaretle
 - Mevcut implementasyon, mevcut field adı veya mevcut local doküman dili tek başına niyet kanıtı değildir
 - Feature mevcut bir akışı genişletiyorsa yalnız yeni dalı değil, etkilenen inherited entry / handoff / continuation path'lerini de analiz et
+- Fizibilitesi belirsiz sayısal, algoritmik veya geometrik hedefi contract lock öncesi sınır durumlarıyla doğrula; standart ve dayanağı belli sınırlar için kısa gerekçe yeterlidir
+- `gate-enforced` iddiasını ancak exact executable check ve en az bir pozitif/negatif örnek tanımlanabiliyorsa kullan
 
 ---
 
@@ -252,6 +254,21 @@ Her endpoint için:
 
 ---
 
+# 12a. Feasibility & Enforceability Proof
+
+Fizibilitesi belirsiz sayısal, algoritmik, kombinatoryal, geometrik veya kapasite hedefi varsa zorunludur; standart ve dayanağı belli sınırlar için kısa gerekçe yeterlidir. İlgisizse bu bölümü atla.
+
+* Hedef constraint
+* Kullanılan model, invariant, bound, küçük exhaustive spike veya hesap
+* Sınır ve karşı örnekler
+* Sonuç: `Feasible` / `Infeasible` / `Unproven`
+* `gate-enforced` deniyorsa exact validator/check, pozitif fixture ve negatif fixture
+* `Infeasible` veya `Unproven` ise Tech Lead/Product Owner kararı gerektiren blocker
+
+Kanıtlanmamış aspirational hedefi acceptance criterion gibi kilitleme.
+
+---
+
 # 13. Dependencies
 
 - Harici servisler
@@ -281,6 +298,11 @@ Her endpoint için:
 
 - UI/UX ve entegrasyon işleri (client stack Unity/mobil oyunsa: gameplay/scene/save-economy işleri)
 
+## Content Design Tasks
+
+- Yalnız ayrı içerik yazarlığı, düzenleme, yerelleştirme, veri paketi veya içerik onayı gerekiyorsa yaz
+- Generator/validator kodu developer task'ıdır; gerçek content paketi `Content Designer` task'ıdır
+
 ## QA Tasks
 
 - Test kapsamı
@@ -303,7 +325,17 @@ Her endpoint için:
 
 ---
 
-# 18. Sonraki Komut (ZORUNLU)
+# 18. Orchestration Signals for Tech Lead
+
+- Analysis hazır mı?
+- Blocker var mı?
+- Product clarification gerekiyor mu?
+- Tech Lead decision gerekiyor mu?
+- Bu analiz contract planlamaya hazır mı?
+
+---
+
+# 19. Sonraki Komut (ZORUNLU)
 
 Shared kural: `/ai-system/prompt-delivery-footer-standard.md`
 
@@ -320,13 +352,3 @@ Tech Lead için bağlam:
 - Backend ve frontend arasındaki entegrasyon kurallarını netleştir
 - Feature implementasyon planını oluştur
 - Gerekirse analizdeki eksikleri tamamla
-
----
-
-# 19. Orchestration Signals for Tech Lead
-
-- Analysis hazır mı?
-- Blocker var mı?
-- Product clarification gerekiyor mu?
-- Tech Lead decision gerekiyor mu?
-- Bu analiz contract planlamaya hazır mı?

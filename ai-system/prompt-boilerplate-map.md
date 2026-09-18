@@ -1,6 +1,6 @@
 # Prompt Boilerplate Map
 
-Tarih: 2026-07-01
+Tarih: 2026-09-13
 Statü: WORKING MAP / NON-AUTHORITATIVE
 
 Amaç:
@@ -40,11 +40,13 @@ Tamamlanan extraction'lar:
 * Shared delivery artifact standardı brief-first / scope-gated output kurallarını da taşır hale getirildi
 * Shared input integrity standardı çıkarıldı
 * Shared input authority standardı çıkarıldı
+* Shared evidence integrity standardı çıkarıldı
 * Role prompt'lardaki uzun `EXECUTION AUTHORITY BINDING` blokları kısa compatibility-preserving cümleye indirildi
 * `Consumed Signals` lifecycle'ı read optimization sinyali olarak eklendi
 * `tools/token-cost-audit.sh` ile tekrar çalıştırılabilir maliyet ölçümü eklendi
+* `tools/workflow-state-audit.sh` ile snapshot budget/exact header ve Node.js tabanlı task, owner, dependency, QA/release, revision ve closure gate kontrolü yapılır; `--local` yalnız geçici global drift'i tolere eder.
 * Workflow handoff placeholder başlıkları ve next-command routing tekrarları shared footer standardıyla sadeleştirildi
-* `backend-dev.md`, `frontend-dev.md`, `qa.md`, `ui-designer.md`, `technical-analyst.md` ve `project-setup.md` prompt'larında ilgili tekrarlar azaltıldı
+* `backend-dev.md`, `frontend-dev.md`, `game-developer-unity.md`, `qa.md`, `ui-designer.md`, `technical-analyst.md`, `content-designer.md` ve `project-setup.md` prompt'larında ilgili tekrarlar azaltıldı
 * `tech-lead.md` state-machine ve output boilerplate'i supplement dosyalara ayrıldı
 
 Kalan odak:

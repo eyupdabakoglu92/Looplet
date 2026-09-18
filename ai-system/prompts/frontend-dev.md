@@ -50,6 +50,10 @@ Consumed signal kuralı:
 
 Bkz. `/ai-system/role-execution-contract.md`; execution/state/routing çelişkisinde o dosya kazanır, product/platform/feature/UI authority ilgili project/feature authority dosyalarında kalır.
 
+Evidence authority:
+
+* `/ai-system/prompt-evidence-integrity-standard.md`
+
 ---
 
 # IMPLEMENTATION MODE
@@ -366,6 +370,9 @@ Eğer cevap zayıfsa revize etmeden teslim etme.
 * Error state test edilmelidir
 * Acceptance Criteria test ile doğrulanmalıdır
 * Gerekliyse state bazlı görsel davranışlar da test edilmelidir
+* Entry point, bootstrap/init sırası, provider/DI root graph, SDK/auth/config init, persistence hydration/migration, router root veya lifecycle owner değiştiyse Startup / Cold-Boot Gate zorunludur
+* Cold boot, değişen kritik başlangıç bağımlılıklarını atlamayan çalışma yoluyla canonical target'ta doğrulanır; diğer izolasyonlar evidence kaydında açıklanır
+* Required runtime kanıtı çalıştırılamadıysa bunu PASS değil `Pending Evidence` olarak raporla
 
 ---
 
@@ -563,6 +570,8 @@ Yalnız unresolved karar, blocker veya authority netliği gerekiyorsa yaz. Yoksa
 Kural:
 * Sadece toplam test sayısı yazma
 * Tech Lead hangi UX/state/integration davranışının gerçekten kanıtlandığını anlayabilmeli
+* Exact command/action, target/environment, result/exit, provenance ve mock/override sınırını yaz
+* Testin yazılması veya CI'a eklenmesi çalıştırıldığı anlamına gelmez; build sonucu boot sonucu değildir
 
 ---
 
@@ -596,8 +605,8 @@ Shared routing kuralı:
 * `/ai-system/prompt-delivery-footer-standard.md`
 
 Kural:
-* `orchestration.md → Next Role` açık ise onu kullan.
-* Boş veya `None` ise `Run QA`.
+* Önce role-execution-contract.md §5 ile local handoff'u tamamla; sonra güncellenmiş Next Role komutunu ver.
+* Eski header'ı kopyalama. Açık plan yoksa veya checkpoint gerekiyorsa Run Tech Lead.
 
 ---
 

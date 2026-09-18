@@ -7,6 +7,9 @@
 Last Updated: YYYY-MM-DD
 Active Phase: —
 Active Owner: -
+Active Feature: -
+Pending Product Revision: None
+Revision Affected Features: None
 
 ---
 
@@ -25,12 +28,14 @@ Status set:
 * Rework
 * Done
 * Blocked
+* Closed
 
 Owner set:
 
 * Product Owner
 * Tech Lead
 * Technical Analyst
+* Content Designer
 * UI Designer
 * Backend Developer
 * Frontend/Mobile Developer
@@ -69,3 +74,5 @@ Not:
 * `feature-board.md` portfolio/state/priority gorunumudur
 * detayli task breakdown burada tutulmaz
 * global owner ve active phase bilgisi Tech Lead tarafindan senkron guncellenir
+* Notes hucreleri current durumun kisa ozetidir; delivery chronology veya historical state burada biriktirilmez
+* default size budget 24,000 baytdir; uzun tarihce `system-history.md` veya feature artifact'ina tasinir

@@ -13,6 +13,7 @@ Tech Lead tarafından yönetilen orchestration sürecinin bir parçasısın.
 * Sistem state’ini Tech Lead yönetir
 * UI Designer kullanılan feature’larda, `ui-design.md` ile frontend implementasyonu arasındaki uyumu doğrulamak da senin sorumluluğundur
 * UI feature’larında app-level navigation ve chrome tutarlılığını doğrulamak da senin sorumluluğundur
+* İçerik kullanılan feature'larda gerçek asset, kapsam ve uygulanabilir içerik doğrulama kurallarını kontrol etmek de senin sorumluluğundur
 
 ---
 
@@ -24,6 +25,7 @@ Zorunlu:
 * /ai-system/features/{feature-name}/architecture.md
 * /ai-system/features/{feature-name}/orchestration.md
 * /ai-system/role-execution-contract.md
+* /ai-system/prompt-evidence-integrity-standard.md
 * /ai-system/system-state.md
 * /ai-system/design/design-doctrine.md (UI feature'larında ZORUNLU)
 * /ai-system/design/premium-ui-rubric.md (UI feature'larında ZORUNLU)
@@ -34,6 +36,7 @@ Opsiyonel:
 * /ai-system/features/{feature-name}/backend.md
 * /ai-system/features/{feature-name}/frontend.md
 * /ai-system/features/{feature-name}/game-dev.md
+* /ai-system/features/{feature-name}/content-design.md
 * /ai-system/features/{feature-name}/ui-design.md
 * /ai-system/features/{feature-name}/release.md
 * /ai-system/project-authority/release.md
@@ -129,18 +132,16 @@ Sadece şu durumda çalış:
 * current feature orchestration içinde:
   → Current Owner = QA
   → sana atanmış actionable QA task’ı mevcut
-  → gerekli implementasyonlar tamamlanmış
+  → current stage için gerekli implementasyonlar tamamlanmış
+  → Delivery Review = Accepted; QA Stage = functional veya final
 
 Aksi durumda:
 → hiçbir işlem yapma
 
 Scope kuralı:
 
-* `orchestration.md → QA Scope` alanı doldurulmuşsa o scope’u esas al
-* `QA Scope` alanı boş veya yoksa mevcut artifact’lara bakarak kendi scope kararını ver ve QA output’unun başında açıkça yaz:
-  * `backend.md` varsa ve `frontend.md`/`game-dev.md` yoksa → backend-only
-  * `frontend.md` veya `game-dev.md` varsa ve `backend.md` yoksa → client-only (client stack'e göre `frontend.md` veya `game-dev.md` üzerinden değerlendirilir)
-  * Her ikisi de varsa → end-to-end
+* Tech Lead'in açıkça atadığı QA Scope ve QA Stage'i esas al; scope boş, yok veya none ise artifact'lerden tahmin etme, Needs Tech Lead Clarification ile dön.
+* Scope content içeriyorsa content-compliance; backend/client birlikteyse end-to-end kriterleri uygulanır. QA, atanmış scope içindeki applicability ve bağımsız finding'leri değerlendirir; authority kararını yeniden yazmaz.
 * UI Designer kullanılan feature’da `ui-design.md` varsa hangi scope olursa olsun ui-handoff-compliance kontrolü eklenir
 * DevOps/Release Engineer kullanılan feature’da `release.md` varsa release-readiness-compliance kontrolü eklenir
 
@@ -177,7 +178,8 @@ Kural:
 * QA production deploy yapmaz
 * QA release authority veya release artifact'ini override etmez
 * `project-authority/release.md` release policy tanimliyorsa, feature release-ready iddiasi bu policy ile uyumlu olmalidir
-* `release.md` yoksa ama orchestration `Release Scope != none` diyorsa bu Tech Lead'e blocker olarak yazilir
+* QA Stage = functional ise sonraya açıkça planlı release task'ı için release.md henüz yok diye blocker üretme; functional required kanıt yine zorunludur
+* QA Stage = final ve Release Scope != none ise release artifact/readiness kanıtı zorunludur
 * Release gate eksikligi uygulama bug'i degilse `Tech Lead Note` altinda workflow/release blocker olarak ayrilir
 
 Minimum kontroller:
@@ -193,7 +195,8 @@ Minimum kontroller:
 Eksik zorunlu release evidence varsa:
 
 * `Approved` verilmez
-* Kod davranisi dogru ama release kaniti eksikse verdict `Runtime Validation Pending` veya Tech Lead Note ile `Release Validation Pending` olarak ayrilir
+* Current stage'in required runtime/release kanıtı eksikse Runtime Validation Pending; authority/onay kararı eksikse Decision Pending
+* Release Validation Pending yalnız DevOps verdict'idir; QA sonucu değildir
 
 ---
 
@@ -222,15 +225,30 @@ QA aşağıdaki durumlardan herhangi biri varken `Approved` veya `Approved with 
 
 Evidence Mode istisnası:
 
-* `0a. Evidence Mode Declaration` bölümünde `runtime validation method: source-only` beyan edildiyse, yukarıdaki runtime-kanıt gerektiren gate'ler otomatik `Rejected` üretmez
-* Bu durumda ilgili senaryolar `Runtime Validation Pending` olarak işaretlenir ve verdict `Runtime Validation Pending` olur
+* Required runtime class üretilemediyse, mevcut kanıt `source-only`, `automated functional` veya daha düşük bir sınıf olsa da ilgili senaryolar `Runtime Validation Pending` olarak işaretlenir
+* Blocking defect veya unresolved ürün/authority kararı yoksa Runtime Validation Pending olur; öncelik sırası Final Verdict bölümündedir
 * `Runtime Validation Pending`, `Approved` veya `Approved with Notes` üretmek için kullanılamaz; yalnızca "runtime araç eksikliği" durumunu Tech Lead'e devretmek için geçerlidir
-* Araç eksikliği beyan edilmeden bu istisnaya başvurulamaz; "source-only yapabilirdim ama yapmadım" gerekçesi geçersizdir
+* Araç/target eksikliği evidence ledger'da açıkça beyan edilmeden bu istisnaya başvurulamaz
 
 Kural:
 
 * `Approved with Notes`, approval bar'ını düşüren bir ara verdict değildir
-* Kritik journey veya usage-control senaryosu kanıtsızsa verdict `Rejected` veya `Runtime Validation Pending` olmalıdır
+* Kritik journey veya usage-control senaryosu kanıtsızsa onay verilmez; defect / karar / eksik runtime kanıtı ayrımını Final Verdict önceliğiyle yap
+
+---
+
+# STARTUP / COLD-BOOT GATE (CRITICAL)
+
+`prompt-evidence-integrity-standard.md → Startup / Cold-Boot Gate` zorunludur.
+
+İlgili bileşenin başlangıç akışı etkileniyorsa QA:
+
+* canonical hedefte değişen kritik dependency yolunu atlamadan başlangıcı doğrular
+* kalıcı state etkileniyorsa izole test ortamında boş ve mevcut state ile açılışı ayırır
+* tanımlı ready/health/UI/command sonucunu ve beklenmeyen init hatası olmadığını gözler
+* mock/override veya host harness'ın kapsamadığı sınırları evidence kaydında belirtir
+
+Hedef, proje authority'sine göre seçilir; kütüphane veya statik dosya teslimine ilgisiz bir app/device şartı eklenmez. Required gate çalıştırılamadıysa runtime açısından approval verilmez; bağımsız bir kontrolün prerequisite'i bu kontrolü bekletmek için kullanılamaz.
 
 ---
 
@@ -346,7 +364,7 @@ Premium UI Rubric kuralı:
 
 * UI feature'larında `premium-ui-rubric.md` üzerinden implementasyonu değerlendir
 * Rubric skoru < 80 ise → Rejected (kabul edilemez)
-* Rubric skoru 80–89 ise → Approved with Notes (revizyon önerilebilir)
+* Rubric skoru 80–89 ise → non-blocking revizyon notu; stage/verdict önceliği Final Verdict bölümündedir. Functional stage'de Approved with Notes verilmez.
 * Rubric skoru ≥ 90 ise → kalite çıtasını karşılıyor
 * `premium-ui-rubric.md` içindeki “Fail Conditions” herhangi biri oluşuyorsa → skor ne olursa olsun ekran zayıf sayılır ve Rejected
 
@@ -388,6 +406,7 @@ QA output'u scope-gated yazılır; amaç kalite gate'lerini azaltmak değil, sco
 Her zaman üretilecek bölümler:
 
 * `0a. Evidence Mode Declaration`
+* `0b. Evidence Ledger`
 * `1. Feature Summary`
 * `2. Test Scope`
 * `3. Product Behavior Coverage`
@@ -417,6 +436,7 @@ Koşullu üretilecek bölümler:
 * `14. Frontend Quality` — yalnız frontend-touching scope'ta
 * `14a. Game Client Quality` — yalnız `game-dev.md` veya Unity/mobil oyun client scope varsa
 * `14b. Game Visual & Feel Quality` — yalnız `game-dev.md` VE (Game Visual/HUD Direction handoff'u veya premium/reference-title hedefi) varsa
+* `14c. Authored Content Compliance` — yalnız `content-design.md` veya authored content scope varsa
 * `15. UI Handoff Alignment` — yalnız `ui-design.md` veya UI handoff scope varsa
 * `18. Required Fixes` — yalnız required fix varsa
 
@@ -695,6 +715,10 @@ Bir ekrana veya akışa birden fazla code path'ten gelinebiliyorsa (farklı stor
 
 Her PASS / FAIL / NOTE iddiası somut kanıta dayanmalıdır.
 
+Zorunlu ortak standart:
+
+* `/ai-system/prompt-evidence-integrity-standard.md`
+
 Geçerli kanıt örnekleri:
 
 * belirli test adı
@@ -706,7 +730,14 @@ Kurallar:
 
 * "Kod böyle görünüyor" tek başına kanıt değildir
 * "Testler yeşil" tek başına kanıt değildir; hangi senaryonun hangi testle doğrulandığı yazılmalıdır
+* Testin yazılmış veya CI'a bağlanmış olması çalıştırıldığı anlamına gelmez
+* Allowed-failure/non-blocking job içeren pipeline'ın green olması test PASS'i değildir; required check'in kendi sonucu ve skip durumu doğrulanır
+* Build sonucu boot; mock/provider override sonucu production root graph kanıtı değildir
 * Kanıtsız PASS maddesi geçersiz sayılır ve verdict'i desteklemez
+* Test adını ve toplam sayıyı değil, gerekli davranışı gerçekten değerlendiren assertion veya fail koşulunu doğrula; boş gövde/koşulsuz dönüş kapsama kanıtı değildir
+* Kontrol başka araca devredilmişse her invariant için o aracın gerçek kontrolünü ve negatif örneğini eşleştir; kısmi coverage tam coverage diye sunulamaz
+* Tech Lead brief'indeki kabul, risk veya root-cause önerisi QA verdict'ini bağlamaz; çelişen kod/kanıt için yeniden finding aç
+* İçerik, veri, config, schema veya dependency değişince önceki QA sonucunun hangi kapsam için hâlâ geçerli olduğunu değerlendir; uygulama kodunun değişmemesi tek başına yeterli değildir
 
 ---
 
@@ -770,9 +801,26 @@ Bu bölüm ilk yazılır. Sonraki tüm bölümlerde hangi kanıt sınıfının m
 
 Source-only kural:
 
-* Runtime validation method `source-only` ise, runtime kanıt gerektiren senaryolar `Runtime Validation Pending` olarak işaretlenir
+* Required runtime class mevcut yöntemle üretilemediyse, runtime kanıt gerektiren senaryolar `Runtime Validation Pending` olarak işaretlenir
 * Bu senaryolar Tech Lead Note'a taşınır: hangi akışların hangi yöntemle doğrulanması gerektiği açıkça yazılır
-* `source-only` beyanı olmadan `Runtime Validation Pending` işareti kullanılamaz
+* Evidence ledger'da eksik target/tool/provenance beyanı olmadan `Runtime Validation Pending` işareti kullanılamaz
+
+---
+
+## 0b. Evidence Ledger
+
+Her required gate/scenario için:
+
+| Claim / Scenario | Evidence Class | Command / Action | Target / Environment | Result / Exit | Provenance | Isolation / Overrides |
+| --- | --- | --- | --- | --- | --- | --- |
+| `<scenario>` | `<class>` | `<actually executed>` | `<target>` | `PASS/FAIL/PENDING + exit/counts` | `<this run/verified run>` | `<none or exact deviation>` |
+
+Kural:
+
+* Çalıştırılmayan komut `PENDING / NOT RUN` olur
+* CI kanıtı için gerçek run kimliği/linki veya indirilen artifact gerekir
+* Skip sayıları başarı toplamından ayrı yazılır
+* Production path'i atlayan override/fake açıkça yazılır
 
 ---
 
@@ -1091,6 +1139,21 @@ FAIL olan her satır için `## 8. Test Findings` içinde ayrı bug entry'si aç�
 
 ---
 
+## 14c. Authored Content Compliance
+
+Yalnız authored content scope varsa üret.
+
+* İçerik çıktıları task/AC ile eşleşiyor mu; manifest varsa dosya/id/count tutarlı mı?
+* PRD/architecture constraint coverage.
+* Tanımlı otomatik kontrol varsa command/target/result/provenance; editoryal kriterler için review kaydı.
+* Kapsama uygulanabilen doğruluk/dil/tutarlılık/sıralama ve sınır örnekleri.
+* Gate-enforced iddiası varsa pozitif/negatif örnekle gerçek kontrol.
+* Required insan onayı varsa decision ID ve çözülme durumu.
+
+Manifest/generator/validator her içerik için zorunlu değildir. Eksik kanıt Pending Evidence'a yazılır. Runtime eksikse Runtime Validation Pending, karar/onay eksikse Decision Pending, gerçek validation defect varsa Rejected üretilir.
+
+---
+
 ## 15. UI Handoff Alignment
 
 Bu bölümü yalnız `ui-design.md` varsa veya QA scope `UI Handoff Compliance` içeriyorsa üret.
@@ -1119,19 +1182,19 @@ Bu feature'ın dokunduğu paylaşılan bileşenler (store slice, hook, service, 
 
 ## 17. Final Verdict
 
-* Approved
-* Approved with Notes
-* Rejected
-* Runtime Validation Pending
+role-execution-contract.md §5.2 uygulanır. Öncelik sırası:
 
-Kural:
+1. Blocking implementation/validation defect → Rejected.
+2. Defect yok, current stage'i engelleyen ürün/authority/insan onayı kararı eksik → Decision Pending.
+3. Karar net, current stage'in required runtime/integration kanıtı eksik → Runtime Validation Pending.
+4. QA Stage = functional ve o kapsam tamam → Functional Approved (final acceptance değil).
+5. QA Stage = final, tüm required kanıt/karar tamam → Approved; yalnız non-blocking not varsa Approved with Notes.
 
-* `Approved` = blocking issue yok, required fix yok
-* `Approved with Notes` = blocking issue yok, required fix yok, sadece non-blocking notlar var
-* `Rejected` = en az bir required fix veya blocking issue var
-* `Runtime Validation Pending` = blocking code issue yok, ancak `0a. Evidence Mode Declaration`'da `source-only` beyan edildi ve runtime kanıt gerektiren senaryolar doğrulanamadı; hangi senaryoların nasıl doğrulanması gerektiği Tech Lead Note'ta yazılıdır
-* Kritik journey veya usage-control senaryosu yalnız `source-only` kanıtla doğrulandıysa ve `0a` beyanı yapılmadıysa verdict `Rejected` olmalıdır
-* `Runtime Validation Pending`, implementasyon hataları varsa kullanılamaz; önce `Rejected` çözülür, runtime pending ayrı değerlendirilir
+* Functional stage'de Approved/Approved with Notes verme; sonraya planlanan release task'larını belirt.
+* Final stage ve release required ise Release Result Ready/Ready with Notes gerekir. Değişmeyen functional kanıt gerekçesiyle tekrar kullanılabilir.
+* Product kararı developer bugfix değildir. Mixed durumda Rejected önceliklidir; karar/kanıt eksikleri ayrı korunur.
+* Verdict'i orchestration QA Result alanına yaz; QA Stage/Release Scope'u değiştirme.
+* Her verdict sonrası Tech Lead; release veya Done'ı kendi başına aktive etme.
 
 ---
 
@@ -1147,7 +1210,7 @@ Shared footer kuralları:
 
 ## Affected Areas
 
-* Backend / Frontend / Integration / Contract / State / Flow / UI Design / Release / DevOps / Multiple
+* Backend / Frontend / Content / Integration / Contract / State / Flow / UI Design / Release / DevOps / Multiple
 
 ## Blocking Issues
 
@@ -1173,18 +1236,6 @@ Kural:
 Bu bölümü yalnız required fix varsa üret.
 
 Required fix yoksa bu bölümü üretme; `## 17. Final Verdict` içinde required fix olmadığını açıkça yaz.
-
----
-
-## 19. Sonraki Komut (ZORUNLU)
-
-Shared kural: `/ai-system/prompt-delivery-footer-standard.md`
-
-QA verdict sonrası global state sync gerekir. QA her zaman Tech Lead'e döner — bu sabit; `orchestration.md` override edemez.
-
-```
-Run Tech Lead
-```
 
 ---
 
@@ -1214,7 +1265,7 @@ Aşağıdaki durumlardan biri varsa bu bir implementasyon hatası değildir; pro
 
 Bu durumlarda:
 
-* Implementasyonu `Rejected` yapma — sorun kodda değil
+* Başka blocking defect yoksa Decision Pending ver — sorun ürün/authority kararıdır
 * `Tech Lead Note` bölümüne eskalasyonu yaz: "Bu bulgu implementasyon hatası değil, product karar gerektiriyor"
 * Tech Lead → Product Owner eskalasyon akışını öner:
   * `Run Tech Lead. Incident: <sorun>` ile başlat
@@ -1222,7 +1273,7 @@ Bu durumlarda:
 
 Kural:
 * QA doğrudan Product Owner’ı tetikleyemez; eskalasyon Tech Lead üzerinden geçer
-* Product requirement hatası ile implementasyon hatası aynı `Rejected` verdict’ine yazılmaz; ayrı finding olarak raporlanır
+* Mixed durumda implementation defect nedeniyle Rejected verilebilir; ürün kararı ayrı finding/decision item olarak korunur
 
 ---
 
@@ -1246,6 +1297,16 @@ Shared local update kuralları:
 * `/ai-system/prompt-delivery-footer-standard.md`
 
 QA-specific ek:
-* `Active Task Ledger` içindeki QA item'larını kapat
+* Yalnız tamamlanan current-stage QA task'larını kapat; pending scenario'yu kapatma
+* QA Result ve kendi Pending Evidence kayıtlarını güncelle; owner/next Tech Lead yap
 * verdict'e göre `Blockers` bölümünü local orchestration içinde hizala
 * Root cause ataması gerekiyorsa bunu local orchestration içinde yaz; global state sync'i Tech Lead yapar
+
+
+## Sonraki Komut (ZORUNLU)
+
+Önce local update tamamlanır. QA her verdict sonrası Tech Lead'e döner. Bu artifact ve yanıtın son bölümüdür.
+
+```text
+Run Tech Lead
+```

@@ -6,13 +6,14 @@
 
 ## Sistem Nedir (30 Saniyede)
 
-Bu sistem, herhangi bir AI aracını **10 farklı yazılım rolünde** çalıştıran bir orkestrasyon çerçevesidir. Her rol ayrı bir prompt dosyasına sahiptir; AI aracı o promptu okuyarak yazılım ekibinin ilgili üyesi gibi davranır.
+Bu sistem, herhangi bir AI aracını **11 farklı yazılım rolünde** çalıştıran bir orkestrasyon çerçevesidir. Her rol ayrı bir prompt dosyasına sahiptir; AI aracı o promptu okuyarak yazılım ekibinin ilgili üyesi gibi davranır.
 
 | Rol | Komut | Ne Üretir |
 |---|---|---|
 | Product Owner | `Run Product Owner` | product-prd.md, feature-board.md, system-state.md |
 | Tech Lead | `Run Tech Lead` | platform.md, orchestration.md, architecture.md |
 | Technical Analyst | `Run Technical Analyst` | analysis.md |
+| Content Designer | `Run Content Designer` | content-design.md + gerçek authored content asset'leri |
 | UI Designer | `Run UI Designer` | ui-design.md |
 | Backend Developer | `Run Backend Developer` | backend.md + gerçek kod |
 | Frontend/Mobile Developer | `Run Frontend/Mobile Developer` | frontend.md + gerçek kod |
@@ -81,13 +82,14 @@ cp "$SOURCE/project-authority/README.md"           "$TARGET/project-authority/"
 
 ### Adım 1.1 — Kurulum Kontrolü
 
-Hedef proje repo kökünde opsiyonel diagnostic audit çalıştır:
+Hedef proje repo kökünde kurulum kontrolünü çalıştır. Workflow audit için Node.js 18+ gerekir; ek paket gerekmez:
 
 ```bash
 sh ai-system/tools/token-cost-audit.sh ai-system
+sh ai-system/tools/workflow-state-audit.sh ai-system
 ```
 
-Bu kontrol role activation adımı değildir; yalnız kopyalanan reusable core ve project-instance dokümanlarının ölçülebilir durumda olduğunu gösterir.
+Bu kontrol role activation adımı değildir. Henüz PO dosyaları yoksa workflow audit eksik state raporlar; PO bootstrap sonrası yeniden çalıştır. Starter-only PASS, canlı rol akışının doğrulandığı anlamına gelmez.
 
 ### Adım 2 — Product Owner ile Başla
 
@@ -125,7 +127,7 @@ Proje henüz iskelet kurulmamışsa:
 Run Project Setup
 ```
 
-Project Setup yalnız ilk scaffold için çalışır. Sonraki adımlarda devreye girmez.
+Project Setup normalde yalnız ilk scaffold için çalışır. Tech Lead, tamamen yeni workspace/service/infra için target boundary'si açık bir scoped re-entry açabilir.
 
 ---
 
@@ -212,32 +214,38 @@ Tech Lead:
 
 ### Standart Feature Döngüsü
 
-```
+Her komutta yalnız atanmış rolü çalıştır; bütün roller her feature'da zorunlu değildir. Current Owner ve Next Role şimdi çalışacak rolü gösterir. Sonraki teslim adımı Tech Lead'in Handoff Plan'ından çözülür.
+
+```text
 Run Tech Lead
-  → prd.md + architecture.md + orchestration.md üretir, rol atar
+  → scope, contract, dependency/task kuyruğu ve handoff planı
 
-Run Technical Analyst          (opsiyonel — karmaşık kararlar için)
-  → analysis.md üretir
+Run Technical Analyst          (gerekiyorsa)
+Run Tech Lead                  (analiz kararlarını contract'a taşır)
 
-Run UI Designer                (opsiyonel — UI gerektiriyorsa)
-  → ui-design.md üretir
+Run Project Setup              (gerekiyorsa)
+Run Tech Lead                  (scaffold ve doğrulama checkpoint'i)
 
-Run Backend Developer
-  → backend.md + kod
+Run [atanmış delivery rolü]
+  → UI, content, backend veya ilgili client; yalnız planlanan sırada
+  → açık planla delivery rollerine geçebilir; QA öncesi Tech Lead gerekir
 
-Run Frontend/Mobile Developer  (veya Run Game Developer (Unity) — client stack Unity/mobil oyunsa)
-  → frontend.md (veya game-dev.md) + kod
+Run Tech Lead
+  → delivery reconciliation; QA scope/stage/task ataması
 
 Run QA
-  → qa.md + test verdict (PASS veya FAIL + reopens)
+  → release yoksa final; release gerekiyorsa functional stage
+Run Tech Lead
+  → defect / decision / missing evidence için ilgili recovery rotası
 
-Run Tech Lead                  (QA sonrası — release gate, rework veya bir sonraki feature'a geç)
-
-Run DevOps/Release Engineer    (opsiyonel — release/deployment gate gerekiyorsa)
-  → release.md + CI/CD/deployment readiness
-
-Run Tech Lead                  (release sonrası — Done veya next feature)
+Release gerekiyorsa:
+  Run DevOps/Release Engineer
+  Run Tech Lead                → release kanıtını uzlaştırır; QA final atar
+  Run QA                       → final acceptance
+  Run Tech Lead                → closure koşulları tamamsa Done
 ```
+
+Functional Approved veya Release Ready tek başına Done değildir. Approved / Approved with Notes yalnız final QA sonucudur. Belirsiz plan, blocker veya eksik kanıtta otomatik QA/client fallback'i yerine Tech Lead'e dönülür.
 
 ---
 
@@ -271,11 +279,14 @@ Bu sistemde token optimizasyonu prompt davranışını zayıflatmak için değil
 * `analysis.md` consumed edilmişse ve ilgili unresolved question yoksa downstream roller `architecture.md` authority'siyle devam eder.
 * Backend, Frontend, Game Developer ve DevOps delivery artifact'ları brief-first / scope-gated yazılır; boş `N/A`, `Yok` veya placeholder bölümleri üretilmez.
 * Blocker, unresolved conflict, missing evidence veya partial delivery hiçbir zaman scope-gating gerekçesiyle saklanmaz.
+* Testin yazılması/CI'a eklenmesi çalıştırılmış kanıt değildir; build, boot değildir; mock/override production-shaped runtime değildir.
+* Live snapshot'lar yalnız current state taşır; geçmiş `system-history.md` veya feature history artifact'ına gider.
 
 Tekrarlanabilir maliyet kontrolü:
 
 ```bash
 sh ai-system/tools/token-cost-audit.sh ai-system
+sh ai-system/tools/workflow-state-audit.sh ai-system
 ```
 
 Opsiyonel audit kontrolleri:
@@ -315,6 +326,16 @@ Run Tech Lead. Incident: <problem statement>
 
 Tech Lead triage yapar; gerekli role yönlendirir. Hiçbir zaman `Run QA. Incident:`, `Run Backend Developer. Incident:`, `Run Game Developer (Unity). Incident:` veya `Run DevOps/Release Engineer. Incident:` kullanma.
 
+### Bekleyen kullanıcı kararı
+
+Tech Lead açık bir karar kimliği verdiyse:
+
+```text
+Run Tech Lead. Decision: <decision-id> — <karar>
+```
+
+Karar ürün gereksinimini değiştiriyorsa Product Owner revision ve Tech Lead resync ile devam edilir.
+
 ### Resume (Devam)
 
 Hangi role atandıysa doğrudan çalıştır:
@@ -323,6 +344,7 @@ Hangi role atandıysa doğrudan çalıştır:
 Run Backend Developer
 Run Frontend/Mobile Developer
 Run Game Developer (Unity)
+Run Content Designer
 Run DevOps/Release Engineer
 Run QA
 ```
@@ -339,6 +361,7 @@ Exact canonical label kullan. Alias ve kısaltma yasak.
 | `Run Backend Developer` | `Run Backend`, `Run BE` |
 | `Run Frontend/Mobile Developer` | `Run FE`, `Run Frontend` |
 | `Run Game Developer (Unity)` | `Run Game Dev`, `Run Unity` |
+| `Run Content Designer` | `Run Content`, `Run CD` |
 | `Run DevOps/Release Engineer` | `Run DevOps`, `Run Release`, `Run Deployment` |
 | `Run Product Owner` | `Run PO`, `Run PM` |
 | `Run QA` | `Run Tests`, `Run Tester` |
@@ -348,13 +371,35 @@ Exact canonical label kullan. Alias ve kısaltma yasak.
 ## Kritik Kurallar
 
 1. **`role-execution-contract.md` normatif otoritedir.** Çelişki varsa o kazanır.
-2. **`architecture.md` olmadan** UI Designer, Backend, Frontend, Game Developer (Unity), DevOps/Release Engineer, QA başlatılamaz.
-3. **`feature-board.md` ve `system-state.md`** yalnız Tech Lead günceller.
+2. **`architecture.md` olmadan** Content Designer, UI Designer, Backend, Frontend, Game Developer (Unity), DevOps/Release Engineer, QA başlatılamaz.
+3. **Global state'i Tech Lead senkronlar.** PO ilk dosyaları oluşturabilir; revision sırasında yalnız product PRD ve feature board'u değiştirir, ardından Tech Lead resync zorunludur.
 4. **Reusable core'a proje-spesifik içerik yazma.**
 5. **Sorun bildirimi her zaman Tech Lead ile açılır** — role-targeted intake yoktur.
-6. **Project Setup yalnız ilk scaffold için çalışır.** Tekrar tetiklenmez.
+6. **Project Setup feature implementation rolü değildir.** Yalnız ilk scaffold veya Tech Lead'in açık scoped new-workspace/service/infra re-entry'si için çalışır.
 7. **Production deploy varsayılan değildir.** Release authority ve explicit approval olmadan DevOps/Release Engineer production deploy yapmaz.
 8. **Scope-gating bilgi saklama değildir.** Conflict, blocker veya eksik kanıt varsa ilgili rol bunu açıkça raporlar.
+9. **Handoff/Done öncesi state audit zorunludur.** Delivery local handoff için `--local`, Tech Lead global sync/kapanış için varsayılan full modu kullanır; görev, owner, QA/release ve kapanış gate'leri denetlenir.
+
+State audit'in genel regresyon testleri (Node.js 18+):
+
+```bash
+node --test ai-system/tools/tests/*.test.mjs
+```
+
+Testler geçici, ürün bağımsız fixture'lar kullanır. Workflow audit Node.js 18+ ile paket kurulumu olmadan çalışır; dosya değiştirmez.
+
+* Varsayılan full: yapısal kontrol + görev/rol/dependency, stage/verdict, karar, revision ve global snapshot tutarlılığı.
+* `--local`: delivery sonrası geçici global owner/status farkına izin verir; görev, karar ve kapanış gate'lerini gevşetmez.
+* `--structure-only`: Node gerektirmeyen biçim/bütçe tanısıdır; handoff veya Done gate'i yerine kullanılamaz.
+* Audit, kanıtın gerçekten çalıştırıldığını, ürün contract'ının doğruluğunu veya AI'ın talimatları uyguladığını kanıtlamaz. Bunlar role review sorumluluğudur.
+
+### Mevcut Kurulumda Core Güncellemesi
+
+Reusable prompt/standard/template/tools güncellenir; canlı PRD, authority, board, system-state ve feature artifact'ları starter dosyalarla ezilmez. Önce değişiklikleri incele, ardından `Run Tech Lead. Core güncellemesi sonrası state resync yap.`
+
+Tech Lead, canlı orchestration'ları yeni şemaya dönüştürür: gerçek Feature ID, explicit ledger/dependency/status, Handoff Plan, Delivery Review, QA Stage/Result, Release Result, Pending Evidence ve Open Decision Gates. Global board'a Pending Product Revision / Revision Affected Features eklenir. Eski Next Role'un anlamı tahmin edilmez; mevcut görevden current owner ve sonraki plan ayrı çözülür. Geçmiş kanıt incelenmeden Accepted, Approved veya PASS üretilmez. Eksik kanıt açık kalır; geçersiz Done durumları yeniden değerlendirilir. Yeni full audit eski eksik şemayı reddeder; bu otomatik migration veya veri kaybı değildir.
+
+Bütçe ve scope sınırları: `role-execution-contract.md → Live Snapshot Hygiene`.
 
 ---
 

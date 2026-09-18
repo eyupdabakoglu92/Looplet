@@ -1,0 +1,196 @@
+{
+  "date": "2026-09-18",
+  "sourceProjectHead": "833d3dc24a0f3c70b92ce4000c03c39d678677a5",
+  "sourceCoreHead": "1c163d3aa75c9d0230d268262567c263eb681504",
+  "coreSource": "uncommitted working tree; hashes below are the transferred revisions",
+  "archives": [
+    {
+      "path": "ai-system/feature-board.md",
+      "archivePath": "ai-system/history/core-sync-2026-09-18/feature-board.md",
+      "bytes": 30916,
+      "sha256": "1f9ead3c42fb87241ce4bd40454a1faec36973330d9d6ba91612f4c99d61ff23"
+    },
+    {
+      "path": "ai-system/system-state.md",
+      "archivePath": "ai-system/history/core-sync-2026-09-18/system-state.md",
+      "bytes": 138651,
+      "sha256": "7a6bd957f239a77aa0468b8f4aaf5ac829b77488dbd8b201a88d885916254701"
+    },
+    {
+      "path": "ai-system/features/f01-dictionary-service/orchestration.md",
+      "archivePath": "ai-system/history/core-sync-2026-09-18/features/f01-dictionary-service/orchestration.md",
+      "bytes": 10371,
+      "sha256": "bfe6d3107cacb5f6e1db8b0174b0add9160b46d16c995af0e3e4e1fa263b4d22"
+    },
+    {
+      "path": "ai-system/features/f02-grid-engine/orchestration.md",
+      "archivePath": "ai-system/history/core-sync-2026-09-18/features/f02-grid-engine/orchestration.md",
+      "bytes": 7939,
+      "sha256": "dc9be78231783b880d30e396292f2429261e7eac98c1e01edf8bbf3665c2d21d"
+    },
+    {
+      "path": "ai-system/features/f03-puzzle-play-session/orchestration.md",
+      "archivePath": "ai-system/history/core-sync-2026-09-18/features/f03-puzzle-play-session/orchestration.md",
+      "bytes": 59669,
+      "sha256": "707233bfe568193c0489dcc9a59fbaaeb9c48dc21b9bc397e1d7fdacca0c736a"
+    },
+    {
+      "path": "ai-system/features/f04-star-rating-and-personal-best/orchestration.md",
+      "archivePath": "ai-system/history/core-sync-2026-09-18/features/f04-star-rating-and-personal-best/orchestration.md",
+      "bytes": 66034,
+      "sha256": "163df0d48e7801f528ed789bd160e85fb790f20f95dafcb127f5906f6e575ccc"
+    },
+    {
+      "path": "ai-system/features/f05-journey-progression/orchestration.md",
+      "archivePath": "ai-system/history/core-sync-2026-09-18/features/f05-journey-progression/orchestration.md",
+      "bytes": 232705,
+      "sha256": "ea135fca0add981d9f3c803dd54957e67fe9566bb2ec5054e4c7db54248d33c3"
+    },
+    {
+      "path": "ai-system/features/f06-puzzle-content-and-solver-tooling/orchestration.md",
+      "archivePath": "ai-system/history/core-sync-2026-09-18/features/f06-puzzle-content-and-solver-tooling/orchestration.md",
+      "bytes": 25572,
+      "sha256": "77e7a59a9872e128c128b730a32f4e2a279394a2145915b84d45682ec168a485"
+    },
+    {
+      "path": "ai-system/features/f08-offline-persistence-and-sync/orchestration.md",
+      "archivePath": "ai-system/history/core-sync-2026-09-18/features/f08-offline-persistence-and-sync/orchestration.md",
+      "bytes": 119836,
+      "sha256": "13846c9d24b1337e4a0665283b92c9d97716ee083265b553a2097869e4ba65a3"
+    }
+  ],
+  "sharedCoreFiles": [
+    {
+      "path": "ai-system/README.md",
+      "sha256": "a57ce0f60b2e809e3bc69611f3d2724ea9b12b3a6a01e3dd94ba84d0e83811ef"
+    },
+    {
+      "path": "ai-system/new-project-adoption-guide.md",
+      "sha256": "89f6f7d44b4446b5010a94b9ff54a7a086a8e409ccacea753964001de45d1816"
+    },
+    {
+      "path": "ai-system/new-project-bootstrap-checklist.md",
+      "sha256": "7ac2796f6dd834f7706a9d7a15f603fbff52d2d7d75d463b7d863a8e5a082be2"
+    },
+    {
+      "path": "ai-system/orchestration-template.md",
+      "sha256": "b3f5fa61412d2cb7d714d4e0669f7e373db418648783f0f3a168d862ff574b22"
+    },
+    {
+      "path": "ai-system/prompt-alignment-matrix.md",
+      "sha256": "79af4d00b0b9c3fe66336517993e75ae697193ce3e502e30b56f8f871f95827f"
+    },
+    {
+      "path": "ai-system/prompt-boilerplate-map.md",
+      "sha256": "8576fb3a3c5294b099afa109efdb0e85a5da6b5039f848ce461f4c7651a31fd5"
+    },
+    {
+      "path": "ai-system/prompt-delivery-footer-standard.md",
+      "sha256": "0e663e62a6b80eee25dc933f45d67d1a50d2fbf03ea48a811df49b37d88436d5"
+    },
+    {
+      "path": "ai-system/prompt-execution-gating-standard.md",
+      "sha256": "27d6e4088aa90ba83c9b351a89d4c4eae85d1291ed0a71e81e4a5e6fa651896b"
+    },
+    {
+      "path": "ai-system/prompt-tech-lead-output-standard.md",
+      "sha256": "9da4901c8538ccb1c012d850d91e06f6b82d0b969893c2b076dd63a7363be437"
+    },
+    {
+      "path": "ai-system/prompt-tech-lead-state-machine-standard.md",
+      "sha256": "67529871e00dc52fd325edbd0b129d2ee4b27c0119e7f6cdad72ddbbc9297330"
+    },
+    {
+      "path": "ai-system/prompts/backend-dev.md",
+      "sha256": "a5fa4c8cf0c113e2e563439486df1b976c9596da9f1894a910c3327718f09177"
+    },
+    {
+      "path": "ai-system/prompts/devops-release.md",
+      "sha256": "6524aa26f5f944ade519815380d9c1eda4670d0d11f1b8e3fa66d8f689a0a76d"
+    },
+    {
+      "path": "ai-system/prompts/frontend-dev.md",
+      "sha256": "f6384e5cc84dd27ff32c4cc40c49898f29ec3d25771096d78a2e204e10790ff3"
+    },
+    {
+      "path": "ai-system/prompts/game-developer-unity.md",
+      "sha256": "079b053f6abee4e00835efc2d825c73fd5330ddd5f727a6142aa914cb71d0961"
+    },
+    {
+      "path": "ai-system/prompts/product-owner.md",
+      "sha256": "0e45c82157a0b833462b5e5e2bdc890ed350e946021d8dd374ea0400f0a3c23c"
+    },
+    {
+      "path": "ai-system/prompts/project-setup.md",
+      "sha256": "b33fa60c90417daf4cff476d070eee0d4e2d3b2ca1c6377bfd2b09d5cde95783"
+    },
+    {
+      "path": "ai-system/prompts/qa.md",
+      "sha256": "c47860870b916d185dbe263959bb7a3973e9f12117455fd3c4ba0b401b4dc5cb"
+    },
+    {
+      "path": "ai-system/prompts/tech-lead.md",
+      "sha256": "0761126b747699a45943fd9b2cb4dc1b22f32ec5f14f5e81cd1dbe2961e20fa9"
+    },
+    {
+      "path": "ai-system/prompts/technical-analyst.md",
+      "sha256": "1830d176f702bbdac8758d4a42fc3358c8acf66ee30b3df434eac7072177c9fe"
+    },
+    {
+      "path": "ai-system/prompts/ui-designer.md",
+      "sha256": "8123b5ecc8062f8c4fc18c9f571502ae1936420cd26e7e605da6828c7d8d22e3"
+    },
+    {
+      "path": "ai-system/role-execution-contract.md",
+      "sha256": "73ae99abcce6bbec9aad8bf9f7708f4079ada829af3966d7d5b573be7fd28125"
+    },
+    {
+      "path": "ai-system/templates/feature-board.template.md",
+      "sha256": "72fa3121c0565cf1dff27a3cd49e91ec23e1c95be0d384c6dd0bcb897b565fae"
+    },
+    {
+      "path": "ai-system/templates/feature-release.template.md",
+      "sha256": "8ade2d095681f5d3d1947d46240756124cd099a60d024e0ab8be45aa201181a4"
+    },
+    {
+      "path": "ai-system/templates/project-release.template.md",
+      "sha256": "b834c0c2396364c7b56dd1e547a0f1a99e52f13307fb25d85c862399c7ab5b9f"
+    },
+    {
+      "path": "ai-system/templates/setup-manifest.template.md",
+      "sha256": "a9ec1bed3f36ee893bbeef76f35c08257ecf35f8e386178ec6091708738b0ba1"
+    },
+    {
+      "path": "ai-system/templates/system-state.template.md",
+      "sha256": "9da7f69256a0072d61a617811947bb84228e9d7126104d90345927a40d78cca4"
+    },
+    {
+      "path": "ai-system/tools/token-cost-audit.sh",
+      "sha256": "951d0c904160596eaf36553bde3c887cd3c953d8ae850fde37a51a6081ada14b"
+    },
+    {
+      "path": "ai-system/prompt-evidence-integrity-standard.md",
+      "sha256": "86a3196b0e5a6cd85d8bab46cb9371975fdcd1b07a81490c4cc5f690e167ffae"
+    },
+    {
+      "path": "ai-system/prompts/content-designer.md",
+      "sha256": "d8fb654ba5cb717558a78096236365e56d64a04699924200ca2c0f4678d27065"
+    },
+    {
+      "path": "ai-system/tools/tests/workflow-flow-audit.test.mjs",
+      "sha256": "4b2db4719ab5bb2430a325906fb5a663eb058cee504f7c9c927ac67a9e8f4a86"
+    },
+    {
+      "path": "ai-system/tools/tests/workflow-state-audit.test.mjs",
+      "sha256": "a3c825d9aff430159323d21a2ed9dcfc4c6709ec69ae63bfb615f90051a70683"
+    },
+    {
+      "path": "ai-system/tools/workflow-flow-audit.mjs",
+      "sha256": "da65979d4c6b867e28973afc933b185ba05b068d51c1683a1f61bf257d64daea"
+    },
+    {
+      "path": "ai-system/tools/workflow-state-audit.sh",
+      "sha256": "0c91d8edbf3e21eb1de85b6492fba2e537b3e2833ef7e665a66488c9d4496d56"
+    }
+  ]
+}

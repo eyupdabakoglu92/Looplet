@@ -24,9 +24,11 @@ Bir rol çalışmaya başlamadan önce:
 
 * exact canonical role label bekler
 * aktif feature ve actionable task çözümlemesini `role-execution-contract.md` kurallarına göre yapar
-* yalnız non-terminal current feature üzerinde çalışır
-* varsa önce `Active Task Ledger` bölümünü kullanır
-* `Open Tasks` bölümünü yalnız fallback olarak kullanır
+* delivery için Done/Closed/Blocked olmayan tek feature üzerinde çalışır; Tech Lead kontrol işleri ve PO bootstrap/revision istisnadır
+* ledger varsa boş/None olsa da yalnız onu kullanır
+* ledger hiç yoksa exact role section'ından legacy fallback kullanılır; full handoff öncesi normalize edilir
+* aynı role ait çoklu task belge/dependency sırasıyla çalışılır
+* bekleyen product revision etkilenen feature'da resync'e kadar delivery'yi durdurur
 
 Task resolution sırasında aşağıdaki alanlardan görev çıkarılmaz:
 
@@ -59,7 +61,7 @@ Bu standart, role-specific prerequisites'in yerini tutmaz.
 Örnek:
 
 * QA için implementasyonların tamamlanmış olması
-* Project Setup için hedef dizinin scaffold edilmemiş olması
+* Project Setup için yeni scaffold veya aynı açık task/target içinde güvenli partial resume
 * DevOps/Release Engineer için release/deployment task'ının açık olması
 * UI Designer için actionable design task bulunması
 

@@ -100,18 +100,11 @@ Containerization:
 
 ## 9. Gate Evidence
 
-| Gate | Result | Evidence / Notes |
-| --- | --- | --- |
-| Build | PASS / FAIL / NOT CONFIGURED / N/A | |
-| Test | PASS / FAIL / NOT CONFIGURED / N/A | |
-| Lint | PASS / FAIL / NOT CONFIGURED / N/A | |
-| Typecheck | PASS / FAIL / NOT CONFIGURED / N/A | |
-| Security | PASS / FAIL / NOT CONFIGURED / N/A | |
-| Container Build | PASS / FAIL / NOT CONFIGURED / N/A | |
-| Container Smoke | PASS / FAIL / NOT CONFIGURED / N/A | |
-| Deploy Preview / Staging | PASS / FAIL / NOT CONFIGURED / N/A | |
-| Smoke | PASS / FAIL / NOT CONFIGURED / N/A | |
-| Rollback | PASS / FAIL / NOT CONFIGURED / N/A | |
+Yalnız applicable gate'leri yaz; N/A satırı doldurma.
+
+| Gate / Claim | Evidence Class | Command / Job | Target / Environment | Result / Exit / Counts | Provenance / Run ID / Artifact | Isolation / Skips |
+| --- | --- | --- | --- | --- | --- | --- |
+| {applicable gate} | {class} | {actually executed command/job} | {target} | {result} | {provenance} | {none or limits} |
 
 ---
 
@@ -130,21 +123,8 @@ Containerization:
 
 ## 12. Sonraki Komut
 
-Routing authority: `orchestration.md -> Next Role`.
-
-1. `Next Role` acikca bir role atanmissa:
-
-```text
-Run [Role]
-```
-
-2. `Next Role` bos veya `None` ise:
+Release sonucu local Release Result alanına yazılır; owner/next Tech Lead'e geçirilir. Release Ready final QA veya Done değildir.
 
 ```text
 Run Tech Lead
 ```
-
-Not:
-
-* Release readiness sonrasi genellikle `Run Tech Lead` uretilir.
-* Pre-QA CI/CD config turunda `orchestration.md -> Next Role` esas alinir.

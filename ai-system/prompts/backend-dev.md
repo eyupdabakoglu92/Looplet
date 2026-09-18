@@ -67,6 +67,10 @@ Consumed signal kuralı:
 
 Bkz. `/ai-system/role-execution-contract.md`; execution/state/routing çelişkisinde o dosya kazanır, product/platform/feature/UI authority ilgili project/feature authority dosyalarında kalır.
 
+Evidence authority:
+
+* `/ai-system/prompt-evidence-integrity-standard.md`
+
 ---
 
 # IMPLEMENTATION MODE
@@ -241,6 +245,8 @@ Aşağıdakiler varsayılan olarak bug sayılır:
 * Critical business logic test edilmelidir
 * Edge case’ler test edilmelidir
 * Acceptance Criteria test ile doğrulanmalıdır
+* Process entrypoint, dependency graph, config/secrets loading, persistence open/migration veya server startup değiştiyse canonical backend boot + health/readiness kanıtı zorunludur
+* Required boot/runtime kanıtı çalıştırılamadıysa bunu PASS değil `Pending Evidence` olarak raporla
 
 
 ---
@@ -394,6 +400,8 @@ Yalnız teknik varsayım yapıldıysa yaz. Varsayım yoksa bu bölümü atla.
 Kural:
 * Sadece toplam test sayısı yazma
 * Tech Lead hangi davranışın gerçekten kanıtlandığını anlayabilmeli
+* Exact command/action, target/environment, result/exit, provenance ve mock/override sınırını yaz
+* Unit veya mock sonucu gerçek process boot/integration kanıtı değildir
 
 ---
 
@@ -432,8 +440,8 @@ Shared routing kuralı:
 * `/ai-system/prompt-delivery-footer-standard.md`
 
 Kural:
-* `orchestration.md → Next Role` açık ise onu kullan.
-* Boş veya `None` ise client task açıksa `Run Frontend/Mobile Developer` (Unity/mobil oyun projede `Run Game Developer (Unity)`); yoksa `Run QA`; belirsizse `Run Tech Lead`.
+* Önce role-execution-contract.md §5 ile local handoff'u tamamla; sonra güncellenmiş Next Role komutunu ver.
+* Eski header'ı kopyalama. Açık plan yoksa veya checkpoint gerekiyorsa Run Tech Lead.
 
 ---
 

@@ -48,6 +48,7 @@ Bunlar delivery sirasinda olusur. Basi icin gerekli degildir:
 * `features/{feature-name}/backend.md`
 * `features/{feature-name}/frontend.md`
 * `features/{feature-name}/game-dev.md` (client stack Unity/mobil oyunsa)
+* `features/{feature-name}/content-design.md` (authored content gerekiyorsa)
 * `features/{feature-name}/qa.md`
 * `bugs/`
 * `incidents/`
@@ -55,9 +56,9 @@ Bunlar delivery sirasinda olusur. Basi icin gerekli degildir:
 
 ### D. Project Setup Scope Notu
 
-* `Project Setup` yalnız **ilk kez scaffold** gerektiğinde çalışır (DURUM 0)
+* `Project Setup` normalde yalnız **ilk kez scaffold** gerektiğinde çalışır (DURUM 0)
 * İlk scaffold sonrası Backend Developer, Frontend/Mobile Developer veya client stack Unity/mobil oyunsa Game Developer (Unity) kodu doğrudan proje dosyalarına yazar
-* Tamamen yeni workspace/servis eklenmedikçe Project Setup tekrar tetiklenmez
+* Tamamen yeni workspace/servis/infra yüzeyi gerekiyorsa Tech Lead target boundary'si açık bir scoped re-entry açabilir
 
 ### E. Client Stack Routing Notu
 
@@ -303,6 +304,7 @@ Exact role label kullan:
 
 * `Run Tech Lead`
 * `Run Technical Analyst`
+* `Run Content Designer`
 * `Run UI Designer`
 * `Run Backend Developer`
 * `Run Frontend/Mobile Developer`
@@ -323,6 +325,7 @@ Sorun bildirimi icin tek canonical giris noktasi Tech Lead'dir:
 
 * `Run Tech Lead. Incident: <free text>`
 * `Run Tech Lead. Sorun Tespiti: <free text>`
+* `Run Tech Lead. Decision: <decision-id> — <user decision>`
 
 Opsiyonel:
 
@@ -385,6 +388,7 @@ Tech Lead already assigned ise:
 Run Backend Developer
 Run Frontend/Mobile Developer
 Run Game Developer (Unity)
+Run Content Designer
 Run DevOps/Release Engineer
 Run QA
 Run Technical Analyst
@@ -462,6 +466,7 @@ Kurulumdan sonra reusable core maliyetini izlemek icin:
 
 ```bash
 sh ai-system/tools/token-cost-audit.sh ai-system
+sh ai-system/tools/workflow-state-audit.sh ai-system
 ```
 
 Opsiyonel kontroller:
@@ -475,7 +480,9 @@ sh ai-system/tools/token-cost-audit.sh ai-system --baseline <approved-baseline> 
 
 Kural:
 
-* Bu arac manuel diagnostic aracidir; hicbir rol tarafindan zorunlu runtime input olarak okunmaz.
+* Token-cost audit manuel diagnostic'tir. Workflow-state audit ise delivery handoff için `--local`, Tech Lead sync/Done için full modda zorunludur; Node.js 18+ gerekir, ek paket gerekmez.
+* PO state dosyaları henüz yoksa workflow audit eksik dosyaları raporlar; bootstrap sonrası yeniden çalıştır. Starter-only PASS canlı feature akışını kanıtlamaz.
+* Mevcut kurulumların güncelleme/resync adımları README'dedir; canlı project artifact'larını starter ile ezme.
 * Default rapor dependency-free `chars/4` tahminidir; trend takibi ve buyuk dosya tespiti icindir.
 * Ilk implementasyonda `--baseline/--budget` zorunlu degildir; once proje baseline'i kaydedilir.
 * Sonraki core guncellemelerinde `--baseline <approved-baseline> --budget <project-budget>` regression kontrolu olarak kullanilir.

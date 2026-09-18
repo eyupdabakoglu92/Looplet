@@ -72,11 +72,11 @@ Last Updated: YYYY-MM-DD
 
 ## Current Phase
 
-* Planning / Analysis / UI Design / Backend Development / Frontend Development / Game Client Development / Integration / QA / Release / Rework / —
+* Planning / Analysis / Content Design / UI Design / Backend Development / Frontend Development / Game Client Development / Integration / QA / Release / Rework / —
 
 ## Current Role
 
-* Tech Lead / Technical Analyst / UI Designer / Backend Developer / Frontend/Mobile Developer / Game Developer (Unity) / DevOps/Release Engineer / QA / Project Setup / —
+* Tech Lead / Technical Analyst / Content Designer / UI Designer / Backend Developer / Frontend/Mobile Developer / Game Developer (Unity) / DevOps/Release Engineer / QA / Project Setup / —
 
 ## Current Reason
 
@@ -136,6 +136,9 @@ Kural:
 
 * `system-state.md` yalniz current snapshot tasir
 * append-only tarihce `system-history.md` icinde surdurulur
+* onceki veya historical status paragraflari bu dosyaya eklenmez
+* current reason / last action / next action kisa tutulur; delivery raporu buraya kopyalanmaz
+* default size budget 24,000 baytdir; asilirsa tarihce archive edilir
 
 ---
 
@@ -150,3 +153,4 @@ Kural:
 
 * Stack/runtime authority burada duplicate edilmez; `project-authority/platform.md` referans alinir
 * Workflow degisirse `feature-board.md`, ilgili `orchestration.md` ve bu dosya ayni turda guncellenir
+* Tech Lead transition sonunda `sh ai-system/tools/workflow-state-audit.sh ai-system` calistirir

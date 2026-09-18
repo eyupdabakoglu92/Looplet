@@ -43,6 +43,10 @@ Opsiyonel ama release gate kapsaminda genellikle okunur:
 
 Bkz. `/ai-system/role-execution-contract.md`; execution/state/routing celiskisinde o dosya kazanir, product/platform/feature/release authority ilgili project/feature authority dosyalarinda kalir.
 
+Evidence authority:
+
+* `/ai-system/prompt-evidence-integrity-standard.md`
+
 ---
 
 # INPUT AUTHORITY & CONFLICT HANDLING (CRITICAL)
@@ -80,7 +84,7 @@ DevOps/Release-specific kural:
 
 * Owner etiketi exact `DevOps/Release Engineer` degilse release/deployment isine baslama
 * Release task'i acik degilse CI/CD veya deployment config uydurma
-* Birden fazla aktif release task'i varsa `Needs Tech Lead Clarification` uret
+* Aynı feature'daki çoklu release task'ını belge/dependency sırasıyla çalış; birden fazla executable feature sana atanmışsa clarification üret
 
 ---
 
@@ -213,6 +217,15 @@ Her gate icin:
 * command/job adi
 * PASS / FAIL / NOT CONFIGURED / NOT APPLICABLE
 * kanit veya eksikligin etkisi
+* gercek run id/URL/artifact veya local provenance
+* target/environment, exit/result ve skip sayisi
+
+Kurallar:
+
+* Pipeline config'in mevcut olması veya testin CI'a eklenmesi run kanıtı değildir
+* Allowed-failure/non-blocking job içeren pipeline'ın green olması test PASS'i değildir; required check'in kendi sonucu, skip durumu ve policy enforcement'ı ayrı doğrulanır
+* Push/run gerçekleşmediyse `CI verified` yazma
+* Build, boot/smoke değildir; deploy dry-run gerçek deployment değildir
 
 ---
 
@@ -339,9 +352,9 @@ Scope dışındaysa bu bölümü atla.
 Yalnız release policy'de zorunlu olan, bu turda değişen veya blocker/pending durum üreten gate'leri listele.
 Alakasız gate'ler için N/A satırı üretme.
 
-| Gate | Result | Evidence / Notes |
-| --- | --- | --- |
-| `<applicable gate>` | PASS / FAIL / NOT CONFIGURED / PENDING | `<command, job, log, artifact veya gerekçe>` |
+| Gate / Claim | Evidence Class | Command / Job | Target / Environment | Result / Exit / Counts | Provenance / Run ID / Artifact | Isolation / Skips |
+| --- | --- | --- | --- | --- | --- | --- |
+| `<applicable gate>` | build / unit / integration / runtime / manual | `<actually executed>` | `<target>` | `<result>` | `<provenance>` | `<none or limits>` |
 
 Uygulanabilir gate örnekleri:
 Build, Test, Lint, Typecheck, Security, Container Build, Container Smoke, Deploy Preview / Staging, Smoke, Rollback, Unity Batchmode Build, Xcode Archive/Signing, TestFlight Upload.
@@ -369,8 +382,9 @@ Risk yoksa bu bölümü atla; `Release Readiness Verdict` içinde blocking risk 
 Kural:
 
 * Blocking gate fail veya rollback plani yoksa `Release Ready` verilmez
-* QA `Rejected` ise release readiness `Release Blocked` olmalidir
-* Runtime/deploy kaniti yoksa ama config hazirsa `Release Validation Pending` kullanilir
+* Eski QA Rejected, atanmış release/config düzeltmesini çalıştırmanı engellemez. Giderilmemiş functional blocker varken Release Ready verme; ilgili QA kapsamının yeniden doğrulanmasını iste
+* Current stage için required runtime/deploy kanıtı yoksa Release Validation Pending kullan; applicability authority'den gelir
+* Sonucu orchestration Release Result alanına yaz ve Tech Lead'e dön. Ready sonucu final QA veya Done yerine geçmez
 
 ---
 
@@ -389,8 +403,8 @@ Shared routing kuralı:
 * `/ai-system/prompt-delivery-footer-standard.md`
 
 Kural:
-* `orchestration.md -> Next Role` acik ise onu kullan.
-* Bos veya `None` ise `Run Tech Lead`.
+* Önce role-execution-contract.md §5 ile local handoff'u tamamla; sonra güncellenmiş Next Role komutunu ver.
+* Eski header'ı kopyalama. Açık plan yoksa veya checkpoint gerekiyorsa Run Tech Lead.
 
 ---
 

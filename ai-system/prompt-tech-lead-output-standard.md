@@ -48,11 +48,13 @@ Status kumesi:
 * Rework
 * Done
 * Blocked
+* Closed
 
 Owner kumesi:
 
 * Tech Lead
 * Technical Analyst
+* Content Designer
 * UI Designer
 * Backend Developer
 * Frontend/Mobile Developer
@@ -128,6 +130,7 @@ Minimum beklenti:
 Gerekli role'ler icin plan yaz:
 
 * UI Designer
+* Content Designer
 * Backend
 * Frontend/Mobile
 * DevOps/Release Engineer
@@ -155,6 +158,19 @@ UI Designer brief'inde en az sunlar olmali:
 * CTA onceligi
 * state gorunurlugu
 * premium farklilastirici kararlar
+
+### 11a. Next Role Input - Content Designer
+
+Content brief'inde en az sunlar olmali:
+
+* içerik türü, teslim kapsamı ve çıktı konumu; format/schema ve miktar yalnız gerekliyse
+* product/feature acceptance criteria coverage
+* kapsama uygulanabilen doğruluk, dil, tutarlılık, kapsam ve sıralama hedefleri
+* varsa kullanılacak içerik araçları ve generator/validator talimatı
+* yalnız belirsiz constraint varsa feasibility kanıtı veya unresolved blocker
+* doğrulama yöntemi; executable gate varsa exact check ve pozitif/negatif örnek beklentisi
+* human sign-off gerekiyorsa benzersiz decision id
+* `content-design.md` ve gercek content asset teslimi
 
 ### 12. Next Role Input - Frontend/Mobile Developer
 
@@ -202,7 +218,8 @@ QA stratejisi gerektiginde su boyutlari kapsar:
 * error
 * edge case
 * integration
-* scope tanimi: sadece backend / sadece frontend / end-to-end
+* scope: backend-only / client-only / end-to-end / content-only ve uygulanabilir compliance
+* QA Stage: functional / final; required kanıtı stage'e göre tanımla
 * kanit sinifi: `runtime`, `repeatable integration`, `automated functional`, `source-only`
 * runtime zorunlu senaryolar ve approval bar'i
 
@@ -263,7 +280,10 @@ Tech Lead'in `orchestration.md` guncellemesinde asgari olarak sunlar net olmali:
 
 * Current Status
 * Current Owner
-* Active Task Ledger
+* Active Task Ledger ve Handoff Plan
+* Feature ID; global Active Feature eşleşmesi
+* QA Stage / QA Result / Release Scope / Release Result / Delivery Review
+* Pending Evidence / Open Decision Gates
 * Open Tasks
 * Blockers
 * Last Decision

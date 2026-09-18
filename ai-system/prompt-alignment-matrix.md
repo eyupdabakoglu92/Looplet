@@ -4,7 +4,7 @@
 >
 > Bu doküman rol yüzeylerini ve ortak beklentileri hızlı görünür kılmak için tutulur. Execution semantics, active feature/task resolution ve workflow authority için normatif kaynak `role-execution-contract.md` ve ilgili live state dosyalarıdır.
 
-Last Updated: 2026-07-01
+Last Updated: 2026-09-17
 
 ---
 
@@ -37,15 +37,16 @@ Read/output policy notu:
 | Role | Çalışma Koşulu | Required Input | Optional Input | Output | Tipik Next Role | Uyum Durumu | Not |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Product Owner | `Run Product Owner. Yeni proje: <tanım>` veya `Run Product Owner. Revise: <kapsam>` | Kullanıcı ürün tanımı | Mevcut `product-prd.md` (revizyon modunda) | `product-prd.md`, `feature-board.md`, `system-state.md` | Tech Lead | Yüksek | Bootstrap ve revision olmak üzere iki mod var; platform.md Tech Lead'e bırakılır; kritik boşluk varsa önce soru sorar. **Delivery footer standardına dahil değildir** — PO, `orchestration.md` ile çalışmaz; handoff doğrudan kullanıcıya yönelik mesajla yapılır |
-| Tech Lead | Sürecin orchestration sahibi | `feature-board.md`, `system-state.md`, `product-prd.md`, seçili feature `orchestration.md` / `prd.md` / `architecture.md`, Tech Lead supplement'leri | `project-authority/release.md`, UI referansları, `analysis.md`, `ui-design.md`, delivery artifact'ları, `release.md` scope'a göre | `feature-board.md`, `system-state.md`, `architecture.md`, `orchestration.md` | Technical Analyst / UI Designer / Backend Developer / Frontend/Mobile Developer / Game Developer (Unity) / DevOps/Release Engineer / QA / Project Setup | Yüksek | Read order staged/scope-gated; UI referansları backend-only/release-only turlarda okunmaz; state machine ve output checklist supplement dosyalardadır |
+| Tech Lead | Sürecin orchestration sahibi | `feature-board.md`, `system-state.md`, `product-prd.md`, seçili feature `orchestration.md` / `prd.md` / `architecture.md`, Tech Lead supplement'leri | `project-authority/release.md`, UI referansları, `analysis.md`, `content-design.md`, `ui-design.md`, delivery artifact'ları, `release.md` scope'a göre | `feature-board.md`, `system-state.md`, `architecture.md`, `orchestration.md` | Technical Analyst / Content Designer / UI Designer / Backend Developer / Frontend/Mobile Developer / Game Developer (Unity) / DevOps/Release Engineer / QA / Project Setup | Yüksek | Read order staged/scope-gated; evidence reconciliation ve state audit Done/handoff öncesi zorunludur |
 | Technical Analyst | `Current Owner = Technical Analyst` | feature `prd.md`, `role-execution-contract.md` | `product-prd.md`, `feature-board.md`, `system-state.md`, `orchestration.md`, `architecture.md` | `analysis.md` | Tech Lead | Orta-Yüksek | Seçenek analizi + recommendation verir; final karar vermez; Tech Lead kabul edilen kararları architecture'a taşıyıp consumed signal bırakabilir |
+| Content Designer | `Current Owner = Content Designer` | `prd.md`, `architecture.md`, `orchestration.md`, evidence standardı | `analysis.md`, `ui-design.md`, developer delivery report'u, generator/validator talimatı | Gerçek authored content asset'leri + `content-design.md` | Handoff Plan'daki delivery rolü / Tech Lead | Orta-Yüksek | Pipeline/tooling kodu developer'da, gerçek content bu roldedir; infeasible requirement'ı değiştirmez; human sign-off explicit decision gate olur |
 | UI Designer | `Current Owner = UI Designer` | `architecture.md`, `orchestration.md`, `role-execution-contract.md`, `system-state.md`, `design-doctrine.md`, `premium-ui-rubric.md` | `analysis.md`, `backend.md`, `frontend.md`, `game-dev.md`, `prd.md` | `ui-design.md` | Frontend/Mobile Developer (veya client stack Unity/mobil oyunsa Game Developer (Unity) — meta ekranlar veya Game Visual/HUD Direction gereken kapsam için) / Tech Lead | Yüksek | Prompt dosyaları runtime input değildir; `analysis.md` consumed ise tekrar okunmaz; contract uydurmaması gerekir |
-| Backend Developer | `Current Owner = Backend Developer` | `architecture.md`, `orchestration.md`, `role-execution-contract.md`, `system-state.md` | `platform.md`, `setup-manifest.md`, `release.md`, `prd.md`, `analysis.md`, `feature-board.md` | Gerçek repo değişiklikleri + `backend.md` delivery report | Frontend/Mobile Developer / QA / Tech Lead | Yüksek | Direct-edit modunda çalışır; `backend.md` brief-first / scope-gated traceability artifact'ıdır; authority reconciliation yalnız gerçek conflict/override varsa yazılır |
-| Frontend/Mobile Developer | `Current Owner = Frontend/Mobile Developer` | `architecture.md`, `orchestration.md`, `role-execution-contract.md`, `system-state.md`, `design-doctrine.md`, `premium-ui-rubric.md` | `platform.md`, `release.md`, `analysis.md`, `backend.md`, `ui-design.md` | Gerçek repo değişiklikleri + `frontend.md` delivery report | Backend Developer / QA / Tech Lead | Yüksek | Direct-edit modunda çalışır; UI handoff varsa korur; `frontend.md` brief-first / scope-gated traceability artifact'ıdır |
-| Game Developer (Unity) | `Current Owner = Game Developer (Unity)` | `architecture.md`, `orchestration.md`, `role-execution-contract.md`, `system-state.md`, `platform.md` | `analysis.md`, `backend.md`, `ui-design.md`, `release.md` | Gerçek Unity proje değişiklikleri + `game-dev.md` delivery report | Backend Developer / QA / Tech Lead | Orta-Yüksek | `platform.md` client stack Unity/mobil oyun ise Frontend/Mobile Developer yerine devreye girer; direct-edit modunda çalışır; iOS ATT/Privacy Manifest/IAP etkisi varsa DevOps/Release Engineer handoff'u yazar |
-| DevOps/Release Engineer | `Current Owner = DevOps/Release Engineer` | `orchestration.md`, `role-execution-contract.md`, `system-state.md`, `platform.md`, `release.md` | `setup-manifest.md`, `prd.md`, `architecture.md`, `backend.md`, `frontend.md`, `game-dev.md`, `qa.md`, `feature-board.md` | Gerçek repo değişiklikleri + feature `release.md` | QA / Tech Lead | Orta-Yüksek | Release scope yoksa çalışmaz; gate evidence yalnız applicable control satırlarını üretir; production deploy explicit release authority ve approval olmadan yapılmaz; client stack Unity/mobil oyunsa Xcode signing/TestFlight/App Store gate'lerini de kapsar |
-| QA | `Current Owner = QA` ve gerekli implementasyonlar tamam | `prd.md`, `architecture.md`, `orchestration.md`, `role-execution-contract.md`, `system-state.md`; UI feature'larında design doctrine/rubric | `analysis.md`, `backend.md`, `frontend.md`, `game-dev.md`, `ui-design.md`, feature `release.md`, `project-authority/release.md` | `qa.md` | Backend Developer / Frontend/Mobile Developer / Game Developer (Unity) / UI Designer / Tech Lead | Yüksek | QA output scope matrix kullanır; mandatory evidence/verdict bölümleri korunur; UI/security/release/mode bölümleri yalnız scope varsa üretilir |
-| Project Setup | `Current Owner = Project Setup` ve proje scaffold eksik | `orchestration.md`, `platform.md`, `setup-manifest.md`, `role-execution-contract.md` | `prompt-execution-gating-standard.md`, `prompt-delivery-footer-standard.md` | Scaffold edilmiş workspace / proje iskeleti | Backend Developer / Frontend/Mobile Developer / Game Developer (Unity) / QA / Tech Lead | Orta-Yüksek | Sadece scaffold ve setup recipe uygular; `backend.md` / `frontend.md` / `game-dev.md` delivery report'larını proje dosyalarına uygulamaz |
+| Backend Developer | `Current Owner = Backend Developer` | `architecture.md`, `orchestration.md`, `role-execution-contract.md`, `system-state.md` | `platform.md`, `setup-manifest.md`, `release.md`, `prd.md`, `analysis.md`, `feature-board.md` | Gerçek repo değişiklikleri + `backend.md` delivery report | Handoff Plan'daki delivery rolü / Tech Lead | Yüksek | Direct-edit modunda çalışır; `backend.md` brief-first / scope-gated traceability artifact'ıdır; authority reconciliation yalnız gerçek conflict/override varsa yazılır |
+| Frontend/Mobile Developer | `Current Owner = Frontend/Mobile Developer` | `architecture.md`, `orchestration.md`, `role-execution-contract.md`, `system-state.md`, `design-doctrine.md`, `premium-ui-rubric.md` | `platform.md`, `release.md`, `analysis.md`, `backend.md`, `ui-design.md` | Gerçek repo değişiklikleri + `frontend.md` delivery report | Handoff Plan'daki delivery rolü / Tech Lead | Yüksek | Direct-edit modunda çalışır; UI handoff varsa korur; `frontend.md` brief-first / scope-gated traceability artifact'ıdır |
+| Game Developer (Unity) | `Current Owner = Game Developer (Unity)` | `architecture.md`, `orchestration.md`, `role-execution-contract.md`, `system-state.md`, `platform.md` | `analysis.md`, `backend.md`, `ui-design.md`, `release.md` | Gerçek Unity proje değişiklikleri + `game-dev.md` delivery report | Handoff Plan'daki delivery rolü / Tech Lead | Orta-Yüksek | `platform.md` client stack Unity/mobil oyun ise Frontend/Mobile Developer yerine devreye girer; direct-edit modunda çalışır; iOS ATT/Privacy Manifest/IAP etkisi varsa DevOps/Release Engineer handoff'u yazar |
+| DevOps/Release Engineer | `Current Owner = DevOps/Release Engineer` | `orchestration.md`, `role-execution-contract.md`, `system-state.md`, `platform.md`, `release.md` | `setup-manifest.md`, `prd.md`, `architecture.md`, `backend.md`, `frontend.md`, `game-dev.md`, `qa.md`, `feature-board.md` | Gerçek repo değişiklikleri + feature `release.md` | Tech Lead | Orta-Yüksek | Release scope yoksa çalışmaz; gate evidence yalnız applicable control satırlarını üretir; production deploy explicit release authority ve approval olmadan yapılmaz; client stack Unity/mobil oyunsa Xcode signing/TestFlight/App Store gate'lerini de kapsar |
+| QA | Current Owner = QA; Accepted review, stage ve açık QA task'ı | `prd.md`, `architecture.md`, `orchestration.md`, `role-execution-contract.md`, `system-state.md`, evidence standardı; UI feature'larında design doctrine/rubric | `analysis.md`, `backend.md`, `frontend.md`, `game-dev.md`, `content-design.md`, `ui-design.md`, feature `release.md`, `project-authority/release.md` | `qa.md` | Tech Lead | Yüksek | Required evidence eksikse Approved with Notes değil scenario-level Pending Evidence üretir; cold boot production-shaped graph ile ayrıdır |
+| Project Setup | `Current Owner = Project Setup` ve scaffold task'ı açık | `orchestration.md`, `platform.md`, `setup-manifest.md`, `role-execution-contract.md`, evidence standardı | `prompt-execution-gating-standard.md`, `prompt-delivery-footer-standard.md` | Scaffold edilmiş workspace / proje iskeleti + command/boot evidence | Tech Lead | Orta-Yüksek | İlk scaffold veya Tech Lead'in boundary'si açık yeni workspace/service/infra re-entry'sidir; feature implementation rolü değildir |
 
 ---
 
@@ -89,16 +90,16 @@ Not:
 ### 1.4 Active Feature Resolution
 
 * Özet: roller aktif feature'ı önce feature-level `orchestration.md` header alanlarından çözer
-* Tie-breaker, ambiguity ve "rol çalışmaz" koşullarının detayları `role-execution-contract.md` içindedir
+* Birden fazla executable feature aynı delivery role atanmışsa global active feature ile tie-break yapılmaz; Tech Lead tek atama yapar. Blocked dahil control-plane recovery ayrı çözülür.
 
 ### 1.5 Active Task Resolution
 
-* Özet: `Active Task Ledger` authoritative run queue, `Open Tasks` fallback inventory'dir
+* Özet: `Active Task Ledger` varsa boş olsa bile authoritative run queue'dur; Open Tasks yalnız ledger bölümü hiç yoksa legacy fallback'tir.
 * Ignore kuralları ve actionable task çözümleme detayları `role-execution-contract.md` içindedir
 
 ### 2. Contract Chain
 
-* `prd.md` → `analysis.md` → `architecture.md` → `backend.md` / `frontend.md` (veya client stack Unity/mobil oyunsa `game-dev.md`) / `ui-design.md` → `qa.md` → gerekirse `release.md`
+* `prd.md` → gerekirse `analysis.md` → `architecture.md` → kapsamlı delivery artifact'ları → Tech Lead review → `qa.md`; release gerekiyorsa functional QA → `release.md` → Tech Lead → final QA.
 * `architecture.md`, backend ve frontend için contract authority kabul edilir
 * `ui-design.md` varsa frontend visual/state authority olarak eklenir; client stack Unity/mobil oyunsa Game Visual/HUD Direction scope'unda Game Developer (Unity) için de authority sayılır
 * `design-doctrine.md` + `premium-ui-rubric.md`, UI Designer / Frontend / Game Developer (Unity) (Game Visual/HUD Direction scope'unda) / QA / Tech Lead arasında ortak görsel kalite authority’sidir
@@ -107,6 +108,8 @@ Not:
 * Async state kullanan feature'larda authoritative bağlam anahtarları ve runtime lifecycle ownership de contract zincirinin parçasıdır
 
 ### 3. Rework Routing
+
+QA her zaman Tech Lead'e döner; aşağıdaki owner'ları Tech Lead task/dependency planı ile aktive eder.
 
 * Backend implementasyon sorunu → Backend Developer
 * Frontend implementasyon sorunu → Frontend/Mobile Developer
@@ -120,7 +123,7 @@ Not:
 
 * QA doğrudan Product Owner'ı tetikleyemez
 * Product requirement hatası tespit edilirse: QA `Tech Lead Note` bölümüne yazar → Tech Lead değerlendirerek `Run Product Owner. Revise: <kapsam>` tetikler
-* Implementasyon hatası ile product requirement hatası aynı `Rejected` verdict'ine karıştırılmaz; ayrı finding olarak raporlanır
+* Bilinen blocking defect varsa Rejected; defect yok ama ürün/authority kararı eksikse Decision Pending verilir. Bütün finding'ler ayrı korunur; karar sorunu developer bugfix'e dönüştürülmez.
 
 ### 4. Architecture Gate
 
@@ -215,20 +218,20 @@ Not:
 ### 5. PO Revision sonrası `system-state.md` senkronsuz kalabilir
 
 * PO Revision Mode yalnız `product-prd.md` ve `feature-board.md` günceller; `system-state.md` güncellenmez
-* Kullanıcı Tech Lead resync komutunu çalıştırmadan devam ederse global snapshot geçici olarak senkronsuz kalır
-* Kontrol: PO revision sonrası `Run Tech Lead` komutu verildiğinde Tech Lead bu iki dosyayı karşılaştırıp gerekirse hizalamalıdır
+* Pending Product Revision ve Revision Affected Features etkilenen scope'ta delivery'yi resync'e kadar durdurur.
+* Kontrol: Aktif feature olmasa veya hepsi Done olsa da Tech Lead resync zorunludur; eski approval etkisi incelenmeden revision flag'i temizlenmez.
 
 ### 6. `QA Scope` alanı doldurulmadan QA tetiklenirse scope belirsizliği kalır
 
-* Tech Lead, orchestration.md'de `QA Scope` alanını boş bırakırsa QA kendi scope kararını artifact mevcudiyetine göre üretir
-* Bu genellikle doğru sonuç verir; ancak kısmi delivery senaryosunda (backend tamam, frontend devam ediyor ama frontend.md kısmen oluştu) hatalı end-to-end scope alınabilir
-* Öneri: Tech Lead QA handoff öncesi `QA Scope` alanını her zaman açıkça doldurmalıdır
+* QA artifact mevcudiyetinden scope tahmin etmez. Eksik scope/stage/review halinde clarification ister.
+* Kontrol: Tech Lead QA handoff öncesi scope, stage ve task'ları açıkça atar; audit eksik gate'i reddeder.
 
-### 7. `Runtime Validation Pending` verdict Tech Lead koordinasyonu gerektirir
+### 7. `Runtime Validation Pending` dependency propagation gerektirir
 
-* QA bu verdict'i ürettiğinde Tech Lead, hangi senaryoların nasıl doğrulanacağını kullanıcıyla koordine etmelidir
-* Koordinasyon yapılmadan yeni feature'a geçilirse runtime kanıtsız bir feature `Done` olarak kapanabilir
-* Öneri: Tech Lead, `Runtime Validation Pending` gördüğünde `system-state.md`'ye bu notu eklemeli ve feature'ı Done'a almadan önce doğrulamayı beklemeli
+* QA bu verdict'i ürettiğinde Tech Lead her senaryoyu evidence id, target, owner ve blocking scope ile ledger'a taşır
+* Aynı entry point/provider/persistence/lifecycle substrate'ını kullanan downstream feature bu borcu miras alır
+* Deploy/billing bekleyişi deploy gerektirmeyen local cold boot'u park edemez
+* Kontrol: `prompt-evidence-integrity-standard.md` ve `workflow-state-audit.sh`
 
 ### 8. Security scope tespiti QA'ya bırakılmıştır
 
@@ -246,34 +249,31 @@ Not:
 
 * Her rol yalnızca kullanıcının açık komutuyla (`Run [Role]`) tetiklenir
 * Tech Lead için `Run Tech Lead. Incident: ...` ve `Run Tech Lead. Sorun Tespiti: ...` triage-only girişleridir
+* `Run Tech Lead. Decision: <decision-id> — <karar>` yalnız önceden açılmış explicit decision gate'ini çözer
 * Sorun bildirimi için canonical intake noktası Tech Lead'dir; role-targeted issue komutu kullanılmaz
 * Active feature resolution, active task resolution, local/global ownership, delivery handoff ve terminal cleanup detayları `role-execution-contract.md` içinde normatif olarak tanımlıdır
 * Bu doküman ambiguity çözmek için değil, hızlı cross-role görünürlük için kullanılmalıdır
 
 ### Self-Directing Flow Özeti
 
-* Her delivery rolü teslim sonunda zorunlu `## Sonraki Komut` bölümü üretir
-* Routing authority `orchestration.md → Next Role`'dur
-* Tech Lead feature aktive ederken `Next Role`'u kesin yazar; delivery rolleri arası her geçişte tekrar çalışmaz
-* **QA** ve **Technical Analyst** her zaman `Run Tech Lead` üretir (sabit)
-* **DevOps/Release Engineer** release readiness sonrası genellikle `Run Tech Lead` üretir; pre-QA CI/CD config turunda `orchestration.md → Next Role` esas alınır
-* Diğer delivery rolleri `orchestration.md → Next Role` değeri boşsa kendi varsayılan sonraki rolüne geçer
-* Detaylar: `role-execution-contract.md §5.1`
-
-Detaylı trigger ve execution kuralları için:
-
-* `/ai-system/role-execution-contract.md`
+* Her delivery rolü teslim sonunda zorunlu `## Sonraki Komut` üretir.
+* Current Owner = Next Role = şimdi çalışacak rol; teslim sonrası adım ayrı Handoff Plan'dadır.
+* Planlı, prerequisite'i tamamlanmış delivery geçişi mümkündür; plan yoksa veya belirsizse Tech Lead.
+* QA, Technical Analyst, Project Setup ve DevOps teslimleri Tech Lead'e döner.
+* Her QA girişinden önce Tech Lead reconciliation ve Accepted review gerekir.
+* QA functional → release → QA final sırası yalnız release scope varsa uygulanır.
+* Detaylar: `role-execution-contract.md §5–5.3`.
 
 ---
 
 ## Recommended Working Order
 
-1. Tech Lead feature seçer ve `prd.md` varlığını doğrular
-2. Gerekirse Technical Analyst analiz üretir
-3. Tech Lead contract + orchestration planını çıkarır
-4. Gerekirse UI Designer handoff üretir
-5. Backend ve client (Frontend/Mobile veya Game Developer (Unity)) implementation yapılır
-6. QA verdict verir
-7. Tech Lead rework, release gate veya next feature kararını verir
-8. Release gate gerekiyorsa DevOps/Release Engineer `release.md` ve readiness evidence üretir
-9. Tech Lead release sonucunu reconcile ederek Done veya rework/blocked kararını verir
+1. Tech Lead feature seçer ve gerekli authority'leri doğrular.
+2. Gerekirse Technical Analyst analiz, Project Setup scaffold üretir; her biri Tech Lead'e döner.
+3. Tech Lead contract, task/dependency ve handoff planını çıkarır.
+4. UI, content ve developer teslimleri yalnız scope/dependency planında gereken sırada ilerler.
+5. Tech Lead delivery reconciliation yapar ve QA scope/stage/task'larını aktive eder.
+6. Release yoksa QA final verdict; release varsa önce functional QA.
+7. Her verdict Tech Lead'e döner; defect, decision veya evidence recovery uygulanır.
+8. Functional Approved sonrası DevOps release evidence üretir; Tech Lead final QA'yı aktive eder.
+9. QA final kabulü ve tüm closure gate'leri tamamlanınca Tech Lead Done ve global state sync yapar.

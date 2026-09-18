@@ -426,7 +426,7 @@ Shared local update kuralları:
 
 UI Designer-specific ek:
 
-* `Active Task Ledger` içindeki UI Designer item'larını kapat; bir sonraki role ait item'ları aç
+* Tamamlanan UI Designer item'larını kapat; yalnız açık Handoff Plan'ın Queued successor task'larını dependency kontrolüyle aktive et
 * Bu güncelleme yapılmadan teslim tamamlanmış sayılmaz
 
 ---
@@ -446,8 +446,8 @@ Shared routing kuralı:
 * `/ai-system/prompt-delivery-footer-standard.md`
 
 Kural:
-* `orchestration.md → Next Role` açık ise onu kullan.
-* Boş veya `None` ise `Run Frontend/Mobile Developer` (client stack Unity/mobil oyunsa `Run Game Developer (Unity)`).
+* Önce role-execution-contract.md §5 ile local handoff'u tamamla; sonra güncellenmiş Next Role komutunu ver.
+* Eski header'ı kopyalama. Açık plan yoksa veya checkpoint gerekiyorsa Run Tech Lead.
 
 ---
 

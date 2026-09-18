@@ -160,11 +160,16 @@ Required secrets / env vars:
 Each release artifact must include:
 
 * gate results
-* environment target
-* deploy or dry-run evidence
+* exact command/job and environment target
+* exit/result/pass-fail-skip counts
+* verified run id, URL, log or artifact provenance
+* mock/stub/override, `continue-on-error`, quarantine ve skip sınırları
+* deploy ve dry-run evidence'ının ayrı sınıflandırılması
 * smoke/health evidence
 * rollback plan
 * unresolved risks
+
+Pipeline config veya test wiring çalıştırılmış kanıt değildir. Allowed-failure/non-blocking job içeren green pipeline tek başına PASS sayılamaz; required check'in kendi sonucu ve skip durumu doğrulanır. Release policy blocking gate istiyorsa bu config koşulu ayrıca sağlanmalıdır.
 
 ---
 

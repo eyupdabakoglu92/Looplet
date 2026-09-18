@@ -4,7 +4,7 @@
 >
 > Bu dosya Tech Lead prompt'undaki state-machine ve role transition mantigini ayri bir katmanda tutar. `role-execution-contract.md` global execution semantics authority olarak kalir; bu supplement Tech Lead'in orchestration karar modelini detaylandirir.
 
-Last Updated: 2026-04-11
+Last Updated: 2026-09-17
 
 ---
 
@@ -22,10 +22,11 @@ Bu dosya:
 
 ### DURUM 0 — Proje Scaffold Gerekiyor
 
-Kosul: delivery spec hazir, ancak ilgili uygulama/workspace dizini bos veya scaffold edilmemis.
+Koşul: scaffold recipe hazır; hedef yeni scaffold veya aynı açık task/target'ın kısmi scaffold'unu güvenli şekilde sürdürmek gerekiyor. Dolu target üzerinde yeniden scaffold/overwrite yapılmaz.
 
 Yapilacaklar:
 
+* Project Setup'a routing yapmadan once `project-authority/setup-manifest.md` mevcut ve hedefe ozel recipe + canonical build/test/boot komutlariyla dolu mu kontrol et
 * orchestration.md'ye scaffold open task ekle
 * Current Owner = Project Setup olarak guncelle
 * Next Role = Project Setup
@@ -33,7 +34,9 @@ Yapilacaklar:
 
 Not:
 
-* Bu durum sadece ilk feature'da veya yeni proje eklenirken olusur
+* Bu durum ilk scaffold'da veya tamamen yeni, daha once scaffold edilmemis workspace/service/infra surface eklenirken olusur
+* Existing workspace'e feature logic eklemek Project Setup re-entry gerekcesi degildir
+* Hedefe uygulanabilen verification command syntax'i ve expected result manifestte tanımlı değilse Project Setup'a handoff verilmez; çalıştırılabilir bileşen yoksa ilgisiz boot hedefi uydurulmaz
 
 ---
 
@@ -60,7 +63,7 @@ Yapilacaklar:
 * `prd.md` yoksa once feature-level PRD olustur
 * `architecture.md` yoksa placeholder degil, gercek feature-level contract brief olustur
 * Feature complex ise:
-  * Next Role = Technical Analyst
+  * Current Owner = Next Role = Technical Analyst
   * analysis task'ini orchestration icinde ac
 * Feature complex degilse:
   * direkt contract + plan olustur
@@ -77,6 +80,7 @@ Asagidaki kosullardan biri veya birden fazlasi varsa feature COMPLEX sayilir:
 * **Cross-feature bagimlilik**: Baska bir feature'in yarim kalmis veya belirsiz contract'ina bagi
 * **State machine kavramsalligi**: Coklu durum gecisi, terminal state kurallari veya sira bagimliligi
 * **Guvensiz varsayim riski**: Tech Lead onemli bir karari "tahmin" etmek zorunda kaliyorsa
+* **Olculebilir fizibilite riski**: Sayisal limit, geometri, algoritmik minimum/maksimum, performans bandi veya gate-enforced iddiasi proof/spike gerektiriyorsa
 
 Asagidaki kosullar varsa feature BASIT sayilir ve analyst gerekmez:
 
@@ -92,6 +96,7 @@ Asagidaki kosullar varsa feature BASIT sayilir ve analyst gerekmez:
 Yapilacaklar:
 
 * Analizi degerlendir
+* Fizibilitesi belirsiz acceptance constraint'lerini kısa türetim, spike veya sınır örnekleriyle doğrula; standart ve dayanağı belli sınırlar için kısa gerekçe yeterlidir
 * Contract olustur veya devralinan contract'i feature-level `architecture.md` icine tasi
 * Acceptance Criteria'lari contract'a yansit
 * UI gereksinimini degerlendir
@@ -99,9 +104,15 @@ Yapilacaklar:
 * Implementation plan olustur
 * Dev'lere task ver
 
+Gate-enforced claim kurali:
+
+* Architecture veya brief bir kurala `gate-enforced` diyorsa exact command/check, pozitif senaryo ve kuralin ihlalini yakalayan negatif test adlandirilir
+* Tasarım aşamasında uygulanacak command/check ve pozitif/negatif örnekler tanımlanır; henüz çalıştırılmamış kontrol `planned gate` olarak kalır. Contract, testleri yazacak developer'a bu açık planla devredilebilir; enforcement kanıtı ancak implementasyon ve execution sonrasında accepted sayılır
+* Product requirement fizibil degilse Tech Lead PRD'yi kendi degistirmez; Product Owner revision rotasi acar
+
 Kural:
 
-* `architecture.md` uretilmeden UI Designer / Backend / Frontend / Game Developer (Unity) / DevOps/Release Engineer / QA handoff verilmez
+* `architecture.md` uretilmeden Content Designer / UI Designer / Backend / Frontend / Game Developer (Unity) / DevOps/Release Engineer / QA handoff verilmez
 
 ---
 
@@ -151,7 +162,7 @@ Yapilacaklar:
 
 ### DURUM 3.7 — Delivery Artifact Completion Check
 
-Kosul: `orchestration.md` icinde bir rol hala `Current Owner` olarak gorunuyor, ama o role ait delivery artifact (`backend.md`, `frontend.md`, `game-dev.md`, `ui-design.md`, `release.md`) mevcut.
+Koşul: Yeni/değişmiş delivery artifact (`backend.md`, `frontend.md`, `game-dev.md`, `ui-design.md`, `content-design.md`, `release.md`) veya Pending delivery review var. Local handoff owner'ı Tech Lead'e ya da planlı successor'a değiştirmiş olsa da completion/reconciliation kontrolü atlanmaz.
 
 Kural:
 
@@ -176,6 +187,7 @@ Her delivery artifact icin kontrol:
   * ayni mantigi uygula
 * `ui-design.md` varsa:
   * UI Designer handoff tamamlandiysa orchestration'da UI Designer phase kapali olmalidir
+* `content-design.md` varsa: task/asset/kanıt ve gerekli insan onayını kontrol et; araç teslimi gerçek içerik yerine geçmez
 * `release.md` varsa:
   * DevOps/Release Engineer readiness verdict'i okunur
   * `Release Blocked` veya `Release Validation Pending` varsa otomatik Done'a gecilmez
@@ -215,12 +227,20 @@ Zorunlu reconciliation ciktilari:
    * Ozellikle inherited path'lerde hangi davranislarin degismeden kaldigi acik mi?
    * Regression riski olan unchanged branch'ler not edildi mi?
 5. Evidence Quality
+   * `prompt-evidence-integrity-standard.md` evidence record alanlari var mi?
    * Test notlari task bazinda yeterince izlenebilir mi?
+   * Komutun gerçek run/revision ve exit/skip sonucu var mı; önceki kanıt kullanılıyorsa değişim etkisiyle hâlâ geçerli olduğu açıklanmış mı?
+   * CI-wired ile CI-executed, build ile boot, mock ile production graph ayrilmis mi?
+   * Test gövdesi gerçek assertion/fail yolu içeriyor mu; başka araca devredilmiş her invariant'ın orada doğrulandığı gösterilmiş mi?
+   * İçerik/veri/config/schema/dependency değişimi eski kanıtı veya ertelenmiş testlerin prerequisite'ini etkiledi mi?
+   * Startup-impact varsa production-shaped cold-boot kaniti veya explicit pending scenario var mi?
    * Artifact, Tech Lead'in kodu tekrar reverse-engineer etmeden handoff verebilmesine yetecek acikligi sagliyor mu?
 
 Karar kurali:
 
+* Reconciliation tamamlanınca Delivery Review = Accepted; eksik/çelişkiliyse Pending yaz
 * Completion sinyali var ama reconciliation basarisizsa otomatik handoff verme
+* Required evidence eksikse completion sinyalini accepted veya Done olarak yorumlama; Pending Evidence ledger'i ac
 * Sorun kod degil, teslim acikligi/izlenebilirligi ise:
   * Current Owner ilgili delivery rolunde kalir
   * acik bir artifact clarification task'i yazilir
@@ -237,13 +257,14 @@ Kayit kurali:
 
 ### DURUM 4 — Development Tamamlandi
 
-Kosul: Feature kapsaminda gereken implementasyon dosyalari mevcut ve DURUM 3.7 completion check'i gecildi.
+Kosul: Kapsamdaki delivery artifact'ları tamam; DURUM 3.7 + 3.8 geçti; Delivery Review = Accepted.
 
 Kural:
 
 * Backend gerekiyorsa `backend.md` mevcut ve tamamlanmis olmali
 * Client implementasyonu gerekiyorsa: client stack Unity/mobil oyun ise `game-dev.md`, degilse `frontend.md` mevcut ve tamamlanmis olmali (ikisi ayni feature'da birlikte zorunlu degildir; `platform.md` client stack alani hangisinin gecerli oldugunu belirler)
 * UI Designer gereken feature'da `ui-design.md` mevcut ve tamamlanmis olmali
+* İçerik planlandıysa content-design.md ve gerçek asset'ler tamamlanmış olmalı
 * Release gate gerekiyorsa DevOps/Release Engineer task'i QA sonrasina veya gerekli CI/CD config turuna acikca planlanmis olmali
 
 QA handoff oncesi Tech Lead su alanlari feature-level authority'ye acikca yazar:
@@ -252,6 +273,10 @@ QA handoff oncesi Tech Lead su alanlari feature-level authority'ye acikca yazar:
 * forbidden actor / misuse / invalid-entry kontrol noktalarini
 * persist/hydrate/reconnect/back/retry/cancel gibi riskli giris yollarini
 * gerekli runtime evidence yontemini (cihaz, simulator, entegrasyon, replay, boot/build)
+* startup-impact degerini ve gerekiyorsa production-shaped cold-boot senaryosunu
+* inherited/shared substrate'tan devralinan pending evidence item'larini
+* Değişimle artık çalıştırılabilir olan ertelenmiş kontrolleri ve her biri için expected assertion/required evidence'i
+* QA brief'i expected verdict veya kanıtla çelişen bir finding'i yasaklayan talimat içermez; root-cause tahmini yalnız hypothesis olarak yazılır
 * approval exit criteria'ni
 * release gate gerekip gerekmedigini ve `Release Scope` degerini
 
@@ -262,8 +287,9 @@ Kural:
 
 Sonra:
 
-* QA'ya gonder
-* Next Role = QA
+* Release Scope none ise QA Stage = final, aksi halde ilk QA functional olur
+* QA task'larını dependency kontrolüyle aktive et; QA Result = None
+* Current Status = In QA; Current Owner = Next Role = QA
 
 ---
 
@@ -302,14 +328,14 @@ Kosul: Birden fazla feature/fix es zamanli QA bekliyor.
 
 Kural:
 
-* QA her seferinde yalnizca tek bir aktif task alir
+* QA tek feature alır; aynı stage'e ait birden fazla task'ı belge/dependency sırasıyla çalışabilir
 
 Yapilacaklar:
 
-1. QA'ya verilecek tek bir aktif task sec
-2. Secilen task'in `orchestration.md` icinde `Current Owner = QA` yaz
-3. Diger bekleyen task'lari `Current Owner = -` veya ilgili rol olarak birak
-4. `system-state.md` icinde `Current Role = QA` ve `Current Phase` yalnizca tek aktif task'i referans alsin
+1. QA'ya verilecek tek bir aktif feature ve stage seç
+2. Seçilen feature'da review/stage/scope'u doğrula; Current Owner = Next Role = QA yaz, stage'e ait task'ları aktive et
+3. Diğer feature'ların QA task'larını Queued bırak; owner/next Tech Lead veya ayrı executable işi olan role ait olsun. İkinci bir QA owner bırakma
+4. `system-state.md` içinde Current Role = QA; Current Phase tek seçili feature/stage'i gösterir, birden fazla aynı-role task'ı yasaklamaz
 5. Feature board notes alaniyla coklu QA sirasi yonetimi kurma
 
 Aktif QA task secim sirasi:
@@ -326,143 +352,70 @@ Ek kural:
 
 ### DURUM 5 — QA Sonucu Geldi
 
-#### Eger Rejected
+Tüm QA sonuçları Tech Lead'e döner. Stage/verdict authority: role-execution-contract.md §5.2.
 
-* Status = Rework
-* QA bulgularina gore root cause belirle:
-  * Backend
-  * Frontend
-  * Game Client (Unity)
-  * DevOps / Release
-  * Integration
-  * Contract
-  * State / Flow
-  * UI Design
+| QA sonucu | Tech Lead geçişi |
+| --- | --- |
+| Functional Approved | Final acceptance değildir. Release task'larını aktive et; In Release / DevOps. |
+| Approved / Approved with Notes | Yalnız final stage. Tüm closure koşullarını doğrula; sonra Done. |
+| Rejected | Rework; finding'leri root cause'a göre ayır ve ilk fix task'ını aktive et. |
+| Decision Pending | Ürün/authority/onay gate'i veya PO revision; developer bugfix uydurma. |
+| Runtime Validation Pending | Scenario bazında owner/target/prerequisite; kanıt task'ı; sonra aynı QA stage. |
 
-Eger birden fazla role ait hata varsa:
+Rework routing:
 
-* Rework Plan olustur
-* Issues'i rol bazinda ayir
-* Fix Order yaz
-* Next Role yalnizca ilk adimi temsil etsin
-* Tum fix sureci tamamlanmadan QA tekrar calistirilmasin
+* İçerik → Content Designer; içerik aracı/kod → ilgili Developer.
+* UI handoff → UI Designer; uygulama → ilgili client Developer.
+* Contract/ürün anlamı → Tech Lead/PO; release/config → DevOps.
+* Çoklu fix varsa dependency sıralı plan yaz; required fix ve review tamamlanmadan QA'yı aktive etme.
+* Executable fix varsa Rework; dış karar/ortam bekleniyorsa Blocked + owner/next Tech Lead.
+* Header, ledger, global state ve Next Action aynı geçişte hizalanır.
 
-Eger tek role ait hata varsa:
+Pending kanıt:
 
-* Next Role = ilgili rol
-
-Onemli kural:
-
-* Sorun implementasyon degil, yanlis veya eksik UI handoff ise Next Role = UI Designer
-* Sorun UI handoff dogru ama uygulama yanlis ise Next Role = Frontend/Mobile Developer (client stack Unity/mobil oyunsa Game Developer (Unity))
-* Sorun gorsel kalite hedefinin altinda kalan handoff ise Next Role = UI Designer
-* Sorun release/deployment/CI-CD/rollback/readiness kaynakli ise Next Role = DevOps/Release Engineer
-
-#### Eger Approved
-
-* Release gate required degilse:
-  * Status = Done
-  * Sonraki uygun feature'a gec
-  * Next Role = sonraki feature icin gerekli ilk rol
-* Release gate required ise:
-  * Status = In Release
-  * Current Owner = DevOps/Release Engineer
-  * Next Role = DevOps/Release Engineer
-  * Release readiness task'i ac
-  * Feature `Done` yapilmaz
-
-#### Eger Approved with Notes
-
-`Approved with Notes`, QA tanımı gereği `Required Fixes` boş ve blocking issue yok anlamına gelir.
-
-Tech Lead, QA notlarını okuyarak aşağıdaki kararlardan birini verir:
-
-* **Notlar gerçekten non-blocking ise:**
-  * Release gate required degilse:
-    * Status = Done
-    * Notları orchestration change log / decision history içinde kaydet
-    * Sonraki uygun feature'a geç
-  * Release gate required ise:
-    * Status = In Release
-    * Current Owner = DevOps/Release Engineer
-    * Next Role = DevOps/Release Engineer
-    * QA notlarını release riskleri olarak DevOps/Release Engineer brief'ine ekle
-
-* **Notlar incelendiğinde fiilen bir düzeltme gerektirdiği görülüyorsa** (QA'nın yanlış verdict verdiği veya notu yeterince öne çıkarmadığı durum):
-  * Status = Rework
-  * Rework Plan oluştur
-  * Root cause belirle
-  * Next Role = gerekli ilk düzeltme rolü
-  * Neden Rework açıldığı change log'a yazılır ("QA Approved with Notes ama şu not Rework gerektiriyor: ...")
-
-Kural: Bu karar Tech Lead'e aittir; QA'nın "Approved with Notes" sinyali otomatik olarak Done tetiklemez.
-
-#### Eger Runtime Validation Pending
-
-* Runtime kaniti release/deploy/staging ile kapatilacaksa:
-  * Status = In Release
-  * Current Owner = DevOps/Release Engineer
-  * Next Role = DevOps/Release Engineer
-  * Pending validation scenarios release task'ina tasinir
-* Runtime kaniti release gate ile kapatilamayacaksa:
-  * Status = Rework veya Blocked
-  * Tech Lead gerekli dogrulama yolunu netlestirir
-
----
+* Bir scenario'nun prerequisite'i bağımsız kontrolü bekletmez.
+* Client/process/CLI/servis kanıtını ilgili developer; CI/deploy kanıtını DevOps hazırlar.
+* Ortak yolu kullanan downstream feature'a pending evidence taşınır.
+* Kanıt geldiğinde QA aynı stage'de tekrar değerlendirir; Tech Lead/DevOps QA adına approval vermez.
 
 ### DURUM 5.5 — Release Readiness Sonucu Geldi
 
-Kosul: `release.md` mevcut ve DevOps/Release Engineer release readiness verdict uretmis.
+* Authority, gerçek run/provenance, scope, skip ve rollback gereksinimlerini doğrula.
+* Release Result alanını artifact'la uzlaştır.
+* Release Ready / Release Ready with Notes → Done değil, QA final stage. Delivery Review'u yenile; QA task'ı aç ve QA Result = None yap.
+* Functional kabul release değişikliklerinden etkilenmişse ilgili functional kapsamı önce yeniden doğrulat.
+* Release Blocked → executable fix için Rework; dış prerequisite için Blocked + Tech Lead.
+* Release Validation Pending → kanıt owner'ına task; dış onay/authority için Tech Lead decision gate.
+* Eski QA Rejected, atanmış DevOps düzeltmesini çalıştırmayı engellemez; giderilmemiş functional blocker varken final readiness/acceptance yoktur.
 
-Tech Lead sunlari reconcile eder:
+### DURUM 5.6 — Closure Gate
 
-1. Release Authority Compliance
-   * `project-authority/release.md` gate policy uygulandi mi?
-   * environment, approval, secret ve rollback kararlarina uyuldu mu?
-2. Gate Evidence
-   * build/test/lint/typecheck/security/deploy-preview/smoke gate'leri kanitlandi mi?
-   * missing gate varsa blocking mi non-blocking mi?
-3. QA Alignment
-   * QA verdict `Approved` veya kabul edilebilir `Approved with Notes` mi?
-   * QA `Runtime Validation Pending` ise pending scenario release evidence ile kapandi mi?
-4. Operational Readiness
-   * rollback plani, smoke validation ve observability yuzeyleri yeterli mi?
+Yalnız bütün koşullarla Done/Closed:
 
-Karar:
+* Delivery Review = Accepted.
+* QA Stage = final; QA Result = Approved veya Approved with Notes.
+* Required release varsa Release Result = Release Ready veya Release Ready with Notes.
+* Açık task, PENDING/FAIL required evidence, blocker veya OPEN decision yok.
+* Kanıt/approval aynı geçerli revision/scope'u kapsıyor; product revision resync tamam.
+* Owner/Next Role/Next Action = -; Active Task Ledger = Handoff Plan = None. Geçmiş arşive taşınır; unfinished iş silinmez.
+* Sonraki feature routing'i kendi orchestration'ına yazılır.
+* `sh ai-system/tools/workflow-state-audit.sh ai-system` full PASS gerekir.
 
-* `Release Ready` ve QA approved ise:
-  * Status = Done
-  * Current Owner = -
-  * Next Role = sonraki feature'in ilk rolu veya Tech Lead
-* `Release Ready with Notes` ise:
-  * Notlar blocking degilse Done olabilir, notlar change log'a yazilir
-  * Notlar fiilen risk doguruyorsa Status = In Release veya Rework kalir
-* `Release Blocked` ise:
-  * Status = Blocked veya Rework
-  * Root Cause = DevOps / Release, Backend, Frontend, Game Client (Unity) veya Contract olarak ayrilir
-  * Next Role = gerekli ilk duzeltme rolu
-* `Release Validation Pending` ise:
-  * Status = In Release
-  * Feature Done yapilmaz
-  * Pending validation CI/CD, preview, staging, smoke veya rollback kanitiyla kapanabilecekse:
-    * Current Owner = DevOps/Release Engineer
-    * Next Role = DevOps/Release Engineer
-    * Next Action = pending validation scenario'lari hangi gate/command/environment ile kanitlanacaksa bunu calistir veya runbook'a bagla
-  * Pending validation external approval, eksik environment, secret ownership veya release authority karari gerektiriyorsa:
-    * Current Owner = Tech Lead
-    * Next Role = Tech Lead
-    * Next Action = eksik approval/environment/authority kararini netlestir; sonra DevOps/Release Engineer veya ilgili role reroute et
+### DURUM 5.7 — Decision / Unblock / Revision Resume
 
-Terminal state kurali:
-
-* `Done` feature icinde `Next Role` ve `Next Action`, tamamlanmis role geri donmemelidir
-* `Done` feature icinde `Next Role` ya `Tech Lead` olur ya da bir sonraki feature'in ilk rolu olur
+* Decision ID'yi Blocked dahil bütün feature'larda exact çözümle; tek OPEN eşleşme gerekir.
+* Seçim, zaman ve scope'u gate'e kaydet; aynı kararı ikinci kez uygulama.
+* Product değişikliği → PO revision → zorunlu Tech Lead resync.
+* Eski Done feature dahil etkilenen contract/kanıt/task'ları yeniden değerlendir.
+* Prerequisite çözülünce mevcut task'ları aktive et; status/owner/next alanlarını hizala.
+* Blocked ledger'ı silme. Tech Lead kontrol işi için delivery task arama.
+* Pending Product Revision flag'ini ancak etki kaydı ve routing sonrası temizle.
 
 ---
 
 ### DURUM 6 — Tum Feature'lar Done (End of Project)
 
-Kosul: `feature-board.md` icindeki tum feature'larin Status = `Done` oldugu durum.
+Kosul: Bütün kapsam-içi feature'lar Done/Closed; açık revision/kanıt/karar/task yok.
 
 Yapilacaklar:
 

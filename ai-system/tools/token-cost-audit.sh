@@ -39,6 +39,7 @@ Supported role filters:
   product-owner, po
   tech-lead, tl
   technical-analyst, ta
+  content-designer, content
   ui-designer, ui
   backend, be
   frontend, fe
@@ -436,6 +437,10 @@ profile "Technical Analyst" "technicalanalyst ta analyst" \
   "prompts/technical-analyst.md" \
   "role-execution-contract.md" \
   "system-state.md"
+profile "Content Designer" "contentdesigner content" \
+  "prompts/content-designer.md" \
+  "role-execution-contract.md" \
+  "system-state.md"
 profile "UI Designer" "uidesigner ui designer" \
   "prompts/ui-designer.md" \
   "role-execution-contract.md" \
@@ -498,6 +503,9 @@ printf "%-36s %8s   %s\n" "prompt-input-authority-standard" \
 printf "%-36s %8s   %s\n" "prompt-input-integrity-standard" \
   "$(file_tokens_active "$ROOT/prompt-input-integrity-standard.md")" \
   "Frontend, Game Developer, UI Designer, QA"
+printf "%-36s %8s   %s\n" "prompt-evidence-integrity-standard" \
+  "$(file_tokens_active "$ROOT/prompt-evidence-integrity-standard.md")" \
+  "Tech Lead, QA, Project Setup, Developer, DevOps, Content"
 
 echo
 echo "## Conditional Cost Add-ons"

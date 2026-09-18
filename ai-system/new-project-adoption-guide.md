@@ -178,6 +178,7 @@ Diagnostic tooling:
 
 ```bash
 sh ai-system/tools/token-cost-audit.sh ai-system
+sh ai-system/tools/workflow-state-audit.sh ai-system
 sh ai-system/tools/token-cost-audit.sh ai-system --role qa
 sh ai-system/tools/token-cost-audit.sh ai-system --role unity
 sh ai-system/tools/token-cost-audit.sh ai-system --estimator auto
@@ -186,7 +187,8 @@ sh ai-system/tools/token-cost-audit.sh ai-system --baseline <approved-baseline> 
 
 Not:
 
-* Audit araci role activation input'u degildir; manuel maliyet takibi icin kullanilir.
+* Token-cost audit manuel maliyet takibidir. Workflow-state audit handoff/Done gate'idir; Node.js 18+ ister, paket kurulumu veya dosya değişikliği yapmaz. Delivery `--local`, Tech Lead full mod kullanır; `--structure-only` yalnız tanıdır.
+* Eski kurulumlarda canlı dosyaları starter ile ezme; README içindeki Mevcut Kurulumda Core Güncellemesi adımlarını ve Tech Lead resync'i uygula. Kanıt olmadan approval üretme.
 * Ilk implementasyonda `--baseline/--budget` zorunlu degildir; once proje baseline'i kaydedilir.
 * Sonraki core guncellemelerinde `--baseline <approved-baseline> --budget <project-budget>` regression kontrolu olarak kullanilir.
 * `--estimator auto`, `python3+tiktoken` varsa tokenizer sayimi kullanir; yoksa `chars/4` fallback ile devam eder.
@@ -199,6 +201,7 @@ Not:
 
 * Standart web/mobil/native app client'larında `Frontend/Mobile Developer` çalışır ve `frontend.md` üretir.
 * Client Type `game (Unity)` ise `Game Developer (Unity)` çalışır ve `game-dev.md` üretir.
+* Ayrı içerik kararları gerektiren metin, yerelleştirme, eğitim veya veri paketi için `Content Designer` çalışır ve `content-design.md` ile gerçek asset'leri üretir; araç ve entegrasyon kodu developer rolünde kalır.
 * Aynı feature'da `Frontend/Mobile Developer` ve `Game Developer (Unity)` eşzamanlı client owner yapılmaz; route `orchestration.md -> Next Role` üzerinden netleşir.
 * Unity oyunlarda `ui-design.md`, meta ekranlar veya Game Visual/HUD Direction gereken kapsamlar için Game Developer'a visual/state authority sağlayabilir.
 * Yeni HUD sistemi, FTUE/tutorial overlay, win/lose/reward reveal, premium polish veya reference-title hedefi varsa UI Designer önce Game Visual/HUD Direction üretmeli; Game Developer bunu uygular.

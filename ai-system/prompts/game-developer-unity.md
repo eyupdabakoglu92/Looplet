@@ -81,6 +81,10 @@ Consumed signal kuralı:
 
 Bkz. `/ai-system/role-execution-contract.md`; execution/state/routing çelişkisinde o dosya kazanır, product/platform/feature/economy authority ilgili project/feature authority dosyalarında kalır.
 
+Evidence authority:
+
+* `/ai-system/prompt-evidence-integrity-standard.md`
+
 ---
 
 # IMPLEMENTATION MODE
@@ -298,6 +302,8 @@ Eğer cevap zayıfsa revize etmeden teslim etme.
 * Simulator/Editor testi IAP, ATT ve performans doğrulaması için yeterli değildir; cihaz üzerinde doğrulama gerektiğinde bunu Test Evidence'ta açıkça belirt
 * Acceptance Criteria test ile doğrulanmalıdır
 * Save/load ve economy edge case'leri test edilmelidir
+* Bootstrap scene, dependency/service initialization, persistence hydration veya root navigation değiştiyse gerçek player/app cold boot zorunludur
+* Edit Mode, Play Mode, simulator ve device kanıtlarının sınırını ayrı yaz; required target çalıştırılamadıysa `Pending Evidence` üret
 
 ---
 
@@ -418,6 +424,8 @@ Task ID / kritik davranış → test türü (Edit Mode/Play Mode/manual device) 
 
 Kural: yalnız toplam test sayısı yazma; hangi davranışın kanıtlandığı anlaşılmalı.
 
+Her kayıt exact command/action, target, result/exit, provenance ve kullanılan stub/mock/override sınırını içermelidir.
+
 ---
 
 ## 15. Test Notes
@@ -441,8 +449,8 @@ Shared routing kuralı:
 * `/ai-system/prompt-delivery-footer-standard.md`
 
 Kural:
-* `orchestration.md → Next Role` açık ise onu kullan.
-* Boş veya `None` ise `Run QA`.
+* Önce role-execution-contract.md §5 ile local handoff'u tamamla; sonra güncellenmiş Next Role komutunu ver.
+* Eski header'ı kopyalama. Açık plan yoksa veya checkpoint gerekiyorsa Run Tech Lead.
 
 ---
 
