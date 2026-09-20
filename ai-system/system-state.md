@@ -1,6 +1,6 @@
 # System State — LOOPLET
 
-Last Updated: 2026-09-20
+Last Updated: 2026-09-21
 
 ## Platform Initialized
 
@@ -40,28 +40,28 @@ features/f03-puzzle-play-session/orchestration.md
 
 ## Current Phase
 
-F03 final QA re-verify
+F03 rework (F03-QA-03 / F03-QA-04)
 
 ## Current Role
 
-QA
+Frontend/Mobile Developer
 
 ## Current Reason
 
-F03 final QA (2026-09-20, rev 7a907dd) returned Rejected. The rework is delivered: contract resolution (architecture §18), the UI Designer's `Won composition` (ui-design §16), and the Frontend/Mobile Developer's implementation (win sequence then a capped panel with the answer docked; device-form integration suite fixed). The Tech Lead reproduced the gates and the device suite at HEAD cf8d8f0 and accepted the delivery. QA re-verifies the win path, the unchanged paths that share the edited screen, and the route-A scenarios (rotation, live lifecycle, AC9), for which macOS Accessibility was observed granted. F05/F08 stay queued.
+F03 re-verify QA (2026-09-20, rev c0cba44) closed F03-QA-01/02 and returned Rejected on two new defects: F03-QA-03 (an OS interruption during a held drag commits the move) and F03-QA-04 (iOS Reduce Motion is not honoured; the app reads only `disableAnimations`). The Tech Lead's incident intake (ai-system upgrade cfd6b59) reconciled that verdict, opened F03-FE-CANCEL and F03-FE-REDUCEMOTION, normalized F03 to the new orchestration schema (Visual Scope none for this behavioural reopen) and defined the Design Adoption Route for the new Design Foundation / Visual Quality Gate (workflow-follow-ups.md).
 
 ## Last Completed Action
 
-Tech Lead delivery reconciliation: analyze 0, format 0, 197 package + 214 app tests, device suite 12/12 exit 0 reproduced at cf8d8f0; Delivery Review = Accepted; F03-QA-REVERIFY activated with an updated brief. No app code, package, product or release file changed by the Tech Lead. Full workflow audit PASS after this transition.
+Tech Lead incident intake 2026-09-21: reviewed the upgraded ai-system (design, QA and audit changes), synchronized board/system-state with the QA verdict, routed the fixes, added platform.md §14 capture baseline and the Design Adoption Route. No app code, package, product or release file changed. Workflow audit PASS after this transition.
 
 ## Next Expected Action
 
-Run QA on F03-QA-REVERIFY (final stage). The verdict returns to Tech Lead, who then activates F05-QA-STRICT or the appropriate rework/evidence task.
+Run Frontend/Mobile Developer on F03-FE-CANCEL and F03-FE-REDUCEMOTION. Then Tech Lead reconciliation, QA F03-QA-REVERIFY2, and only after that verdict the Design Foundation phase (UI Designer, user selection decision).
 
 ## Portfolio Summary
 
 * F01, F02, F04, F06: historical scoped Done retained.
-* F03: In QA (final re-verify); first final QA Rejected 2026-09-20, rework delivered and accepted; runtime-limits decision RESOLVED = A, Accessibility observed granted.
+* F03: Rework; final re-verify Rejected 2026-09-20 (F03-QA-03/04 open, F03-QA-01/02 closed); Visual Scope none for this reopen; whole-surface visual conformance pending the Design Adoption Route.
 * F05: In Progress; real strict content delivered (bundle mirrors content/journey), QA queued behind F03 rework + re-QA, final verdict None.
 * F08: In Progress, queued behind F03 rework; independent local/emulator validation pending, release task Blocked, release/final acceptance pending.
 * F07, F09–F13: Not Started. Pending follow-ons are in workflow-follow-ups.md.
@@ -72,8 +72,9 @@ F08.DEPLOY-AUTHORIZATION is OPEN with Blocking Scope = release. The old deferral
 
 ## Global Risks
 
-* F03 win moment (F03-QA-01): fix delivered (win sequence, then the answer docked above a capped panel); awaiting independent QA. F04's panel code changed with it (F04 stays Done, tests green).
-* Rotation, live app-lifecycle-during-gesture and drag highlight are unproven on any target; route A chosen (F03.RUNTIME-LIMITS), Accessibility observed granted but not yet used by QA; Info.plist still allows landscape, so the portrait lock rests on one runtime call.
+* F03-QA-03 (interrupted drag commits a move) and F03-QA-04 (iOS Reduce Motion ignored) are open product defects; F04/F05 reduce-motion reads share the fix.
+* No Design Foundation exists; shipped visuals (default font, Material icons, text-only legacy ui-designs, self-scores only) have not passed the independent Visual Quality Gate. Any surface reopened as visual work will be gated (>= 93 total, every dimension >= 8). See Design Adoption Route.
+* Rotation, AC9 highlight, back/exit and won-moment regular motion passed runtime QA (rev c0cba44); live lifecycle and reduced-motion runtime remain FAIL/pending until the fixes land. Info.plist still allows landscape; the portrait lock rests on runtime behaviour (rotation PASS).
 * Required device/manual evidence is not established by a widget test, build or a planned CI job.
 * Startup/resume/persistence proof is shared by consuming features; reconcile the actual scope before clearing a downstream gate.
 * F08 cold-boot fix evidence exists in prior delivery/Tech Lead reports; QA must review applicable provenance, not invent an approval.

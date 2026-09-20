@@ -1,6 +1,6 @@
 # Workflow Follow-ups — LOOPLET
 
-Last Updated: 2026-09-20
+Last Updated: 2026-09-21
 
 These are retained, unresolved portfolio items. They do not authorize execution by themselves and are not completed merely because their source feature's scoped delivery is Done. Tech Lead must bring the applicable item into the owning feature's ledger/authority before delivery. Original wording and history remain in history/core-sync-2026-09-18/.
 
@@ -20,6 +20,20 @@ These are retained, unresolved portfolio items. They do not authorize execution 
 | F07.OFFLINE-DAILY | OPEN | Frontend/Mobile Developer / QA; F07 | Real Daily producer, Remote Config seam and offline pre-fetched Daily proof; fake producer is not end-user coverage. | F08 qa.md and existing F07 dependency. |
 | F08-PLATFORM-ATTESTATION | DEFERRED | Tech Lead / DevOps; applicable platform release | Existing post-MVP attestation and release identity/CI-secret ownership notes; no enforcement/policy change during migration. | F08 architecture and release authority. |
 | OPTIONAL-QUALITY-NOTES | OPEN / non-blocking | Relevant role when touching scope | F04 reduced-motion assertion; F05 pulse-direction cosmetic and routeLog robustness; F02 Phase-2 coverage; previously noted analyzer cleanup; app/pubspec.yaml still carries an "Interim — 5 files" comment and melos `content:sync` says "no-op until F06-CONTENT" although the bundle now holds the 30-level pack (comment-only, Frontend/Mobile Developer on next touch). F03 won moment: the 30 ms L→R amber stagger in F03 ui-design (§8/§16.2) was never implemented (tiles switch together) and PanelDensity engagement at large text is not test-asserted (Frontend/Mobile Developer / UI Designer if a polish pass is wanted). Do not invent blockers or claim completion. | Source qa.md reports and archived orchestrations. |
+
+## Design Adoption Route (incident 2026-09-21)
+
+Trigger: ai-system upgrade cfd6b59 added the Design Foundation, Visual Quality Gate (independent QA, >= 93 total, every dimension >= 8, rendered evidence) and modular QA. The project has no Selected Foundation; shipped F03/F04/F05 visuals use the default system font and Material icons, legacy ui-designs are text-only, and only self-scores exist. This route is planning input; Tech Lead activates each phase in the owning orchestration.
+
+| Phase | Owner | Scope and exit | Activation trigger |
+| --- | --- | --- | --- |
+| A. Close behavioural rework | Frontend/Mobile Developer, QA | F03-QA-03/04 fixed and re-verified (Visual Scope none). | Now (F03 orchestration). |
+| B. Design Foundation | UI Designer; decision by user/PO or explicitly delegated Tech Lead | `project-authority/design-foundation.md`: >= 2 materially different RENDERED directions on real screens (Play, won moment, Home/Journey), typography with Turkish glyph proof (İ ı Ş Ğ Ç Ö Ü) and tabular figures, icon set, tokens, motion language, capture targets (platform.md §14). Decision gate DESIGN-FOUNDATION-SELECTION (OPEN until the user selects). Status Selected + decision reference. | After Phase A verdict is reconciled. |
+| C. Conformance audit | UI Designer, Tech Lead | Per shipped surface (F03 play + won moment, F04 panel, F05 home/journey/tutorial): existing-parity or new-surface classification, gap list against the Foundation, priority order. Output: Visual Scope per feature and reopen decisions; no code. | Foundation Selected. |
+| D. Conformance delivery | UI Designer, Frontend/Mobile Developer, independent QA | One surface at a time: Foundation-conformant ui-design with rendered evidence, gate Ready for Implementation, implementation with Visual Evidence Manifest, gate Ready for QA, QA visual-quality module verdict, gate Passed. Motion-critical surfaces need video/frame-sequence evidence. | Phase C classification; rework-control rule applies per feature. |
+| E. New features | Tech Lead | F07, F09, F10, F11, F13 (and any surface-bearing change) start with a Visual Scope, design conformance to the Selected Foundation, and the gate. | Foundation Selected. |
+
+Rules: no feature with Visual Scope other than none is activated for QA before Foundation Selected; terminal Done for a visual feature requires gate Passed; Phase D reopens are tracked as visual rework, not silent edits; Android capture stays Pending (ANDROID-CI-EVIDENCE) and is stated as a limit in every visual verdict.
 
 ## Required Migration Follow-through
 

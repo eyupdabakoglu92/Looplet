@@ -10,11 +10,11 @@ Rework
 
 ## Current Owner
 
-Tech Lead
+Frontend/Mobile Developer
 
 ## Next Role
 
-Tech Lead
+Frontend/Mobile Developer
 
 ## Active Task Ledger
 
@@ -23,6 +23,9 @@ Tech Lead
 - [x] Task ID: F03-FE-WON | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: DELIVERED 2026-09-20 (frontend.md; F03.WIN-LAYOUT 33/33). F03-QA-01: implement win-sequence-then-panel sequencing (panel not before T0+600 ms) and the UI Designer's Won composition; add widget/golden layout assertions; update frontend.md | Depends On: F03-UI-WON
 - [x] Task ID: F03-FE-INTEG | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: DELIVERED 2026-09-20 (12/12 exit 0 on 3 simulator widths). F03-QA-02: make integration_test/play_session_test.dart group 4 complete and exit 0 on a live simulator on 2 widths; no product-semantics change | Depends On: -
 - [x] Task ID: F03-QA-REVERIFY | Assigned Role: QA | Status: Done | Summary: DONE 2026-09-20 — verdict Rejected (F03-QA-03, F03-QA-04; qa.md). Re-verify F03 final on the changed win path per Planned QA Re-verify Brief; independent verdict | Depends On: F03-FE-WON, F03-FE-INTEG
+- [ ] Task ID: F03-FE-CANCEL | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: F03-QA-03: a pointer cancel (OS interruption) must abort the drag with no move; releases (incl. outside the plate) keep resolving; real-PointerCancel tests; see Current Frontend Brief | Depends On: -
+- [ ] Task ID: F03-FE-REDUCEMOTION | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: F03-QA-04: honour iOS Reduce Motion (reduceMotion OR disableAnimations) through one shared helper at all six call sites (F03, F04, F05); tests for both flags; see Current Frontend Brief | Depends On: -
+- [ ] Task ID: F03-QA-REVERIFY2 | Assigned Role: QA | Status: Queued | Summary: Re-verify F03-QA-03/04 and the paths the fixes touch per Planned QA Re-verify Brief 2; independent verdict | Depends On: F03-FE-CANCEL, F03-FE-REDUCEMOTION
 
 ## Open Tasks
 
@@ -34,7 +37,7 @@ None
 
 ## Delivery Review
 
-Accepted
+Pending
 
 ## QA Scope
 
@@ -55,6 +58,34 @@ none
 ## Release Result
 
 None
+
+## Visual Scope
+
+none
+
+## Design Foundation
+
+Not Required
+
+## Visual Quality Gate
+
+Not Required
+
+## Visual Evidence
+
+None
+
+## QA Modules
+
+none
+
+## Regression Depth
+
+not-set
+
+## Evidence Reuse
+
+not-evaluated
 
 ## Pending Evidence
 
@@ -157,6 +188,36 @@ None
   * Result: PASS
   * Provenance / Note: 2026-09-20 QA, rev c0cba44: analyze 0, format:check 0, 197 package + 214 app tests, debug simulator build 0; device suite 12/12 exit 0 on 16e and Pro Max (QA) — independent of Frontend/Tech Lead runs
 
+- Evidence ID: F03.CANCEL-TEST
+  * Scenario: a real PointerCancel during a drag (OS interruption) leaves MOVES unchanged, phase idle and no persisted move; genuine releases (incl. beyond the plate) still resolve
+  * Required Class: automated functional
+  * Target / Environment: app widget tests (`TestGesture.cancel()`), integration group 4 without pumping while paused
+  * Owner Role: Frontend/Mobile Developer
+  * Prerequisite / External Decision: None
+  * Re-evaluation Trigger: F03-FE-CANCEL delivery
+  * Blocks: F03 final acceptance
+  * Result: PENDING
+
+- Evidence ID: F03.REDUCE-MOTION-FLAG
+  * Scenario: every reduce-motion call site (home_screen, column_tutorial_overlay, completion_panel ×2, play_session_screen, puzzle_board) reacts to `reduceMotion` and to `disableAnimations`
+  * Required Class: automated functional
+  * Target / Environment: app widget tests with `FakeAccessibilityFeatures(reduceMotion: true)` and `(disableAnimations: true)`
+  * Owner Role: Frontend/Mobile Developer
+  * Prerequisite / External Decision: None
+  * Re-evaluation Trigger: F03-FE-REDUCEMOTION delivery
+  * Blocks: F03 final acceptance
+  * Result: PENDING
+
+- Evidence ID: F03.REDUCE-MOTION-RUNTIME
+  * Scenario: with the real Settings toggle ON: F03 win (static hold → fade → panel, no glide/slide), F04 star reveal settled, F05 ring static
+  * Required Class: runtime
+  * Target / Environment: iPhone 16 simulator, Settings > Accessibility > Motion > Reduce Motion
+  * Owner Role: QA
+  * Prerequisite / External Decision: F03-FE-REDUCEMOTION delivered
+  * Re-evaluation Trigger: After F03-FE-REDUCEMOTION delivery is Accepted
+  * Blocks: F03 final acceptance
+  * Result: PENDING
+
 ## Open Decision Gates
 
 - Decision ID: F03.RUNTIME-LIMITS
@@ -173,22 +234,21 @@ None
 
 ## Blockers
 
-* F03-QA-03 — an OS interruption during a drag commits the swipe as a move; architecture §12 says cancel with no move (Contract Violation, Medium). See qa.md §8/§18.
-* F03-QA-04 — iOS Reduce Motion is not honoured (code reads disableAnimations; iOS exposes reduceMotion), so the §16.2 reduced-motion path is unreachable on iOS (Functional/Accessibility, Medium); same check in F04/F05. See qa.md §8/§18.
+None
 
 ## Next Action
 
-Run Tech Lead: QA verdict is Rejected (F03-QA-03, F03-QA-04); F03-QA-01 and F03-QA-02 are verified closed. Scope both fixes (QA-03: treat a pointer cancel as an abort in PuzzleBoard, real-cancel test; QA-04: shared reduceMotion || disableAnimations helper across F03/F04/F05 call sites, tests for both flags), decide the F04/F05 acceptance impact, route Frontend/Mobile Developer, then re-activate F03 final QA. No evidence is pending; F03.RUNTIME-LIMITS is fully used. F05 and F08 stay queued.
+Run Frontend/Mobile Developer on F03-FE-CANCEL and F03-FE-REDUCEMOTION using the Current Frontend Brief. Delivery returns to Tech Lead for reconciliation before F03-QA-REVERIFY2. Both fixes are behavioural (no new or changed visual output). F03's visual acceptance under the new Visual Quality Gate is handled by the design adoption program (workflow-follow-ups.md → Design Adoption Route), not by this closure.
 
 ## Last Decision
 
-2026-09-20 — QA Rejected F03 (F03-QA-01 win sequence/geometry, F03-QA-02 integration group 4). Tech Lead: (1) sequencing is an implementation defect — F03 §10, F03 ui-design and F04 ui-design already agree that the panel follows the ≤600 ms win sequence; (2) the F04 "winning row stays visible above a 56–66 % panel" line cannot hold for rows 1–4, so geometry goes to the UI Designer first, F03 `Won composition` wins over F04 §5 numbers where they conflict, F04 stays Done; (3) F03-QA-02 goes to Frontend/Mobile Developer; (4) rotation, live lifecycle and AC9 highlight need a target/tool the user controls → decision F03.RUNTIME-LIMITS; resolved A on 2026-09-20 (Accessibility-enabled simulator automation). Update 2026-09-20 (reconciliation): frontend delivery accepted (see Delivery Reconciliation), F03-QA-REVERIFY activated. Update 2026-09-20 (earlier): user resolved F03.RUNTIME-LIMITS = A. Retro-rework rule applied: no QA/DevOps owner is assigned to F05/F08 while F03 rework is open. No product criterion, package or app code was changed.
+2026-09-20 — QA Rejected F03 (F03-QA-01 win sequence/geometry, F03-QA-02 integration group 4). Tech Lead: (1) sequencing is an implementation defect — F03 §10, F03 ui-design and F04 ui-design already agree that the panel follows the ≤600 ms win sequence; (2) the F04 "winning row stays visible above a 56–66 % panel" line cannot hold for rows 1–4, so geometry goes to the UI Designer first, F03 `Won composition` wins over F04 §5 numbers where they conflict, F04 stays Done; (3) F03-QA-02 goes to Frontend/Mobile Developer; (4) rotation, live lifecycle and AC9 highlight need a target/tool the user controls → decision F03.RUNTIME-LIMITS; resolved A on 2026-09-20 (Accessibility-enabled simulator automation). Update 2026-09-21 (incident intake, ai-system upgrade cfd6b59): QA verdict (F03-QA-03/04, F03-QA-01/02 closed) reconciled; both defects routed to Frontend/Mobile Developer; feature normalized to the new schema with Visual Scope = none for THIS reopen (the reopen delta is behavioural: pointer-cancel handling and the Reduce Motion flag; no visual output is added or changed) — legacy F03 visuals were accepted under the legacy rubric and are re-evaluated for the whole surface by the design adoption program, which can reopen F03 as visual rework if the independent visual verdict is < 93 / any dimension < 8. Update 2026-09-20 (reconciliation): frontend delivery accepted (see Delivery Reconciliation), F03-QA-REVERIFY activated. Update 2026-09-20 (earlier): user resolved F03.RUNTIME-LIMITS = A. Retro-rework rule applied: no QA/DevOps owner is assigned to F05/F08 while F03 rework is open. No product criterion, package or app code was changed.
 
 ## Last Update
 
-* Updated By: QA
-* Timestamp: 2026-09-20
-* Summary: F03-QA-REVERIFY executed on rev c0cba44 (simulators 16/16e/16 Pro Max, Accessibility route): verdict Rejected; F03-QA-01/02 closed; new F03-QA-03/04; ROTATION and AC9 PASS; qa.md replaced.
+* Updated By: Tech Lead
+* Timestamp: 2026-09-21
+* Summary: QA verdict reconciled; fixes routed; schema normalized (Visual Scope none for this reopen); QA plan fields left at defaults until QA activation.
 
 ## Context & Follow-ups
 
@@ -212,6 +272,7 @@ F03 implementation is retained; F04/F05 integration code stays; the rework deliv
 * 2026-09-20 — Frontend/Mobile Developer: F03-FE-WON and F03-FE-INTEG delivered; owner → Tech Lead.
 * 2026-09-20 — Tech Lead: delivery reconciled (Accepted); Accessibility observed granted; F03-QA-REVERIFY Open, status In QA.
 * 2026-09-20 — QA: re-verify verdict Rejected (F03-QA-03, F03-QA-04); F03-QA-01/02 closed.
+* 2026-09-21 — Tech Lead: incident intake (ai-system upgrade): verdict reconciled, F03-FE-CANCEL / F03-FE-REDUCEMOTION opened, visual/QA-plan schema fields added.
 
 ## Current UI Brief
 
@@ -236,13 +297,18 @@ Non-goals: F04 product ACs, star/best logic and copy; new features; controller/p
 
 Decisions on the delivery's notes: (a) row-0 strip left visible between docked row and panel — accepted as specified; QA judges it visually against the rubric, no rework unless QA finds a fail condition. (b) the 30 ms L→R amber stagger from the original ui-design was never implemented (pre-existing, not in scope) — recorded in workflow-follow-ups.md as a non-blocking quality note; QA must not invent a blocker but may report it. (c) `PanelDensity` engagement at large text is not asserted by tests — QA checks it at a large Dynamic Type size. (d) latent: a session restored straight into `won` (unreachable in production because the snapshot is cleared at `won`) would show no docked row until a rebuild — recorded as a note only.
 
-## Current QA Brief (F03-QA-REVERIFY — final, client-only)
+## Current Frontend Brief (F03-FE-CANCEL, F03-FE-REDUCEMOTION — activated 2026-09-21)
 
-Environment: simulators iPhone 16e (390) / 16 (393) / 16 Pro Max (440), debug build of HEAD, real `main.dart` root; Accessibility is granted — probe it first.
+Read: qa.md §8 (F03-QA-03, F03-QA-04), architecture.md §12 (backgrounding) and §18 (Won-sequence authority), ui-design.md §16.2 (reduce motion).
 
-1. **F03-QA-01 closure (F03.VISUAL, F03.WIN-LAYOUT cross-check).** Frame-capture (`simctl io recordVideo` + frame sheet) the won moment on every winning row reachable in the bundle (debug smoke L1 row 0, L6 row 2; Journey levels via CONTINUE — find and record other rows) with Perfect and non-Perfect results and first-clear / matched / newBest variants (Retry loops). Verify: amber row visible for the win sequence, dock glide, panel after ≥ 600 ms, docked row + seam visible above the panel at rest, star reveal after rest, nothing clipped. Judge the residual dimmed row-0 strip and the missing amber stagger against ui-design.md and the rubric; report, do not invent blockers.
-2. **F03-QA-02 / F03.INTEG-DEVICE.** Run the device suite yourself on ≥ 2 simulator widths; exit 0 required.
-3. **Large text / reduce motion.** Set a large Dynamic Type size (`xcrun simctl ui <UDID> content_size accessibility-large` or similar) and confirm the panel is unclipped, controls tappable and the docked row still clear; if feasible enable Reduce Motion and confirm the static hold → fade → panel sequence.
-4. **Route A scenarios (F03.ROTATION, F03.LIFECYCLE-LIVE, F03.AC9-HIGHLIGHT).** Probe Accessibility (rotate the simulator; send a keystroke; press HOME while a touch is held). Then: rotation attempt leaves the portrait layout unchanged; HOME during a held drag and within ~190 ms of a shift → settled state, no lost/half move; capture the row/column lift and rail highlight during a held drag. If the probe fails record Runtime Validation Pending with the exact error — no static substitution. Greyscale: use an OS colour filter if it can be driven; otherwise say so.
-5. **Re-spot-check unchanged paths on the real app** (play_session_screen.dart changed): chevron, iOS edge-swipe, replaced-route exit after Next Level, Close, Retry, kill/relaunch resume (CONTINUE and debug entry), tampered thaw cache on the real store, a sub-threshold / rejected / multi-touch / diagonal set, locked pivot and frozen tile. Reuse the 2026-09-20 PASS only where the path is provably unchanged, with the reason.
-6. Record command, target, exit, counts and revision for every claim; independent verdict; return to Tech Lead for every outcome. Storage-full injection stays out (F08.STORAGE).
+F03-FE-CANCEL — QA reproduced 3× that an OS app switch during a held drag commits the swipe (persisted `R3`/`R4`). Verify the hypothesis before fixing: add a test that sends a real `PointerCancel` mid-drag and observe today's behaviour; then make a cancel abort the gesture (no `endDrag` resolution, no move, phase → idle, highlight cleared) while `_onPanEnd` releases — including a release outside the plate — keep resolving. Do not change threshold, tie band, undo/restart, persistence or the idle-pause path. Add tests (widget with `TestGesture.cancel()`; integration group 4 case that never pumps while paused) and record command/exit/counts.
+
+F03-FE-REDUCEMOTION — iOS Reduce Motion arrives as `AccessibilityFeatures.reduceMotion` ("Only supported on iOS"); the app reads only `disableAnimations` at six sites: `home_screen.dart:144`, `journey/column_tutorial_overlay.dart:49`, `rating/completion_panel.dart:110` and `:137`, `play/play_session_screen.dart:367`, `play/widgets/puzzle_board.dart:105`. Introduce one shared helper (`reduceMotionRequested = reduceMotion || disableAnimations`) and use it at every site; decide and document the `AnimationController.animationBehavior` consequences (won controllers already use `preserve`). Tests: each site under `FakeAccessibilityFeatures(reduceMotion: true)` and `(disableAnimations: true)`. F04/F05 acceptance criteria are unchanged (accessibility behaviour only); their suites must stay green; state the F04/F05 files touched and the change impact in frontend.md. No visual change on the normal-motion path.
+
+Deliver in frontend.md: task-to-code traceability, preserved behavior, evidence per task (exact commands, targets, exit, counts, revision), the mirror-vs-real limits (widget tests cannot prove the iOS flag or the OS touch cancel; QA does). Close both tasks, Delivery Review = Pending, owner → Tech Lead.
+
+## Planned QA Re-verify Brief 2 (F03-QA-REVERIFY2 — activate only after Tech Lead reconciliation)
+
+Plan fields to write at activation (then `node ai-system/tools/qa-preflight.mjs ai-system` must PASS): QA Scope client-only · QA Stage final · **QA Modules: core, client-ui, stateful-flow** (lifecycle / persistence / interruption) · **Regression Depth: full** (final gate; shared lifecycle/gesture code) · **Evidence Reuse: allowed**, per the fingerprints below · Visual Scope none ⇒ no visual-quality module.
+
+Reuse (rev c0cba44, valid only where the changed files do not touch the path): REUSED — rotation (main.dart/Info.plist unchanged), kill/relaunch resume and persistence (controller/persistence unchanged), chevron / edge-swipe / replaced-route exit, F04 variants and won-moment regular-motion frames (spot-check rows 0 and 4 only). INVALIDATED — anything through `puzzle_board.dart` gesture handling (AC9 lift, cancel/release, mid-drag lifecycle), every reduce-motion path (F03 won, F04 reveal, F05 ring/tutorial). Must be executed independently this run: OS app switch during a held drag (no move, idle), Reduce Motion via the real Settings toggle on F03 win + F04 panel + F05 home ring, integration suite on ≥ 2 widths, gates (analyze/format/tests). Report as EXECUTED THIS RUN / REUSED / INVALIDATED / PENDING per prompt-qa-evidence-reuse-standard.md.

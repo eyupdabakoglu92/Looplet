@@ -1,6 +1,6 @@
 # Project Platform Authority — LOOPLET
 
-Last Updated: 2026-09-06 (§3 + §11 shared-enum carve-out extended at F06 close-out; §6 guest-identity decouple + §13 Drift-schema/App-Check notes at F08 contract finalization; §13 App Check provider selection + iOS-App-Attest-deferred at F08 Firebase-project incident)
+Last Updated: 2026-09-21 (§14 visual capture / asset / motion baseline added for the Visual Quality Gate; §3 + §11 shared-enum carve-out extended at F06 close-out; §6 guest-identity decouple + §13 Drift-schema/App-Check notes at F08 contract finalization; §13 App Check provider selection + iOS-App-Attest-deferred at F08 Firebase-project incident)
 Owner: Tech Lead
 
 ---
@@ -202,3 +202,41 @@ Melos-managed monorepo. Domain packages import **no** Flutter.
 * **Daily offline-result sync surface (F08):** HTTPS Callable `submitDailyResultV1` (the "one RPC-style callable" from §4), not a direct client Firestore write. Contract locked in F08's `architecture.md`.
 * **Level editor surface (F06):** CLI-only for the MVP (`solve`/`playtest`/`export`/`check`/`fill`); a Flutter desktop editor is a Future Consideration. Locked 2026-09-05 in F06's `architecture.md`.
 * **Product-analytics depth (F12):** GA4 built-in funnels/retention are assumed sufficient for the §52 gate; a dedicated tool (PostHog/Amplitude) is a Future Consideration only if GA4 proves insufficient.
+
+---
+
+# 14. Visual Capture, Asset and Motion Baseline (added 2026-09-21 — `design/visual-quality-gate.md`)
+
+Facts as verified on the running app (F03 QA runs, 2026-09-20). Where this section says **Pending**, a visual claim on that surface cannot PASS.
+
+## Canonical visual capture target
+
+* **Primary:** iOS Simulator, portrait, iOS 18.6 — iPhone 16 (393×852 pt, primary reference), iPhone 16e (390×844, smallest), iPhone 16 Pro Max (440×956, largest). Debug build of the exact revision under review: `flutter build ios --debug --simulator`, installed with `xcrun simctl install`.
+* **Android:** no emulator/device capture exists or is planned yet. Any Android visual claim is **Pending**; iOS evidence does not stand in for it.
+* Physical-device capture: not available in the current environment; simulator pointer input is synthetic (gesture accuracy claims need a physical-finger pass — see F03 QA notes).
+
+## Screenshot / recording / state-forcing methods (proven)
+
+| Need | Method |
+| --- | --- |
+| Still capture | `xcrun simctl io <UDID> screenshot <file>.png` (native 1179×2556 on iPhone 16) |
+| Motion capture | `xcrun simctl io <UDID> recordVideo --codec h264 --force <file>.mov`, stop with SIGINT; frame sequences extracted with an AVFoundation (Swift) contact-sheet tool at 40–60 ms steps |
+| Dynamic Type | `xcrun simctl ui <UDID> content_size <category>` (verified through accessibility-medium) |
+| Reduce Motion | the real Settings toggle (Settings → Accessibility → Motion). `defaults write` does **not** reach the app |
+| Rotation | Simulator menu `Device > Rotate Left/Right` via System Events (requires macOS Accessibility for the host); use a landscape-capable app (Safari) as the control |
+| App switch / lifecycle | `xcrun simctl launch <other bundle id>` (the Simulator `Home` menu item is not reliable) |
+| Greyscale | the OS Grayscale colour filter is **not available** in this iOS 18.6 simulator's Settings; luminance conversion of a real frame is an *approximation* and must be declared as such |
+| Persisted-state forcing | `sqlite3` against the app container's `Documents/looplet.sqlite` |
+
+## Fonts, icons, assets, motion runtime
+
+* **Fonts:** no custom font family is bundled; all text uses the Flutter/Material default (system font). **Pending design decision** in the project Design Foundation: family, licence, and glyph coverage for Turkish (`İ ı Ş ş Ğ ğ Ç ç Ö ö Ü ü`) plus tabular figures for MOVES / stats. Shipping the default font is a rubric risk ("placeholder/default font"), not an accepted final state.
+* **Icons:** Material Icons (`chevron_left_rounded`, `refresh_rounded`, undo, `push_pin`) plus custom-painted stars and rails. **Pending** the Foundation's icon/illustration direction; the Material defaults are treated as placeholders until decided.
+* **Motion runtime:** Flutter `AnimationController` / `Interval` timelines (F03 won sequence, F04 star reveal, F05 ring). iOS "Reduce Motion" is exposed by Flutter as `AccessibilityFeatures.reduceMotion` (iOS-only), **not** `disableAnimations`; current code reads only `disableAnimations` (F03-QA-04). Motion evidence must be video or a frame sequence, never a static screenshot.
+* **Audio / haptic:** none exists (F11 not started). Any audio/haptic claim is **Pending** until F11.
+* **Localization/visual:** Turkish is the launch language; layouts must tolerate longer strings and Dynamic Type up to at least accessibility-medium (verified for the F03 win panel).
+
+## Ownership
+
+Project-specific brand, references, colour, font and art-direction decisions live in `project-authority/design-foundation.md` (not in `ai-system/design/`); this section only fixes *how* visual evidence is produced on this stack.
+
