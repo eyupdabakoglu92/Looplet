@@ -40,28 +40,28 @@ features/f03-puzzle-play-session/orchestration.md
 
 ## Current Phase
 
-F03 rework — win sequence and integration suite
+F03 final QA re-verify
 
 ## Current Role
 
-UI Designer
+QA
 
 ## Current Reason
 
-F03 final QA (2026-09-20, rev 7a907dd) returned Rejected: F03-QA-01 (the F04 completion panel rises without delay and covers the win sequence/winning row) and F03-QA-02 (integration_test group 4 never completes on a live simulator). Sequencing is an implementation defect (F03 §10, F03 and F04 ui-design agree); the F04 "row stays visible" geometry cannot hold for rows 1–4, so the UI Designer resolves it first. Rework-control rule: F05/F08 QA and developer work stay queued. Rotation, live lifecycle and AC9 highlight closure are closed through Accessibility-enabled simulator automation (F03.RUNTIME-LIMITS RESOLVED = A); the user still has to grant the macOS permission.
+F03 final QA (2026-09-20, rev 7a907dd) returned Rejected. The rework is delivered: contract resolution (architecture §18), the UI Designer's `Won composition` (ui-design §16), and the Frontend/Mobile Developer's implementation (win sequence then a capped panel with the answer docked; device-form integration suite fixed). The Tech Lead reproduced the gates and the device suite at HEAD cf8d8f0 and accepted the delivery. QA re-verifies the win path, the unchanged paths that share the edited screen, and the route-A scenarios (rotation, live lifecycle, AC9), for which macOS Accessibility was observed granted. F05/F08 stay queued.
 
 ## Last Completed Action
 
-Tech Lead reconciled the QA verdict: contract resolution in F03 architecture §18, ledger + handoff plan (UI Designer → Frontend/Mobile Developer), pending-evidence split, runtime-limits decision F03.RUNTIME-LIMITS prepared and now RESOLVED = A. No app code, package, product or release file changed. Full workflow audit PASS after this transition.
+Tech Lead delivery reconciliation: analyze 0, format 0, 197 package + 214 app tests, device suite 12/12 exit 0 reproduced at cf8d8f0; Delivery Review = Accepted; F03-QA-REVERIFY activated with an updated brief. No app code, package, product or release file changed by the Tech Lead. Full workflow audit PASS after this transition.
 
 ## Next Expected Action
 
-Run UI Designer on F03-UI-WON (`Won composition` in F03 ui-design.md). Then Frontend/Mobile Developer (F03-FE-WON, F03-FE-INTEG), Tech Lead reconciliation, F03-QA-REVERIFY. F03.RUNTIME-LIMITS is RESOLVED = A; the user grants macOS Accessibility before re-QA and QA probes it first.
+Run QA on F03-QA-REVERIFY (final stage). The verdict returns to Tech Lead, who then activates F05-QA-STRICT or the appropriate rework/evidence task.
 
 ## Portfolio Summary
 
 * F01, F02, F04, F06: historical scoped Done retained.
-* F03: Rework; final QA Rejected 2026-09-20 (win moment + integration suite); interaction/resume/back/misuse passed on simulators; runtime-limits decision RESOLVED = A (Accessibility grant pending).
+* F03: In QA (final re-verify); first final QA Rejected 2026-09-20, rework delivered and accepted; runtime-limits decision RESOLVED = A, Accessibility observed granted.
 * F05: In Progress; real strict content delivered (bundle mirrors content/journey), QA queued behind F03 rework + re-QA, final verdict None.
 * F08: In Progress, queued behind F03 rework; independent local/emulator validation pending, release task Blocked, release/final acceptance pending.
 * F07, F09–F13: Not Started. Pending follow-ons are in workflow-follow-ups.md.
@@ -72,8 +72,8 @@ F08.DEPLOY-AUTHORIZATION is OPEN with Blocking Scope = release. The old deferral
 
 ## Global Risks
 
-* F03 win moment (F03-QA-01): the completion panel covers the win sequence; fix pending. F04's panel geometry changes with it (F04 stays Done).
-* Rotation, live app-lifecycle-during-gesture and drag highlight are unproven on any target; route A chosen (F03.RUNTIME-LIMITS), macOS Accessibility grant pending; Info.plist still allows landscape, so the portrait lock rests on one runtime call.
+* F03 win moment (F03-QA-01): fix delivered (win sequence, then the answer docked above a capped panel); awaiting independent QA. F04's panel code changed with it (F04 stays Done, tests green).
+* Rotation, live app-lifecycle-during-gesture and drag highlight are unproven on any target; route A chosen (F03.RUNTIME-LIMITS), Accessibility observed granted but not yet used by QA; Info.plist still allows landscape, so the portrait lock rests on one runtime call.
 * Required device/manual evidence is not established by a widget test, build or a planned CI job.
 * Startup/resume/persistence proof is shared by consuming features; reconcile the actual scope before clearing a downstream gate.
 * F08 cold-boot fix evidence exists in prior delivery/Tech Lead reports; QA must review applicable provenance, not invent an approval.

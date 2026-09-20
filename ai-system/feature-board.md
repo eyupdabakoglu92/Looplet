@@ -1,8 +1,8 @@
 # Feature Board — LOOPLET
 
 Last Updated: 2026-09-20
-Active Phase: F03 rework — win sequence and integration suite
-Active Owner: UI Designer
+Active Phase: F03 final QA re-verify
+Active Owner: QA
 Active Feature: F03
 Pending Product Revision: None
 Revision Affected Features: None
@@ -14,8 +14,8 @@ Revision Affected Features: None
 | F01 | dictionary-service | Done | - | Approved with Notes (historical scope) | P0 | Dictionary implementation accepted historically; production corpus review and Android confirmation remain follow-ups. |
 | F02 | grid-engine | Done | - | Approved with Notes (historical scope) | P0 | Engine accepted historically; future scope/CI notes retained in workflow-follow-ups.md. |
 | F06 | puzzle-content-and-solver-tooling | Done | - | Approved with Notes (historical scope) | P0 | Done covers toolchain + smoke set only. Journey acceptance now F05; OPEN Daily content follow-on belongs to F07 (workflow-follow-ups.md). |
-| F03 | puzzle-play-session | Rework | UI Designer | Rejected (final QA 2026-09-20) | P0 | Interaction, resume, back and misuse passed on simulators. Rejected for F03-QA-01 (F04 panel hides the win sequence/winning row) and F03-QA-02 (integration group 4). Route: UI Designer → Frontend/Mobile Developer → Tech Lead → QA. F03.RUNTIME-LIMITS RESOLVED = A (Accessibility grant is a pending user action). |
-| F04 | star-rating-and-personal-best | Done | - | Approved with Notes (historical scope) | P1 | Historical scoped automated acceptance retained; later device-feel and shared persistence notes remain explicit. F03 rework may adjust panel timing/geometry (F03 architecture §18, 2026-09-20); F04 ACs unchanged, stays Done. |
+| F03 | puzzle-play-session | In QA | QA | Final QA re-verify active (F03-QA-REVERIFY) | P0 | Win-sequence/geometry rework (F03-QA-01) and integration suite fix (F03-QA-02) delivered and accepted at HEAD cf8d8f0; QA re-verifies the win path, unchanged paths and the route-A scenarios (rotation, live lifecycle, AC9). Decision F03.RUNTIME-LIMITS RESOLVED = A; Accessibility observed granted. |
+| F04 | star-rating-and-personal-best | Done | - | Approved with Notes (historical scope) | P1 | Historical scoped automated acceptance retained; later device-feel and shared persistence notes remain explicit. F03 rework changed panel timing/geometry and code (F03 architecture §18, 2026-09-20: deferred reveal, density, spine glow, Close tap target 44 pt); F04 ACs unchanged, F04 tests green, stays Done. |
 | F05 | journey-progression | In Progress | Tech Lead | Pending current acceptance | P0 | Strict 30-level content delivered; F05-QA-STRICT queued behind F03 rework + re-QA (its shared win/exit path is changing). Not activated for QA. |
 | F07 | daily-challenge | Not Started | - | - | P1 | Not activated. Depends on F03/F04/F06/F08. OPEN F06-CONTENT Daily pool (~60), real producer/offline proof and manifest require F07 planning; see workflow-follow-ups.md. |
 | F08 | offline-persistence-and-sync | In Progress | Tech Lead | Runtime Validation Pending | P0 | Local/emulator validation pending, queued behind F03 QA (one QA feature at a time); not dependent on paid deploy. Release task Blocked on explicit billing/deploy authorization; final QA still required. |
@@ -27,10 +27,10 @@ Revision Affected Features: None
 
 ## Current Routing
 
-* Next command: Run UI Designer (task F03-UI-WON in F03 orchestration).
-* F03 is the active feature in Rework after final QA returned Rejected. Planned chain: UI Designer → Frontend/Mobile Developer (F03-FE-WON, F03-FE-INTEG) → Tech Lead reconciliation → QA (F03-QA-REVERIFY).
-* Rework-control rule: no QA, DevOps or client-developer owner is assigned to F05/F08 while F03 rework is open. F05-QA-STRICT and F08 local evidence stay queued with Owner Tech Lead.
-* Decision F03.RUNTIME-LIMITS RESOLVED = A (2026-09-20): rotation / live lifecycle / AC9 highlight are closed by QA through Accessibility-enabled simulator automation. Pending user action: grant macOS Accessibility (and Automation for System Events) to the host app running Claude Code; QA probes it first at F03-QA-REVERIFY. It does not affect the rework chain.
+* Next command: Run QA (task F03-QA-REVERIFY in F03 orchestration; QA Stage = final).
+* F03 rework is delivered and reconciled (Delivery Review = Accepted at HEAD cf8d8f0). QA re-verifies the won moment, re-spot-checks unchanged paths, and closes the route-A scenarios (rotation, live lifecycle, AC9 highlight). Every QA outcome returns to Tech Lead.
+* Rework-control rule still applies: no QA, DevOps or client-developer owner is assigned to F05/F08 until F03's re-QA verdict is reconciled. F05-QA-STRICT and F08 local evidence stay queued with Owner Tech Lead.
+* Decision F03.RUNTIME-LIMITS is RESOLVED = A (2026-09-20); macOS Accessibility was observed granted by a read-only Tech Lead probe; QA verifies the capability itself.
 * F08 release authorization gates the release stage only. No paid service, deployment, production action or store distribution is authorized.
 * F09–F13 remain Not Started; no new feature was activated.
 
