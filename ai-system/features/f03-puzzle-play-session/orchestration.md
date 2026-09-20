@@ -10,18 +10,18 @@ Rework
 
 ## Current Owner
 
-UI Designer
+Frontend/Mobile Developer
 
 ## Next Role
 
-UI Designer
+Frontend/Mobile Developer
 
 ## Active Task Ledger
 
 - [x] Task ID: F03-QA-RUNTIME | Assigned Role: QA | Status: Done | Summary: Final-stage runtime QA on rev 7a907dd returned verdict Rejected (qa.md 2026-09-20); residual scenarios live in Pending Evidence | Depends On: -
-- [ ] Task ID: F03-UI-WON | Assigned Role: UI Designer | Status: Open | Summary: F03-QA-01 geometry: deliver a `Won composition` section in F03 ui-design.md so the winning row + docked seam stay visible above the F04 panel for rows 0–4 and every F04 variant, per architecture.md §18 (2026-09-20); see Current UI Brief | Depends On: -
-- [ ] Task ID: F03-FE-WON | Assigned Role: Frontend/Mobile Developer | Status: Queued | Summary: F03-QA-01: implement win-sequence-then-panel sequencing (panel not before T0+600 ms) and the UI Designer's Won composition; add widget/golden layout assertions; update frontend.md | Depends On: F03-UI-WON
-- [ ] Task ID: F03-FE-INTEG | Assigned Role: Frontend/Mobile Developer | Status: Queued | Summary: F03-QA-02: make integration_test/play_session_test.dart group 4 complete and exit 0 on a live simulator on 2 widths; no product-semantics change | Depends On: -
+- [x] Task ID: F03-UI-WON | Assigned Role: UI Designer | Status: Done | Summary: DELIVERED 2026-09-20 (ui-design.md §16 Won composition, rubric self-review 92). F03-QA-01 geometry: deliver a `Won composition` section in F03 ui-design.md so the winning row + docked seam stay visible above the F04 panel for rows 0–4 and every F04 variant, per architecture.md §18 (2026-09-20); see Current UI Brief | Depends On: -
+- [ ] Task ID: F03-FE-WON | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: F03-QA-01: implement win-sequence-then-panel sequencing (panel not before T0+600 ms) and the UI Designer's Won composition; add widget/golden layout assertions; update frontend.md | Depends On: F03-UI-WON
+- [ ] Task ID: F03-FE-INTEG | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: F03-QA-02: make integration_test/play_session_test.dart group 4 complete and exit 0 on a live simulator on 2 widths; no product-semantics change | Depends On: -
 - [ ] Task ID: F03-QA-REVERIFY | Assigned Role: QA | Status: Queued | Summary: Re-verify F03 final on the changed win path per Planned QA Re-verify Brief; independent verdict | Depends On: F03-FE-WON, F03-FE-INTEG
 
 ## Open Tasks
@@ -30,9 +30,7 @@ None
 
 ## Handoff Plan
 
-| After Tasks | Next Role | Activate Tasks |
-| --- | --- | --- |
-| F03-UI-WON | Frontend/Mobile Developer | F03-FE-WON, F03-FE-INTEG |
+None
 
 ## Delivery Review
 
@@ -177,7 +175,7 @@ None
 
 ## Next Action
 
-Run UI Designer on F03-UI-WON using the Current UI Brief. Deliver the `Won composition` section in F03 ui-design.md (architecture.md §18, 2026-09-20). On completion the planned handoff activates F03-FE-WON and F03-FE-INTEG for Frontend/Mobile Developer; their delivery returns to Tech Lead for reconciliation before F03-QA-REVERIFY. F03.RUNTIME-LIMITS is RESOLVED = A; the user still has to grant macOS Accessibility before F03-QA-REVERIFY (QA probes it first).
+Run Frontend/Mobile Developer on F03-FE-WON and F03-FE-INTEG using the Planned Frontend Brief below and ui-design.md §16 (Won composition, incl. the rect-testable rule §16.5) plus architecture.md §18 (Won-sequence authority). Delivery returns to Tech Lead for reconciliation before F03-QA-REVERIFY. F03.RUNTIME-LIMITS is RESOLVED = A; the user still has to grant macOS Accessibility before the QA re-verify.
 
 ## Last Decision
 
@@ -185,9 +183,9 @@ Run UI Designer on F03-UI-WON using the Current UI Brief. Deliver the `Won compo
 
 ## Last Update
 
-* Updated By: Tech Lead
+* Updated By: UI Designer
 * Timestamp: 2026-09-20
-* Summary: QA verdict reconciled; contract resolution in architecture.md §18; ledger, handoff plan, evidence split written; runtime-limits decision prepared as a planned gate.
+* Summary: F03-UI-WON delivered: ui-design.md §16 Won composition (Direction A "The answer docks": win sequence, then the winning row glides to a fixed dock under the target rail, then the panel capped at ≤ 64 % H); Frontend tasks activated per the planned handoff.
 
 ## Context & Follow-ups
 
@@ -207,6 +205,7 @@ F03 implementation is retained; F04/F05 integration code stays. Delivery Review 
 * 2026-09-20 — QA: verdict Rejected (F03-QA-01, F03-QA-02).
 * 2026-09-20 — Tech Lead: rework routed (UI Designer → Frontend/Mobile Developer → Tech Lead → QA); decision F03.RUNTIME-LIMITS prepared as a planned gate.
 * 2026-09-20 — Tech Lead: F03.RUNTIME-LIMITS RESOLVED = A on the user's decision; Accessibility grant is a pending user action.
+* 2026-09-20 — UI Designer: F03-UI-WON delivered (ui-design.md §16); F03-FE-WON and F03-FE-INTEG activated.
 
 ## Current UI Brief
 
@@ -221,7 +220,7 @@ Deliver in F03 `ui-design.md` a new section `Won composition` (F03's `won` treat
 4. A premium-rubric self-review of the won moment and a testable statement of the visibility rule that the Frontend Developer can assert (rects, not pixels).
 Non-goals: F04 product ACs, star/best logic and copy; new features; controller/persistence semantics. If no geometry works on the smallest device, state the fallback (panel may cover the row only after the full ≥ 600 ms sequence) and raise `Needs Tech Lead Clarification`. Handoff status: Ready for Frontend/Mobile Developer.
 
-## Planned Frontend Brief (activates after F03-UI-WON)
+## Current Frontend Brief (F03-FE-WON, F03-FE-INTEG — activated 2026-09-20)
 
 F03-FE-WON — implement architecture.md §18 sequencing (panel not before T0+600 ms; controller/persistence timing unchanged) and the `Won composition`; add widget/golden assertions for F03.WIN-LAYOUT (panel absent before 600 ms; winning-row rect never intersected by the panel rect at rest; rows 0–4 × Perfect/non-Perfect × 390×844 / 440×956; F04 variants unclipped); keep F04/F05 tests green (update timing/geometry expectations only where the new contract requires); `flutter analyze`, `dart format`, `melos run test` clean; record command/exit/counts in frontend.md with task-to-code traceability, preserved behavior (AC1–AC11, back/exit, unlock, resume) and the change impact on F04's panel.
 F03-FE-INTEG — make group 4 of integration_test/play_session_test.dart complete on a live simulator (hypothesis to test, not assume: `paused` stops frame scheduling so `pumpAndSettle` never settles); run it on two simulator widths and report exit code and counts; if the cause is product behavior rather than harness, stop and write `Needs Tech Lead Clarification`.

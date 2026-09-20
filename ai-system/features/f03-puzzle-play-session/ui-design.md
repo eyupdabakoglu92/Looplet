@@ -1,6 +1,7 @@
 # F03 — puzzle-play-session: UI Design Handoff
 
 > UI Designer output. Contract authority stays in `architecture.md`; this handoff resolves the `architecture.md §18 [PENDING — UI]` list and must not change the interaction contract (§6 state machine, §7 gesture mapping, §8 MOVES/Undo/Restart, §9 persistence, §11 animation timing, §13 route/chrome).
+> **Addendum 2026-09-20 (F03-UI-WON):** §16 `Won composition` is the authority for the win sequence's timing, the winning row's placement and the completion-panel geometry. It supersedes the `won` row of §8 / the flow line in §4, the "Completion sheet" sizing in §7, and — where they conflict — F04 `ui-design.md` §4–§5 (strip / panel-height / spine-glow numbers). Everything else in this handoff is unchanged.
 > Mandatory references: `design/design-doctrine.md`, `design/premium-ui-rubric.md`. No user-specified aesthetic → default premium doctrine applies.
 
 ---
@@ -247,6 +248,8 @@ Portrait only. Three stacked zones over the stage:
 
 ### Completion sheet (minimal seam — F04 replaces)
 
+> Geometry and timing superseded by §16 (2026-09-20). Sizing below is historical.
+
 * **Role:** report the result, route out. **Not** the rating panel.
 * **Weight:** a focused bottom sheet, ~42–50 % screen height, not full-screen.
 * **Content (top→bottom, tight):** kicker `ÇÖZÜLDÜ` (`amber` @ 70 %, micro) · the formed **word** as amber text (~34 pt, weight 800) · one stat `HAMLE  14` (micro label + tabular figure) · actions.
@@ -389,13 +392,117 @@ Portrait only. Three stacked zones over the stage:
 3. **Shared in-flow chrome rule** — this handoff proposes "no title bar, one quiet back chevron top-left, hidden in terminal/won states" as a pattern F10 and later in-flow screens should share. Confirm whether to lock that as a cross-screen rule now or defer to F10.
 4. **Microcopy** — `HEDEF / HAMLE / ÇÖZÜLDÜ / Yeniden / Kapat` are placeholders; PO / localization owns the final strings.
 
+## 16. Won composition (addendum 2026-09-20 — F03-UI-WON, post-F04)
+
+**Why this exists.** QA (qa.md, rev 7a907dd, F03-QA-01) measured that the F04 panel rises with no delay and covers the win moment: on iPhone 16 (393×852 pt) the row centres sit at 308 / 375 / 442 / 509 / 575 pt while the panel top sits at ≈ 356 pt (non-Perfect) or ≈ 319 pt (Perfect). No panel height can keep rows 2–4 visible *where they are*, so the fix is not a smaller panel — it is moving the answer. Authority: `architecture.md §18` "Won-sequence authority" (sequencing, requirement). This section is the design that satisfies it.
+
+### 16.1 Design direction
+
+* **Direction A — "The answer docks" (selected).** After the win sequence, the winning row (tiles + drawn seam bar as one unit) lifts out of the board and glides *up* to a fixed **dock** between the target rail and the panel, so the finished word sits directly under the goal word it just matched. The board behind stays where it is, dimmed, its vacated row a faint outline. The panel then rises beneath. *Why strong:* the player literally sees "goal → my answer" pair up, from any row, and the panel is anchored to that pairing; one small moving object, so it is cheap to render; distance travelled is the only thing that varies by row. *Risks:* a travelling row must not read as a UI glitch (needs lift + shadow + one clean ease); vacated slot must not look broken.
+* **Direction B — "Camera glide".** The whole board plate translates up so the winning row lands in the frame above the panel (rows above it slide under the target rail). *Strong:* cinematic, no copy of the row. *Risks:* up to ~340 pt of board travel would sweep 25 tiles over the target rail and top bar; needs masking; heavier repaint on mid-tier; the target rail would have to fade, breaking the "goal → answer" pairing.
+* **Selected: A.** Cheaper, clearer, and it keeps the F04 idea ("the panel is anchored to the thing the player just did") true for every winning row instead of only row 0.
+
+### 16.2 Timeline (T0 = the settle that yields `solvedThisStep`; times in ms after T0)
+
+| t | What happens | Notes |
+| --- | --- | --- |
+| 0 | input locked, controls → 40 %, chevron hidden, rest of board recedes to 12 % dim (dim only, no blur) | unchanged from §8 |
+| 0–150 | winning row fills amber, `ink-amber` glyphs, 1.06 lift, 30 ms L→R stagger | unchanged |
+| 0–360 | 3 pt amber **seam bar** draws L→R beneath the row, soft glow | unchanged |
+| 0–600 | one restrained radial bloom (~20 % peak) pulses once and is gone by 600 | unchanged; bloom stays at the row's *home* position |
+| **600–840** | **dock:** row + seam translate (y only) from home to the dock, ease `cubic-bezier(0.22, 1, 0.36, 1)`; while travelling the row is lifted above the board (z-top) with a deeper shadow; at the same time the vacated slot shows the ghost | new |
+| 620–840 | 40 % scrim fades in (220 ms) | scrim never before 600 |
+| 680–940 | panel slides up (~260 ms, same curve) and lands as the row settles | **panel never before T0+600** |
+| ≥ 940 | AT REST. F04 star reveal starts now (≤ 800 ms, F04 §4) | F04 unchanged from here |
+
+* Input stays locked and the chevron hidden from T0 through the panel; nothing is tappable except panel controls once at rest.
+* **Reduce motion (OS setting):** no stagger / bloom / travel. At T0 the row is amber with its seam already drawn; hold ≥ 300 ms; at T0+300 the row cross-fades (160 ms) to the dock while the source slot shows the ghost; scrim + panel fade in (200 ms) from T0+460; at rest ≈ T0+660.
+
+### 16.3 Geometry — the dock and the panel cap
+
+Terms: `H` screen height; `dividerY` = y of the hairline under the target rail; `U` = unit height of *row + seam* (tile height + ≈ 6 pt gap + 3 pt bar ≈ tile + 9). Everything is relative, not pixel-absolute.
+
+* **Panel cap:** the panel's height is **≤ 64 % of `H`** for every variant (F04's 56–66 % band, tightened at the top) ⇒ `panelTop ≥ 0.36 H`.
+* **Free zone:** `Z = [dividerY + 12 pt, 0.36 H − 16 pt]`.
+* **Dock:** the row keeps its x; its y is `dockTop = (dividerY + 12) + (|Z| − U) / 2`, i.e. **centred in Z, fixed for all variants and all winning rows** (Perfect or not, so a re-win looks identical).
+* Reference values (from simulator screenshots, rev 7a907dd):
+
+| Device (pt) | tile | dividerY | U | Z | |Z| | slack | dock row top→bottom (incl. seam) | gap to panelTop (worst case = 16 + slack/2) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 390×844 (16e) | 58 | 170 | 67 | 182–288 | 106 | 39 | ≈ 202–269 | ≈ 35 |
+| 393×852 (16) | 59 | 182 | 68 | 194–291 | 97 | 29 | ≈ 208–276 | ≈ 30 |
+| 440×956 (16 Pro Max) | 67 | 189 | 76 | 201–328 | 127 | 51 | ≈ 227–303 | ≈ 42 |
+
+* Travel on 393×852 (row centre → dock centre ≈ 238): row 0 −70, row 1 −137, row 2 −204, row 3 −271, row 4 −337 pt. A row always travels *upward over the rows above it*; that is intended (it is lifted).
+* **Vacated slot ("ghost"):** the five home cells show a 1 pt `amber` @ 25 % outline at the tile radius (0.19 × tile) on the `plate` colour, no fill, so the board reads as "this row left", not "broken". It sits under the 12 % dim and the 40 % scrim.
+* **Docked row:** scale 1.06 (as lifted), contact shadow `#000` @ 45 %, y+6, blur 16 at rest (y+10, blur 24 while travelling). The seam keeps its glow.
+* **Panel spine (F04):** keep the 3 pt amber bar flush with the panel's top edge but **drop its outer glow** while a docked row is present — one glow only (the seam's). The bar now rhymes with the seam above it; the two are joined visually by the 16–40 pt of dark between them, not by a second bloom.
+* **Concessions if the panel exceeds the cap** (OS text scaling up to 1.3×, longer Turkish strings), in this order and no other: (1) shrink inter-block gaps to ≥ 60 %; (2) stars to 88 %; (3) drop the `3 / 3` count line (stars already say it); (4) never clip, scroll or shrink below 44 pt the Retry / Next / Close controls or the amber word. If |Z| < U + 16 after (1)–(3), scale the docked row down to ≥ 0.8; if still short, stop and raise `Needs Tech Lead Clarification` — do not let the panel cover the row.
+* No backdrop blur anywhere. The travelling row is one `RepaintBoundary` layer moved by a transform; nothing else on the board repaints during the dock (mid-tier 60 fps budget, §18 perf clarification stays).
+
+### 16.4 States and exits
+
+| From | Behaviour |
+| --- | --- |
+| **Retry** (primary) | panel slides out (~180 ms), docked row + seam fade out (140 ms), dim and scrim clear, board re-lights on the *restarted* grid, state → `idle`. The row does **not** fly home (the restarted grid no longer contains it). |
+| **Next Level** (F05 primary when enabled) | route replacement carries the transition; no extra choreography. |
+| **Close** | pop / go home as today; no extra choreography. |
+| **Kill / relaunch during T0…rest** | unchanged contract: the `completed` snapshot was cleared at `won` (§9); relaunch shows a fresh idle board or home per F05 — nothing in this section changes persistence. |
+
+* **Non-colour cue (accessibility):** seam bar (shape) + the *displacement* of the row to sit under the target rail + lift/shadow. In greyscale the amber/cream tiles collapse in luminance, so shape and position carry the win; the panel's text (`ÇÖZÜLDÜ` + word + stars) repeats it. The docked row is decorative: `ExcludeSemantics`; the panel announces the result.
+
+### 16.5 Testable visibility rule (rects, not pixels — for Frontend/QA)
+
+At rest (panel and dock animations finished), for winning row ∈ {0,1,2,3,4}, variants ∈ {first-clear, matched, newBest, Perfect}, sizes 390×844 and 440×956 (and 393×852):
+
+1. `W` = docked row + seam rect, `P` = panel rect (including its spine), `R` = target-rail rect. `W ∩ P = ∅`; `P.top − W.bottom ≥ 16 pt`; `W.top ≥ dividerY + 12 pt`; `W` inside the safe area; all five glyphs fully unclipped.
+2. `P.height ≤ 0.64 H` (so `P.top ≥ 0.36 H`).
+3. At `T0 + 599 ms` the panel is not visible (offset fully off-screen or opacity 0) and the scrim alpha is 0; at `T0 + 600 ms` the dock has just begun.
+4. The home row cells are ghost outlines from the dock start; no tile of the winning word remains in the board at rest.
+5. Retry / Next / Close hit boxes ≥ 44 pt and fully inside the screen above the home-indicator inset; no scrolling panel.
+6. With OS text scale 1.0 and 1.3 the same assertions hold (concession order in §16.3 applies).
+
+### 16.6 Component and premium decisions
+
+* **Docked answer row:** primary focus of the won frame — highest luminance + amber + shadow on a receded stage; the goal rail above it is the only sibling of equal meaning. Not generic: it turns a static "result card" into a spatial payoff.
+* **Ghost slot, single glow, fixed dock, one travelling layer, ease shared with the panel** are the deliberate details; do not replace them with a cross-fade, a scale-to-fit or a fade of the board.
+* **Anti-patterns for this moment:** panel earlier than T0+600; panel covering the row after it docks; teleporting/cross-fading the row instead of gliding (outside reduce-motion); a second bloom or spine glow; backdrop blur; scaling the whole board; per-row bespoke dock positions; showing a spinner while the panel waits for the rating read.
+
+### 16.7 Frontend handoff for §16
+
+* **Must not break:** T0+600 rule; fixed dock rule; ≤ 64 % panel cap; the ghost slot; the single-glow rule; reduce-motion path; input lock and hidden chevron through the whole moment; controller / persistence timing unchanged.
+* **Flexible:** exact gaps within ±4 pt (12 / 16 pt), travel duration 220–260 ms and panel slide 240–280 ms within the shared curve, ghost outline alpha 20–30 %, whether the docked row is a copy or the real row layer.
+* **Do not cheapen:** no `Opacity` on the whole board, no backdrop filter, no separate glow for the spine, no scroll view around the panel, no bespoke per-row offsets.
+
+### 16.8 Self-review against the rubric (won moment only)
+
+| Item | /10 | Reason |
+| --- | --- | --- |
+| Visual Hierarchy | 10 | one lifted amber object under the goal rail; everything else receded |
+| Layout & Composition | 9 | goal → answer → panel column, fixed dock, measured clearances |
+| Surface & Depth | 9 | z-lift, contact shadow, ghost slot, scrim tiers |
+| Typography | 9 | unchanged from F03/F04 |
+| CTA Quality | 9 | Retry / Next dominance untouched, now unobstructed |
+| State Design | 9 | reduce-motion, Retry/Next/Close, concession order defined |
+| Product Feel | 10 | the "I built that" beat now actually lands from any row |
+| Modernity | 9 | restrained motion, one glow |
+| Non-Generic Originality | 10 | answer docking under the goal is specific to this game |
+| Implementability | 8 | needs a measured panel top and a transform layer; rules are rect-testable, concessions ordered |
+| **Total** | **92** | ≥ 90 threshold; the won moment is the scope of this score |
+
+### 16.9 Assumptions and clarification
+
+* Measurements (tile size, `dividerY`, row centres, panel heights) come from simulator screenshots of rev 7a907dd; Frontend should read the real layout values, not these constants.
+* F04 panel content order and copy are unchanged; only its height cap, timing and spine glow change here.
+* **Needs Tech Lead Clarification:** none blocking. Informational: the dock replaces F04's "seam docks as panel spine" narrative with "seam stays under the docked row"; the panel keeps its spine bar without glow — confirm during reconciliation if you prefer to keep the F04 wording.
+
 ---
 
 # WORKFLOW HANDOFF SUGGESTION (NON-AUTHORITATIVE)
 
-* **Completed Tasks:** F03-UI — `ui-design.md` delivered. Resolves the `architecture.md §18 [PENDING — UI]` list (screen layout + hierarchy, target separation, swipe-begin highlight, animating/input-lock affordance, win-row highlight + non-colour cue, success-animation choreography, shift duration/curve envelope, minimal completion panel treatment, screen chrome / back affordance, debug loading/error states). Self-review 94/100.
-* **Remaining Tasks:** F03-FE1…FE8 (Frontend/Mobile Developer) — implement the screen against `architecture.md` + this handoff.
-* **Blockers:** none. Four `Needs Tech Lead Clarification` items are non-blocking (sensible defaults chosen); Tech Lead may confirm/adjust in review or in the F03 close-out.
+* **Completed Tasks:** F03-UI-WON — §16 `Won composition` added (2026-09-20): timeline, fixed dock geometry, panel cap, ghost slot, reduce-motion, exits, rect-testable visibility rule, rubric self-review 92.
+* **Remaining Tasks:** F03-FE-WON, F03-FE-INTEG (Frontend/Mobile Developer).
+* **Blockers:** none.
 * **Status Suggestion:** Ready for Frontend.
 
 ---
