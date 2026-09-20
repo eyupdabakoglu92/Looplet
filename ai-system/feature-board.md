@@ -1,9 +1,9 @@
 # Feature Board — LOOPLET
 
-Last Updated: 2026-09-18
-Active Phase: Evidence and QA queue reconciliation
-Active Owner: Tech Lead
-Active Feature: F05
+Last Updated: 2026-09-20
+Active Phase: Final QA — F03 runtime evidence
+Active Owner: QA
+Active Feature: F03
 Pending Product Revision: None
 Revision Affected Features: None
 
@@ -14,11 +14,11 @@ Revision Affected Features: None
 | F01 | dictionary-service | Done | - | Approved with Notes (historical scope) | P0 | Dictionary implementation accepted historically; production corpus review and Android confirmation remain follow-ups. |
 | F02 | grid-engine | Done | - | Approved with Notes (historical scope) | P0 | Engine accepted historically; future scope/CI notes retained in workflow-follow-ups.md. |
 | F06 | puzzle-content-and-solver-tooling | Done | - | Approved with Notes (historical scope) | P0 | Done covers toolchain + smoke set only. Journey acceptance now F05; OPEN Daily content follow-on belongs to F07 (workflow-follow-ups.md). |
-| F03 | puzzle-play-session | In Progress | Tech Lead | Pending current acceptance | P0 | Acceptance validation reopened: required device/manual evidence in architecture §16/§18 is still pending. No new code defect asserted. |
+| F03 | puzzle-play-session | In QA | QA | Final QA active (F03-QA-RUNTIME) | P0 | Single active QA feature. Required device/manual evidence in architecture §16/§18 plus re-verification of post-2026-09-06 F04/F05 edits to lib/play. No new code defect asserted. |
 | F04 | star-rating-and-personal-best | Done | - | Approved with Notes (historical scope) | P1 | Historical scoped automated acceptance retained; later device-feel and shared persistence notes remain explicit. |
-| F05 | journey-progression | In Progress | Tech Lead | Pending current acceptance | P0 | Active feature. Strict 30-level content delivered; F05-QA-STRICT queued. Tech Lead reconciles inherited F03/F08 runtime proof before final QA. |
+| F05 | journey-progression | In Progress | Tech Lead | Pending current acceptance | P0 | Strict 30-level content delivered; F05-QA-STRICT queued behind F03 (depends on F03; shares its runtime proof). Not activated for QA yet. |
 | F07 | daily-challenge | Not Started | - | - | P1 | Not activated. Depends on F03/F04/F06/F08. OPEN F06-CONTENT Daily pool (~60), real producer/offline proof and manifest require F07 planning; see workflow-follow-ups.md. |
-| F08 | offline-persistence-and-sync | In Progress | Tech Lead | Runtime Validation Pending | P0 | Local/emulator validation pending and can proceed independently. Release task Blocked on explicit billing/deploy authorization; final QA still required. |
+| F08 | offline-persistence-and-sync | In Progress | Tech Lead | Runtime Validation Pending | P0 | Local/emulator validation pending, queued behind F03 QA (one QA feature at a time); not dependent on paid deploy. Release task Blocked on explicit billing/deploy authorization; final QA still required. |
 | F09 | onboarding-tutorial | Not Started | - | - | P1 | Interactive 3-step tutorial (row / column / form target), action-gated, < 60s, flows into Level 1, shown once. Depends on F03. KPI gate: > 85% completion. |
 | F10 | main-menu-and-settings | Not Started | - | - | P1 | LOOPLET logo, CONTINUE (primary), DAILY (secondary), Journey Progress, Daily Streak, Settings (Sound / Haptics toggles). No Shop/Battle Pass/Clan/Events. Accessibility baseline. Depends on F05, F07. |
 | F11 | audio-and-haptics | Not Started | - | - | P2 | Fixed SFX set + light/medium/success haptics, independent on/off toggles, no BGM, game completable with both off. Depends on F03, F10. |
@@ -27,10 +27,10 @@ Revision Affected Features: None
 
 ## Current Routing
 
-* Next command: Run Tech Lead.
-* F05 remains the current feature; its strict-content QA task is queued, not deleted or approved.
-* Reconcile F03's required device/manual evidence and F08's shared local persistence proof before claiming downstream final acceptance. Activate only one QA feature at a time.
-* F08 release authorization gates the release stage only. No paid service, deployment, production action or store distribution was authorized by core migration.
+* Next command: Run QA.
+* F03 is the single active QA feature (final stage, task F03-QA-RUNTIME). It is the dependency root of F05, and its runtime proof is reused by F05.SHARED-RUNTIME.
+* After F03's verdict returns, Tech Lead activates F05-QA-STRICT (or F03 rework), then schedules F08 local evidence. F05 and F08 stay queued with Owner Tech Lead.
+* F08 release authorization gates the release stage only. No paid service, deployment, production action or store distribution is authorized.
 * F09–F13 remain Not Started; no new feature was activated.
 
 ## Open Portfolio Follow-ups

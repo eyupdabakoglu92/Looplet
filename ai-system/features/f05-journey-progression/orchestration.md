@@ -84,17 +84,17 @@ None
 
 ## Next Action
 
-Run Tech Lead to reconcile the migrated QA queue and shared proof, then activate exactly one QA feature. Keep F05-QA-STRICT; do not activate F09 while F05 acceptance is unfinished. Use the QA brief below instead of stale command/verdict suggestions in the archived snapshot.
+Wait for F03-QA-RUNTIME (the single active QA feature); Tech Lead then reviews its verdict and activates F05-QA-STRICT with F03's provenance reused for F05.SHARED-RUNTIME. Keep F05-QA-STRICT queued; do not activate F09 while F05 acceptance is unfinished. Use the QA brief below instead of stale command/verdict suggestions in the archived snapshot.
 
 ## Last Decision
 
-2026-09-18 — preserve F05 as the active feature but return routing to Tech Lead for evidence/queue reconciliation. The existing strict-content QA work is queued, not discarded or approved. No product, content, application or architecture file was changed.
+2026-09-20 — F05 stays In Progress and queued behind F03: it depends on F03, and F05.SHARED-RUNTIME reuses F03's runtime/back/visual proof, so QA runs F03 first (one QA feature at a time). Tech Lead verified the bundled pack app/assets/journey/tr is byte-identical to content/journey/tr (`diff -rq`, 30 levels + manifest); this is orientation, not QA evidence. No product, content, application or architecture file was changed.
 
 ## Last Update
 
-* Updated By: Tech Lead (core/state migration)
-* Timestamp: 2026-09-18
-* Summary: Current-only snapshot; original record archived without alteration.
+* Updated By: Tech Lead
+* Timestamp: 2026-09-20
+* Summary: Routing re-pointed behind F03-QA-RUNTIME; F05-QA-STRICT unchanged and queued.
 
 ## Context & Follow-ups
 
@@ -110,6 +110,7 @@ F05 code and the promoted strict pack are unchanged. Previous qa.md approved the
 ## Change Log
 
 * 2026-09-18 — migrated state; see the immutable pre-migration snapshot for all earlier tasks, decisions and evidence.
+* 2026-09-20 — Tech Lead: QA sequencing set to F03 first; F05 routing note only.
 
 ## Consumed Signals
 

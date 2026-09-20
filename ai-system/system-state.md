@@ -1,6 +1,6 @@
 # System State — LOOPLET
 
-Last Updated: 2026-09-18
+Last Updated: 2026-09-20
 
 ## Platform Initialized
 
@@ -32,38 +32,38 @@ feature-board.md for portfolio; features/*/orchestration.md for execution; role-
 
 ## Active Feature
 
-F05
+F03
 
 ## Active Orchestration Path
 
-features/f05-journey-progression/orchestration.md
+features/f03-puzzle-play-session/orchestration.md
 
 ## Current Phase
 
-Evidence and QA queue reconciliation
+Final QA — F03 runtime evidence
 
 ## Current Role
 
-Tech Lead
+QA
 
 ## Current Reason
 
-Reusable core and seven live orchestrations now use the same schema. F05 strict-content acceptance is pending; F03's required runtime gap and local F08 persistence gaps must stay visible. No delivery role is ambiguously assigned across multiple features.
+F03 is the dependency root of F05 and its required device/manual evidence is producible now on available iOS simulators (iPhone 16 booted; 16e and 16 Pro Max available; Flutter, JDK 17, Firebase CLI, Node 24 present). F03's lib/play code changed after its 2026-09-06 approval (F04/F05 edits), so F03.CURRENT-REVISION is part of the same QA task. F05 and F08 are queued behind it; no delivery role is ambiguously assigned across multiple features.
 
 ## Last Completed Action
 
-Core transfer and evidence-preserving state normalization. This is not a new product QA run or release approval.
+Tech Lead reconciliation: workflow audit PASS; F03 Delivery Review = Accepted (artifact + diff level); F03-QA-RUNTIME activated with a feature-specific brief; F05/F08 routing notes updated. Tech Lead sanity run `flutter test` in app/: 181 passed (orientation only, not QA evidence). No product, application or release action.
 
 ## Next Expected Action
 
-Run Tech Lead. Review the migrated queues, reuse valid evidence, and activate the appropriate single QA feature or scoped evidence-preparation task. F05-QA-STRICT remains queued.
+Run QA on F03 (final stage). Every QA outcome returns to Tech Lead, who then activates F05-QA-STRICT or the appropriate rework/evidence task.
 
 ## Portfolio Summary
 
 * F01, F02, F04, F06: historical scoped Done retained.
-* F03: validation reopened; implementation retained, QA tasks queued.
-* F05: active; real strict content delivered, current final verdict None.
-* F08: In Progress for independent local/emulator validation; release task Blocked, release/final acceptance pending.
+* F03: In QA (final); validation reopened, QA task active, verdict None.
+* F05: In Progress; real strict content delivered (bundle mirrors content/journey), QA queued behind F03, final verdict None.
+* F08: In Progress, queued behind F03 QA; independent local/emulator validation pending, release task Blocked, release/final acceptance pending.
 * F07, F09–F13: Not Started. Pending follow-ons are in workflow-follow-ups.md.
 
 ## Release Decision
@@ -76,7 +76,7 @@ F08.DEPLOY-AUTHORIZATION is OPEN with Blocking Scope = release. The old deferral
 * Startup/resume/persistence proof is shared by consuming features; reconcile the actual scope before clearing a downstream gate.
 * F08 cold-boot fix evidence exists in prior delivery/Tech Lead reports; QA must review applicable provenance, not invent an approval.
 * Daily content, first distribution, Android CI and other unresolved follow-ons remain OPEN in workflow-follow-ups.md.
-* No product tests, emulator runs, billing changes or deployment were executed during this migration.
+* No emulator/simulator QA run, billing change or deployment has been executed; the migration and this Tech Lead turn added no test PASS claims.
 
 ## Contract Version
 

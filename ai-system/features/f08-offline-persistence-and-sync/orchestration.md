@@ -143,7 +143,7 @@ None
 
 ## Next Action
 
-Tech Lead schedules independent local/emulator evidence tasks without waiting for paid deployment. One QA feature at a time. The release task remains Blocked and no deployment/billing action is authorized by this migration. After functional QA, resolve the release decision explicitly, run the scoped DevOps task, then Tech Lead review and final QA; DevOps Ready alone never closes F08.
+Queued behind F03-QA-RUNTIME (the single active QA feature); F08-LOCAL-EVIDENCE and F08-QA-FUNCTIONAL stay Queued and none waits for paid deployment. Tech Lead reviews F03's runtime provenance before deciding whether F08.LOCAL-RESUME/LIFECYCLE can reuse any of it for the identical scope. The release task remains Blocked and no deployment/billing action is authorized by this migration. After functional QA, resolve the release decision explicitly, run the scoped DevOps task, then Tech Lead review and final QA; DevOps Ready alone never closes F08.
 
 ## Last Decision
 
@@ -151,9 +151,9 @@ Tech Lead schedules independent local/emulator evidence tasks without waiting fo
 
 ## Last Update
 
-* Updated By: Tech Lead (core/state migration)
-* Timestamp: 2026-09-18
-* Summary: Current-only snapshot; original record archived without alteration.
+* Updated By: Tech Lead
+* Timestamp: 2026-09-20
+* Summary: Routing note only (queued behind F03 QA); ledger, evidence and release gate unchanged.
 
 ## Context & Follow-ups
 

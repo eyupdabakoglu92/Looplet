@@ -1,6 +1,6 @@
 # Workflow Follow-ups — LOOPLET
 
-Last Updated: 2026-09-18
+Last Updated: 2026-09-20
 
 These are retained, unresolved portfolio items. They do not authorize execution by themselves and are not completed merely because their source feature's scoped delivery is Done. Tech Lead must bring the applicable item into the owning feature's ledger/authority before delivery. Original wording and history remain in history/core-sync-2026-09-18/.
 
@@ -19,7 +19,7 @@ These are retained, unresolved portfolio items. They do not authorize execution 
 | F12-ANALYTICS | DEFERRED | Tech Lead / Developer; F12 | Existing event/offline-buffering/exactly-once and validation-gate obligations. | Feature board / product PRD. |
 | F07.OFFLINE-DAILY | OPEN | Frontend/Mobile Developer / QA; F07 | Real Daily producer, Remote Config seam and offline pre-fetched Daily proof; fake producer is not end-user coverage. | F08 qa.md and existing F07 dependency. |
 | F08-PLATFORM-ATTESTATION | DEFERRED | Tech Lead / DevOps; applicable platform release | Existing post-MVP attestation and release identity/CI-secret ownership notes; no enforcement/policy change during migration. | F08 architecture and release authority. |
-| OPTIONAL-QUALITY-NOTES | OPEN / non-blocking | Relevant role when touching scope | F04 reduced-motion assertion; F05 pulse-direction cosmetic and routeLog robustness; F02 Phase-2 coverage; previously noted analyzer cleanup. Do not invent blockers or claim completion. | Source qa.md reports and archived orchestrations. |
+| OPTIONAL-QUALITY-NOTES | OPEN / non-blocking | Relevant role when touching scope | F04 reduced-motion assertion; F05 pulse-direction cosmetic and routeLog robustness; F02 Phase-2 coverage; previously noted analyzer cleanup; app/pubspec.yaml still carries an "Interim — 5 files" comment and melos `content:sync` says "no-op until F06-CONTENT" although the bundle now holds the 30-level pack (comment-only, Frontend/Mobile Developer on next touch). Do not invent blockers or claim completion. | Source qa.md reports and archived orchestrations. |
 
 ## Required Migration Follow-through
 
