@@ -29,6 +29,7 @@ import 'widgets/puzzle_board.dart';
 import 'widgets/restart_button.dart';
 import 'widgets/target_rail.dart';
 import 'widgets/undo_button.dart';
+import '../reduce_motion.dart';
 
 /// Route `'/play'` (`architecture.md` §13). Resolves the puzzle + validator,
 /// then hands off to [_LoadedPlaySession] which owns the [PlaySessionController]
@@ -360,11 +361,7 @@ class _PlayBodyState extends State<_PlayBody> with TickerProviderStateMixin {
   }
 
   void _enterWon({required bool animate}) {
-    final reduceMotion = WidgetsBinding
-        .instance
-        .platformDispatcher
-        .accessibilityFeatures
-        .disableAnimations;
+    final reduceMotion = reduceMotionRequested();
     _tl = WonTimeline.forReduceMotion(reduceMotion);
     _timeline.duration = _tl.total;
     final row = _c.wonRow ?? 0;

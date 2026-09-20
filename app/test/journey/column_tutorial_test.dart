@@ -232,4 +232,44 @@ void main() {
     await _boot(tester, db, level: 4);
     expect(find.byType(ColumnTutorialOverlay), findsNothing);
   });
+
+  // F03-QA-04: the gesture ghost loops unless the OS asks for reduced motion —
+  // iOS reports that as `reduceMotion`, Android as `disableAnimations`.
+  Future<void> bootWith(
+    WidgetTester tester,
+    FakeAccessibilityFeatures features,
+  ) async {
+    tester.platformDispatcher.accessibilityFeaturesTestValue = features;
+    addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
+    tester.view.physicalSize = const Size(390, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+    final db = AppDatabase.forTesting(NativeDatabase.memory());
+    addTearDown(db.close);
+    await tester.pumpWidget(_app(db));
+    await tester.pump(const Duration(milliseconds: 600));
+    await tester.pump(const Duration(milliseconds: 600));
+    expect(find.byType(ColumnTutorialOverlay), findsOneWidget);
+  }
+
+  testWidgets('control — no OS signal: the gesture ghost loops', (
+    tester,
+  ) async {
+    await bootWith(tester, const FakeAccessibilityFeatures());
+    await tester.pump(const Duration(seconds: 6));
+    expect(tester.hasRunningAnimations, isTrue);
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
+  for (final signal in <String, FakeAccessibilityFeatures>{
+    'iOS reduceMotion': const FakeAccessibilityFeatures(reduceMotion: true),
+    'Android disableAnimations': const FakeAccessibilityFeatures(
+      disableAnimations: true,
+    ),
+  }.entries) {
+    testWidgets('${signal.key}: the gesture ghost is static', (tester) async {
+      await bootWith(tester, signal.value);
+      await tester.pumpAndSettle(); // throws if the ghost still loops
+    });
+  }
 }

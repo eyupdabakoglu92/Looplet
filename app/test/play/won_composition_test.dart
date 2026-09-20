@@ -228,27 +228,36 @@ void main() {
     },
   );
 
-  testWidgets('reduce motion: static row, hold, then fade; same rest rules', (
-    tester,
-  ) async {
-    const size = Size(390, 844);
-    tester.platformDispatcher.accessibilityFeaturesTestValue =
-        const FakeAccessibilityFeatures(disableAnimations: true);
-    addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
+  for (final signal in <String, FakeAccessibilityFeatures>{
+    'iOS reduceMotion': const FakeAccessibilityFeatures(reduceMotion: true),
+    'Android disableAnimations': const FakeAccessibilityFeatures(
+      disableAnimations: true,
+    ),
+  }.entries) {
+    testWidgets('reduce motion (${signal.key}): static row, hold, then fade; '
+        'same rest rules', (tester) async {
+      const size = Size(390, 844);
+      tester.platformDispatcher.accessibilityFeaturesTestValue = signal.value;
+      addTearDown(
+        tester.platformDispatcher.clearAccessibilityFeaturesTestValue,
+      );
 
-    await _boot(tester, size, row: 3);
-    await _swipeRow(tester, 3);
-    await _pumpToWonT0(tester);
+      await _boot(tester, size, row: 3);
+      await _swipeRow(tester, 3);
+      await _pumpToWonT0(tester);
 
-    await tester.pump(const Duration(milliseconds: 250));
-    expect(find.byType(CompletionPanel), findsNothing);
-    expect(find.byType(DockedAnswerRow), findsNothing);
-    await tester.pump(const Duration(milliseconds: 100)); // ≈ T0+350: dock fade
-    expect(find.byType(DockedAnswerRow), findsOneWidget);
-    expect(find.byType(CompletionPanel), findsNothing);
-    await tester.pumpAndSettle();
-    _expectRestVisibility(tester, size);
-  });
+      await tester.pump(const Duration(milliseconds: 250));
+      expect(find.byType(CompletionPanel), findsNothing);
+      expect(find.byType(DockedAnswerRow), findsNothing);
+      await tester.pump(
+        const Duration(milliseconds: 100),
+      ); // ≈ T0+350: dock fade
+      expect(find.byType(DockedAnswerRow), findsOneWidget);
+      expect(find.byType(CompletionPanel), findsNothing);
+      await tester.pumpAndSettle();
+      _expectRestVisibility(tester, size);
+    });
+  }
 }
 
 // --- helpers -------------------------------------------------------------------

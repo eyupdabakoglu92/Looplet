@@ -304,6 +304,38 @@ void main() {
     );
 
     testWidgets(
+      'an OS pointer cancel mid-drag aborts, then the app pauses — no move '
+      '(F03-QA-03)',
+      timeout: hangGuard,
+      (tester) async {
+        await tester.binding.setSurfaceSize(_large);
+        final db = _freshDb();
+        await _bootTo(tester, db, 'smoke-tr-02');
+
+        final gesture = await tester.startGesture(_rowStart(tester, 1));
+        await gesture.moveBy(const Offset(40, 0));
+        await tester.pump(); // frames still enabled: the row is lifted
+        // The real iOS order: the OS cancels the touch first…
+        await gesture.cancel();
+        await tester.pump();
+        // …then the app leaves the foreground. Paused: no pump.
+        tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+        await Future<void>.delayed(const Duration(milliseconds: 300));
+        final atPause = await ActiveSessionRepo(db).read();
+        expect(atPause?.moveCount ?? 0, 0, reason: 'no move persisted');
+        expect(atPause?.appliedMoves ?? const <String>[], isEmpty);
+        tester.binding.handleAppLifecycleStateChanged(
+          AppLifecycleState.resumed,
+        );
+        await tester.pumpAndSettle();
+
+        expect(_moves(tester), 0);
+        expect(tester.takeException(), isNull);
+        await _unmount(tester);
+      },
+    );
+
+    testWidgets(
       'paused mid-animation commits a settled move (never torn)',
       timeout: hangGuard,
       (tester) async {

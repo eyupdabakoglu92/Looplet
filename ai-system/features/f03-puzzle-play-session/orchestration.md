@@ -10,11 +10,11 @@ Rework
 
 ## Current Owner
 
-Frontend/Mobile Developer
+Tech Lead
 
 ## Next Role
 
-Frontend/Mobile Developer
+Tech Lead
 
 ## Active Task Ledger
 
@@ -23,8 +23,8 @@ Frontend/Mobile Developer
 - [x] Task ID: F03-FE-WON | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: DELIVERED 2026-09-20 (frontend.md; F03.WIN-LAYOUT 33/33). F03-QA-01: implement win-sequence-then-panel sequencing (panel not before T0+600 ms) and the UI Designer's Won composition; add widget/golden layout assertions; update frontend.md | Depends On: F03-UI-WON
 - [x] Task ID: F03-FE-INTEG | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: DELIVERED 2026-09-20 (12/12 exit 0 on 3 simulator widths). F03-QA-02: make integration_test/play_session_test.dart group 4 complete and exit 0 on a live simulator on 2 widths; no product-semantics change | Depends On: -
 - [x] Task ID: F03-QA-REVERIFY | Assigned Role: QA | Status: Done | Summary: DONE 2026-09-20 — verdict Rejected (F03-QA-03, F03-QA-04; qa.md). Re-verify F03 final on the changed win path per Planned QA Re-verify Brief; independent verdict | Depends On: F03-FE-WON, F03-FE-INTEG
-- [ ] Task ID: F03-FE-CANCEL | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: F03-QA-03: a pointer cancel (OS interruption) must abort the drag with no move; releases (incl. outside the plate) keep resolving; real-PointerCancel tests; see Current Frontend Brief | Depends On: -
-- [ ] Task ID: F03-FE-REDUCEMOTION | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: F03-QA-04: honour iOS Reduce Motion (reduceMotion OR disableAnimations) through one shared helper at all six call sites (F03, F04, F05); tests for both flags; see Current Frontend Brief | Depends On: -
+- [x] Task ID: F03-FE-CANCEL | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: DELIVERED 2026-09-21 (frontend.md). F03-QA-03: a pointer cancel aborts the drag (render Listener + controller.cancelDrag); root cause corrected: a cancel of an accepted pan is delivered as onPanEnd, not onPanCancel; widget 5/5, controller +2, device suite 13/13 on 3 simulator widths; two negative controls | Depends On:
+- [x] Task ID: F03-FE-REDUCEMOTION | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: DELIVERED 2026-09-21 (frontend.md). F03-QA-04: one shared reduceMotionRequested() (reduceMotion OR disableAnimations) at all six call sites incl. F04 panel and F05 ring/tutorial; per-site tests for both flags with no-signal controls and a negative control; 243 app tests | Depends On:
 - [ ] Task ID: F03-QA-REVERIFY2 | Assigned Role: QA | Status: Queued | Summary: Re-verify F03-QA-03/04 and the paths the fixes touch per Planned QA Re-verify Brief 2; independent verdict | Depends On: F03-FE-CANCEL, F03-FE-REDUCEMOTION
 
 ## Open Tasks
@@ -196,7 +196,8 @@ not-evaluated
   * Prerequisite / External Decision: None
   * Re-evaluation Trigger: F03-FE-CANCEL delivery
   * Blocks: F03 final acceptance
-  * Result: PENDING
+  * Result: PASS
+  * Provenance / Note: 2026-09-21, working tree on HEAD 6ad8268 (uncommitted): `flutter test test/play/pointer_cancel_test.dart` 5/5 (real PointerCancelEvent via TestGesture.cancel; cancel + paused/resumed leaves the store's appliedMoves empty; pre-slop cancel; release inside and outside the plate still resolves), play_session_controller_test +2, integration_test/play_session_test.dart 13/13 exit 0 on iPhone 16, 16e, 16 Pro Max (iOS 18.6 simulators). Negative controls: old behaviour and an onPanCancel-only fix both FAIL the mid-drag cancel test. Synthetic cancel through the live binding, not an OS touch cancel (QA LIFECYCLE-LIVE).
 
 - Evidence ID: F03.REDUCE-MOTION-FLAG
   * Scenario: every reduce-motion call site (home_screen, column_tutorial_overlay, completion_panel ×2, play_session_screen, puzzle_board) reacts to `reduceMotion` and to `disableAnimations`
@@ -206,7 +207,8 @@ not-evaluated
   * Prerequisite / External Decision: None
   * Re-evaluation Trigger: F03-FE-REDUCEMOTION delivery
   * Blocks: F03 final acceptance
-  * Result: PENDING
+  * Result: PASS
+  * Provenance / Note: 2026-09-21, working tree on HEAD 6ad8268 (uncommitted): reduce_motion_test 12, journey_home_test +6, column_tutorial_test +3, won_composition_test reduce-motion x2 flags; each site tested under FakeAccessibilityFeatures(reduceMotion) and (disableAnimations) with a no-signal control; negative control (helper reading only disableAnimations) fails every iOS variant. melos analyze 0, format:check 0 (155 files), 197 package + 243 app tests pass. Flags are faked; that iOS Settings flips reduceMotion is QA REDUCE-MOTION-RUNTIME.
 
 - Evidence ID: F03.REDUCE-MOTION-RUNTIME
   * Scenario: with the real Settings toggle ON: F03 win (static hold → fade → panel, no glide/slide), F04 star reveal settled, F05 ring static
@@ -238,7 +240,7 @@ None
 
 ## Next Action
 
-Run Frontend/Mobile Developer on F03-FE-CANCEL and F03-FE-REDUCEMOTION using the Current Frontend Brief. Delivery returns to Tech Lead for reconciliation before F03-QA-REVERIFY2. Both fixes are behavioural (no new or changed visual output). F03's visual acceptance under the new Visual Quality Gate is handled by the design adoption program (workflow-follow-ups.md → Design Adoption Route), not by this closure.
+Tech Lead: reconcile the F03-FE-CANCEL / F03-FE-REDUCEMOTION delivery (frontend.md; two Needs-Tech-Lead-Clarification items: board shift/bounce under reduce motion, the QA-03 root-cause correction), reproduce the gates, then activate F03-QA-REVERIFY2 per Planned QA Re-verify Brief 2 (add the root-cause note: cancel of an accepted pan arrives as onPanEnd, so QA's real OS app-switch repro is the deciding evidence). F03.REDUCE-MOTION-RUNTIME and LIFECYCLE-LIVE stay QA-owned.
 
 ## Last Decision
 
@@ -246,9 +248,9 @@ Run Frontend/Mobile Developer on F03-FE-CANCEL and F03-FE-REDUCEMOTION using the
 
 ## Last Update
 
-* Updated By: Tech Lead
+* Updated By: Frontend/Mobile Developer
 * Timestamp: 2026-09-21
-* Summary: QA verdict reconciled; fixes routed; schema normalized (Visual Scope none for this reopen); QA plan fields left at defaults until QA activation.
+* Summary: F03-FE-CANCEL and F03-FE-REDUCEMOTION delivered; F03.CANCEL-TEST and F03.REDUCE-MOTION-FLAG PASS (automated); Delivery Review Pending; owner Tech Lead.
 
 ## Context & Follow-ups
 
@@ -273,6 +275,7 @@ F03 implementation is retained; F04/F05 integration code stays; the rework deliv
 * 2026-09-20 — Tech Lead: delivery reconciled (Accepted); Accessibility observed granted; F03-QA-REVERIFY Open, status In QA.
 * 2026-09-20 — QA: re-verify verdict Rejected (F03-QA-03, F03-QA-04); F03-QA-01/02 closed.
 * 2026-09-21 — Tech Lead: incident intake (ai-system upgrade): verdict reconciled, F03-FE-CANCEL / F03-FE-REDUCEMOTION opened, visual/QA-plan schema fields added.
+* 2026-09-21 — Frontend/Mobile Developer: F03-FE-CANCEL + F03-FE-REDUCEMOTION delivered (frontend.md); root cause of QA-03 corrected (onPanEnd, not onPanCancel).
 
 ## Current UI Brief
 
@@ -297,15 +300,9 @@ Non-goals: F04 product ACs, star/best logic and copy; new features; controller/p
 
 Decisions on the delivery's notes: (a) row-0 strip left visible between docked row and panel — accepted as specified; QA judges it visually against the rubric, no rework unless QA finds a fail condition. (b) the 30 ms L→R amber stagger from the original ui-design was never implemented (pre-existing, not in scope) — recorded in workflow-follow-ups.md as a non-blocking quality note; QA must not invent a blocker but may report it. (c) `PanelDensity` engagement at large text is not asserted by tests — QA checks it at a large Dynamic Type size. (d) latent: a session restored straight into `won` (unreachable in production because the snapshot is cleared at `won`) would show no docked row until a rebuild — recorded as a note only.
 
-## Current Frontend Brief (F03-FE-CANCEL, F03-FE-REDUCEMOTION — activated 2026-09-21)
+## Current Frontend Brief (F03-FE-CANCEL, F03-FE-REDUCEMOTION — DELIVERED 2026-09-21)
 
-Read: qa.md §8 (F03-QA-03, F03-QA-04), architecture.md §12 (backgrounding) and §18 (Won-sequence authority), ui-design.md §16.2 (reduce motion).
-
-F03-FE-CANCEL — QA reproduced 3× that an OS app switch during a held drag commits the swipe (persisted `R3`/`R4`). Verify the hypothesis before fixing: add a test that sends a real `PointerCancel` mid-drag and observe today's behaviour; then make a cancel abort the gesture (no `endDrag` resolution, no move, phase → idle, highlight cleared) while `_onPanEnd` releases — including a release outside the plate — keep resolving. Do not change threshold, tie band, undo/restart, persistence or the idle-pause path. Add tests (widget with `TestGesture.cancel()`; integration group 4 case that never pumps while paused) and record command/exit/counts.
-
-F03-FE-REDUCEMOTION — iOS Reduce Motion arrives as `AccessibilityFeatures.reduceMotion` ("Only supported on iOS"); the app reads only `disableAnimations` at six sites: `home_screen.dart:144`, `journey/column_tutorial_overlay.dart:49`, `rating/completion_panel.dart:110` and `:137`, `play/play_session_screen.dart:367`, `play/widgets/puzzle_board.dart:105`. Introduce one shared helper (`reduceMotionRequested = reduceMotion || disableAnimations`) and use it at every site; decide and document the `AnimationController.animationBehavior` consequences (won controllers already use `preserve`). Tests: each site under `FakeAccessibilityFeatures(reduceMotion: true)` and `(disableAnimations: true)`. F04/F05 acceptance criteria are unchanged (accessibility behaviour only); their suites must stay green; state the F04/F05 files touched and the change impact in frontend.md. No visual change on the normal-motion path.
-
-Deliver in frontend.md: task-to-code traceability, preserved behavior, evidence per task (exact commands, targets, exit, counts, revision), the mirror-vs-real limits (widget tests cannot prove the iOS flag or the OS touch cancel; QA does). Close both tasks, Delivery Review = Pending, owner → Tech Lead.
+Delivered; see frontend.md "F03-FE-CANCEL / F03-FE-REDUCEMOTION". Brief retained in the Tech Lead's 2026-09-21 intake record (change log).
 
 ## Planned QA Re-verify Brief 2 (F03-QA-REVERIFY2 — activate only after Tech Lead reconciliation)
 

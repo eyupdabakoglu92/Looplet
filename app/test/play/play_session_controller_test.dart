@@ -42,6 +42,43 @@ void main() {
 
   tearDown(() => db.close());
 
+  test('cancelDrag while tracking → idle, line dropped, no move, no write '
+      '(F03-QA-03)', () async {
+    final c = _fresh(repo);
+    await c.whenPersisted;
+
+    c.beginDrag(startRow: 0, startCol: 0);
+    c.updateDrag(const Offset(40, 0));
+    expect(c.phase, PlaySessionPhase.tracking);
+    expect(c.activeLine, isNotNull);
+
+    c.cancelDrag();
+    expect(c.phase, PlaySessionPhase.idle);
+    expect(c.activeLine, isNull);
+    expect(c.moveCount, 0);
+
+    // A release delivered after the cancel resolves nothing.
+    expect(c.endDrag(const Offset(40, 0)), DragResolution.none);
+    expect(c.moveCount, 0);
+
+    await c.whenPersisted;
+    expect((await repo.read())!.appliedMoves, isEmpty);
+    c.dispose();
+  });
+
+  test('cancelDrag is inert outside tracking (idle, animatingShift)', () async {
+    final c = _fresh(repo);
+    await c.whenPersisted;
+
+    c.cancelDrag(); // idle
+    expect(c.phase, PlaySessionPhase.idle);
+
+    await _solveMove(c); // → animatingShift, move already applied
+    c.cancelDrag();
+    expect(c.phase, PlaySessionPhase.animatingShift);
+    c.dispose();
+  });
+
   test('fresh start writes an initial in-progress snapshot', () async {
     final c = _fresh(repo);
     await c.whenPersisted;

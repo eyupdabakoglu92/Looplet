@@ -175,4 +175,72 @@ void main() {
     await tester.pumpAndSettle();
     expect(lastPlayArgs?.journeyLevel, 1);
   });
+
+  /// Level 1 done + an active session on level 2 → the ring's in-progress node
+  /// (the only thing that pulses).
+  Future<void> seedInProgress() async {
+    await seedCompleted(1);
+    await ActiveSessionRepo(db).save(journeySnapshot('journey-tr-02'));
+  }
+
+  // F03-QA-04: iOS Reduce Motion arrives as `reduceMotion` (iOS-only), Android
+  // "Remove animations" as `disableAnimations`; the ring honours either.
+  void motion(WidgetTester tester, FakeAccessibilityFeatures features) {
+    tester.platformDispatcher.accessibilityFeaturesTestValue = features;
+    addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
+    tester.view.physicalSize = const Size(390, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+  }
+
+  final signals = <String, FakeAccessibilityFeatures>{
+    'iOS reduceMotion': const FakeAccessibilityFeatures(reduceMotion: true),
+    'Android disableAnimations': const FakeAccessibilityFeatures(
+      disableAnimations: true,
+    ),
+  };
+
+  testWidgets('control — no OS signal: the in-progress node keeps breathing', (
+    tester,
+  ) async {
+    motion(tester, const FakeAccessibilityFeatures());
+    await seedInProgress();
+    await tester.pumpWidget(buildApp());
+    await tester.pump(const Duration(seconds: 6)); // past any one-shot
+    expect(tester.hasRunningAnimations, isTrue); // the repeating pulse
+  });
+
+  testWidgets('control — no OS signal: the terminal bloom plays for ~620 ms', (
+    tester,
+  ) async {
+    motion(tester, const FakeAccessibilityFeatures());
+    await seedCompleted(30);
+    await tester.pumpWidget(buildApp());
+    final frames = await tester.pumpAndSettle(const Duration(milliseconds: 16));
+    expect(frames, greaterThan(20));
+  });
+
+  for (final signal in signals.entries) {
+    testWidgets('${signal.key}: no pulse while a level is in progress', (
+      tester,
+    ) async {
+      motion(tester, signal.value);
+      await seedInProgress();
+      await tester.pumpWidget(buildApp());
+      // `pumpAndSettle` throws if the repeating pulse is still running.
+      await tester.pumpAndSettle();
+    });
+
+    testWidgets('${signal.key}: no bloom when all 30 are complete', (
+      tester,
+    ) async {
+      motion(tester, signal.value);
+      await seedCompleted(30);
+      await tester.pumpWidget(buildApp());
+      final frames = await tester.pumpAndSettle(
+        const Duration(milliseconds: 16),
+      );
+      expect(frames, lessThan(20)); // settled at once, no 620 ms bloom
+    });
+  }
 }

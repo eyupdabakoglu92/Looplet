@@ -301,6 +301,18 @@ class PlaySessionController extends ChangeNotifier {
     }
   }
 
+  /// The pointer was cancelled (an OS interruption such as an app switch, a
+  /// system gesture or an incoming call) — abort the gesture: no move is
+  /// resolved, nothing is applied or persisted, the lifted line drops and the
+  /// state returns to [idle] (`architecture.md` §12, F03-QA-03). A genuine
+  /// release goes through [endDrag] instead.
+  void cancelDrag() {
+    if (_phase != PlaySessionPhase.tracking) return;
+    _activeLine = null;
+    _phase = PlaySessionPhase.idle;
+    notifyListeners();
+  }
+
   /// Pointer released with cumulative [delta]. Resolves the move and moves to
   /// [animatingShift] / [animatingBounce] — the board then animates and calls
   /// [commitShift] / [commitBounce].

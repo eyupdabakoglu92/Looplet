@@ -7,6 +7,7 @@ import 'package:looplet_core/looplet_core.dart'
 import '../play_session_controller.dart';
 import '../play_theme.dart';
 import 'board_tile.dart';
+import '../../reduce_motion.dart';
 
 /// The hero: the 5×5 backlit board on a recessed plate, with the loop-rail
 /// affordance, the wrap-shift animation, the rejected-move bounce, and the win
@@ -98,11 +99,7 @@ class _PuzzleBoardState extends State<PuzzleBoard>
     }
     if (phase == PlaySessionPhase.won && _lastPhase != PlaySessionPhase.won) {
       // OS reduce-motion: the amber row + seam render static (no stagger/bloom).
-      final reduceMotion = WidgetsBinding
-          .instance
-          .platformDispatcher
-          .accessibilityFeatures
-          .disableAnimations;
+      final reduceMotion = reduceMotionRequested();
       if (reduceMotion) {
         _win.value = 1;
       } else {
@@ -140,7 +137,28 @@ class _PuzzleBoardState extends State<PuzzleBoard>
   }
 
   void _onPanEnd(DragEndDetails d) => _release(_dragOffset);
-  void _onPanCancel() => _release(_dragOffset);
+
+  /// Only reached when the pointer is cancelled before the pan is accepted
+  /// (never resolves a move — the pan slop was not even crossed).
+  void _onPanCancel() => _abort();
+
+  /// An OS-level pointer cancel (`PointerCancelEvent`: app switch, system
+  /// gesture, call) aborts the drag — no move (`architecture.md` §12,
+  /// F03-QA-03). Flutter's pan recogniser reports a cancel of an *accepted*
+  /// pan through `onPanEnd`, exactly like a lift-off, so `onPanCancel` alone
+  /// cannot tell them apart; this raw listener sees the cancel first (render
+  /// listeners run before the gesture arena's pointer router) and drops the
+  /// drag, which makes the `onPanEnd` that follows a no-op (phase is no longer
+  /// `tracking`). A genuine release — including one outside the plate — is a
+  /// `PointerUpEvent` and still resolves through [_release].
+  void _onPointerCancel(PointerCancelEvent _) => _abort();
+
+  void _abort() {
+    _pressedCell = null;
+    _dragOffset = Offset.zero;
+    _c.cancelDrag();
+    if (mounted) setState(() {});
+  }
 
   void _release(Offset delta) {
     _pressedCell = null;
@@ -235,68 +253,71 @@ class _PuzzleBoardState extends State<PuzzleBoard>
             _c.phase == PlaySessionPhase.animatingBounce);
     final dimInactive = lineActive ? PlayTheme.inactiveTileDim : 0.0;
 
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onPanDown: _onPanDown,
-      onPanUpdate: _onPanUpdate,
-      onPanEnd: _onPanEnd,
-      onPanCancel: _onPanCancel,
-      child: SizedBox(
-        width: widget.boardSize,
-        height: widget.boardSize,
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: PlayTheme.plate,
-            borderRadius: BorderRadius.circular(radius),
-            border: const Border(top: BorderSide(color: Color(0x0FFFFFFF))),
-            boxShadow: const <BoxShadow>[
-              BoxShadow(
-                color: Color(0x73000000),
-                offset: Offset(0, 3),
-                blurRadius: 10,
-              ),
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(radius),
-            child: Stack(
-              children: <Widget>[
-                // Loop rails on the active axis' two edges.
-                ..._buildRails(line, lineActive),
-                // Static tiles (skip the active line — the moving layer draws it).
-                for (var r = 0; r < _size; r++)
-                  for (var c = 0; c < _size; c++)
-                    if (!(lineActive && _inActiveLine(line, r, c)))
-                      Positioned(
-                        left: _plate + c * _stride,
-                        top: _plate + r * _stride,
-                        width: _tile,
-                        height: _tile,
-                        child: vacated && r == wonRow
-                            ? _GhostCell(size: _tile)
-                            : BoardTile(
-                                letter: letters[r][c],
-                                size: _tile,
-                                status: statuses[r][c],
-                                winning: wonRow != null && r == wonRow,
-                                pressed:
-                                    _pressedCell?.row == r &&
-                                    _pressedCell?.col == c,
-                                dim: (wonRow != null && r != wonRow)
-                                    ? 0.12
-                                    : (_inActiveLine(line, r, c)
-                                          ? 0
-                                          : dimInactive),
-                              ),
-                      ),
-                // Moving active line (with wrap ghosts).
-                if (lineActive) _buildMovingLine(line, letters, statuses),
-                // Winning seam bar (the docked overlay draws it once vacated).
-                if (wonRow != null && !vacated) _buildSeam(wonRow),
-                // Win bloom (finished by T0+600, i.e. before the dock).
-                if (wonRow != null && !vacated && _win.value > 0)
-                  _buildBloom(wonRow),
+    return Listener(
+      onPointerCancel: _onPointerCancel,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onPanDown: _onPanDown,
+        onPanUpdate: _onPanUpdate,
+        onPanEnd: _onPanEnd,
+        onPanCancel: _onPanCancel,
+        child: SizedBox(
+          width: widget.boardSize,
+          height: widget.boardSize,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: PlayTheme.plate,
+              borderRadius: BorderRadius.circular(radius),
+              border: const Border(top: BorderSide(color: Color(0x0FFFFFFF))),
+              boxShadow: const <BoxShadow>[
+                BoxShadow(
+                  color: Color(0x73000000),
+                  offset: Offset(0, 3),
+                  blurRadius: 10,
+                ),
               ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(radius),
+              child: Stack(
+                children: <Widget>[
+                  // Loop rails on the active axis' two edges.
+                  ..._buildRails(line, lineActive),
+                  // Static tiles (skip the active line — the moving layer draws it).
+                  for (var r = 0; r < _size; r++)
+                    for (var c = 0; c < _size; c++)
+                      if (!(lineActive && _inActiveLine(line, r, c)))
+                        Positioned(
+                          left: _plate + c * _stride,
+                          top: _plate + r * _stride,
+                          width: _tile,
+                          height: _tile,
+                          child: vacated && r == wonRow
+                              ? _GhostCell(size: _tile)
+                              : BoardTile(
+                                  letter: letters[r][c],
+                                  size: _tile,
+                                  status: statuses[r][c],
+                                  winning: wonRow != null && r == wonRow,
+                                  pressed:
+                                      _pressedCell?.row == r &&
+                                      _pressedCell?.col == c,
+                                  dim: (wonRow != null && r != wonRow)
+                                      ? 0.12
+                                      : (_inActiveLine(line, r, c)
+                                            ? 0
+                                            : dimInactive),
+                                ),
+                        ),
+                  // Moving active line (with wrap ghosts).
+                  if (lineActive) _buildMovingLine(line, letters, statuses),
+                  // Winning seam bar (the docked overlay draws it once vacated).
+                  if (wonRow != null && !vacated) _buildSeam(wonRow),
+                  // Win bloom (finished by T0+600, i.e. before the dock).
+                  if (wonRow != null && !vacated && _win.value > 0)
+                    _buildBloom(wonRow),
+                ],
+              ),
             ),
           ),
         ),

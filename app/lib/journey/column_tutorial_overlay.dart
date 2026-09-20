@@ -6,6 +6,7 @@ import 'package:looplet_core/looplet_core.dart' show MoveAxis;
 import '../play/play_session_controller.dart';
 import '../play/play_theme.dart';
 import 'journey_strings.dart';
+import '../reduce_motion.dart';
 
 /// The levels 4–6 column micro-tutorial (`ui-design.md §6/§7.3`,
 /// `architecture.md §9`). A diegetic, action-gated coach-mark over the F03
@@ -42,11 +43,7 @@ class _ColumnTutorialOverlayState extends State<ColumnTutorialOverlay>
   @override
   void initState() {
     super.initState();
-    final reduceMotion = WidgetsBinding
-        .instance
-        .platformDispatcher
-        .accessibilityFeatures
-        .disableAnimations;
+    final reduceMotion = reduceMotionRequested();
     _ghost = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1400),

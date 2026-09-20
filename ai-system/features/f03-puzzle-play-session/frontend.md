@@ -326,14 +326,90 @@ Controller state machine and persistence timing (`completed` snapshot + clear, F
 6. **Density concessions:** `PanelDensity` steps (compact → tight) on the next frame when the measured panel exceeds `0.64 H − inset`. At scale 1.0 no step is needed on the three simulator sizes; whether the step engaged in the 1.3 text-scale test is not separately asserted (the rule-2 assertion passes either way).
 7. **Not proven here (QA owns):** greyscale legibility, rotation, HOME during a held touch (F03.RUNTIME-LIMITS route A), AC9 highlight capture, and the win frames on real reachable rows through home/CONTINUE.
 
+## F03-FE-CANCEL / F03-FE-REDUCEMOTION — QA-03 / QA-04 rework (2026-09-21)
+
+**Tasks:** `F03-FE-CANCEL` (F03-QA-03: an OS interruption during a held drag committed the swipe) and `F03-FE-REDUCEMOTION` (F03-QA-04: iOS Reduce Motion was not honoured). Authority: `architecture.md` §12 (backgrounding), §18 / `ui-design.md` §16.2 (reduce motion), F04 `ui-design.md` §4/§9 and F05 `ui-design.md` §13 (reduced-motion end states — unchanged). **Visual Scope: none** — no visual output is added or changed on the normal-motion path. Revision: base HEAD `6ad8268` + uncommitted working tree (files below); every result below was produced on that tree.
+
+### Impacted files
+
+| File | Change | Why |
+| --- | --- | --- |
+| `app/lib/reduce_motion.dart` | **new** — `reduceMotionRequested()` = `accessibilityFeatures.reduceMotion \|\| .disableAnimations` | one shared read (iOS flag is `reduceMotion`, Android's is `disableAnimations`) |
+| `app/lib/home_screen.dart`, `app/lib/journey/column_tutorial_overlay.dart` (F05) | reduce-motion read → helper (1 site each) | QA-04 |
+| `app/lib/rating/completion_panel.dart` (F04) | reduce-motion read → helper (2 sites) | QA-04 |
+| `app/lib/play/play_session_screen.dart`, `app/lib/play/widgets/puzzle_board.dart` | reduce-motion read → helper (1 site each) | QA-04 |
+| `app/lib/play/play_session_controller.dart` | `cancelDrag()` — `tracking` → `idle`, line dropped, no move/persist; inert in every other phase | QA-03 |
+| `app/lib/play/widgets/puzzle_board.dart` | `Listener(onPointerCancel)` around the pan `GestureDetector`; `_onPanCancel` and the listener both call `_abort()` | QA-03 |
+| `app/test/play/pointer_cancel_test.dart` | **new** — 5 widget tests, real `PointerCancelEvent` | `F03.CANCEL-TEST` |
+| `app/test/play/play_session_controller_test.dart` | +2 `cancelDrag` tests | `F03.CANCEL-TEST` |
+| `app/integration_test/play_session_test.dart` | +1 group-4 case: cancel, then `paused` (no pump while paused) | `F03.CANCEL-TEST` |
+| `app/test/reduce_motion_test.dart` | **new** — 12 tests (helper truth table; board win; F04 reveal) | `F03.REDUCE-MOTION-FLAG` |
+| `app/test/journey/journey_home_test.dart` (+6), `app/test/journey/column_tutorial_test.dart` (+3), `app/test/play/won_composition_test.dart` (reduce-motion test now runs for both flags, +1) | per-site tests with a no-signal control | `F03.REDUCE-MOTION-FLAG` |
+
+### Retro-bugfix analysis
+
+* **Broken user path (QA-03):** a player holds a swipe, the OS takes the touch away (app switch, system gesture, call) and the half-finished swipe is played as a move.
+* **Root cause — differs from QA's hypothesis.** QA suspected `PuzzleBoard._onPanCancel → _release`. Flutter's `DragGestureRecognizer` reports a `PointerCancelEvent` of an **accepted** pan through `onEnd` (`didStopTrackingLastPointer → _checkEnd`), exactly like a lift-off; `onPanCancel` fires only before the pan slop is crossed. So `onPanEnd` resolved the move and `paused` then committed it. Fixing only `_onPanCancel` is not enough (verified — see the second control below). A render `Listener` receives the cancel before the recogniser's pointer router, drops the drag (`controller.cancelDrag()`), and the `onPanEnd` that follows finds the phase no longer `tracking` and does nothing.
+* **Entry paths:** iOS touch cancel before `paused`/`inactive`; cancel with no lifecycle change (system gesture, call banner); cancel before the pan slop (row never lifted); genuine release inside / outside the plate (unchanged, still resolves); `paused` with the pointer still down and no cancel (existing path — `onAppPaused` handles `tracking`); second-finger / pointer while `inputLocked` (`_onPanDown` ignores it, an abort in a non-`tracking` phase is inert).
+* **State read/written:** `PlaySessionPhase`, `activeLine`, `moveCount`, `appliedMoves` and the persisted snapshot — nothing is written on cancel; `_dragOffset` / `_pressedCell` (board-local) reset.
+* **Unaffected, deliberately:** drag threshold and tie band, `endDrag` resolution, shift/bounce animations, undo/restart, persistence timing, idle-pause path, F04/F05 behaviour.
+* **Matrix:** fresh session (widget tests) · persisted snapshot after cancel + `paused` + `resumed` (`appliedMoves` empty in the store) · alternate path: pre-slop cancel · lifecycle-only `paused` mid-drag (existing integration test, still green).
+
+### Task-to-code traceability
+
+| Task | Status | Where | Behaviour |
+| --- | --- | --- | --- |
+| F03-FE-CANCEL | **Complete** | `puzzle_board.dart` `_onPointerCancel` / `_onPanCancel` / `_abort`; `play_session_controller.dart` `cancelDrag` | a pointer cancel aborts the drag: no move, `MOVES` unchanged, `idle`, nothing persisted; a genuine release (incl. outside the plate) resolves as before |
+| F03-FE-REDUCEMOTION | **Complete** | `reduce_motion.dart`; six call sites: `home_screen.dart:144` (F05 ring), `column_tutorial_overlay.dart:49` (F05), `completion_panel.dart:110` and `:137` (F04), `play_session_screen.dart:367` (F03 won timeline), `puzzle_board.dart:105` (F03 win) | every site honours `reduceMotion` **or** `disableAnimations`; the reduced won timeline (660 ms), F04 end-state reveal, static F05 ring / tutorial ghost now run on iOS |
+
+### `AnimationController.animationBehavior` decision
+
+The won controllers already use `AnimationBehavior.preserve` (kept: the reduced timeline's 300 ms hold must not collapse). Flutter's own duration scaling for `AnimationBehavior.normal` reads only `disableAnimations` (Android); it is **not** triggered by iOS `reduceMotion`, so the helper's explicit branches are what switch iOS to the reduced paths. The board's shift / bounce controllers, the F04 panel's controllers and the home / tutorial controllers keep `normal`: no contract makes the *move* animation itself reduce-motion sensitive (architecture §18 / ui-design §16.2 name the win moment, F04 the reveal, F05 the pulse / bloom / ghost), so on iOS a tile shift still animates at normal speed while on Android `disableAnimations` still collapses it (pre-existing platform difference). **Not changed; flagged for Tech Lead (§16).**
+
+### F04 / F05 change impact
+
+Only the *source* of the reduce-motion flag changed (three files, four call sites). F04/F05 ACs, copy, layout, timing and persistence are untouched; their suites are green. On iOS with Reduce Motion ON they now take the reduced-motion end states their `ui-design.md` already specifies.
+
+### Contract compliance
+
+Screen / route: Preserved · UI state / store state: Extended (`cancelDrag`) · Navigation / back / header: Preserved · Async / lifecycle: Preserved (`onAppPaused` unchanged; the cancel now arrives first) · Backend / error mapping: Not Applicable.
+
+### Test evidence by task
+
+| Task / behaviour | Class | Command / action | Target | Result | Provenance / isolation |
+| --- | --- | --- | --- | --- | --- |
+| F03.CANCEL-TEST — cancel mid-drag then `inactive/hidden/paused/resumed`: no move, store `appliedMoves` empty, next swipe plays; pre-slop cancel; release inside / outside the plate still resolves (1-move win); non-winning release still commits one persisted move | automated functional (widget, real `PointerCancelEvent` via `TestGesture.cancel`) | `flutter test test/play/pointer_cancel_test.dart` | flutter_tester | **5/5 pass** | working tree on `6ad8268`; in-memory drift DB; validator = `NeverValidWordValidator` |
+| F03.CANCEL-TEST — controller | automated functional | `flutter test test/play/play_session_controller_test.dart` | Dart VM | **+2 pass** (`cancelDrag` while tracking; inert in idle / animatingShift) | same |
+| **Negative control 1** | mutation | listener removed **and** `_onPanCancel → _release` restored (old behaviour) | same | mid-drag cancel test **FAILS** (`MOVES` no longer 0) as it must; source restored | proves the test sees the defect |
+| **Negative control 2** | mutation | `_onPanCancel → _abort()` only, **no `Listener`** (QA's literal recommendation) | same | mid-drag cancel test **still FAILS** — the cancel arrives as `onPanEnd` | proves the root cause and that the listener is required; source restored |
+| F03.CANCEL-TEST — device form | repeatable integration | `flutter test integration_test/play_session_test.dart -d <UDID>` | iPhone 16 (393×852), iPhone 16e (390×844), iPhone 16 Pro Max (440×956), iOS 18.6 simulators | **13/13 PASS, exit 0** on each (≈ 19 s test time; 12 prior + the new cancel-then-paused case, no frame requested while paused) | synthetic pointer cancel through the live binding — **not** an OS touch cancel |
+| F03.REDUCE-MOTION-FLAG | automated functional | `flutter test test/reduce_motion_test.dart test/journey/journey_home_test.dart test/journey/column_tutorial_test.dart test/play/won_composition_test.dart` | flutter_tester | **all pass**: helper truth table (none / iOS / Android / both); per site: F03 board win (seam already full at 100 ms), F03 won timeline (static row → hold → fade, both flags), F04 reveal (end state, nothing running), F05 ring (no pulse with a real in-progress session, no terminal bloom), F05 tutorial ghost static — each with a **no-signal control** that proves the animation does run without the flag | `FakeAccessibilityFeatures(reduceMotion: true)` and `(disableAnimations: true)` |
+| **Negative control 3** | mutation | helper reads only `disableAnimations` (old behaviour) | same | every iOS-flag variant **FAILS** (helper, board, F04 reveal, F03 won, F05 ring pulse + bloom, F05 tutorial) while the Android variants pass; source restored | proves the tests distinguish the platform flags |
+| Regression | automated functional | `melos run analyze` / `melos run format:check` / `melos run test` | workspace | analyze exit 0 (**No issues found** in every package and the app), format exit 0 (155 files, 0 changed), **197 package tests (177 in `packages/*` + 20 `looplet_authoring`, unchanged) + 243 app tests pass** (214 → 243: +5 cancel, +2 controller, +12 reduce_motion, +6 home, +3 tutorial, +1 won) | same working tree |
+
+### Not proven here (QA owns — `F03.REDUCE-MOTION-RUNTIME`, LIFECYCLE-LIVE)
+
+* That the real iOS Settings toggle flips `AccessibilityFeatures.reduceMotion` (the tests fake the flags) and that F03 win / F04 reveal / F05 ring visibly follow it.
+* That a real OS app switch during a held drag now yields no move (QA's original repro: hold ≥ 3 s, then `simctl launch` another app). The synthetic cancel proves the handler and event order in Flutter's own dispatch, not the iOS touch cancellation.
+* No developer runtime self-check was run for this delivery (no recording / screenshots) — Visual Scope none; the normal-motion path is unchanged.
+* Physical-finger accuracy (unchanged N3).
+
 ---
 
 # WORKFLOW HANDOFF SUGGESTION (NON-AUTHORITATIVE)
 
-* **Completed Tasks:** F03-FE1…FE9 (earlier) + **F03-FE-WON** and **F03-FE-INTEG** (2026-09-20).
-* **Remaining Tasks:** Tech Lead delivery reconciliation, then F03-QA-REVERIFY (QA).
+* **Completed Tasks:** F03-FE1…FE9, F03-FE-WON, F03-FE-INTEG (earlier) + **F03-FE-CANCEL** and **F03-FE-REDUCEMOTION** (2026-09-21).
+* **Remaining Tasks:** Tech Lead delivery reconciliation, then F03-QA-REVERIFY2 (QA: real OS interruption, real Reduce Motion toggle).
 * **Blockers:** none.
+* **Needs Tech Lead Clarification:** see §16 (below) — shift/bounce animation vs reduce motion; the QA-03 root-cause correction.
 * **Status Suggestion:** Needs Tech Lead Review (then Ready for QA).
+
+---
+
+## 16. Needs Tech Lead Clarification (2026-09-21)
+
+1. **Board shift/bounce under reduce motion.** No authority makes the tile shift / bounce reduce-motion sensitive; on iOS it keeps animating, on Android `disableAnimations` collapses it (Flutter default). Kept as is. Decide whether a contract line is wanted (then UI Designer + a follow-up task).
+2. **QA-03 root cause differs from the recorded hypothesis** (cancel of an accepted pan is delivered as `onPanEnd`); `qa.md` F03-QA-03's mechanism note should be read with §"Retro-bugfix analysis" above. No contract change.
 
 ---
 

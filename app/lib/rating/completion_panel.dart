@@ -6,6 +6,7 @@ import '../play/play_strings.dart';
 import '../play/play_theme.dart';
 import 'completion_result.dart';
 import 'rating_strings.dart';
+import '../reduce_motion.dart';
 
 /// Vertical density of the panel. F03 `ui-design.md` §16.3 concessions when the
 /// panel would exceed the 64 %-of-screen cap (large OS text scale, long
@@ -103,11 +104,7 @@ class _CompletionPanelState extends State<CompletionPanel>
   void _startOrSettle() {
     if (_revealStarted) return;
     _revealStarted = true;
-    final reduceMotion = WidgetsBinding
-        .instance
-        .platformDispatcher
-        .accessibilityFeatures
-        .disableAnimations;
+    final reduceMotion = reduceMotionRequested();
     if (reduceMotion) {
       _reveal.value = 1;
       if (_isNewBest) _underline.value = 1;
@@ -130,11 +127,7 @@ class _CompletionPanelState extends State<CompletionPanel>
     final becameNewBest =
         oldWidget.result?.bestOutcome != BestOutcome.newBest && _isNewBest;
     if (becameNewBest && !_underline.isAnimating && _underline.value == 0) {
-      final reduceMotion = WidgetsBinding
-          .instance
-          .platformDispatcher
-          .accessibilityFeatures
-          .disableAnimations;
+      final reduceMotion = reduceMotionRequested();
       reduceMotion ? _underline.value = 1 : _underline.forward();
     }
   }

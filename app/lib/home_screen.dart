@@ -12,6 +12,7 @@ import 'play/debug_puzzle_library.dart';
 import 'play/play_session_args.dart';
 import 'play/play_theme.dart';
 import 'play/widgets/play_stage.dart';
+import 'reduce_motion.dart';
 
 /// The app's home (`/`) — F05 (`ui-design.md` "The loop, filling"). Replaces the
 /// debug placeholder. LOOPLET wordmark, a 30-tick journey-progress ring with the
@@ -137,11 +138,7 @@ class _JourneyRingState extends State<_JourneyRing>
   @override
   void initState() {
     super.initState();
-    _reduceMotion = WidgetsBinding
-        .instance
-        .platformDispatcher
-        .accessibilityFeatures
-        .disableAnimations;
+    _reduceMotion = reduceMotionRequested();
     _pulse = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 2000),
