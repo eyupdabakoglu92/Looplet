@@ -84,7 +84,7 @@ None
 
 ## Next Action
 
-Wait for F03-QA-RUNTIME (the single active QA feature); Tech Lead then reviews its verdict and activates F05-QA-STRICT with F03's provenance reused for F05.SHARED-RUNTIME. Keep F05-QA-STRICT queued; do not activate F09 while F05 acceptance is unfinished. Use the QA brief below instead of stale command/verdict suggestions in the archived snapshot.
+Wait for the F03 rework (win sequence/panel geometry) and F03's re-QA; F03's first final QA returned Rejected on 2026-09-20 and the shared win/exit path is changing. Tech Lead then activates F05-QA-STRICT, reusing F03 provenance for F05.SHARED-RUNTIME only for unchanged paths. Keep F05-QA-STRICT queued; do not activate F09 while F05 acceptance is unfinished. Use the QA brief below instead of stale command/verdict suggestions in the archived snapshot.
 
 ## Last Decision
 
@@ -111,6 +111,7 @@ F05 code and the promoted strict pack are unchanged. Previous qa.md approved the
 
 * 2026-09-18 — migrated state; see the immutable pre-migration snapshot for all earlier tasks, decisions and evidence.
 * 2026-09-20 — Tech Lead: QA sequencing set to F03 first; F05 routing note only.
+* 2026-09-20 — Tech Lead: F03 QA Rejected; F05 stays queued behind F03 rework + re-QA (rework-control rule).
 
 ## Consumed Signals
 

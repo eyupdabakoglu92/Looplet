@@ -143,7 +143,7 @@ None
 
 ## Next Action
 
-Queued behind F03-QA-RUNTIME (the single active QA feature); F08-LOCAL-EVIDENCE and F08-QA-FUNCTIONAL stay Queued and none waits for paid deployment. Tech Lead reviews F03's runtime provenance before deciding whether F08.LOCAL-RESUME/LIFECYCLE can reuse any of it for the identical scope. The release task remains Blocked and no deployment/billing action is authorized by this migration. After functional QA, resolve the release decision explicitly, run the scoped DevOps task, then Tech Lead review and final QA; DevOps Ready alone never closes F08.
+Queued behind the F03 rework (F03 final QA returned Rejected 2026-09-20; rework-control rule blocks other-feature client/QA activation); F08-LOCAL-EVIDENCE and F08-QA-FUNCTIONAL stay Queued and none waits for paid deployment. Tech Lead reviews F03's runtime provenance (resume/kill PASS on rev 7a907dd) before deciding whether F08.LOCAL-RESUME can reuse any of it for the identical scope after F03 re-QA. The release task remains Blocked and no deployment/billing action is authorized by this migration. After functional QA, resolve the release decision explicitly, run the scoped DevOps task, then Tech Lead review and final QA; DevOps Ready alone never closes F08.
 
 ## Last Decision
 
