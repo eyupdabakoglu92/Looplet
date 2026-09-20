@@ -1,266 +1,181 @@
-# F03 — puzzle-play-session: QA Report (re-verify after F03-FE9)
+# F03 — puzzle-play-session: QA Report
+
+QA run: 2026-09-20 · Task: F03-QA-RUNTIME · QA Stage: final · QA Scope: client-only · Release Scope: none
+Verified revision: `7a907dd` (working tree clean; app/, packages/, content/, tools/ byte-identical to `ac7f74d`, which the first gates ran on — only `ai-system/` differs). This report replaces the 2026-09-06 report; that approval is NOT imported (its scope predates commit `e4311d3` — F04/F05 edits to `lib/play`).
 
 ---
 
 ## 0a. Evidence Mode Declaration
 
-* **Bash / build access:** VAR
-* **e2e test suite** (Detox / Patrol / `integration_test` on a device): **KISMEN** — an `integration_test/play_session_test.dart` suite now exists (scenarios 1–4). It runs on a device via `flutter test integration_test -d <device>` (wired into CI as a best-effort `continue-on-error` step). A **headless** `flutter test integration_test/` run is slow + timing-sensitive for this app's drift-backed async boot and was not carried to completion in this environment; **no device / simulator session** is available here.
-* **Screenshot / browser tool:** YOK
-* **Runtime validation method:** **`automated functional` (strong)** — the F03-FE9 `test/play/play_session_runtime_test.dart` suite (13 `flutter_test` widget tests) drives real gestures through the full widget tree, pumps the real ~190 ms animation window, dispatches app-lifecycle transitions, and does a dispose + remount "kill/relaunch" on a shared in-memory DB — directly targeting `qa.md §17` scenarios **1–4**. Plus **build gates**. The `repeatable integration` form (the `integration_test/` suite) is delivered but its device-matrix run is pending a device. `qa.md §17` scenarios **5–7** are pure visual / OS confirmations that still need a device pass.
-
-Consequence: the runtime scenarios that were `Runtime Validation Pending` at the prior verdict are now **closed to the automatable slice (1–4)**; the residual is a **3-item manual device confirmation (5–7)**, carried as Notes for the Tech Lead to accept the deferral at close-out (per the Tech Lead's Next-Action brief and `architecture.md §18 → [RUNTIME VALIDATION PENDING — F03-FE9]`).
+* Bash / build access: **VAR**
+* e2e / device test suite: **VAR** — `flutter test integration_test/play_session_test.dart -d D0011CE7-6E50-4367-93FA-B323E81270BE` (iPhone 16 simulator, iOS 18.6)
+* Screenshot / device tool: **VAR** — iOS Simulator control (screenshot, tap, swipe, touch_path, touch2_path, HOME button); `simctl io recordVideo` + a Swift/AVFoundation frame-sheet tool for timing evidence
+* Runtime validation method: **`runtime` (simulator: iPhone 16 393×852, iPhone 16e 390×844, iPhone 16 Pro Max 440×956, debug build, real `main.dart` root and real on-disk Drift store)** + `repeatable integration` (integration_test on simulator) + `automated functional`
+* Not producible with the available tooling (declared): device **rotation** (Simulator menu automation denied: assistive access −1719), a **HOME/lifecycle event while a touch is held or mid-animation** (cannot interleave two tool calls), physical-finger touch (simulator pointer is synthetic), OS Grayscale colour filter (frame luminance conversion used instead).
 
 ---
 
-## 0. Backend Build Gate
+## 0b. Evidence Ledger
 
-F03 touches **no backend** (`Release Scope = none`). The client build/test gate (canonical `melos` scripts) was re-run in full:
-
-| Gate | Command | Result |
-| --- | --- | --- |
-| Format | `dart format --output=none --set-exit-if-changed .` | **PASS** — 123 files, 0 changed |
-| Analyze (app, incl. `integration_test/`) | `flutter analyze` | **PASS** — No issues found |
-| Analyze (pure packages) | `dart analyze .` ×6 | **PASS** — 5 clean; `looplet_solver` has **1 pre-existing `info`** (`solver.dart:56`, not F03, `dart analyze` exits 0, package tests pass) — noted in the Tech Lead Note |
-| Unit + widget tests | `dart test` (6 packages) + `flutter test` (app) | **PASS — 308 / 308** (core 22, dictionary 32, engine 83, content 17, solver 23, authoring 19, **app 112** = 4 pre-existing + 68 F08 + 27 F03 + **13 new F03-FE9**) |
-| Integration tests | `flutter test integration_test/` (best-effort, `continue-on-error` in CI) | **PENDING (device)** — analyze-clean; headless run slow/timing-sensitive, not completed here; authoritative run is `flutter test integration_test -d <emulator>` |
-| iOS release build | `flutter build ios --release --no-codesign` | **PASS** — `✓ Built build/ios/iphoneos/Runner.app (54.5MB)` |
-| Android App Bundle | `flutter build appbundle --release` | **NOT RUN** — CI-only locally (no Android SDK; established posture) |
-
-* **Gate decision: PASS → QA continues.** No product-code changed since the prior verdict; F03-FE9 is additive test infrastructure + CI wiring only.
+| Claim / Scenario | Evidence Class | Command / Action | Target / Environment | Result / Exit | Provenance | Isolation / Overrides |
+| --- | --- | --- | --- | --- | --- | --- |
+| Static analysis, all packages + app | static / build | `melos run analyze` | workspace | **PASS**, exit 0 | run 2026-09-20 19:2x, tree = `ac7f74d` code | none |
+| Format | static | `melos run format:check` | workspace | **PASS**, exit 0 | same | none |
+| Unit + widget suites | automated functional | `melos run test` | 6 packages + app | **PASS**, exit 0: content 17, core 22, dictionary 32, authoring 20, engine 83, solver 23 (=197) + app 181 = **378 passed, 0 failed; no skips reported** | same | widget tests use in-memory DB + provider overrides (not production root) |
+| Debug simulator build of current tree | build | `flutter build ios --debug --simulator` | app | **PASS**, exit 0 (53.1 s) | 2026-09-20 | build ≠ boot; boot evidenced separately below |
+| integration_test device-form suite | repeatable integration | `flutter test integration_test/play_session_test.dart -d <iPhone 16>` | iPhone 16 sim | groups 1–3 **10/10 PASS**; group 4 test 1 (`paused mid-drag cancels the gesture`) **did not complete [E] after 16m46s**; `tearDownAll` did not complete; group 4 test 2 never ran; runner: "Some tests failed", wrapper exit 144 | log `scratchpad/integ_16.log`, 2026-09-20 | in-memory DB + `_bootTo` harness; NOT the production bootstrap graph |
+| Cold boot with empty + existing persisted state, real root graph | runtime | `simctl install` fresh; `simctl terminate` + `simctl launch`; observe splash → home | iPhone 16 | **PASS** (home renders; no init error visible; existing snapshot present on 2nd boot) | 2026-09-20 | none (debug build) |
+| AC1–AC9 interaction on the real app | runtime | see §4 | iPhone 16 (393), 16e (390), 16 Pro Max (440) | **PASS** except AC9 highlight (not observed) | 2026-09-20 | simulator pointer |
+| AC10 exact resume after real OS kill (Journey via CONTINUE and debug entry) | runtime | play → `simctl terminate` → `simctl launch` → re-enter | iPhone 16 | **PASS** (grid, MOVES, undo pips restored) | 2026-09-20 | elapsed/restartCount not displayed → not runtime-verified |
+| Tampered `thawedFrozenCells` re-derived on the real store | runtime | kill app; `sqlite3 … update kv` set `["2,2"]`; relaunch; open smoke-tr-06 | iPhone 16 Pro Max, `Documents/looplet.sqlite` | **PASS** (tile renders frozen) | 2026-09-20 | none |
+| Background → foreground (HOME) at idle | runtime | HOME, relaunch to foreground | iPhone 16 | **PASS** (same PID 84575, state identical, still playable) | 2026-09-20 | not mid-drag / mid-animation |
+| Portrait lock under rotation | runtime | — | — | **PENDING / NOT RUN** (tooling) | — | static only: `main()` `setPreferredOrientations([portraitUp])`; iPhone `Info.plist` still lists LandscapeLeft/Right, so the runtime call is the only guard |
+| Paused mid-drag / mid-animation on device | runtime | — | — | **PENDING / NOT RUN** (tooling + suite group 4 hang) | widget mirror `play_session_runtime_test.dart` §17.4 passes (automated functional only) | — |
+| Win choreography timing / occlusion | runtime + video | `recordVideo`, 40 ms frame sheet | iPhone 16, smoke-tr-06 and Journey L1 | **FAIL** — see F03-QA-01 | `scratchpad/win.mov`, `sheet1.png` | debug build |
 
 ---
 
 ## 1. Feature Summary
 
-* **Feature under test:** F03 puzzle-play-session — the playable screen (swipe → one-cell wrap shift; always-visible outline-ghost target; live `MOVES` HUD; 3-action Undo; separated Restart; bounded win → minimal completion sheet; exact resume via the F08 snapshot).
-* **QA scope:** end-to-end **client** QA + `ui-design.md` handoff compliance + navigation/chrome consistency. **This pass is a re-verify** after F03-FE9 (the runtime-validation closure) and the Tech Lead's resolution of the 6 open clarifications.
-
----
+F03 is the playable screen: swipe → one-cell row/column shift, live MOVES, 3 Undo actions, separated Restart, input lock, win sequence, exact resume. This run is the final-stage runtime re-verification after F04 (real completion panel) and F05 (Journey entry, unlock, `_popToCaller`) modified the F03 win/exit/persist path.
 
 ## 2. Test Scope
 
-* **Scope Type:** **Client Only** + **UI Handoff Compliance** + **Runtime Validation** (`architecture.md §16`) — now closed to the automatable slice via F03-FE9; 3 manual device items remain.
-* **Documents reviewed (this pass):** `qa.md` (prior verdict), `frontend.md` (incl. the new **"F03-FE9"** section), `architecture.md` (incl. **§18 "Clarifications resolved 2026-09-06"** + the `[RUNTIME VALIDATION PENDING — F03-FE9]` item), `orchestration.md` (Last Decision v6 + the Tech Lead reconciliation + the Next-Action brief), `prd.md §3/§7`, `ui-design.md §11/§12/§14`, `design/design-doctrine.md`, `design/premium-ui-rubric.md`, `project-authority/release.md §2/§4`. `analysis.md` N/A.
-* **Delta re-verified:** `app/test/play/play_session_runtime_test.dart` (new, 13 tests), `app/integration_test/play_session_test.dart` (new), `.github/workflows/ci.yml` (best-effort `integration` step), `melos.yaml` (`test:integration`). The full prior F03 surface (`app/lib/play/**`, `app_router.dart`, `home_screen.dart`, `main.dart`) is unchanged — the prior verdict's contract + `ui-design.md` + security + regression findings still stand and are re-confirmed below by reference.
-* **Out of scope:** **Security compliance — out of scope:** pure client UI, single actor, no auth, no cross-user resources, no endpoint; the only persistence is the local single-row `kv['active_session']` snapshot owned by F08. **Release compliance — out of scope:** `Release Scope = none` (the new best-effort CI `integration` step is a CI gate, not a deployment; verified below in §6.7). **iOS platform compliance — out of scope:** Flutter (not Unity), no `game-dev.md`, no new tracking SDK / IAP / privacy-manifest change. **Backend quality / 13 — out of scope:** no backend. **Mode/Configuration matrix — out of scope:** one actor, one mode; puzzle-config variants covered in §5.
-* **Bugfix?** No. F03-FE9 is additive test infrastructure for a `Runtime Validation Pending` closure.
-* **Critical user journeys:** open → orient; swipe → one-cell shift + `MOVES +1`; sub-threshold → nothing; swipe during animation → dropped, not queued, no double-count; 3 undos then a 4th → no-op, no prompt; Restart → reset, no dialog; form target → lock + win highlight + seam bar + bounded anim + sheet; Retry → reset in place; leave mid-puzzle → exact resume (dispose/remount + OS kill). **Forbidden / misuse:** input during `animating`/`won`; Undo at 0; engine-rejected move; multi-touch; off-screen release; rotation; corrupt / mismatched / tampered snapshot; direct entry with an empty stack.
-* **Navigation / header consistency:** `/play` has no system header (contract §13, Tech-Lead-confirmed `[LOCKED]` in §18); the quiet back chevron pops to the caller and is hidden in `won`; F03 is the first in-flow screen (the cross-screen chrome family rule is deferred to F10 per §18) — sibling-source comparison N/A.
-* **Evidence class summary:** `automated functional` (308 workspace tests, incl. 27 F03 + 13 F03-FE9) + `build` (analyze / format / iOS release) + a delivered-but-device-pending `integration_test/` suite. **Manual device confirmation of `qa.md §17` 5–7 not performed** (no device).
-* **Runtime validation method:** `automated functional` (strong) + build; `integration_test/` scaffold delivered, device run pending.
-
----
+* Scope Type: client-only, final stage. Reviewed: prd.md, architecture.md (§5–§18), ui-design.md (won/frozen/locked/tile states), F04 ui-design.md (panel geometry/sequence), orchestration.md brief, code (`play_session_screen.dart`, `play_session_controller.dart`, `puzzle_board.dart`, `play_theme.dart`, `home_screen.dart`, `app_router.dart`, `main.dart`), integration + runtime test files.
+* Critical journeys: open → swipe → win → panel → Retry / Next / Close; back → resume; kill → relaunch → resume; Journey via CONTINUE incl. Next Level and exit. Misuse: sub-threshold, rejected move, undo exhaustion, restart, diagonal tie, multi-touch, release beyond board, slow drag, tampered thaw cache, stale snapshot from another puzzle, replaced-route exit.
+* Navigation/chrome: chevron, iOS edge-swipe back, hidden chevron while won, replaced-route exit. Sibling comparison: home ↔ play chrome (no header on either; quiet chevron on `/play` only) — structural source comparison of `home_screen.dart` and `play_session_screen.dart`: no header divergence found.
+* Out of scope (single-line reasons): Backend build gate / backend quality — no backend touched. Security compliance out of scope: no auth, no other-user data, no finance; local single-player state. Release compliance out of scope: Release Scope = none, no deploy/CI change (CI best-effort `integration` step unchanged). iOS/Unity game-client sections — client stack is Flutter. Mode/configuration matrix — screen-size variants folded into §4/§5 (390/393/440).
+* Storage-full / write-failure injection is F08 AC7 (F08.STORAGE), explicitly not an F03 criterion; neither passed nor failed here.
+* Evidence classes: runtime, repeatable integration, automated functional, static. Method: see 0a.
 
 ## 3. Product Behavior Coverage
 
-| User Story (`prd.md §2`) | Test scenario | Evidence | Result |
+| User story | Scenario | Evidence | Result |
 | --- | --- | --- | --- |
-| "swipe a row/column and watch it slide one cell" | row-0 right swipe on `smoke-tr-01` at 2 surface sizes → `rowRight(0)` → engine → win sheet; a legal non-winning move → `MOVES` +1 | `play_session_runtime_test.dart` §17.1 ×6; `play_session_controller_test.dart` | **PASS** — device slide *feel*: a Note item |
-| "target word always visible and clearly separated from the grid" | `HEDEF` + 5 outline-ghost tiles above a `_DividerGlow` + `zoneGap`; unchanged since the prior verdict | `play_session_screen_test.dart` + source | **PASS** |
-| "live MOVES counter" | `MOVES` = `engine.moveCount`, settled-only; ticks 0→1→2→3 across the F03-FE9 flows; restored after a kill/relaunch | `play_session_runtime_test.dart` §17.2/§17.3; `play_session_controller_test.dart` | **PASS** |
-| "up to 3 undos and a restart to recover" | 3 undos → quota 0 → 4th is a no-op; Restart → `MOVES` 0, quota 3, `restartCount++` (persisted across a kill/relaunch) | `play_session_controller_test.dart`; `play_session_runtime_test.dart` §17.3 (Restart persists) | **PASS** |
-| "accidental taps and tiny drags ignored" | a `(6,4)` sub-threshold drag at 2 surface sizes → `MOVES` 0, no sheet | `play_session_runtime_test.dart` §17.1 ×2; `gesture_resolver_test.dart` | **PASS** — real-touchscreen threshold accuracy: a Note item |
-| "leave mid-puzzle and come back exactly where I was" | 3 moves → dispose (`pumpWidget(SizedBox)`) → remount on the same DB → `MOVES` 3; repo-seeded `['R1']` snapshot → hydrates to `MOVES` 1; `paused` mid-animation → committed + survives a kill/relaunch | `play_session_runtime_test.dart` §17.3 ×3, §17.4 | **PASS** — real OS-kill on hardware: a Note item |
-
-**No user story is uncovered.** The device-`runtime` facets are now down to 3 explicitly-scoped visual/OS confirmations (Notes), not logic gaps.
-
----
+| Swipe a row/column and watch it slide one cell | row swipe (393/390/440), column swipe smoke-tr-06, slow 50 pt drag | runtime | PASS |
+| Target word always visible, separated | HEDEF rail + divider on all widths | runtime | PASS |
+| Live MOVES | 0→1→… on each settled move; unchanged on reject/no-op | runtime | PASS |
+| Up to 3 undos and a restart | pips 3→0, 4th tap inert, Restart resets to 3 | runtime | PASS |
+| Accidental taps/tiny drags ignored | 10 pt drag ×2 sizes → no move; multi-touch first pointer only | runtime | PASS |
+| Leave and return exactly where I was | kill+relaunch (CONTINUE and debug), chevron, edge-swipe, HOME | runtime | PASS (elapsed/restartCount unobservable) |
 
 ## 4. Acceptance Criteria Traceability
 
-| AC (`prd.md §3`) | Scenario + evidence (this pass) | Result |
+| AC | Scenario → Evidence | Result |
 | --- | --- | --- |
-| **AC1** open → target + grid + `MOVES: 0` + Undo(3) + Restart; target separated | `play_session_screen_test.dart` "renders …"; `play_session_runtime_test.dart` §17.1 (`_moves == 0` at boot) | **PASS** |
-| **AC2** horizontal swipe past threshold → that row shifts one cell in the swipe direction + `MOVES +1` | `play_session_runtime_test.dart` §17.1 (row-0 right → `MASAL` forms) at `360×780` **and** `430×932`; `gesture_resolver_test.dart` | **PASS** |
-| **AC3** vertical swipe past threshold → that column shifts one cell + `MOVES +1` | `gesture_resolver_test.dart` (+dy → `columnDown`, −dy → `columnUp`); engine enforces on column-enabled puzzles; F03-FE9 §17.1 rejected-column case proves the wiring on a no-column puzzle | **PASS (automated)** — a real vertical swipe on a column-enabled puzzle on hardware: a Note item |
-| **AC4** swipe below threshold → no shift, `MOVES` unchanged | `play_session_runtime_test.dart` §17.1 `(6,4)` at 2 sizes; `gesture_resolver_test.dart` (below-threshold → `null`) | **PASS** |
-| **AC5** animation in progress → another swipe **ignored and not queued** | `play_session_runtime_test.dart` §17.2 — a second `dragFrom` fired 60 ms into the shift → `MOVES` ticks **once**; rapid same-row swipes → each counts only post-settle → `MOVES == 2`. **This directly proves the `prd.md §7` "0 double-registered moves during animation in QA" metric.** | **PASS** |
-| **AC6** all 3 undos used → Undo again → nothing, no prompt/ad | `play_session_controller_test.dart` (`undo()` → `false` at quota 0); source (`UndoButton` `onTap: active ? … : null`, no dialog/ad code) | **PASS** |
-| **AC7** Restart → grid reset, `MOVES = 0`, undos → 3, **no confirm dialog**; away from the grid | `play_session_runtime_test.dart` §17.3 (Restart → `MOVES` 0, persisted across a kill/relaunch); `play_session_controller_test.dart`; source (`RestartButton` no `showDialog`; `_HudBar` layout) | **PASS** |
-| **AC8** target forms on settle → input locks, winning row highlights, short success anim, completion panel opens | `play_session_screen_test.dart` + `play_session_runtime_test.dart` §17.1 (win → `CompletionSheet` + `ÇÖZÜLDÜ`) | **PASS (automated)** — the seam-bar draw / bloom timing *look*: a Note item (§17.5) |
-| **AC9** swipe begins → affected row/column receives a light highlight | source (`updateDrag` → `_activeLine` → the moving-line lift + `_buildRails` + 8 % dim); `gesture_resolver_test.dart` `trackingAxis` | **PASS (source + automated for the axis logic)** — visual highlight on a device: a Note item |
-| **AC10** leave + return → grid, `MOVES`, undos, restart count, elapsed restored | `play_session_runtime_test.dart` §17.3 (dispose+remount → `MOVES` 3; seeded `['R1']` → `MOVES` 1; **tampered `thawedFrozenCells: ['2,2']` on `smoke-tr-06` → the tile renders `TileStatus.frozen`, not `thawed`** — the cache is re-derived by replay, not trusted); §17.4 (`paused` mid-animation → committed + survives a kill/relaunch) | **PASS** — real OS-kill on hardware: a Note item |
-| **AC11** transient target-word mid-animation → no win; win on settled state only | source — the engine sets `solvedThisStep` from the **settled** next-state; the controller checks it only in `commitShift()` (post-animation); `looplet_engine` 83 tests | **PASS (source + engine tests)** |
-
-**Every AC has ≥ 1 automated scenario, most now runtime-adjacent via F03-FE9.** The remaining device confirmations are visual/OS, listed in the Notes.
-
----
+| AC1 | open smoke-tr-01 / Journey L1 on 3 widths: target rail, grid, `0 HAMLE`, 3 pips, Restart bottom-right away from grid — runtime | PASS |
+| AC2 | row 1 right → exactly one cell, only that row, MOVES 1 (393); 105 pt row-0 swipe wins in 1 (390) — runtime | PASS |
+| AC3 | smoke-tr-06 column 0 down → one cell, MOVES 1 — runtime; tie-band diagonal (dx60/dy56) → horizontal on 440 — runtime | PASS |
+| AC4 | 10 pt drag → grid + MOVES unchanged (393 and 390) — runtime | PASS |
+| AC5 | integration groups 2 ×2 (second drag dropped in the ~190 ms window; rapid same-row swipes count after settle) on the live simulator — repeatable integration; widget mirror §17.2 — automated. A hand-timed double swipe was not attempted (tool latency > 190 ms) | PASS (repeatable integration) |
+| AC6 | 3 undos then 4th tap: pips hollow, Undo greyed, MOVES unchanged, no dialog/ad — runtime | PASS |
+| AC7 | Restart: grid reset, MOVES 0, pips 3, no dialog — runtime | PASS |
+| AC8 | win → lock, amber row fill, panel opens, chevron hidden — runtime; choreography timing/visibility **FAIL** (F03-QA-01) | **FAIL (visual)** |
+| AC9 | axis/tracking logic: `gesture_resolver_test.dart` `trackingAxis`, controller `tracking` phase — automated. Rail/lift highlight while dragging not observed at runtime (tool cannot capture during a held touch) | PENDING (runtime), automated PASS |
+| AC10 | kill+relaunch via CONTINUE (Journey L1) and debug entry: exact grid/MOVES/pips; tampered cache re-derived; HOME round trip; back keeps snapshot — runtime | PASS (elapsed, restartCount unobservable) |
+| AC11 | widget mirror only (transient word during animation ≠ win); not separately provable on-screen | automated PASS; runtime not separately executed |
 
 ## 5. Boundary Matrix
 
-Re-confirmed from the prior verdict; the F03-FE9 rows are now **automated**, not source-only:
-
-| Boundary / transition | Result | Evidence (this pass) |
+| Transition / boundary | Result | Evidence |
 | --- | --- | --- |
-| `idle → tracking → idle` (below threshold) | **PASS** | `play_session_runtime_test.dart` §17.1 `(6,4)` |
-| `idle → tracking → animatingShift → idle` (legal, no win) | **PASS** | §17.2 (row 1 shift); `play_session_controller_test.dart` |
-| `idle → tracking → animatingShift → won` (legal, win) | **PASS** | §17.1 (row-0 right → sheet) |
-| `idle → tracking → animatingBounce → idle` (rejected move) | **PASS** | §17.1 (vertical drag on a no-column puzzle → `MOVES` unchanged) |
-| `animatingShift` + a new pointer | **PASS — automated** | §17.2 (a second drag 60 ms in → dropped, `MOVES` ticks once) |
-| `won` + a pointer / Undo / Restart | **PASS** | prior verdict + `canRestart`/`canUndo` false; `_TopBar` hides the chevron |
-| Undo 3→2→1→0 | **PASS** | `play_session_controller_test.dart` |
-| `restart()` from `idle` (persisted) | **PASS — automated** | §17.3 (Restart → `MOVES` 0 → kill/relaunch → still 0) |
-| `retryFromCompletion()` from `won` | **PASS** | `play_session_screen_test.dart` "Retry … resets" |
-| Config: `columnMovesEnabled == false` / `== true` | **PASS** | §17.1 (rejected column) + `gesture_resolver` |
-| Config: locked pivot (`smoke-tr-05`) | **PASS (source)** — visual on device: Note §17.5 | `board_tile.dart` locked branch + F02 tests |
-| Config: frozen tile (`smoke-tr-06`) | **PASS — automated (status)** | §17.3 tampered-cache test asserts `TileStatus.frozen` renders; visual + thaw cross-fade: Note §17.5 |
-| App `paused` during `tracking` | **PASS — automated** | §17.4 (gesture cancelled, `MOVES` 0) |
-| App `paused` during `animatingShift` | **PASS — automated** | §17.4 (move committed settled, survives kill/relaunch) |
-| Open with a matching `puzzleId` snapshot | **PASS — automated** | §17.3 (seeded `['R1']` → `MOVES` 1) |
-| Open with a mismatched / corrupt / tampered snapshot | **PASS** | tampered: §17.3; mismatched/corrupt: source + F08 QA |
-| Direct entry to `/play` with an empty stack | **PASS (source)** — `_popToCaller` → `maybePop` | source; device edge-swipe back: Note §17.7 |
-
-No architecture-defined boundary lacks a scenario.
-
----
+| idle → tracking → resolve (threshold, tie band, first pointer, off-plate release) | PASS | runtime (10 pt / 60×56 / two-finger / release at x=439) |
+| animating: input dropped, not queued | PASS | integration groups 2 on simulator |
+| won: input locked; only panel actions | PASS | runtime (Retry, Next, Close) |
+| snapshot: fresh puzzle, matching puzzleId, mismatching puzzleId (another puzzle's slot replaced on open), tampered cache | PASS | runtime |
+| one active-session slot: opening a different puzzle replaces the previous in-progress session | matches F08/§9 contract (note N2) | runtime |
+| background: idle HOME round trip | PASS | runtime |
+| background: mid-drag / mid-animation | **PENDING** | not producible; widget mirror passes; suite group 4 hangs |
+| rotation | **PENDING** | not producible |
+| exit paths: chevron, edge-swipe, replaced-route (Next Level → chevron) → `/` | PASS | runtime |
+| literal direct entry `/play` with empty stack | not reachable at runtime (no URL scheme registered); nearest equivalent (replaced route) PASS; `_popToCaller` else-branch source-inspected | static |
 
 ## 6. Contract Compliance Check
 
-Re-confirmed against `architecture.md` (unchanged since the prior verdict; §18 gained the Tech-Lead clarifications, no behavioural change):
-
-| Contract area | Status | Note |
-| --- | --- | --- |
-| Route / navigation (§13) + the `[LOCKED]` "no system header, quiet chevron, hidden in `won`" (§18) | **Preserved** | `play_session_screen_test.dart` (chevron hidden in `won`, restored after Retry) |
-| Screen state machine (§6) + **no input queue** | **Preserved** | `play_session_runtime_test.dart` §17.2 + `play_session_controller_test.dart` |
-| Gesture → Move mapping (§7) — threshold, dominant axis, **tie-band → horizontal**, one cell, first pointer | **Preserved** | `gesture_resolver_test.dart` (13) + §17.1 at 2 sizes |
-| MOVES / Undo / Restart (§8) — settled-only, no prompt/ad at 0, no dialog, separated | **Preserved** | §17.2/§17.3 + `play_session_controller_test.dart` + source |
-| Persistence integration (§9) — F08-frozen keys, hydrate via restore path, `completed` + `clear()`, no F03 background work | **Preserved** | §17.3 (dispose/remount + seeded snapshot + tampered cache) |
-| Completion sequence (§10) — lock → win-row highlight + **drawn seam bar (colour + shape)** → bounded ≤ 600 ms → minimal panel (no rating logic — F04 seam) | **Preserved** | §17.1 (sheet appears) + source; the *visual* readability is Note §17.5 |
-| Animation / input-lock (§11) — 190 ms shift, diegetic lock (HUD dim, not a spinner), no queue, transient-word-mid-animation ≠ win | **Preserved** | §17.2 (window behaviour) + source |
-| Backgrounding (§12) — gesture cancelled on `paused`; mid-shift commits synchronously; snapshot always settled | **Preserved** | §17.4 |
-| Localization (§14) + the `PlayStrings` seam accepted in §18 | **Preserved** | `PlayStrings` per-language table; no hard-coded display string |
-| `Release Scope` (§17) = `none` | **Preserved** | only test/CI files added; `pubspec.yaml` unchanged; iOS build green with no new pods |
-| §18 clarifications applied | **Confirmed** | no playing-screen CTA (correct); F03 tile visuals present; `/play` chrome as specced; `PlayStrings` seam; perf deviations (recede blur → dim-only; breathing omitted) present and acceptable — no rubric fail |
-| Contract version / breaking change | **No breaking change** | no `looplet_*` package changed; F02 83 + F08 68 + prior F03 27 tests unchanged and green |
-
-**No contract violation.**
-
----
-
-## 6.7 Release / CI-CD Compliance Check
-
-F03 `Release Scope = none` — no deployment. This section is limited to the **new CI wiring** F03-FE9 added:
-
-| Control | Result | Evidence / Notes |
-| --- | --- | --- |
-| CI gate policy for the new integration step | **PASS** | `.github/workflows/ci.yml` `verify` job — `Integration tests (play session — best-effort)` with `continue-on-error: true`; `release.md §4` explicitly permits `integration_test` as a **best-effort** gate ("failure is investigated, not auto-blocking until F03 lands"). It does not block the pipeline. |
-| The best-effort step's failure mode | **PASS** | `continue-on-error: true` → a slow/partial headless run does not fail CI; the authoritative automated gate is `play_session_runtime_test.dart` inside `melos run test` (always-green). |
-| `melos.yaml` `test:integration` | **PASS** | added, mirrors the CI command |
-| No deploy / secret / env / container change | **PASS (N/A confirmed)** | F03 adds none; `Release Scope = none` unchanged |
-
-No release/deployment blocker. The `integration_test/` device-matrix run is a Note (below), not a gate.
-
----
+* §6 state machine, §7 gesture mapping (one cell, tie → horizontal, first pointer), §8 counters, §9 persistence (hydrate on matching id, fresh + initial snapshot otherwise, `completed` + clear on panel open), §13 route: **honoured** on the current code; `_popToCaller` (post-F05) returns to `/` on every observed exit.
+* §10 completion sequence: lock, highlight, seam bar, bounded ≤600 ms **then** panel — sequencing and row visibility **not honoured** (F03-QA-01).
+* §11 animation lock: honoured (integration). §12 backgrounding: idle verified; mid-drag/mid-animation pending.
+* No contract change or breaking change observed in packages (all package suites unchanged and green).
 
 ## 7. UI Design Compliance Check
 
-Unchanged since the prior verdict (implementation not modified). Re-confirmed against `ui-design.md` + the §18 clarifications:
+* Screen goal/hierarchy/state: HEDEF rail, recessed board plate, quiet HUD, no playing-screen CTA (intended, §18), Undo pips, separated Restart — consistent with Direction A.
+* Special tiles: locked = brass ring (pin glyph very faint, note N1), frozen = frost fill + crystal border, thaw on win: PASS as static states.
+* Win: fill + drawn seam bar exist in code and appear briefly, but are not visible for their designed duration (F03-QA-01).
+* Premium rubric: not re-scored this run (no visual redesign); the win-moment mismatch is the only deviation found.
 
-* **Screen goal / UX flow / visual hierarchy / layout / component blueprint / state design / motion intent / chrome / background-colour-type-surface / premium differentiators** — all met (see the prior verdict §7 — Direction A fully implemented; spotlight stage, backlit tiles, loop-rail + wrap animation, outline-ghost target, diegetic input-lock, amber-fill + drawn seam bar, undo pips, separated outline Restart, minimal-but-crafted sheet).
-* **Accepted perf deviations** (now Tech-Lead-ratified in `architecture.md §18`): board-recede blur → dim-only (0.12); breathing spotlight ambient omitted. **No `premium-ui-rubric.md` fail condition; no `design-doctrine.md §8` anti-pattern.** Rubric ≥ 90 (design self-review 94; the two deviations stay above the threshold).
-* **Runtime visual confirmation** (win choreography, tile-state visuals, rail highlight, seam-bar greyscale legibility) — a Note item (§17.5); no logic risk (the state transitions driving them are automated-covered).
+## 8. Test Findings
 
-**No UI Design Mismatch finding.**
+### F03-QA-01 — Win choreography is cut off / occluded by the completion panel
 
----
+* Severity: Medium (core "win moment"; regression introduced after the 2026-09-06 approval)
+* Area: F03 win path × F04 panel integration (`app/lib/play/play_session_screen.dart:314-345`, `app/lib/play/widgets/puzzle_board.dart` win animation)
+* Type: UI Design Mismatch
+* Related authority: F03 `ui-design.md` (won: ≤600 ms L→R amber stagger + drawn amber seam bar + bloom, **then** the sheet; "seam bar is not optional"); F04 `ui-design.md` (F03 win sequence completes, then the panel rises; "the amber winning row is visible above the panel … deliberate"); F03 architecture §10 (highlight → success animation → open panel).
+* Description / Actual: `CompletionPanel` is revealed with `AnimatedSlide(320 ms)` the instant `phase == won`; `PlayTheme.winDuration` (600 ms) drives the board's stagger/seam/bloom concurrently. 40 ms frame sheet of smoke-tr-06 (win row 2): shift settles ≈ +240 ms, row turns amber ≈ +280 ms, sheet starts ≈ +320 ms, winning row fully covered by ≈ +400 ms. The amber row is visible ≈ 1–3 frames (≈ 40–120 ms); the seam bar/bloom are effectively never seen. For rows 2–4 the row is always hidden behind the panel; with the Perfect variant (`HARİKA` plate) the sheet also clips the lower half of the **row-0** win tiles (Journey L1 on 393 and smoke-tr-01 on 390 widths). Non-Perfect row-0 wins keep the row visible.
+* Expected: choreography plays to completion, seam bar drawn, then the panel; winning row remains visible above the panel (F04 handoff) — for any winning row.
+* Reproduce: iPhone 16, debug build, home → L06 → swipe (63,442)→(63,540); or CONTINUE → level 1 → two left swipes on row 0.
+* Recommendation (hypothesis, not a verdict on cause): the F04 handoff geometry (a 34–42 % strip above a 56–66 % panel) cannot hold win rows 2–4, and the implementation has no sequencing delay. Tech Lead to settle sequencing/geometry authority; then Frontend/Mobile Developer implements; UI Designer only if the geometry needs a new handoff.
+* Not a finding against AC8's literal wording: input locks, the row highlights and the panel opens.
+
+### F03-QA-02 — Device-form integration suite does not complete on a live simulator
+
+* Severity: Medium (required closure artifact per architecture §18 is not green)
+* Area: `app/integration_test/play_session_test.dart` group 4
+* Type: Regression Risk (validation)
+* Actual: on iPhone 16, groups 1–3 pass (10/10); `paused mid-drag cancels the gesture, no move` never completes (16m46s, `[E]`), `tearDownAll` fails, the second lifecycle test never runs; run = "Some tests failed". The CI step is `continue-on-error`, so this is invisible in CI.
+* Hypothesis only: `handleAppLifecycleStateChanged(paused)` disables frame scheduling on the live binding, after which `pumpAndSettle` cannot settle.
+* Recommendation: Frontend/Mobile Developer makes group 4 complete on a live device binding (or replaces it with device-safe assertions) so `flutter test integration_test -d <sim>` exits 0; then QA re-runs it.
+
+### Notes (non-blocking, no verdict effect)
+
+* N1 — locked-tile pin glyph is very faint behind the letter; ring + fill carry the cue.
+* N2 — opening any puzzle replaces the single active-session slot (per §9/F08); a debug-row entry discards a Journey session in progress. Debug-only today; confirm intent for F07/F10.
+* N3 — iPhone `Info.plist` lists LandscapeLeft/Right; the portrait lock exists only as the runtime call in `main()`.
+* N4 — elapsed time and restartCount have no on-screen surface; their restore is verified only by automated tests.
+* N5 — integration helper builds several `AppDatabase` instances per run (Drift multiple-database warning noise in debug logs).
+* N6 — simulator pointer is synthetic; the "gesture accuracy ≥ target on the device matrix" success metric is measured only at a few points (10 pt no-op; 50/105/120 pt one-cell; 60×56 tie), not a threshold sweep or physical-finger run.
 
 ## 9. Positive Scenarios
 
-**Journey 1 — solve at 2 screen sizes (AC2/AC8, `prd.md §7` gesture accuracy).**
-Start: `smoke-tr-01` open on a `360×780` **and** a `430×932` surface. Action: swipe row 0 right past the threshold. Visible result: the row slides exactly one cell (M wraps in from the left), settling to `M A S A L`; input locks; the winning row fills amber and the seam bar draws; the completion sheet rises. Evidence: `play_session_runtime_test.dart` §17.1 ×2 sizes.
-
-**Journey 2 — no double move during the real animation window (AC5, `prd.md §7` "0 double-registered moves").**
-Start: `smoke-tr-02`, a legal non-winning move started on row 1. Action: 60 ms into the ~190 ms shift, a second drag on the same row. Visible result: `MOVES` shows `1`, not `2` — the second gesture is dropped, not queued. Two settled swipes → `MOVES 2`. Evidence: `play_session_runtime_test.dart` §17.2 ×2.
-
-**Journey 3 — kill and resume (AC10).**
-Start: `smoke-tr-02`, 3 moves applied. Action: the widget tree is disposed (`pumpWidget(SizedBox)`), then remounted against the same in-memory DB. Visible result: `MOVES` shows `3`; then Restart → `MOVES 0` → dispose + remount → still `0`. A repo-seeded `['R1']` / quota 2 / restarts 1 snapshot → the screen hydrates to `MOVES 1`. Evidence: `play_session_runtime_test.dart` §17.3 ×3.
-
-**Journey 4 — tampered thaw cache is not trusted (AC10, security-of-restore).**
-Start: a repo-seeded `smoke-tr-06` snapshot with no moves but a bogus `thawedFrozenCells: ['2,2']`. Action: open the puzzle. Visible result: the tile at 2,2 renders **frozen** (frost + crystal border), not thawed — the engine re-derived thaw by replaying the (empty) move list, ignoring the cache. Evidence: `play_session_runtime_test.dart` §17.3.
-
-**Journey 5 — backgrounding mid-swipe / mid-animation (AC10, `architecture.md §12`).**
-Start: `smoke-tr-02`. Action: `handleAppLifecycleStateChanged(paused)` while a pointer is held mid-drag → the gesture is cancelled, `MOVES 0`, no exception. Separately: `paused` fired 50 ms into a shift → the move commits settled (`MOVES 1`) and survives a subsequent kill/relaunch. Evidence: `play_session_runtime_test.dart` §17.4 ×2.
-
----
+* Start: `smoke-tr-01`, `MOVES 0`. Action: row 1 right. Result: `G B C D F`, MOVES 1, Undo enabled. Then row 0 right → `MASAL`, lock, amber row, panel (2/3 stars, SEN 2 / OPTİMAL 1 / EN İYİ İLK 2), chevron hidden.
+* Start: CONTINUE → Journey L1 (`ASLAN`). Action: two left swipes on row 0. Result: `HARİKA`, 3/3, SEN 2 = OPTİMAL 2, SONRAKİ primary → level 2 (`BADEM`) → chevron → home `1 / 30`, CONTINUE = Seviye 2.
+* Start: L1 with 1 move + 2 undos left; kill process; relaunch; L01 → identical grid, MOVES 1, 2 pips.
 
 ## 10. Negative / Edge Cases
 
-Re-confirmed from the prior verdict; F03-FE9 upgrades several from source-only to automated:
-
-| Case | Result | Evidence |
-| --- | --- | --- |
-| Input while `phase == animatingShift` | **PASS — automated** | §17.2 (second drag dropped, `MOVES` ticks once) |
-| Input while `phase == won` | **PASS** | `inputLocked` true; `_TopBar` hides the chevron; prior verdict |
-| Undo with no history / during `won` | **PASS** | `canUndo` guard |
-| A rejected engine move (column disabled) | **PASS — automated** | §17.1 (vertical drag on `smoke-tr-01` → bounce, `MOVES` unchanged, no error) |
-| Multi-touch / two-finger | **PASS (framework)** | `GestureDetector` pan is single-pointer |
-| Swipe ending off-screen | **PASS (source)** — `_onPanEnd`/`_onPanCancel` both `_release(_dragOffset)` | source — on-device: Note §17.7 |
-| Fast flick vs slow drag | **PASS** | `gesture_resolver_test.dart` "one cell only" |
-| Diagonal near-tie → horizontal | **PASS** | `gesture_resolver_test.dart` |
-| Device-rotation attempt | **PASS (source)** — `main()` portrait lock | Note §17.6 |
-| Restart during an animation | **PASS** | `canRestart` requires `idle` |
-| Corrupt `active_session` on open | **PASS** | F08 `read()` catch → `null`; source |
-| Mismatched-`puzzleId` snapshot | **PASS** | `_tryRestore` guard; source |
-| **Tampered `thawedFrozenCells`** | **PASS — automated** | §17.3 (renders `frozen`, not `thawed`) |
-| `restoreSession` throws (dict drift) | **PASS (source + F08)** | `_tryRestore` catches `SessionRestoreException` → fresh |
-| App `paused` mid-drag / mid-animation | **PASS — automated** | §17.4 |
-| Direct entry with an empty stack | **PASS (source)** — `maybePop` fallback | source |
-| Unsupported `source` (`daily` pre-F07) | **PASS** | `play_session_screen_test.dart` "load-error state" |
-| Storage full / disk write failure during persist | **PASS (source)** — `_persist` try/catch → `debugPrint('persist_failed …')`, keep playing | source — **no automated fault-injection (residual test-debt, shared with F08 AC7)** — Note |
-
-No misuse path produced a crash, a lost/duplicated move, a wrong `MOVES`, or an unauthorized action.
-
----
+* Sub-threshold 10 pt (393, 390): ignored. Column swipe on column-disabled puzzle: MOVES unchanged, no error surfaced. 4th Undo: inert. Restart: no dialog. Diagonal 60×56 (440): horizontal. Two-finger (440): first pointer's row only, +1 move. Release at x=439 beyond the plate (440): resolves on last position (+1). Slow 50 pt drag: exactly one cell. Locked pivot (smoke-tr-05): pivot stayed while its row rotated (`V P R U T`). Frozen tile (smoke-tr-06): stays put while its row rotates (`L X S A A`), thaws on win. Stale/mismatching snapshot: opening another puzzle starts fresh, no crash. Tampered thaw cache on the real store: re-derived (frozen).
+* Not executed: rotation; HOME during held touch / mid-animation; hand-timed double swipe.
 
 ## 12. UX & State Handling
 
-Unchanged since the prior verdict (implementation not modified). Loading (skeleton, no spinner) / Error (contained dev-only body) / Success (bounded win sequence) / Disabled (Undo-at-0 inert, HUD dim during lock) / Pressed (0.97 tile) / Focused (`Semantics(button:, label:)`) — all present. No CTA on the playing screen (correct, `[LOCKED]` in §18); the single CTA `Retry` dominates the sheet. **Runtime evidence summary:** `automated functional` (308 workspace tests, incl. 13 F03-FE9 directly exercising the runtime scenarios) + build; the seam-bar/tile visuals and portrait/back OS behaviour are the 3 Note items.
-
----
+Loading: bounded splash → home; Error: not triggered; Success: see F03-QA-01; Disabled: Undo greyed at 0; Pressed/tracking: not visually captured; Focused/Semantics: not exercised (accessibility tree unavailable for Flutter in this tool). Runtime evidence summary: simulator runtime for AC1–AC8/AC10 and misuse cases; win visuals fail on timing/occlusion.
 
 ## 14. Frontend Quality
 
-* **F03-FE9 code quality:** `flutter analyze` clean incl. `integration_test/`; `dart format --set-exit-if-changed` clean. The two suites are well-structured (a shared `_app` / `_rowStart` / `_moves` helper set; per-test fresh in-memory DB; explicit dispose via `pumpWidget(SizedBox)` for the kill/relaunch). The `test/play/play_session_runtime_test.dart` mirror is the pragmatic, reliable form; the `integration_test/` suite is the device-matrix form with an honest header comment explaining the headless limitation.
-* **CI wiring:** the best-effort `continue-on-error` step is the correct choice for `integration_test` per `release.md §4` — it surfaces the device suite without making a slow/flaky headless run block the pipeline; the real gate is the always-green mirror in `melos run test`.
-* **No product-code regression:** the 4 pre-existing app tests + 68 F08 + 27 prior-F03 unchanged and green; 196 package tests unchanged; iOS release build unaffected.
-* **Runtime evidence summary:** `automated functional` (strong — the 13 F03-FE9 tests directly target `qa.md §17` 1–4 with real gestures + animation-window + lifecycle + dispose/remount) + build; device-matrix + the 3 visual/OS items pending a device.
-
----
+analyze/format clean, 181 app tests green; the integration suite defect (F03-QA-02) and the win sequencing (F03-QA-01) are the only quality gaps found.
 
 ## 15. UI Handoff Alignment
 
-Unchanged since the prior verdict — Direction A fully implemented and holding the ~94/100 bar; the 2 perf deviations are now Tech-Lead-ratified in `architecture.md §18`; no unacceptable UX/visual deviation. The seam-bar greyscale legibility + tile-state visuals + thaw cross-fade are the Note §17.5 device confirmation (no rubric fail; the state logic is automated-covered).
-
----
+Aligned: stage, tiles, HUD, Undo pips, Restart placement, chevron rule, locked/frozen states. Deviating: won sequence order and winning-row visibility (F03-QA-01), affecting the F03 `ui-design.md` "seam bar not optional" and the F04 "winning row stays in frame" requirements.
 
 ## 16. Regression Risk
 
-* **Files changed since the prior verdict:** `app/test/play/play_session_runtime_test.dart` (new), `app/integration_test/**` (new), `.github/workflows/ci.yml` (a best-effort step), `melos.yaml` (a script), `ai-system/**` docs. **No `app/lib/**` change, no `pubspec.yaml` change, no package change.**
-* **Impact:** none on runtime behaviour — additive test + CI config only. The best-effort CI step is `continue-on-error`, so it cannot break `main`.
-* **Downstream dependents** (F04/F05/F07/F09/F10/F11/F12) — unaffected; they build against the unchanged F03 contract.
-* **Risk: negligible.** The prior verdict's "low regression risk" (only `main.dart` was the shared-file change, and that's now several turns stable + covered) stands.
-
----
+Shared files touched since the last approval: `play_session_controller.dart`, `play_session_providers.dart`, `play_session_screen.dart` (e4311d3), plus F04 rating wiring. Dependents: F04 panel, F05 Journey/unlock, F08 persistence. Exercised at runtime: unlock + Next Level + exit, resume, completion panel variants (non-Perfect, Perfect). Not exercised: Daily source (F07 unimplemented), F08 storage-failure path (F08.STORAGE), all-30-complete state (F05 QA).
 
 ## 17. Final Verdict
 
-### **Approved with Notes**
+### **Rejected**
 
-* **No blocking issue. No required fix.** All build + automated gates are green: **308 / 308** workspace tests (13 new F03-FE9 directly exercising `qa.md §17` scenarios 1–4 with real gestures, the real ~190 ms animation window, app-lifecycle dispatch, and a dispose+remount kill/relaunch), `flutter analyze` (app incl. `integration_test/`) + `dart analyze` (6 packages) + `dart format --set-exit-if-changed` clean, `flutter build ios --release --no-codesign` green. The full `architecture.md` contract (incl. the §18 clarifications) is honoured, all 11 ACs have automated scenarios, `ui-design.md` Direction A holds the ~94/100 bar with no rubric fail / no doctrine anti-pattern, security is legitimately out of scope, `Release Scope = none` and the new best-effort CI `integration` step complies with `release.md §4`, and regression risk is negligible.
-* **Why `Approved with Notes` (not `Approved`):** `architecture.md §16` names `runtime` (device/simulator) evidence as mandatory, and `architecture.md §18 → [RUNTIME VALIDATION PENDING — F03-FE9]` defines the closure as the `integration_test/` suite **plus** a manual device/simulator confirmation of the visual/OS items (`qa.md §17` 5–7). The automatable slice (1–4) is now **closed** by the F03-FE9 `play_session_runtime_test.dart` suite — including the headline `prd.md §7` "0 double-registered moves during animation in QA" metric. The residual is a **3-item manual device confirmation** that this environment cannot produce (no device); per the Tech Lead's Next-Action brief, these are carried as Notes for the Tech Lead to accept the deferral at close-out.
-* **Why not `Runtime Validation Pending`:** the prior verdict's gap — *no* automated runtime coverage and *no* `integration_test` suite — is resolved. Repeatable automation now directly targets the runtime scenarios; the residual is explicitly-scoped, low-risk visual/OS confirmation, not an unproven critical journey. Per the QA `Approved with Notes` rule and the Tech Lead's pre-authorization, this is the correct verdict.
+* Blocking: **F03-QA-01** (reproduced deviation from two UI authorities on the win moment, regression after the prior approval) and **F03-QA-02** (required device-form suite fails). Functional interaction, persistence, navigation and misuse behaviour are otherwise sound on the current revision.
+* Missing required runtime evidence (kept separate from the defects, still required before any approval): rotation (F03.ROTATION); paused mid-drag / mid-animation on a live target (part of F03.RUNTIME-MATRIX); AC9 rail highlight at runtime; hand-timed AC5 optional.
+* Why not Approved / Approved with Notes: a blocking defect exists and required scenarios are unexecuted; `Approved with Notes` cannot absorb either.
 
-**Notes (all non-blocking; the Tech Lead accepts the deferral at close-out):**
+## 18. Required Fixes
 
-1. **Manual device / simulator confirmation of `qa.md §17` scenarios 5–7** — not producible in the QA env (no device). Recommend a quick device pass **or** folding into the first app-build distribution smoke (~F05):
-   * **5** — win choreography reads as "earned" not a wait; the drawn L→R **amber seam bar is legible with colour OFF / in greyscale** (accessibility); `smoke-tr-05` locked pivot renders the brass ring + pin glyph and never moves while its row rotates; `smoke-tr-06` frozen tile renders the frost fill + crystal border and plays the thaw cross-fade when its row forms a valid word.
-   * **6** — a device rotation attempt leaves the layout unchanged (portrait lock).
-   * **7** — the quiet back chevron pops to the caller via the button, the system back, **and the edge-swipe gesture**; hidden in `won`; a direct entry to `/play` falls back safely.
-2. **`integration_test/play_session_test.dart` device-matrix run** — the durable `repeatable integration` form; run `flutter test integration_test -d <emulator>` when a device/emulator is available (the CI step is best-effort `continue-on-error`; headless is slow/timing-sensitive for the drift-backed boot). Not a gate.
-3. **Residual test-debt (shared with F08 AC7):** no automated storage-full / disk-write-failure fault-injection test for the persist path. The mechanism (try/catch around the Drift upsert + keep-playing-from-memory) is source-sound. Add in a follow-up.
-4. **`looplet_solver/lib/src/solver.dart:56`** — one pre-existing `info`-level analyzer lint (`curly_braces_in_flow_control_structures`) from an earlier session. Not F03; `dart analyze` exits 0; package tests pass. Optional cleanup on the next F06 touch.
-5. **Tech Lead's §18 clarifications** — QA confirms the implementation matches all six resolutions (no playing-screen CTA is intentional and correct; first-pass locked/frozen tile visuals are present; `/play` chrome is as specced with the family rule deferred to F10; `PlayStrings` is an acceptable localization seam pending a `gen_l10n` follow-on; the two perf deviations are present and do not drop the screen below the premium bar).
+1. F03-QA-01 — sequencing/geometry so the winning row and seam bar are seen for their designed duration before the panel covers the board, for every winning row and the Perfect variant. Authority decision first (Tech Lead), implementation Frontend/Mobile Developer, UI Designer only if a new geometry handoff is needed.
+2. F03-QA-02 — make `integration_test` group 4 complete and green on a live simulator; re-run on ≥ 2 widths.
+3. Re-verification (QA) after 1–2: win visuals on rows 0–4 + Perfect variant with a frame capture; integration suite exit 0; then the still-pending items below.
 
 ---
 
@@ -268,22 +183,27 @@ Unchanged since the prior verdict — Direction A fully implemented and holding 
 
 ## QA Result
 
-* **Approved with Notes** — implementation contract-compliant and `ui-design.md`-aligned; all build + automated gates green; the F03-FE9 suites close the automatable slice of `qa.md §17` (scenarios 1–4, incl. the `prd.md §7` "0 double-registered moves" metric). Residual: a 3-item manual device confirmation (`qa.md §17` 5–7) + 2 non-blocking follow-ups, carried as Notes.
+* **Rejected**
 
 ## Affected Areas
 
-* None requiring code rework. The residual is a device confirmation the environment cannot perform.
+* UI Design / Frontend (win sequencing); Integration test (Frontend); Multiple (F03 × F04 panel).
 
 ## Blocking Issues
 
-* None.
+* F03-QA-01, F03-QA-02.
 
 ## Suggested Fix Order
 
-Not a rework. Tech Lead close-out:
-1. Accept the 3-item manual device deferral (Notes 1) — record the acceptance; recommend the F05 app-distribution smoke as the home for it, or a quick standalone device pass.
-2. Record Notes 2–4 in the change log / follow-on tracking.
-3. Mark F03 `Done` (per DURUM 5 `Approved with Notes` — notes are non-blocking) and sync `feature-board.md` + `system-state.md`.
+1. Tech Lead — decide win-sequence/panel-geometry authority (F03 §10 vs F04 handoff); route a UI Designer geometry handoff only if needed.
+2. Frontend/Mobile Developer — implement sequencing/geometry; fix integration group 4.
+3. QA — re-verify F03 (final), reuse the PASS scenarios listed in §0b for unchanged code paths.
+
+## Pending Validation Scenarios (independent of the defects)
+
+* F03.ROTATION — needs a rotation-capable target/tool (physical device or simulator UI automation with accessibility permission).
+* Paused mid-drag and mid-animation on a live target (HOME while a touch is held; HOME within ~190 ms of a shift).
+* AC9 swipe-begin highlight captured during a held drag.
 
 ---
 
@@ -299,16 +219,14 @@ Run Tech Lead
 
 <<<TEXT
 
-F03 puzzle-play-session — re-verify after F03-FE9. Verdict: **Approved with Notes**. No blocking issue, no required fix.
+F03 final QA on `7a907dd`: **Rejected** (two blocking findings), plus pending runtime scenarios that no code fix will close.
 
-WHAT CHANGED SINCE THE PRIOR VERDICT (`Runtime Validation Pending`): F03-FE9 added `app/test/play/play_session_runtime_test.dart` (13 flutter_test widget tests — the fast, always-green runtime closure in `melos run test`) + `app/integration_test/play_session_test.dart` (device-matrix form, best-effort `continue-on-error` CI step per release.md §4) + a `melos.yaml` `test:integration` script. No product-code change. The 13 tests directly target qa.md §17 scenarios 1–4 with real gestures, the real ~190 ms animation window (a second drag 60ms in → MOVES ticks ONCE — this is the prd.md §7 "0 double-registered moves during animation in QA" metric, now automated-proven), app-lifecycle dispatch, a dispose+remount kill/relaunch on a shared in-memory DB, and a tampered `thawedFrozenCells: ['2,2']` snapshot on smoke-tr-06 → the tile renders TileStatus.frozen not thawed (cache re-derived, not trusted).
+WHAT PASSED (runtime, iPhone 16 / 16e / 16 Pro Max simulators, real app root and on-disk store): AC1–AC8 interaction, AC10 exact resume after real process kill through CONTINUE and the debug entry, tampered thaw cache re-derived on the real store, chevron / iOS edge-swipe / replaced-route exit to home, Journey win → Next Level → progress `1 / 30`, and the misuse set (sub-threshold, rejected move, undo exhaustion, restart, tie-band, two-finger, off-plate release, locked pivot, frozen tile). Gates: analyze 0, format 0, 378 tests pass, debug sim build OK.
 
-GATES: 308/308 workspace tests (app 112 = 99 + 13 F03-FE9); flutter analyze (incl. integration_test/) + dart analyze (6 pkg) + dart format --set-exit-if-changed clean; flutter build ios --release --no-codesign GREEN (54.5MB). Full architecture.md contract + the §18 clarifications honoured; all 11 ACs automated-covered; ui-design.md Direction A ~94/100, no rubric fail; regression risk negligible (only test + CI-config files changed).
+BLOCKING: (1) F03-QA-01 — the F04 completion panel starts rising ≈40 ms after the amber fill, so the ≤600 ms win sequence (stagger, drawn seam bar, bloom) is effectively hidden; for winning rows 2–4 the row is always under the panel, and the Perfect variant clips even row 0. This contradicts F03 ui-design ("seam bar is not optional"; sheet after the sequence) and F04 ui-design ("winning row stays visible"), and is a regression from e4311d3 — the 2026-09-06 approval could not have seen it. Authority question for you: sequencing and geometry (the F04 34–42 % strip cannot hold rows 2–4). (2) F03-QA-02 — integration group 4 never completes on a live simulator (16m46s, then "Some tests failed"); hypothesis only: paused lifecycle + pumpAndSettle.
 
-WHY "APPROVED WITH NOTES" (not Approved): architecture.md §16 names device/simulator `runtime` evidence mandatory, and §18 → [RUNTIME VALIDATION PENDING — F03-FE9] defines the closure as the integration_test/ suite PLUS a manual device confirmation of the visual/OS items (qa.md §17 5–7). The automatable slice (1–4) is now closed; the residual is a 3-item manual device confirmation the QA env cannot produce. Per your Next-Action brief ("automatable slice green AND manual items explicitly deferred with the Tech Lead's acceptance → Approved / Approved with Notes"), this is the verdict.
+STILL PENDING (not defects): rotation (tooling denied), HOME during a held touch / mid-animation, AC9 highlight capture. Suggest scheduling a QA pass on a target/tool that can rotate and interleave lifecycle events, or record an explicit decision gate if you want to accept the simulator-only limits (that acceptance is yours/the user's, not QA's).
 
-CLOSE-OUT ACTIONS FOR YOU:
-1. Accept the 3-item manual device deferral (Notes 1): (5) win-choreography readability + the amber seam bar legible in GREYSCALE (accessibility) + smoke-tr-05 locked pin/ring + smoke-tr-06 frost/crystal + thaw cross-fade; (6) portrait lock survives a rotation attempt; (7) chevron/back on button + system + EDGE-SWIPE, hidden in `won`. Recommend folding into the first app-build distribution smoke (~F05) or a quick standalone device pass. Record the acceptance.
-2. Notes 2–4 to the change log / follow-on tracking: the integration_test/ device-matrix run (`flutter test integration_test -d <emulator>`); the residual storage-full fault-injection test-debt (shared with F08 AC7); the pre-existing looplet_solver:56 info lint (not F03).
-3. Per DURUM 5 `Approved with Notes` (notes non-blocking): mark F03 `Done`, record the notes, sync feature-board.md + system-state.md. F03's critical-path successors (F04 completion panel, F05 Journey) can then activate. F08 stays In Release / parked (unchanged).
+DO NOT read this as a product/PO escalation: no requirement conflict was found. F08.STORAGE stays with F08. F05.SHARED-RUNTIME may reuse only the PASS scenarios above for identical scope (resume, CONTINUE, exits); the win-moment scenario is open.
+
 TEXT

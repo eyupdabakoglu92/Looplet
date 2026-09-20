@@ -6,19 +6,19 @@ F03
 
 ## Current Status
 
-In QA
+Rework
 
 ## Current Owner
 
-QA
+Tech Lead
 
 ## Next Role
 
-QA
+Tech Lead
 
 ## Active Task Ledger
 
-- [ ] Task ID: F03-QA-RUNTIME | Assigned Role: QA | Status: Open | Summary: Final-stage independent runtime/manual verification of F03 on the current revision (evidence F03.RUNTIME-MATRIX, VISUAL, ROTATION, BACK, CURRENT-REVISION) per Current QA Brief; return an independent verdict | Depends On: -
+- [ ] Task ID: F03-QA-RUNTIME | Assigned Role: QA | Status: Blocked | Summary: QA verdict Rejected (F03-QA-01, F03-QA-02) with runtime scenarios still pending; re-run after fixes/decision. Final-stage independent runtime/manual verification of F03 on the current revision (evidence F03.RUNTIME-MATRIX, VISUAL, ROTATION, BACK, CURRENT-REVISION) per Current QA Brief; return an independent verdict | Depends On: -
 
 ## Open Tasks
 
@@ -42,7 +42,7 @@ final
 
 ## QA Result
 
-None
+Rejected
 
 ## Release Scope
 
@@ -63,6 +63,7 @@ None
   * Re-evaluation Trigger: Evidence captured or existing evidence reviewed against the current scope
   * Blocks: F03 final acceptance; F05 shared play/navigation/persistence scope
   * Result: PENDING
+  * Provenance / Note: partial. PASS (runtime, simulators iPhone 16/16e/16 Pro Max, rev 7a907dd, 2026-09-20): AC1–AC8, AC10 real-kill resume via CONTINUE and debug entry, tampered cache on the real store, misuse set (qa.md §4/§10); integration groups 1–3 10/10. Remaining: paused mid-drag / mid-animation on a live target; integration group 4 hangs (F03-QA-02); AC9 highlight not captured at runtime. Elapsed/restartCount unobservable in UI
 
 - Evidence ID: F03.VISUAL
   * Scenario: Win choreography/greyscale seam readability and locked/frozen tile + thaw confirmation
@@ -72,7 +73,8 @@ None
   * Prerequisite / External Decision: Same runtime build and content; no paid deployment required
   * Re-evaluation Trigger: Evidence captured or existing evidence reviewed against the current scope
   * Blocks: F03 final acceptance; applicable F05 shared visuals
-  * Result: PENDING
+  * Result: FAIL
+  * Provenance / Note: (win choreography timing/occlusion, F03-QA-01: rev 7a907dd, video win.mov + 40 ms frame sheet 2026-09-20). Locked pivot (ring, stays put) and frozen tile (frost, stays put, thaws on win) PASS; greyscale seam legibility only approximated by frame luminance conversion (thin light-grey bar visible; amber-vs-cream fill collapses)
 
 - Evidence ID: F03.ROTATION
   * Scenario: Portrait lock remains effective under OS/device rotation
@@ -83,6 +85,7 @@ None
   * Re-evaluation Trigger: Evidence captured or existing evidence reviewed against the current scope
   * Blocks: F03 final acceptance
   * Result: PENDING
+  * Provenance / Note: NOT RUN: Simulator rotation could not be driven (assistive access denied, osascript -1719). Static only: main() setPreferredOrientations([portraitUp]); iPhone Info.plist still lists LandscapeLeft/Right, so the runtime call is the only guard
 
 - Evidence ID: F03.BACK
   * Scenario: Chevron, system back and edge-swipe/direct-entry behavior on the CURRENT navigation code (F05 changed `_popToCaller`: pop when a caller exists, otherwise go home)
@@ -92,7 +95,8 @@ None
   * Prerequisite / External Decision: Runtime target and reachable play route (home CONTINUE and debug row)
   * Re-evaluation Trigger: Evidence captured or existing evidence reviewed against the current scope
   * Blocks: F03 final acceptance; F05 shared navigation
-  * Result: PENDING
+  * Result: PASS
+  * Provenance / Note: (runtime, iPhone 16, rev 7a907dd, 2026-09-20): chevron pop to `/`, iOS left edge-swipe to `/`, chevron hidden in won, exit from a Next-Level replaced route lands on `/` with progress `1 / 30`, resume after chevron keeps the snapshot. Literal direct entry to `/play` with an empty stack is not reachable at runtime (no URL scheme); nearest equivalent (replaced route) passes and `_popToCaller` else-branch was source-inspected
 
 - Evidence ID: F03.CURRENT-REVISION
   * Scenario: The 2026-09-06 approval (308 tests) predates F04/F05 edits to lib/play (commit e4311d3: completion panel/Journey unlock/back routing). Re-establish that the automated F03 suites, analyzer and iOS build hold on the current tree
@@ -102,7 +106,8 @@ None
   * Prerequisite / External Decision: None. Tech Lead's 2026-09-20 pre-QA run (`flutter test` in app/: 181 passed) is orientation only, not QA evidence
   * Re-evaluation Trigger: Evidence captured or existing evidence reviewed against the current scope
   * Blocks: F03 final acceptance
-  * Result: PENDING
+  * Result: PASS
+  * Provenance / Note: (automated functional, 2026-09-20): `melos run analyze` exit 0, `melos run format:check` exit 0, `melos run test` exit 0 = 197 package + 181 app tests, 0 failed; `flutter build ios --debug --simulator` exit 0. Release build not re-run. NOTE: integration suite (device form) fails in group 4 — tracked under F03.RUNTIME-MATRIX / F03-QA-02, not here
 
 ## Open Decision Gates
 
@@ -110,11 +115,12 @@ None
 
 ## Blockers
 
-None
+* F03-QA-01 — win sequence cut off / winning row occluded by the completion panel (UI Design Mismatch, Medium). Authority decision + fix required; see qa.md §8/§18.
+* F03-QA-02 — integration_test group 4 does not complete on a live simulator (Regression Risk, Medium). Fix required; see qa.md §8/§18.
 
 ## Next Action
 
-Run QA on F03-QA-RUNTIME (QA Stage = final). Follow the Current QA Brief below. Return every outcome to Tech Lead. Do not treat build/widget success or a future distribution run as device evidence.
+Run Tech Lead: QA verdict is Rejected. Decide win-sequence/panel-geometry authority for F03-QA-01 (F03 ui-design/§10 vs F04 handoff), route the fix (Frontend/Mobile Developer; UI Designer only if a new geometry handoff is needed) and F03-QA-02 (Frontend/Mobile Developer), keep F03.ROTATION and the mid-drag/mid-animation lifecycle scenarios PENDING with an explicit target/tool or a recorded decision gate, then re-activate F03 final QA. F05 and F08 stay queued.
 
 ## Last Decision
 
@@ -122,9 +128,9 @@ Run QA on F03-QA-RUNTIME (QA Stage = final). Follow the Current QA Brief below. 
 
 ## Last Update
 
-* Updated By: Tech Lead
+* Updated By: QA
 * Timestamp: 2026-09-20
-* Summary: Delivery reconciled, QA task activated with feature-specific brief; post-approval code drift recorded as F03.CURRENT-REVISION.
+* Summary: F03-QA-RUNTIME executed on rev 7a907dd (simulators iPhone 16/16e/16 Pro Max): verdict Rejected; evidence results recorded; qa.md replaced.
 
 ## Context & Follow-ups
 
@@ -141,6 +147,7 @@ F03 implementation is retained. Reconciliation (Tech Lead, 2026-09-20): F03-FE9 
 
 * 2026-09-18 — migrated state; see the immutable pre-migration snapshot for all earlier tasks, decisions and evidence.
 * 2026-09-20 — Tech Lead: reconciled delivery, activated F03-QA-RUNTIME (final), added F03.CURRENT-REVISION.
+* 2026-09-20 — QA: verdict Rejected (F03-QA-01, F03-QA-02); ROTATION and lifecycle scenarios pending.
 
 ## Current QA Brief
 
