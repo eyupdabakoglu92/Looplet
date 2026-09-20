@@ -6,15 +6,15 @@ F03
 
 ## Current Status
 
-In QA
+Rework
 
 ## Current Owner
 
-QA
+Tech Lead
 
 ## Next Role
 
-QA
+Tech Lead
 
 ## Active Task Ledger
 
@@ -22,7 +22,7 @@ QA
 - [x] Task ID: F03-UI-WON | Assigned Role: UI Designer | Status: Done | Summary: DELIVERED 2026-09-20 (ui-design.md §16 Won composition, rubric self-review 92). F03-QA-01 geometry: deliver a `Won composition` section in F03 ui-design.md so the winning row + docked seam stay visible above the F04 panel for rows 0–4 and every F04 variant, per architecture.md §18 (2026-09-20); see Current UI Brief | Depends On: -
 - [x] Task ID: F03-FE-WON | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: DELIVERED 2026-09-20 (frontend.md; F03.WIN-LAYOUT 33/33). F03-QA-01: implement win-sequence-then-panel sequencing (panel not before T0+600 ms) and the UI Designer's Won composition; add widget/golden layout assertions; update frontend.md | Depends On: F03-UI-WON
 - [x] Task ID: F03-FE-INTEG | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: DELIVERED 2026-09-20 (12/12 exit 0 on 3 simulator widths). F03-QA-02: make integration_test/play_session_test.dart group 4 complete and exit 0 on a live simulator on 2 widths; no product-semantics change | Depends On: -
-- [ ] Task ID: F03-QA-REVERIFY | Assigned Role: QA | Status: Open | Summary: Re-verify F03 final on the changed win path per Planned QA Re-verify Brief; independent verdict | Depends On: F03-FE-WON, F03-FE-INTEG
+- [x] Task ID: F03-QA-REVERIFY | Assigned Role: QA | Status: Done | Summary: DONE 2026-09-20 — verdict Rejected (F03-QA-03, F03-QA-04; qa.md). Re-verify F03 final on the changed win path per Planned QA Re-verify Brief; independent verdict | Depends On: F03-FE-WON, F03-FE-INTEG
 
 ## Open Tasks
 
@@ -46,7 +46,7 @@ final
 
 ## QA Result
 
-None
+Rejected
 
 ## Release Scope
 
@@ -66,8 +66,8 @@ None
   * Prerequisite / External Decision: F03-FE-WON and F03-FE-INTEG delivered; residual items closed via the F03.RUNTIME-LIMITS = A route
   * Re-evaluation Trigger: After F03-FE-WON / F03-FE-INTEG delivery is Accepted
   * Blocks: F03 final acceptance; F05 shared play/navigation/persistence scope
-  * Result: PENDING
-  * Provenance / Note: partial PASS, rev 7a907dd, 2026-09-20 (qa.md §0b/§4/§10). Reusable by F05/F08 only for unchanged paths after re-verification
+  * Result: FAIL
+  * Provenance / Note: 2026-09-20 QA re-verify, rev c0cba44 (qa.md): won moment rows 0–4 × variants PASS, resume/back/misuse PASS, integration 12/12 on 16e and Pro Max; FAIL = F03-QA-03 (app interruption mid-drag commits the swipe, contract §12). Reduce Motion FAIL = F03-QA-04
 
 - Evidence ID: F03.VISUAL
   * Scenario: Win choreography readability (F03-QA-01) and locked/frozen tile + thaw confirmation; amber seam bar legible in greyscale
@@ -77,8 +77,8 @@ None
   * Prerequisite / External Decision: F03-UI-WON and F03-FE-WON delivered
   * Re-evaluation Trigger: After F03-FE-WON delivery is Accepted
   * Blocks: F03 final acceptance; applicable F05 shared visuals
-  * Result: FAIL
-  * Provenance / Note: 2026-09-20, rev 7a907dd: sheet starts ≈ +320 ms after settle and covers the winning row by ≈ +400 ms; Perfect variant clips row 0. Locked pivot and frozen tile PASS. Greyscale seam only approximated by frame luminance
+  * Result: PASS
+  * Provenance / Note: 2026-09-20 QA, rev c0cba44: won moment on real frames rows 0–4, Perfect/2★/matched/newBest, 16/16e/Pro Max, XXXL and accessibility-medium text; ghost slot, single glow, docked row clear. Greyscale approximated by luminance conversion of a real frame (OS colour filter unavailable). Notes: dimmed row-0 strip under the seam for lower-row wins; amber stagger absent (pre-existing). Locked/frozen visuals reused from the earlier run (board_tile.dart unchanged) — spot-checked frozen thaw win on L06
 
 - Evidence ID: F03.WIN-LAYOUT
   * Scenario: Panel not visible before T0+600 ms; winning-row rect not intersected by the panel rect at rest, rows 0–4 × {Perfect, non-Perfect} × {390×844, 440×956}, all F04 variants unclipped
@@ -110,8 +110,8 @@ None
   * Prerequisite / External Decision: F03.RUNTIME-LIMITS = A (RESOLVED 2026-09-20). Accessibility observed granted by the Tech Lead (2026-09-20 read-only probe); QA first probes it itself (osascript click Simulator > Device > Rotate Left, a keystroke) and records the result
   * Re-evaluation Trigger: Accessibility grant confirmed by QA's probe, during F03-QA-REVERIFY
   * Blocks: F03 final acceptance
-  * Result: PENDING
-  * Provenance / Note: 2026-09-20 QA could not interleave HOME with a held touch; widget mirror (§17.4) passes, idle HOME round trip PASS
+  * Result: FAIL
+  * Provenance / Note: 2026-09-20 QA: held drag ≥ 3 s + OS app switch (simctl launch Safari), 3 reproductions, 1 Hz screenshot log proves tracking; the swipe is committed and persisted (R3/R4). Idle HOME/app switch PASS. F03-QA-03
 
 - Evidence ID: F03.AC9-HIGHLIGHT
   * Scenario: Row/column lift + rail highlight visible while a drag is in progress (AC9)
@@ -121,8 +121,8 @@ None
   * Prerequisite / External Decision: F03.RUNTIME-LIMITS = A (RESOLVED 2026-09-20); same Accessibility grant and QA probe as F03.ROTATION (needs a held touch plus an interleaved HOME)
   * Re-evaluation Trigger: Accessibility grant confirmed by QA's probe, during F03-QA-REVERIFY
   * Blocks: F03 final acceptance
-  * Result: PENDING
-  * Provenance / Note: automated `trackingAxis` + controller `tracking` phase pass; visual not captured
+  * Result: PASS
+  * Provenance / Note: 2026-09-20 QA: 13 s held touch on row 2 (1000 ms `touch_path` chain) with a mid-hold framebuffer capture: dragged row lifted, brighter, wrap ghost, other rows dimmed, HUD dimmed
 
 - Evidence ID: F03.ROTATION
   * Scenario: Portrait lock remains effective under OS/device rotation
@@ -132,8 +132,8 @@ None
   * Prerequisite / External Decision: F03.RUNTIME-LIMITS = A (RESOLVED 2026-09-20). Accessibility observed granted by the Tech Lead (2026-09-20 read-only probe); QA first probes it itself (osascript click Simulator > Device > Rotate Left, a keystroke) and records the result
   * Re-evaluation Trigger: Accessibility grant confirmed by QA's probe, during F03-QA-REVERIFY
   * Blocks: F03 final acceptance
-  * Result: PENDING
-  * Provenance / Note: 2026-09-20 NOT RUN (assistive access denied, osascript −1719). Static: main() setPreferredOrientations([portraitUp]); iPhone Info.plist still lists LandscapeLeft/Right, so the runtime call is the only guard
+  * Result: PASS
+  * Provenance / Note: 2026-09-20 QA: Accessibility granted; System Events `Device > Rotate Left/Right` with the app in the foreground and a Safari control that rotated to landscape; LOOPLET stayed portrait with unchanged layout, both directions, incl. relaunch. Info.plist still lists landscape, so the runtime lock is the guard
 
 - Evidence ID: F03.BACK
   * Scenario: Chevron, system back and edge-swipe/exit behavior on the current navigation code (post-F05 `_popToCaller`)
@@ -144,7 +144,7 @@ None
   * Re-evaluation Trigger: After F03-FE-WON delivery is Accepted
   * Blocks: F03 final acceptance; F05 shared navigation
   * Result: PASS
-  * Provenance / Note: 2026-09-20 QA rev 7a907dd: chevron, iOS edge-swipe, replaced-route exit → `/`, chevron hidden in won. Literal direct entry to `/play` unreachable at runtime (no URL scheme). Spot-check again after the win-path change
+  * Provenance / Note: 2026-09-20 QA, rev c0cba44: chevron, iOS left edge-swipe, Close from a Next-Level replaced-route chain → `/` with ring 4/30 and CONTINUE = level 5; chevron hidden in won. Literal direct entry still unreachable (no URL scheme)
 
 - Evidence ID: F03.CURRENT-REVISION
   * Scenario: Automated F03 suites, analyzer, format and iOS build on the current tree
@@ -155,7 +155,7 @@ None
   * Re-evaluation Trigger: F03-FE-WON / F03-FE-INTEG delivery changes the tree
   * Blocks: F03 final acceptance
   * Result: PASS
-  * Provenance / Note: 2026-09-20 rev 7a907dd: analyze 0, format 0, 197 package + 181 app tests pass, debug simulator build 0. Valid for that revision only; re-run after the rework
+  * Provenance / Note: 2026-09-20 QA, rev c0cba44: analyze 0, format:check 0, 197 package + 214 app tests, debug simulator build 0; device suite 12/12 exit 0 on 16e and Pro Max (QA) — independent of Frontend/Tech Lead runs
 
 ## Open Decision Gates
 
@@ -173,11 +173,12 @@ None
 
 ## Blockers
 
-None
+* F03-QA-03 — an OS interruption during a drag commits the swipe as a move; architecture §12 says cancel with no move (Contract Violation, Medium). See qa.md §8/§18.
+* F03-QA-04 — iOS Reduce Motion is not honoured (code reads disableAnimations; iOS exposes reduceMotion), so the §16.2 reduced-motion path is unreachable on iOS (Functional/Accessibility, Medium); same check in F04/F05. See qa.md §8/§18.
 
 ## Next Action
 
-Run QA on F03-QA-REVERIFY (QA Stage = final) using the Current QA Brief. Independent verdict; every outcome returns to Tech Lead. F05 and F08 stay queued behind this.
+Run Tech Lead: QA verdict is Rejected (F03-QA-03, F03-QA-04); F03-QA-01 and F03-QA-02 are verified closed. Scope both fixes (QA-03: treat a pointer cancel as an abort in PuzzleBoard, real-cancel test; QA-04: shared reduceMotion || disableAnimations helper across F03/F04/F05 call sites, tests for both flags), decide the F04/F05 acceptance impact, route Frontend/Mobile Developer, then re-activate F03 final QA. No evidence is pending; F03.RUNTIME-LIMITS is fully used. F05 and F08 stay queued.
 
 ## Last Decision
 
@@ -185,9 +186,9 @@ Run QA on F03-QA-REVERIFY (QA Stage = final) using the Current QA Brief. Indepen
 
 ## Last Update
 
-* Updated By: Tech Lead
+* Updated By: QA
 * Timestamp: 2026-09-20
-* Summary: Frontend delivery reconciled and accepted at HEAD cf8d8f0; F03-QA-REVERIFY activated with an updated brief; feature status In QA.
+* Summary: F03-QA-REVERIFY executed on rev c0cba44 (simulators 16/16e/16 Pro Max, Accessibility route): verdict Rejected; F03-QA-01/02 closed; new F03-QA-03/04; ROTATION and AC9 PASS; qa.md replaced.
 
 ## Context & Follow-ups
 
@@ -210,6 +211,7 @@ F03 implementation is retained; F04/F05 integration code stays; the rework deliv
 * 2026-09-20 — UI Designer: F03-UI-WON delivered (ui-design.md §16); F03-FE-WON and F03-FE-INTEG activated.
 * 2026-09-20 — Frontend/Mobile Developer: F03-FE-WON and F03-FE-INTEG delivered; owner → Tech Lead.
 * 2026-09-20 — Tech Lead: delivery reconciled (Accepted); Accessibility observed granted; F03-QA-REVERIFY Open, status In QA.
+* 2026-09-20 — QA: re-verify verdict Rejected (F03-QA-03, F03-QA-04); F03-QA-01/02 closed.
 
 ## Current UI Brief
 
