@@ -10,11 +10,11 @@ In QA
 
 ## Current Owner
 
-QA
+Tech Lead
 
 ## Next Role
 
-QA
+Tech Lead
 
 ## Active Task Ledger
 
@@ -25,7 +25,7 @@ QA
 - [x] Task ID: F03-QA-REVERIFY | Assigned Role: QA | Status: Done | Summary: DONE 2026-09-20 — verdict Rejected (F03-QA-03, F03-QA-04; qa.md). Re-verify F03 final on the changed win path per Planned QA Re-verify Brief; independent verdict | Depends On: F03-FE-WON, F03-FE-INTEG
 - [x] Task ID: F03-FE-CANCEL | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: DELIVERED 2026-09-21 (frontend.md). F03-QA-03: a pointer cancel aborts the drag (render Listener + controller.cancelDrag); root cause corrected: a cancel of an accepted pan is delivered as onPanEnd, not onPanCancel; widget 5/5, controller +2, device suite 13/13 on 3 simulator widths; two negative controls | Depends On:
 - [x] Task ID: F03-FE-REDUCEMOTION | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: DELIVERED 2026-09-21 (frontend.md). F03-QA-04: one shared reduceMotionRequested() (reduceMotion OR disableAnimations) at all six call sites incl. F04 panel and F05 ring/tutorial; per-site tests for both flags with no-signal controls and a negative control; 243 app tests | Depends On:
-- [ ] Task ID: F03-QA-REVERIFY2 | Assigned Role: QA | Status: Open | Summary: ACTIVATED 2026-09-21 at rev cf747f8. Re-verify F03-QA-03 (real OS interruption mid-drag) and F03-QA-04 (real iOS Reduce Motion) and the gesture / reduce-motion paths the fix touched; final stage, modules core + client-ui + stateful-flow, depth full, evidence reuse per Current QA Brief; independent verdict | Depends On: F03-FE-CANCEL, F03-FE-REDUCEMOTION
+- [x] Task ID: F03-QA-REVERIFY2 | Assigned Role: QA | Status: Done | Summary: DONE 2026-09-21 at HEAD 5be4dc6 (app tree = cf747f8) — verdict Approved with Notes (qa.md): real OS app switch mid-drag x3 and device lock = no move; real iOS Reduce Motion ON/OFF verified on F03 win, F04 reveal, F05 ring and tutorial; genuine-release regression, gates, device suite 13/13 on 16e and Pro Max | Depends On: F03-FE-CANCEL, F03-FE-REDUCEMOTION
 
 ## Open Tasks
 
@@ -49,7 +49,7 @@ final
 
 ## QA Result
 
-None
+Approved with Notes
 
 ## Release Scope
 
@@ -97,8 +97,8 @@ allowed
   * Prerequisite / External Decision: F03-FE-WON and F03-FE-INTEG delivered; residual items closed via the F03.RUNTIME-LIMITS = A route
   * Re-evaluation Trigger: During F03-QA-REVERIFY2
   * Blocks: F03 final acceptance; F05 shared play/navigation/persistence scope
-  * Result: PENDING
-  * Provenance / Note: INVALIDATED 2026-09-21 by rev cf747f8 (gesture handling and reduce-motion reads changed; the QA-03/04 scenarios must pass on the real target); prior result on rev c0cba44 was FAIL. Prior note: 2026-09-20 QA re-verify, rev c0cba44 (qa.md): won moment rows 0–4 × variants PASS, resume/back/misuse PASS, integration 12/12 on 16e and Pro Max; FAIL = F03-QA-03 (app interruption mid-drag commits the swipe, contract §12). Reduce Motion FAIL = F03-QA-04
+  * Result: PASS
+  * Provenance / Note: 2026-09-21 QA, HEAD 5be4dc6 (app = cf747f8): journeys AC1-AC10 on iPhone 16 (real main.dart root, on-disk Drift store) incl. Journey levels 1-5 via Next Level, kill/relaunch resume, misuse set; earlier-run paths REUSED by fingerprint (qa.md R1-R7); device suite 13/13 exit 0 on 16e and Pro Max (E3). Android capture remains Pending project-level (platform.md §14).
 
 - Evidence ID: F03.VISUAL
   * Scenario: Win choreography readability (F03-QA-01) and locked/frozen tile + thaw confirmation; amber seam bar legible in greyscale
@@ -109,8 +109,7 @@ allowed
   * Re-evaluation Trigger: After F03-FE-WON delivery is Accepted
   * Blocks: F03 final acceptance; applicable F05 shared visuals
   * Result: PASS
-  * Provenance / Note: 2026-09-20 QA, rev c0cba44: won moment on real frames rows 0–4, Perfect/2★/matched/newBest, 16/16e/Pro Max, XXXL and accessibility-medium text; ghost slot, single glow, docked row clear. Greyscale approximated by luminance conversion of a real frame (OS colour filter unavailable). Notes: dimmed row-0 strip under the seam for lower-row wins; amber stagger absent (pre-existing). Locked/frozen visuals reused from the earlier run (board_tile.dart unchanged) — spot-checked frozen thaw win on L06
-
+  * Provenance / Note: 2026-09-20 QA, rev c0cba44: won moment on real frames rows 0–4, Perfect/2★/matched/newBest, 16/16e/Pro Max, XXXL and accessibility-medium text; ghost slot, single glow, docked row clear. Greyscale approximated by luminance conversion of a real frame (OS colour filter unavailable). Notes: dimmed row-0 strip under the seam for lower-row wins; amber stagger absent (pre-existing). Locked/frozen visuals reused from the earlier run (board_tile.dart unchanged) — spot-checked frozen thaw win on L06 2026-09-21 QA: REUSED at HEAD 5be4dc6 — fingerprint valid (files on this path unchanged since c0cba44); spot-check win rows 0 (reduced) and 4 (regular) re-run, no regression (qa.md R1-R4, E12, E14).
 - Evidence ID: F03.WIN-LAYOUT
   * Scenario: Panel not visible before T0+600 ms; winning-row rect not intersected by the panel rect at rest, rows 0–4 × {Perfect, non-Perfect} × {390×844, 440×956}, all F04 variants unclipped
   * Required Class: automated functional
@@ -140,8 +139,8 @@ allowed
   * Prerequisite / External Decision: F03.RUNTIME-LIMITS = A (RESOLVED 2026-09-20). Accessibility observed granted by the Tech Lead (2026-09-20 read-only probe); QA first probes it itself (osascript click Simulator > Device > Rotate Left, a keystroke) and records the result
   * Re-evaluation Trigger: During F03-QA-REVERIFY2
   * Blocks: F03 final acceptance
-  * Result: PENDING
-  * Provenance / Note: INVALIDATED 2026-09-21 by rev cf747f8 (PuzzleBoard now aborts on PointerCancel; F03-QA-03 fix must be shown on a real OS interruption); prior result on rev c0cba44 was FAIL. Prior note: 2026-09-20 QA: held drag ≥ 3 s + OS app switch (simctl launch Safari), 3 reproductions, 1 Hz screenshot log proves tracking; the swipe is committed and persisted (R3/R4). Idle HOME/app switch PASS. F03-QA-03
+  * Result: PASS
+  * Provenance / Note: 2026-09-21 QA, HEAD 5be4dc6: held drag >= 3 s (1 Hz screenshot log proves touch down and row lifted) + real OS app switch (simctl launch Safari) x3 (row right, row left, column down): no move, MOVES unchanged, idle, store appliedMoves empty, cold relaunch unchanged; device lock (Simulator Cmd+L) mid-hold: no new move; idle app switch: unchanged (qa.md E4-E6, E9). Same repro was 3/3 FAIL on c0cba44.
 
 - Evidence ID: F03.AC9-HIGHLIGHT
   * Scenario: Row/column lift + rail highlight visible while a drag is in progress (AC9)
@@ -151,8 +150,8 @@ allowed
   * Prerequisite / External Decision: F03.RUNTIME-LIMITS = A (RESOLVED 2026-09-20); same Accessibility grant and QA probe as F03.ROTATION (needs a held touch plus an interleaved HOME)
   * Re-evaluation Trigger: During F03-QA-REVERIFY2
   * Blocks: F03 final acceptance
-  * Result: PENDING
-  * Provenance / Note: INVALIDATED 2026-09-21 by rev cf747f8 (puzzle_board.dart gesture handling changed); prior result on rev c0cba44 was PASS. Prior note: 2026-09-20 QA: 13 s held touch on row 2 (1000 ms `touch_path` chain) with a mid-hold framebuffer capture: dragged row lifted, brighter, wrap ghost, other rows dimmed, HUD dimmed
+  * Result: PASS
+  * Provenance / Note: 2026-09-21 QA, HEAD 5be4dc6: held touch, full-resolution mid-hold frame: dragged row lifted and brighter, other rows dimmed, wrap ghost at the edge, left rail highlight (qa.md E8).
 
 - Evidence ID: F03.ROTATION
   * Scenario: Portrait lock remains effective under OS/device rotation
@@ -163,8 +162,7 @@ allowed
   * Re-evaluation Trigger: Accessibility grant confirmed by QA's probe, during F03-QA-REVERIFY
   * Blocks: F03 final acceptance
   * Result: PASS
-  * Provenance / Note: 2026-09-20 QA: Accessibility granted; System Events `Device > Rotate Left/Right` with the app in the foreground and a Safari control that rotated to landscape; LOOPLET stayed portrait with unchanged layout, both directions, incl. relaunch. Info.plist still lists landscape, so the runtime lock is the guard
-
+  * Provenance / Note: 2026-09-20 QA: Accessibility granted; System Events `Device > Rotate Left/Right` with the app in the foreground and a Safari control that rotated to landscape; LOOPLET stayed portrait with unchanged layout, both directions, incl. relaunch. Info.plist still lists landscape, so the runtime lock is the guard 2026-09-21 QA: REUSED at HEAD 5be4dc6 — fingerprint valid (files on this path unchanged since c0cba44); spot-check win rows 0 (reduced) and 4 (regular) re-run, no regression (qa.md R1-R4, E12, E14).
 - Evidence ID: F03.BACK
   * Scenario: Chevron, system back and edge-swipe/exit behavior on the current navigation code (post-F05 `_popToCaller`)
   * Required Class: manual
@@ -174,8 +172,7 @@ allowed
   * Re-evaluation Trigger: After F03-FE-WON delivery is Accepted
   * Blocks: F03 final acceptance; F05 shared navigation
   * Result: PASS
-  * Provenance / Note: 2026-09-20 QA, rev c0cba44: chevron, iOS left edge-swipe, Close from a Next-Level replaced-route chain → `/` with ring 4/30 and CONTINUE = level 5; chevron hidden in won. Literal direct entry still unreachable (no URL scheme)
-
+  * Provenance / Note: 2026-09-20 QA, rev c0cba44: chevron, iOS left edge-swipe, Close from a Next-Level replaced-route chain → `/` with ring 4/30 and CONTINUE = level 5; chevron hidden in won. Literal direct entry still unreachable (no URL scheme) 2026-09-21 QA: REUSED at HEAD 5be4dc6 — fingerprint valid (files on this path unchanged since c0cba44); spot-check win rows 0 (reduced) and 4 (regular) re-run, no regression (qa.md R1-R4, E12, E14).
 - Evidence ID: F03.CURRENT-REVISION
   * Scenario: Automated F03 suites, analyzer, format and iOS build on the current tree
   * Required Class: automated functional
@@ -184,8 +181,8 @@ allowed
   * Prerequisite / External Decision: None
   * Re-evaluation Trigger: During F03-QA-REVERIFY2
   * Blocks: F03 final acceptance
-  * Result: PENDING
-  * Provenance / Note: INVALIDATED 2026-09-21 by rev cf747f8 (the tree changed (14 app files); gates re-run on the current revision); prior result on rev c0cba44 was PASS. Prior note: 2026-09-20 QA, rev c0cba44: analyze 0, format:check 0, 197 package + 214 app tests, debug simulator build 0; device suite 12/12 exit 0 on 16e and Pro Max (QA) — independent of Frontend/Tech Lead runs
+  * Result: PASS
+  * Provenance / Note: 2026-09-21 QA, HEAD 5be4dc6 (clean; app/ packages/ content/ identical to cf747f8): melos analyze exit 0 (1 pre-existing looplet_solver info), format:check exit 0 (155 files), 197 package + 243 app tests pass, debug simulator build exit 0, device suite 13/13 exit 0 on 16e and Pro Max (qa.md E1-E3).
 
 - Evidence ID: F03.CANCEL-TEST
   * Scenario: a real PointerCancel during a drag (OS interruption) leaves MOVES unchanged, phase idle and no persisted move; genuine releases (incl. beyond the plate) still resolve
@@ -215,8 +212,8 @@ allowed
   * Prerequisite / External Decision: F03-FE-REDUCEMOTION delivered and Accepted (2026-09-21)
   * Re-evaluation Trigger: During F03-QA-REVERIFY2
   * Blocks: F03 final acceptance
-  * Result: PENDING
-
+  * Result: PASS
+  * Provenance / Note: 2026-09-21 QA, HEAD 5be4dc6: real Settings > Accessibility > Motion > Reduce Motion ON (Prefer Cross-Fade row visible): F03 win = static amber row, ~300 ms hold, dock cross-fade, scrim + panel fade, at rest ~T0+0.66 s, F04 stars struck at once; F05 ring node static (8/8 identical frames) and tutorial ghost static; controls with Reduce Motion OFF: node breathes (8/8 distinct), ghost loops (8/8 distinct), full 940 ms sequence with glide/slide/staggered stars (qa.md E10-E14). Terminal 30/30 bloom not reached at runtime (widget-tested).
 ## Open Decision Gates
 
 - Decision ID: F03.RUNTIME-LIMITS
@@ -237,7 +234,7 @@ None
 
 ## Next Action
 
-QA: run `node ai-system/tools/qa-preflight.mjs ai-system` (must PASS), then F03-QA-REVERIFY2 per the Current QA Brief at rev cf747f8: the real OS interruption during a held drag (F03-QA-03), the real iOS Reduce Motion toggle on F03 win + F04 reveal + F05 ring/tutorial (F03-QA-04), genuine-release regression, gates. Verdict returns to Tech Lead.
+Tech Lead: closure review of the final QA verdict (Approved with Notes, qa.md). Required before Done: reconcile board/system-state, decide the non-blocking notes (board shift/bounce under reduce motion; terminal 30/30 bloom and multi-touch not exercised at runtime), and record that Visual Scope none covers behaviour/accessibility only — the whole-surface visual evaluation stays in the Design Adoption Route and may reopen F03 as visual rework. Then release the rework-control lock (F05-QA-STRICT, F08 local evidence) and activate the next phase.
 
 ## Last Decision
 
@@ -247,9 +244,9 @@ QA: run `node ai-system/tools/qa-preflight.mjs ai-system` (must PASS), then F03-
 
 ## Last Update
 
-* Updated By: Tech Lead
+* Updated By: QA
 * Timestamp: 2026-09-21
-* Summary: delivery reconciled and Accepted at cf747f8; F03-QA-REVERIFY2 activated (status In QA, owner QA); affected QA evidence reset to PENDING.
+* Summary: F03-QA-REVERIFY2 done — QA Result Approved with Notes; F03-QA-03/04 closed on the real target; QA-owned evidence PASS; owner Tech Lead.
 
 ## Context & Follow-ups
 
@@ -276,6 +273,7 @@ F03 implementation is retained; F04/F05 integration code stays; the rework deliv
 * 2026-09-21 — Tech Lead: incident intake (ai-system upgrade): verdict reconciled, F03-FE-CANCEL / F03-FE-REDUCEMOTION opened, visual/QA-plan schema fields added.
 * 2026-09-21 — Frontend/Mobile Developer: F03-FE-CANCEL + F03-FE-REDUCEMOTION delivered (frontend.md); root cause of QA-03 corrected (onPanEnd, not onPanCancel).
 * 2026-09-21 — Tech Lead: delivery reconciled (Accepted, cf747f8); F03-QA-REVERIFY2 activated; F03 status In QA, owner QA.
+* 2026-09-21 — QA: F03-QA-REVERIFY2 final verdict Approved with Notes (qa.md); F03-QA-03/04 closed; owner -> Tech Lead.
 
 ## Delivery Reconciliation (Tech Lead, 2026-09-20, HEAD cf8d8f0)
 
@@ -295,7 +293,7 @@ Decisions on the delivery's notes: (a) row-0 strip left visible between docked r
 4. **Evidence reproduced by the Tech Lead at cf747f8:** `melos run analyze` exit 0 (one pre-existing `looplet_solver` info), `format:check` exit 0 (155 files), `melos run test` 197 package + 243 app pass, `flutter test integration_test/play_session_test.dart -d iPhone 16` 13/13 exit 0. FE also ran 16e and Pro Max 13/13. Automated only: the widget/integration cancel is synthetic and the reduce-motion flags are faked — QA owns the real-OS proof.
 5. **Clarifications.** Board shift/bounce under reduce motion: no authority requires it; not reworked (optional quality note). Multi-touch (a cancelled second finger while another tracks) would also abort — outside the ACs, QA may note it if observed.
 
-## Current QA Brief (F03-QA-REVERIFY2 — activated 2026-09-21, rev cf747f8)
+## Current QA Brief (F03-QA-REVERIFY2 — activated 2026-09-21, rev cf747f8; COMPLETED, see qa.md)
 
 Read: qa.md §8 (F03-QA-03/04 + the mechanism correction above), frontend.md "F03-FE-CANCEL / F03-FE-REDUCEMOTION", architecture.md §12/§18, prompts/qa.md modules core + client-ui + stateful-flow, prompt-qa-evidence-reuse-standard.md. First `node ai-system/tools/qa-preflight.mjs ai-system` (must PASS) and reset nothing else. Plan: QA Scope client-only · Stage final · Modules core, client-ui, stateful-flow · Depth full · Evidence Reuse allowed (fingerprints below) · Visual Scope none (no visual-quality module and no visual verdict; report any visible regression as a finding).
 

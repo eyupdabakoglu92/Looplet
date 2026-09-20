@@ -1,209 +1,122 @@
-# F03 — puzzle-play-session: QA Report (re-verify)
+# F03 — puzzle-play-session: QA Raporu (final, re-verify 2)
 
-QA run: 2026-09-20 (second final-stage run) · Task: F03-QA-REVERIFY · QA Stage: final · QA Scope: client-only · Release Scope: none
-Verified revision: `c0cba44` (clean tree; `app/`, `packages/`, `content/`, `tools/` byte-identical to the delivery commit `cf8d8f0`, 0 code files differ). Replaces the earlier 2026-09-20 report (rev 7a907dd, Rejected) — its PASS scenarios are reused below only where stated with a reason.
-
----
-
-## 0a. Evidence Mode Declaration
-
-* Bash / build access: **VAR**
-* Device test suite: **VAR** — `flutter test integration_test/play_session_test.dart -d <UDID>`
-* Screenshot / device tool: **VAR** — iOS Simulator control (tap/swipe/touch_path/screenshot), `simctl io recordVideo` + a Swift/AVFoundation frame-sheet tool, `simctl ui content_size`, Simulator menu automation (System Events — **Accessibility now granted**), the Settings app driven by taps
-* Runtime validation method: **runtime** on iOS 18.6 simulators (iPhone 16 393×852 primary, 16e 390×844, 16 Pro Max 440×956; debug build, real `main.dart` root, real on-disk Drift store) + **repeatable integration** + **automated functional**
-* Declared limits: simulator pointer is synthetic (no physical finger / threshold sweep); the OS Grayscale colour filter is not available in this simulator's Settings (luminance conversion of a real frame used); the Settings app's Home menu item and `defaults write` do not reach the app (used `simctl launch` app-switch instead).
+QA turu: 2026-09-21 · Görev: F03-QA-REVERIFY2 · QA Stage: final · QA Scope: client-only · Release Scope: none
+Doğrulanan revizyon: HEAD `5be4dc6`, temiz ağaç. `app/`, `packages/`, `content/` `cf747f8` ile birebir aynı (`git diff cf747f8 HEAD -- app` boş; fark yalnız `ai-system/` dokümanları). Bu rapor önceki (2026-09-20, rev c0cba44, Rejected) raporun yerini alır; önceki bulguların kapanışı §3'tedir.
 
 ---
 
-## 0b. Evidence Ledger
+## 0. QA Execution Plan
 
-| Claim / Scenario | Class | Command / Action | Target | Result / Exit | Provenance | Isolation |
-| --- | --- | --- | --- | --- | --- | --- |
-| Static + automated gates | static / automated functional | `melos run analyze` · `melos run format:check` · `melos run test` | workspace | analyze **0**, format **0** (152 files, 0 changed), **197 package + 214 app tests pass**, 0 failed | rev c0cba44, 2026-09-20 | widget tests use in-memory DB + overrides |
-| Device-form suite (F03-QA-02 closure) | repeatable integration | `flutter test integration_test/play_session_test.dart -d <UDID>` | iPhone 16e; iPhone 16 Pro Max (QA); iPhone 16 (Tech Lead + Frontend on the same code) | **12/12 pass, exit 0** on 16e (1 m 19 s) and 16 Pro Max (1 m 01 s); group 4 completes | rev c0cba44 | in-memory DB, not production root |
-| Debug build of this revision | build | `flutter build ios --debug --simulator` | app | **PASS**, exit 0 (24 s) | rev c0cba44 | build ≠ behaviour |
-| Won moment F03-QA-01: row 0 (Journey L1, debug L01), row 1 (L3), row 2 (debug L06), row 3 (L2), row 4 (L4) | runtime + video | play via CONTINUE → Next Level ×3 and debug row, `recordVideo` + 60 ms frame sheet | iPhone 16; single-frame checks on 16e and 16 Pro Max | **PASS** — see §4/§9 | 2026-09-20 | debug build |
-| F04 variants (2★ first-clear, matched, newBest + Perfect, Perfect) with Retry between | runtime | debug L01 loops | iPhone 16 | **PASS** | same | — |
-| Large text (XXXL, then accessibility-medium) | runtime | `simctl ui <UDID> content_size …` | iPhone 16 | **PASS** — panel top stays ≥ 0.36 H, docked row clear, density fallback visibly engaged, controls unclipped | same | — |
-| Portrait lock (F03.ROTATION) | runtime | System Events `Device > Rotate Left / Right` with the app in the foreground; Safari as a control | iPhone 16 | **PASS** — Safari rotates to landscape, LOOPLET stays portrait, unchanged layout, both directions, incl. relaunch | same | — |
-| Drag lift/highlight (AC9) | runtime | 13 s held touch (`touch_path`, 1000 ms points) + screenshot at +6 s | iPhone 16 | **PASS** — dragged row lifted, brighter, wrap ghost, other rows dimmed, HUD dimmed | same | — |
-| App backgrounded mid-drag (F03.LIFECYCLE-LIVE) | runtime | held drag ≥ 3 s, then `simctl launch Safari` (real OS app switch); 1 Hz screenshot log proves the touch was down | iPhone 16 | **FAIL ×2 (+1 earlier)** — the drag is committed as a move | same | see F03-QA-03 |
-| iOS Reduce Motion | runtime | Settings > Accessibility > Motion > Reduce Motion **ON** (real toggle), relaunch, record a win | iPhone 16 | **FAIL** — full glide/slide and F04 star reveal at normal speed | same | see F03-QA-04 |
-| Resume after real process kill via CONTINUE | runtime | move → `simctl terminate` → relaunch → CONTINUE | iPhone 16 | **PASS** exact grid + MOVES | same | — |
-| Back paths | runtime | chevron, iOS left edge-swipe, Close from a Next-Level replaced-route chain | iPhone 16 | **PASS** → `/`, ring `4 / 30`, CONTINUE = level 5 | same | — |
-| Misuse set | runtime | sub-threshold (10 pt), near-diagonal (60×56) | iPhone 16 | **PASS** | same | — |
-| Greyscale legibility of the docked row | runtime (approximated) | luminance conversion of a real Pro Max win frame | Pro Max | **PASS (approx.)** | same | not the OS colour filter |
+* **Stage / Scope:** final / client-only. Release scope yok.
+* **Modüller ve tetikleyiciler:** `core` (her tur) · `client-ui` (Flutter istemci, gesture/route/UI state; `frontend.md` mevcut) · `stateful-flow` (persistence, resume, lifecycle/interruption; architecture §9/§12). `visual-quality` yok: Visual Scope = none (bu reopen'da görsel çıktı eklenmedi/değişmedi).
+* **Regression Depth: full.** Gerekçe: final gate + ortak gesture/lifecycle/persistence yüzeyi (`puzzle_board.dart`, controller) + F04/F05'in paylaştığı reduce-motion okumaları.
+* **Evidence Reuse: allowed**, fingerprint c0cba44 → cf747f8: değişen tek app dosyaları `home_screen.dart`, `journey/column_tutorial_overlay.dart`, `play/play_session_controller.dart` (+`cancelDrag`), `play/play_session_screen.dart` (1 okuma), `play/widgets/puzzle_board.dart` (Listener + `_abort`), `rating/completion_panel.dart` (2 okuma), yeni `reduce_motion.dart` + testler. `main.dart`, `ios/`, pubspec, packages, persistence, content **değişmedi**.
+* **Canonical target / runtime sınıfı:** iOS Simulator 18.6, iPhone 16 (393×852) birincil; 16e (390×844) ve 16 Pro Max (440×956) cihaz suite'i. Debug build, gerçek `main.dart` kökü, diskteki gerçek Drift store'u (sqlite3 ile okundu).
+* **Fail-fast checkpoint:** aktif QA kapısı + `qa-preflight` PASS → gate'ler (analyze/format/test/build) PASS → en küçük kritik probe (gerçek uygulama geçişi, kesilen sürükleme) PASS → geniş doğrulama. Durdurucu hard prerequisite oluşmadı.
+* **Bildirilen sınırlar:** simulator pointer'ı sentetiktir (fiziksel parmak yok); Android capture Pending (platform.md §14, kapsam dışı: iOS hedefi); OS Grayscale bu turda yeniden yürütülmedi (REUSED).
 
-Reused from the earlier run (rev 7a907dd) with reason — the paths' code is unchanged in `cf8d8f0` (`play_session_controller.dart`, `gesture_resolver.dart`, persistence untouched): AC1–AC7 basic interaction, tampered `thawedFrozenCells` re-derivation on the real store, locked-pivot and frozen-tile behaviour, multi-touch and off-plate release. The edited files (`play_session_screen.dart`, `puzzle_board.dart`, `completion_panel.dart`) were re-exercised above.
+## 1. Evidence Ledger
 
----
+| ID | Claim / Scenario | Class | Command / Action | Target | Result / Counts | Provenance / Fingerprint | Isolation |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| E1 | Statik ve otomatik kapılar | static / automated functional | `melos run analyze` · `melos run format:check` · `melos run test` | workspace | analyze exit 0 (yalnız önceden var olan 1 `looplet_solver` info), format exit 0 (155 dosya, 0 değişti), **197 paket + 243 app test geçti**, 0 fail | HEAD 5be4dc6 | widget testleri in-memory DB + override; reduce-motion bayrakları taklit |
+| E2 | Debug build | build | `flutter build ios --simulator --debug` | app | exit 0 (20.9 s) | HEAD 5be4dc6 | build ≠ davranış |
+| E3 | Cihaz suite'i (13 test, group 4 dahil) | repeatable integration | `flutter test integration_test/play_session_test.dart -d <UDID>` | iPhone 16e; iPhone 16 Pro Max (QA'nın kendi koşusu) | **13/13 pass, exit 0** (57 s / 67 s); Tech Lead + Frontend iPhone 16'da 13/13 | cf747f8 (app aynı) | in-memory DB; sentetik `PointerCancel`, OS iptali değil |
+| E4 | **F03-QA-03:** tutulan sürüklemede gerçek OS uygulama geçişi ×3 | runtime | 10 s'lik `touch_path` + 1 Hz screenshot günlüğü, ardından `simctl launch com.apple.mobilesafari`, sonra uygulamaya dönüş; store `sqlite3` | iPhone 16 | **PASS ×3**: koşu 1 (satır 1 sağa; 02:09:34 karesinde satır kalkık, dokunuş aşağıda, MOVES 0 → 02:09:35 geçiş), koşu 2 (satır 3 sola), koşu 3 (sütun 2 aşağı). Dönüşte grid değişmemiş, MOVES 0, idle; store `appliedMoves: []`, `moveCount: 0` üç koşuda da | rev 5be4dc6; aynı repro c0cba44'te 3/3 FAIL idi | ekran görüntüleri oturum scratchpad'inde (repoda tutulmadı) |
+| E5 | Cihaz kilidi sırasında tutulan sürükleme (2. tetikleyici) | runtime | tutulan sürükleme + Simulator Cmd+L. İlk deneme: menü tıklaması kilitlemedi, sürükleme dokunuş bitince normal bırakma olarak `R4` işlendi — geçerli bir bırakma, tetikleyici sayılmaz. İkinci deneme: klavye kısayolu ekranı karartıp kilitledi | iPhone 16 | **PASS**: kilitten sonra store `["R4"]`, yeni hamle yok; uyandırıp kilit açınca satır 1 dokunulmamış, MOVES 1, idle | rev 5be4dc6 | — |
+| E6 | Soğuk başlatma: kesintilerden sonra kill → relaunch → CONTINUE | runtime | `simctl terminate` → `launch` → CONTINUE | iPhone 16 | **PASS**: grid değişmemiş, MOVES 0 | rev 5be4dc6 | gerçek store |
+| E7 | Genuine release regresyonu (gerçek dokunuş) | runtime | `swipe` / uzun `touch_path`; store `appliedMoves` | iPhone 16 | **PASS**: 10 pt eşik altı → hamle yok; near-diagonal 60×56 → satır kayması (`R2`); ekran dışına (x=388) bırakma → `R0` commit; bu seviyede sütun sürükleme → reddedildi, MOVES değişmedi; 10 s tutulup bırakılan sürükleme → `R4` commit + persist | rev 5be4dc6 | — |
+| E8 | AC9 kaldırma/vurgu (tutulan dokunuş, tam çözünürlüklü kare) | runtime | E4 koşu 1'in kare kırpması | iPhone 16 | **PASS**: sürüklenen satır kalkık ve parlak, diğer satırlar kısılmış, sarma hayaleti (`S`) kenarda, sol ray vurgusu | rev 5be4dc6 | — |
+| E9 | Boşta uygulama geçişi (dokunuş yok) | runtime | 1 hamle (`D0`), `simctl launch` Safari → dönüş | iPhone 16 | **PASS**: store `journey-tr-05 ["D0"]` önce/sonra aynı; MOVES 1 | rev 5be4dc6 | — |
+| E10 | **F03-QA-04:** gerçek Settings > Accessibility > Motion > Reduce Motion **AÇIK** (ek "Prefer Cross-Fade Transitions" satırı görünür → aktif), relaunch; F05 halkası | runtime | 8 kare / ~4 s, düğüm bölgesi piksel özeti (md5) | iPhone 16 | **PASS**: düğüm 8 karede **aynı** (statik) | rev 5be4dc6 | — |
+| E11 | E10 kontrolü: Reduce Motion **KAPALI** | runtime | aynı yöntem (düğüm konumu güncellendi: 3/30, seviye 4 sürüyor) | iPhone 16 | 8 karede **8 farklı** özet → düğüm nefes alıyor; yöntem ayırt edici | rev 5be4dc6 | düğüm konumu E10'dan farklı (seviye 1 vs 4); mekanizma aynı |
+| E12 | Reduce Motion AÇIK: F03 kazanma + F04 açılış | runtime + video | debug L01 (1 hamlelik kazanma), `simctl recordVideo`, 0,1 s kare tablosu | iPhone 16 | **PASS**: T0 ≈ 6,45 s; statik amber satır + dikiş yerinde ≈ 300 ms bekler; satır dock'a çapraz solar (≈ 160 ms), scrim + panel solarak gelir; ≈ T0+0,66 s'de dinlenme; **3 yıldız birden dolu**; glide/slide/yıldız sıralaması yok | rev 5be4dc6; aynı senaryo c0cba44'te FAIL idi | video oturum scratchpad'inde |
+| E13 | Reduce Motion AÇIK: F05 öğretici hayaleti (seviye 4) + Journey akışı | runtime | seviye 1–3 çözümü (`L0 L0`, `L3 L3`, `L1 L1`, her biri Perfect + SONRAKİ) → seviye 4; tam ekran 8 kare özeti | iPhone 16 | **PASS**: ipucu + hayalet görünür, 8 karede **aynı** (statik); kontrol KAPALI: **8/8 farklı** (döngü); ilk sütun hamlesiyle öğretici temizlendi | rev 5be4dc6 | debug puzzle'lar öğretici göstermez; Journey yolu kullanıldı |
+| E14 | Reduce Motion KAPALI: normal kazanma dizisi geri geliyor (seviye 4, `U0 U3 R3 D4`) | runtime + video | 75 ms kare tablosu | iPhone 16 | **PASS**: amber satır ≈ 0,6 s tutulur → dock'a kayar (glide) → panel yukarı kayar → yıldızlar tek tek vurulur (yalnız panel dinlendikten sonra) | rev 5be4dc6 | — |
+| E15 | Journey ilerleme / Next Level (Reduce Motion açık) | runtime | seviye 1→2→3→4→5 SONRAKİ zinciri | iPhone 16 | **PASS**: ana ekran `3 / 30`, "Seviye 4 · sürüyor"; seviye 4 kazanılınca seviye 5'e geçildi | rev 5be4dc6 | — |
 
-## 1. Feature Summary
+**REUSED** (kaynak koşu: QA 2026-09-20, rev c0cba44; fingerprint geçerli, ilgili dosya yolu dokunulmadı): R1 portrait kilidi / döndürme (`main.dart`, `Info.plist` değişmedi); R2 gerçek kill/relaunch resume ve persistence (persistence yolu, DB, `main.dart` değişmedi; E6 ile ayrıca yeniden doğrulandı); R3 chevron / iOS kenar kaydırma / replaced-route Close çıkışları (`play_session_screen.dart` yalnız 1 okuma değişti; E13/E15 zinciri Next Level replaced-route'unu bu turda yeniden yürüttü); R4 F04 varyantları ve normal hareket kazanma kareleri (16/16e/Pro Max, XXXL dahil; bu turda spot: satır 0 [E12], satır 4 [E14]); R5 tampered `thawedFrozenCells` + misuse seti; R6 greyscale yaklaşık kontrolü; R7 büyük metin (XXXL) yerleşimi.
+**INVALIDATED ve bu turda yeniden yürütülen:** LIFECYCLE-LIVE (E4–E6, E9), AC9 (E8), gesture regresyonu (E7), tüm reduce-motion yolları (E10–E14), CURRENT-REVISION (E1–E3).
 
-Final-stage re-verification of F03 after the rework for F03-QA-01 (win sequence vs the F04 panel) and F03-QA-02 (device-form suite), plus the three route-A scenarios (rotation, live lifecycle, AC9) that were pending.
+## 2. Acceptance & Critical Journey Coverage
 
-## 2. Test Scope
+| AC / Journey | Beklenen | Evidence | Sonuç |
+| --- | --- | --- | --- |
+| AC1–AC8 temel etkileşim (grid, hamle, sayaç, kazanma, undo/restart, reddedilen hamle, eşik) | çalışıyor | E7, E12–E15 (+ REUSED R5) | PASS |
+| AC9 sürükleme sırasında kaldırma/vurgu | görünür | E8 | PASS |
+| AC10 resume | kill/relaunch grid + MOVES korunur | E6, R2 | PASS |
+| architecture §12: tutulan dokunuş kesilirse **hamle yok**, idle | OS geçişi ve kilit | E4, E5 | **PASS** (önceki FAIL kapandı) |
+| architecture §12: boşta arka plana alma | durum aynı | E9 | PASS |
+| architecture §12: animasyon sırasında pause → deterministik son durum | settled, kayıp/yarım hamle yok | E3 (group 4, `paused mid-animation`) | PASS (yalnız otomasyon; ~190 ms'lik pencerede gerçek OS geçişi güvenilir zamanlanamadı) |
+| architecture §18 / ui-design §16.2: OS reduce-motion yolu | iOS'ta erişilebilir | E10–E14 | **PASS** (önceki FAIL kapandı) |
+| Gerçek bırakmalar (plaka içi/dışı, uzun tutma) hâlâ çözülür | commit | E7 | PASS |
+| Negatif/misuse: eşik altı, çapraz, sütun reddi, kill sonrası, kesinti sonrası | güvenli durum | E6, E7, E9 (+ R5) | PASS |
+| F04 paneli: Perfect / SONRAKİ / Yeniden / Kapat, Reduce Motion açık/kapalı | tam ve tıklanabilir | E12–E15 | PASS |
+| F05 halka / öğretici: reduce-motion açık statik, kapalı canlı | iki yönlü | E10–E11, E13 | PASS |
 
-* Scope Type: client-only, final. Reviewed: architecture.md §12 and §18 (Won-sequence authority), ui-design.md §16, orchestration brief, frontend.md, code of the edited files, `PuzzleBoard` gesture handlers, Flutter `AccessibilityFeatures` docs in the local SDK.
-* Journeys: CONTINUE → level 1 → Next Level ×3 (real replaced-route chain) → Close; debug wins; Retry loops; kill/relaunch resume.
-* Misuse/interruption: sub-threshold, near-diagonal, held drag + OS app switch, rotation, large text, Reduce Motion.
-* Out of scope: Backend build gate / quality — none touched. Security compliance — local single-player state, no auth/other-user data/finance. Release compliance — Release Scope none. iOS/Unity game sections — Flutter client. Mode matrix — widths folded into §4/§5. Storage-full injection is F08 AC7 (F08.STORAGE), neither passed nor failed here.
+## Client & UI Compliance
 
-## 3. Product Behavior Coverage
-
-| User story | Evidence | Result |
+| Journey / State / Navigation | Sonuç | Evidence |
 | --- | --- | --- |
-| Swipe a row/column, one cell | wins on rows 0–4 (real levels), 2★/Perfect | PASS |
-| Target always visible | rail + divider on all widths; docked row pairs under it after a win | PASS |
-| Live MOVES | HUD through all runs | PASS |
-| 3 undos and a restart | reused (unchanged code) + Retry loops | PASS |
-| Accidental drags ignored | 10 pt no-op, diagonal tie; **an interrupted drag is not ignored — it is committed** | **FAIL (F03-QA-03)** |
-| Leave and return exactly | kill/relaunch via CONTINUE, chevron, edge-swipe, replaced-route exit | PASS |
+| Ekran hedefi: hedef kelime rayı, board, HAMLE, geri chevron; header sibling'lerle tutarlı | PASS | E4, E12–E15 |
+| Kazanma: girdi kilidi, chevron gizli, panel ancak kazanma dizisinden sonra | PASS (azaltılmış ve normal) | E12, E14 |
+| Panel çıkışları: Next Level (replaced-route), Kapat → `/` | PASS | E13, E15 |
+| Öğretici: gate, ilk sütun hamlesiyle temizlenir, reduce-motion'da statik | PASS | E13 |
+| `ui-design.md` §16 niyeti (dock satırı, hayalet hücre, tek glow, panel ≤ %64) — regresyon gözlemi | Regresyon yok (spot: satır 0 azaltılmış, satır 4 normal) | E12, E14 |
+| Animasyon sırasında girdi (çift kayıt) | Reddedilir (integration group 2) | E3 |
 
-## 4. Acceptance Criteria Traceability
+## Stateful Flow & Integration
 
-| AC | Evidence | Result |
-| --- | --- | --- |
-| AC1–AC7 | reused + spot runs (see 0b) | PASS |
-| AC8 | won moment on rows 0,1,2,3,4 (Perfect) and 2★/matched/newBest variants: lock, amber row, seam, **panel only after the win sequence**, docked row visible above the panel at rest, star reveal after rest; 60 ms frame sheet of a row-4 win: amber at home ≈ 600 ms → ghost + glide → panel rises → stars strike, `HARİKA` last | **PASS** |
-| AC9 | held-drag capture | **PASS** |
-| AC10 | kill/relaunch resume PASS; **resume after an OS interruption mid-drag contains the interrupted swipe as a move** (persisted `appliedMoves` R3, R4 = the two interrupted drags) | PASS for kill; see F03-QA-03 |
-| AC11 | widget mirror only | automated PASS |
+| Boundary / Transition | Actor / Start State | Beklenen | Evidence | Sonuç |
+| --- | --- | --- | --- | --- |
+| tracking → OS iptali/geçişi → paused → resumed | tutulan dokunuş, satır kalkık | hamle yok, idle, store değişmez | E4 ×3, E5 | PASS |
+| cold boot, persisted state ile | kesinti sonrası kill | son settled snapshot | E6, R2 | PASS |
+| idle → paused → resumed | hamle sonrası, dokunuş yok | durum aynı | E9 | PASS |
+| won → completed snapshot / kapanış → unlock / SONRAKİ | seviye 1–4 | ilerleme 3/30, sonraki seviye açık | E13, E15 | PASS |
+| Listener sahipliği: `Listener` yalnız PointerCancel'de `_abort`; ardından gelen `onPanEnd` fazı `idle` görüp no-op | kaynak + davranış | çift çözümleme yok | E4 (store) + kaynak incelemesi | PASS |
 
-## 5. Boundary Matrix
+## 3. Findings
 
-| Boundary | Result | Evidence |
-| --- | --- | --- |
-| tracking → OS interruption (app switch) | **FAIL** — swipe committed | timeline log + persisted snapshot |
-| animating → pause | consistent, atomic and persisted (occurred as a consequence of the above: cancel → shift → pause → committed) | runtime |
-| won: T0 → panel at rest, chevron hidden, input locked | PASS | frame sheets |
-| won → Retry / Close / Next | PASS | runtime |
-| rotation | PASS | runtime |
-| large text 1.0 → ~1.6× | PASS | runtime |
-| OS Reduce Motion | **FAIL** | runtime |
+Yeni bulgu **yok**. Önceki bulguların kapanışı:
 
-## 6. Contract Compliance Check
+| ID | Başlık | Durum | Kanıt |
+| --- | --- | --- | --- |
+| F03-QA-01 | Kazanma dizisi/geometri | Kapalı (önceki tur, c0cba44) | REUSED R4 + E12/E14 spot |
+| F03-QA-02 | Cihaz suite group 4 | Kapalı (önceki tur) | E3 (16e, Pro Max) |
+| F03-QA-03 | Kesilen sürükleme hamle olarak işleniyordu | **Kapalı** | E4 ×3, E5, E6 |
+| F03-QA-04 | iOS Reduce Motion yok sayılıyordu | **Kapalı** | E10–E14 |
 
-* architecture.md §18: panel not before T0+600 ms; dock; panel cap; ghost slot; single glow; persistence timing unchanged — **honoured** on all observed rows/variants. §16.5 rules verified by the 25 on-screen tests (rerun green) and by real-app frames.
-* §12 backgrounding: idle pause **honoured**; **"gesture cancelled cleanly, no Move submitted" NOT honoured** on a real OS interruption (F03-QA-03).
-* §18 / ui-design §16.2 reduce-motion path: **unreachable on iOS** (F03-QA-04).
-* Persistence, route contract, F04 panel content: honoured.
+Not (QA-03 kök nedeni): önceki raporun mekanizma notu (`_onPanCancel → _release`) eksikti. Frontend'in düzeltmesi, kabul edilmiş bir pan'in `PointerCancel`'inin Flutter'da `onPanEnd` olarak geldiğini gösterir (iki negatif kontrolle); QA gerçek OS geçişiyle sonucu bağımsız doğruladı (E4). Sözleşme değişikliği gerekmez.
 
-## 7. UI Design Compliance Check
+## 5. Regression & Evidence Reuse
 
-Won composition matches ui-design.md §16 on real frames: fixed dock centred under the target rail, ≥ clearance to the panel, single glow, ghost outlines at the vacated row, no clipping on 390/393/440 widths and at large text. The docked row is the brightest object in greyscale and the seam reads as a bar. Notes (not findings): the dimmed board's row 0 remains as a half-cut strip of letters directly under the docked seam when a *lower* row wins (`Y C D F G` for row 2, `M L Ç N D` for row 4) — acceptable, no rubric fail condition; the 30 ms L→R amber stagger from the original ui-design is still absent (tiles switch together) — pre-existing, non-blocking.
+* **Etkilenen yüzey / depth:** gesture yolu (`puzzle_board.dart`), controller iptal API'si, altı reduce-motion çağrı noktası (F03, F04 paneli ×2, F05 halka + öğretici). Derinlik full: gate'ler, cihaz suite'i 2 genişlikte, gerçek OS kesintisi, gerçek Reduce Motion açık/kapalı, genuine-release regresyonu, Journey zinciri (F04/F05 paylaşılan yol) çalıştırıldı.
+* **Reused:** R1–R7; gerekçe = ilgili dosyalar değişmedi (fingerprint).
+* **Invalidated ve yeniden yürütülen:** LIFECYCLE-LIVE, AC9, gesture, reduce-motion, CURRENT-REVISION.
+* **Bağımsız QA probe:** E4 (gerçek OS geçişi ×3, farklı satır/sütun/eksen), E5 (gerçek cihaz kilidi), E10–E14 (gerçek Settings anahtarı + açık/kapalı kontrol çifti). Teslim sahibinin özeti kopyalanmadı; her sonuç QA'nın kendi çalıştırmasıdır.
+* **F04/F05 etkisi:** yalnız bayrak kaynağı; davranış ve kabul kriterleri değişmedi; runtime'da açık/kapalı iki yönde doğrulandı.
 
-## 8. Test Findings
+## 6. Final Verdict
 
-### F03-QA-03 — An app interruption during a drag commits the swipe instead of cancelling it
+* `QA Result: Approved with Notes`
+* Blocking Issues: None
+* Required Fixes: None
+* Non-blocking Notes:
+  1. **Runtime'da uygulanmayan / yalnız otomatik kanıtlı:** tüm 30 seviye tamamlanınca terminal halka bloom'unun reduce-motion'da statik olması (widget testleri her iki bayrak + kontrolle geçer; runtime'da 30/30'a ulaşılmadı); çok parmaklı kullanım (ikinci parmağın iptali birincinin sürüklemesini iptal eder — AC dışı, gözlenmedi); fiziksel parmak doğruluğu; animasyon penceresinde gerçek OS pause zamanlaması (integration group 4 kanıtı).
+  2. **Tahta kaydırma/sekme animasyonu** iOS Reduce Motion'da normal hızda çalışır (sözleşme yok; Android `disableAnimations`'ta Flutter kısaltır) — Tech Lead kararı: rework değil.
+  3. **Bilinen tasarım gözlemleri (rework değil):** kazanma anında dimlenmiş satır 0'ın dock ile panel arasında şerit olarak görünmesi; ui-design §8/§16.2'deki 30 ms L→R amber stagger uygulanmamış (karolar birlikte geçer).
+  4. **Görsel kalite bu raporun kapsamı dışındadır** (Visual Scope none): F03 yüzeylerinin yeni Design Foundation / Visual Quality Gate altındaki bağımsız değerlendirmesi Design Adoption Route'a aittir. Android capture Pending (platform.md §14).
+  5. Kanıt görüntüleri/videoları oturum scratchpad'indedir, repoya eklenmedi; tekrar üretme adımları E4–E14'te yazılıdır.
 
-* Severity: Medium (an unintended move is counted; contradicts the "honest moves" principle)
-* Area: `PuzzleBoard` gesture handlers × `PlaySessionController.onAppPaused`
-* Type: Contract Violation (State/Flow) — `architecture.md §12` "App backgrounded mid-swipe → the in-progress gesture is cancelled cleanly (no Move submitted); state → idle"; PRD edge cases ("never a half-applied move")
-* Reproduced 3 times on iPhone 16 (rev c0cba44 code): hold a drag > 18 pt for ≥ 3 s (a 1 Hz screenshot log shows the row lifted and tracking until 20:02:53), then bring another app to the front (`simctl launch com.apple.mobilesafari`, 20:02:54.8). After returning: the dragged row is shifted, `MOVES` +1, and the store holds the move (`appliedMoves` `R1 R2 R3 R4`, with R3/R4 the interrupted drags). Both the returned UI and a cold relaunch show it.
-* Expected: no move; `MOVES` unchanged; state idle.
-* Mechanism (hypothesis, not verified in code by a fix): iOS cancels the touch first; `PuzzleBoard._onPanCancel → _release(_dragOffset)` treats a cancel as a release, starting the shift, and the following `paused` commits it (`_finishShift`). The widget/integration mirrors send `paused` without the OS touch cancellation, so they cannot see this.
-* Recommendation: Frontend/Mobile Developer — treat a pointer **cancel** as an abort (no `endDrag` resolution) while keeping genuine releases (including outside the plate) resolving; add a test that sends a real `PointerCancel` mid-drag; re-verify on a simulator with an app switch.
+## 7. Tech Lead Note
 
-### F03-QA-04 — iOS "Reduce Motion" is not honoured; the new reduced-motion path is unreachable on iOS
+* **Root-cause alanı:** F03-QA-03/04 Frontend/Mobile Developer alanındaydı ve kapandı; başka rol/rework gerekmiyor.
+* **Routing / depth:** blocking yok; closure review Tech Lead'de. Board/system-state senkronu ve F03 kapanışı Tech Lead kararıdır. Sonraki iş kuyruğu: F05-QA-STRICT (F03 rework kilidi kalkar), F08 yerel kanıt ve Design Adoption Route Faz B.
+* **Workflow notu:** Visual Scope = none ile verilen onay yalnız davranış/erişilebilirlik kapsamlıdır. F03 terminal `Done` yapılırsa görsel yüzeylerin Design Adoption Route'ta yeniden değerlendirilmesi ve gerekirse görsel rework olarak yeniden açılması Tech Lead tarafından kayda geçirilmelidir.
+* **Ortam notu:** Reduce Motion testten sonra KAPALI konuma geri alındı (E-son durum doğrulandı); üç simulator açık; iPhone 16'daki uygulama store'u seviye 5'te (yerel test verisi).
 
-* Severity: Medium (accessibility; explicit requirement of the reworked contract)
-* Area: `_PlayBodyState._enterWon`, `PuzzleBoard._onController`, `CompletionPanel._startOrSettle` (and the F05 ring), `AnimationController` behaviour
-* Type: Functional Bug (Accessibility) — `architecture.md §18` / `ui-design.md §16.2` "Under OS reduce motion …"
-* Evidence: Settings > Accessibility > Motion > Reduce Motion set ON through the real toggle (the extra "Prefer Cross-Fade Transitions" row appears, confirming it is active) and the app relaunched: a win still plays the full 600 ms hold → 240 ms **glide** → panel **slide**, and F04's stars strike one by one. The local Flutter SDK documents `AccessibilityFeatures.reduceMotion` as "the platform is requesting that certain animations be simplified … **Only supported on iOS**", whereas the code reads `accessibilityFeatures.disableAnimations`.
-* Hypothesis: on iOS Reduce Motion arrives as `reduceMotion`, not `disableAnimations`; the widget tests fake `disableAnimations`, so they pass. The same check exists in F04 and F05 code, so the gap is wider than F03.
-* Recommendation: Frontend/Mobile Developer — one shared helper `reduceMotionRequested = reduceMotion || disableAnimations` used by F03 (`_enterWon`, `PuzzleBoard`), F04 (`CompletionPanel`) and F05 (ring/tutorial); tests for both flags; `AnimationController.animationBehavior` decisions revisited; re-verify with the Settings toggle. Tech Lead to scope the F04/F05 touch.
+## Sonraki Komut
 
-### Notes (non-blocking)
-
-* N1 — Journey progress and unlock, Next Level and the replaced-route exit behaved correctly; one unexplained stray entry into level 5 after tapping the debug `L01` right after closing the level-4 panel occurred once and was not reproducible (3 later attempts opened smoke-tr-01).
-* N2 — Settings > Home menu item and `defaults write com.apple.Accessibility` do not affect the app; OS switch via `simctl launch` is a valid lifecycle trigger.
-* N3 — Physical-finger accuracy (threshold sweep) is still not measured; the simulator pointer is synthetic.
-* N4 — Row-0 strip and missing amber stagger: see §7.
-
-## 9. Positive Scenarios
-
-* CONTINUE → level 1 (row 0) → Next → level 2 (**row 3**) → Next → level 3 (**row 1**) → Next → level 4 (**row 4**, column tutorial) → Close → home `4 / 30`, CONTINUE = level 5 — every win: amber row at home for the win sequence, glide to the dock under the target rail, panel rises after, docked row + seam visible above the panel, `HARİKA` Perfect.
-* Debug `L06`: frozen-tile thaw win in **row 2** (previously hidden) — docked and visible.
-* 2★ first-clear → Retry (fresh idle board, chevron back) → same 2 moves = matched (`EN İYİ 2`, no star mark) → Retry → 1 move = `YENİ REKOR` + Perfect.
-* iPhone 16e and 16 Pro Max: Perfect win, docked row clear of the panel.
-* XXXL and accessibility-medium Dynamic Type: panel unclipped, docked row clear, density fallback engaged (smaller stars).
-
-## 10. Negative / Edge Cases
-
-Sub-threshold drag: no move. Near-diagonal (60×56): horizontal row shift. Rotation both directions with a landscape-capable control app: LOOPLET stays portrait. HOME/app switch while idle: state identical. **App switch during a held drag: the swipe is committed (F03-QA-03).** Reduce Motion on: not honoured (F03-QA-04).
-
-## 12. UX & State Handling
-
-Loading: splash → home; Success: verified; Disabled: Undo greyed; Tracking: lift/dim/HUD dim verified; Runtime evidence summary: simulator runtime across rows 0–4, variants, text sizes, rotation; accessibility (Reduce Motion) fails.
-
-## 14. Frontend Quality
-
-analyze/format clean, 214 app tests and the 12-test device suite green on 3 widths; the two open items are behaviour the automated mirrors cannot see (real touch-cancel, iOS Reduce Motion flag).
-
-## 15. UI Handoff Alignment
-
-Aligned (see §7). The reduced-motion clause of §16.2 cannot take effect on iOS (F03-QA-04).
-
-## 16. Regression Risk
-
-Edited shared files: `play_session_screen.dart`, `puzzle_board.dart`, `completion_panel.dart`. Dependents exercised on the real app: F04 panel (all variants, Close 44 pt), F05 unlock / Next Level / replaced-route exit / CONTINUE / tutorial overlay (level 4), F08 resume. F04/F05 Reduce-Motion checks share F03-QA-04's cause. Not exercised: Daily (F07), storage-failure (F08.STORAGE), all-30-complete (F05 QA).
-
-## 17. Final Verdict
-
-### **Rejected**
-
-* Closed from the previous verdict: **F03-QA-01** (won moment: fixed on rows 0–4 and all variants) and **F03-QA-02** (device suite: 12/12 exit 0 on three widths). The three route-A scenarios were produced: rotation **PASS**, AC9 highlight **PASS**, live lifecycle **FAIL**.
-* Blocking: **F03-QA-03** (contract §12 violated on a real OS interruption) and **F03-QA-04** (iOS Reduce Motion not honoured, reduced-motion path of §18/§16.2 unreachable).
-* No required evidence is pending: the verdict is a defect verdict. Approved / Approved with Notes are barred while either finding stands.
-
-## 18. Required Fixes
-
-1. F03-QA-03 — treat a pointer cancel as an abort; keep releases resolving; add a real-cancel test; QA re-verify with an OS app switch mid-drag (idle pause must stay unchanged).
-2. F03-QA-04 — honour `reduceMotion || disableAnimations` in F03, F04 and F05 sites; tests for both flags; QA re-verify with the Settings toggle (static hold → fade → panel; no glide/slide; F04 reveal settled).
-
----
-
-# WORKFLOW VERDICT SUGGESTION (NON-AUTHORITATIVE)
-
-## QA Result
-
-* **Rejected**
-
-## Affected Areas
-
-* Frontend (gesture handling; accessibility flag) · Multiple (F03 × F04 × F05 for the Reduce Motion check).
-
-## Blocking Issues
-
-* F03-QA-03, F03-QA-04.
-
-## Suggested Fix Order
-
-1. Tech Lead — scope the fix (F03 files for QA-03; a shared helper touching F04/F05 call sites for QA-04; decide whether F04/F05 acceptance needs a QA note).
-2. Frontend/Mobile Developer — implement both with tests.
-3. QA — re-verify F03-QA-03/04 and re-spot-check the won moment; reuse this run's PASS scenarios for unchanged paths.
-
----
-
-## 19. Sonraki Komut
-
-```
+```text
 Run Tech Lead
 ```
-
----
-
-## 20. Tech Lead Note
-
-<<<TEXT
-
-F03 re-verify on `c0cba44` (code = delivery commit `cf8d8f0`): **Rejected** — two new defects; the two earlier ones are closed.
-
-CLOSED: F03-QA-01 — the won moment now matches ui-design §16 on real frames for winning rows 0 (L1/L01), 1 (L3), 2 (L06), 3 (L2) and 4 (L4), Perfect / 2★ / matched / newBest, 16 / 16e / 16 Pro Max, and at XXXL and accessibility-medium text (density fallback engaged, panel top ≥ 0.36 H). A 60 ms frame sheet of the row-4 win shows amber-at-home ≈ 600 ms → ghost + glide → panel → star reveal after rest. F03-QA-02 — device suite 12/12, exit 0 on 16e (1:19) and Pro Max (1:01); analyze 0 / format 0 / 197 + 214 tests. Route A (your decision) worked: Accessibility is granted and used — ROTATION **PASS** (Safari control rotates, LOOPLET stays portrait, both directions), AC9 highlight **PASS**.
-
-NEW BLOCKING: (1) **F03-QA-03** — with a drag in progress, an OS app switch commits the swipe as a move (3 reproductions; a 1 Hz screenshot log proves the finger was down; the store then holds R3/R4 = the interrupted drags). Contradicts architecture §12 ("gesture cancelled cleanly, no Move submitted"). Hypothesis: iOS sends touchesCancelled first and `_onPanCancel` releases the gesture. This was invisible to the mirrors because they send `paused` without the touch cancel — exactly why route A mattered. (2) **F03-QA-04** — with iOS Reduce Motion really ON (Settings toggle; the "Prefer Cross-Fade" row confirms it), the app still glides/slides and F04's stars strike normally. The SDK documents iOS Reduce Motion as `AccessibilityFeatures.reduceMotion` ("Only supported on iOS") while the code reads `disableAnimations`, so the §16.2 reduced path cannot fire on iOS; the same check lives in F04/F05 (your call whether their acceptance needs a note). Widget tests fake `disableAnimations`, hence green.
-
-NOT PENDING any more: every route-A scenario now has a result. Notes only: row-0 strip and missing amber stagger (see §7), an unreproduced stray level-5 entry once, simulator pointer is synthetic. Storage-full stays with F08. F05.SHARED-RUNTIME may reuse: CONTINUE / Next Level / replaced-route exit / kill-resume / back paths PASS on this revision; the interruption and Reduce-Motion items are open.
-
-TEXT
