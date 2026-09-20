@@ -12,7 +12,8 @@
 // CI `integration` job / a device-matrix pass). This is a **best-effort** gate
 // per `project-authority/release.md §4` — failure is investigated, not
 // auto-blocking. A headless `flutter test integration_test/` run is slow and
-// timing-sensitive for this app's drift-backed boot; the fast, always-green
+// timing-sensitive for this app's drift-backed boot; group 4 never requests a
+// frame while the app is paused (see the comment there); the fast, always-green
 // automated coverage of the same scenarios lives in
 // `test/play/play_session_runtime_test.dart`. The visual items (`qa.md §17`
 // 5–7) are the manual device pass — see `frontend.md` "F03-FE9".
@@ -264,50 +265,80 @@ void main() {
     );
   });
 
+  // F03-QA-02 / F03-FE-INTEG: on a LIVE binding `handleAppLifecycleStateChanged(
+  // paused)` switches frame scheduling off (as the OS does), so any `pump` /
+  // `pumpAndSettle` issued while paused never completes — the previous form of
+  // these tests hung for ~17 min. The rule here: never request a frame while
+  // paused; assert what must already be true *at pause* straight from the store,
+  // then resume and settle. A 90 s timeout turns any future hang into a fast
+  // failure.
   group('4 — app lifecycle (architecture.md §12)', () {
-    testWidgets('paused mid-drag cancels the gesture, no move', (tester) async {
-      await tester.binding.setSurfaceSize(_large);
-      await _bootTo(tester, _freshDb(), 'smoke-tr-02');
+    const hangGuard = Timeout(Duration(seconds: 90));
 
-      final gesture = await tester.startGesture(_rowStart(tester, 1));
-      await gesture.moveBy(const Offset(40, 0));
-      await tester.pump();
-      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
-      await tester.pump();
-      await gesture.up();
-      await tester.pumpAndSettle();
-      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
-      await tester.pumpAndSettle();
+    testWidgets(
+      'paused mid-drag cancels the gesture, no move',
+      timeout: hangGuard,
+      (tester) async {
+        await tester.binding.setSurfaceSize(_large);
+        final db = _freshDb();
+        await _bootTo(tester, db, 'smoke-tr-02');
 
-      expect(_moves(tester), 0);
-      expect(tester.takeException(), isNull);
-      await _unmount(tester);
-    });
+        final gesture = await tester.startGesture(_rowStart(tester, 1));
+        await gesture.moveBy(const Offset(40, 0));
+        await tester.pump(); // frames still enabled: the row is lifted
+        tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+        // Paused: no pump. The pointer up is a plain event dispatch.
+        await gesture.up();
+        // The cancelled gesture must not have persisted a move.
+        final atPause = await ActiveSessionRepo(db).read();
+        expect(atPause?.moveCount ?? 0, 0);
+        tester.binding.handleAppLifecycleStateChanged(
+          AppLifecycleState.resumed,
+        );
+        await tester.pumpAndSettle();
 
-    testWidgets('paused mid-animation commits a settled move (never torn)', (
-      tester,
-    ) async {
-      await tester.binding.setSurfaceSize(_large);
-      final db = _freshDb();
-      await _bootTo(tester, db, 'smoke-tr-02');
+        expect(_moves(tester), 0);
+        expect(tester.takeException(), isNull);
+        await _unmount(tester);
+      },
+    );
 
-      await tester.dragFrom(_rowStart(tester, 1), const Offset(140, 0));
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 50));
-      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
-      await tester.pumpAndSettle();
-      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
-      await tester.pumpAndSettle();
+    testWidgets(
+      'paused mid-animation commits a settled move (never torn)',
+      timeout: hangGuard,
+      (tester) async {
+        await tester.binding.setSurfaceSize(_large);
+        final db = _freshDb();
+        await _bootTo(tester, db, 'smoke-tr-02');
 
-      expect(_moves(tester), 1);
-      expect(tester.takeException(), isNull);
-      await _flush(tester);
+        await tester.dragFrom(_rowStart(tester, 1), const Offset(140, 0));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 50)); // mid-shift
+        tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+        // `onAppPaused` commits the in-flight shift synchronously and persists;
+        // give the fire-and-forget write a moment without scheduling a frame.
+        await Future<void>.delayed(const Duration(milliseconds: 300));
+        final atPause = await ActiveSessionRepo(db).read();
+        expect(
+          atPause?.moveCount,
+          1,
+          reason: 'settled move persisted at pause',
+        );
+        tester.binding.handleAppLifecycleStateChanged(
+          AppLifecycleState.resumed,
+        );
+        await tester.pumpAndSettle();
 
-      await tester.pumpWidget(const SizedBox.shrink());
-      await tester.pumpAndSettle();
-      await _bootTo(tester, db, 'smoke-tr-02');
-      expect(_moves(tester), 1);
-      await _unmount(tester);
-    });
+        expect(_moves(tester), 1);
+        expect(tester.takeException(), isNull);
+        await _flush(tester);
+
+        await tester.pumpWidget(const SizedBox.shrink());
+        await tester.pumpAndSettle();
+        await _bootTo(tester, db, 'smoke-tr-02');
+        expect(_moves(tester), 1);
+        await _unmount(tester);
+      },
+    );
   });
 }

@@ -11,13 +11,18 @@ import '../journey/journey_nav.dart';
 import '../journey/journey_strings.dart';
 import '../journey/journey_tutorial.dart';
 import '../persistence/persistence_providers.dart';
+import 'package:looplet_core/looplet_core.dart' show TileStatus;
+
 import '../rating/completion_panel.dart';
+import '../rating/completion_result.dart';
 import '../rating/rating_strings.dart';
 import 'play_session_args.dart';
 import 'play_session_controller.dart';
 import 'play_session_providers.dart';
 import 'play_strings.dart';
 import 'play_theme.dart';
+import 'won_composition.dart';
+import 'widgets/docked_row.dart';
 import 'widgets/moves_hud.dart';
 import 'widgets/play_stage.dart';
 import 'widgets/puzzle_board.dart';
@@ -238,7 +243,7 @@ class _LoadedPlaySessionState extends ConsumerState<_LoadedPlaySession>
   }
 }
 
-class _PlayBody extends StatelessWidget {
+class _PlayBody extends StatefulWidget {
   const _PlayBody({
     required this.controller,
     required this.strings,
@@ -250,10 +255,184 @@ class _PlayBody extends StatelessWidget {
   final VoidCallback? onNextLevel;
 
   @override
+  State<_PlayBody> createState() => _PlayBodyState();
+}
+
+/// The won-presentation snapshot taken at `T0` (the winning row's letters and
+/// statuses), so the docked overlay and the Retry fade-out never depend on the
+/// controller after it has restarted.
+class _WonSnapshot {
+  const _WonSnapshot({
+    required this.row,
+    required this.letters,
+    required this.statuses,
+  });
+
+  final int row;
+  final List<String> letters;
+  final List<TileStatus> statuses;
+}
+
+/// Measured layout the won moment needs (stack-local px), see [WonGeometry].
+class _WonMetrics {
+  const _WonMetrics({
+    required this.rowLeft,
+    required this.homeTop,
+    required this.tile,
+    required this.geometry,
+  });
+
+  final double rowLeft;
+  final double homeTop;
+  final double tile;
+  final WonGeometry geometry;
+}
+
+class _PlayBodyState extends State<_PlayBody> with TickerProviderStateMixin {
+  // `preserve`: under OS reduce-motion the default `normal` behaviour would
+  // collapse these durations to ~5 %, defeating the reduced timeline's hold.
+  late final AnimationController _timeline = AnimationController(
+    vsync: this,
+    duration: WonTimeline.regular.total,
+    animationBehavior: AnimationBehavior.preserve,
+  );
+
+  /// Retry: the won layers fade out (~180 ms) while the board re-lights.
+  late final AnimationController _retire = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 180),
+    animationBehavior: AnimationBehavior.preserve,
+  );
+
+  final GlobalKey _stackKey = GlobalKey(debugLabel: 'play.stack');
+  final GlobalKey _boardKey = GlobalKey(debugLabel: 'play.board');
+  final GlobalKey _dividerKey = GlobalKey(debugLabel: 'play.divider');
+
+  WonTimeline _tl = WonTimeline.regular;
+  _WonSnapshot? _snap;
+  late PlaySessionPhase _lastPhase;
+
+  // Last panel props while won — reused during the Retry fade-out, after the
+  // controller has already restarted.
+  CompletionResult? _pResult;
+  bool _pUnavailable = false;
+  String _pWord = '';
+  int _pMoves = 0;
+
+  PlaySessionController get _c => widget.controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _lastPhase = _c.phase;
+    _c.addListener(_onController);
+    _retire.addStatusListener((status) {
+      if (status == AnimationStatus.completed && mounted) {
+        setState(() {
+          _snap = null;
+          _timeline.value = 0;
+        });
+      }
+    });
+    if (_c.phase == PlaySessionPhase.won) {
+      _enterWon(animate: false);
+    }
+  }
+
+  @override
+  void dispose() {
+    _c.removeListener(_onController);
+    _timeline.dispose();
+    _retire.dispose();
+    super.dispose();
+  }
+
+  void _onController() {
+    final phase = _c.phase;
+    if (phase == _lastPhase) return;
+    final was = _lastPhase;
+    _lastPhase = phase;
+    if (phase == PlaySessionPhase.won && was != PlaySessionPhase.won) {
+      _enterWon(animate: true);
+    } else if (phase != PlaySessionPhase.won && was == PlaySessionPhase.won) {
+      _leaveWon();
+    }
+  }
+
+  void _enterWon({required bool animate}) {
+    final reduceMotion = WidgetsBinding
+        .instance
+        .platformDispatcher
+        .accessibilityFeatures
+        .disableAnimations;
+    _tl = WonTimeline.forReduceMotion(reduceMotion);
+    _timeline.duration = _tl.total;
+    final row = _c.wonRow ?? 0;
+    _snap = _WonSnapshot(
+      row: row,
+      letters: List<String>.of(_c.displayLetters[row]),
+      statuses: List<TileStatus>.of(_c.tileStatuses[row]),
+    );
+    _retire.value = 0;
+    if (animate) {
+      _timeline.forward(from: 0);
+      if (mounted) setState(() {});
+    } else {
+      _timeline.value = 1; // restored straight into `won`: settled, no replay
+    }
+  }
+
+  void _leaveWon() {
+    // Retry: freeze the timeline, fade the won layers out, board re-lights now.
+    _timeline.stop();
+    _retire.forward(from: 0);
+    if (mounted) setState(() {});
+  }
+
+  /// Reads the live layout (after layout, before the dock starts) — `null`
+  /// until the board / divider / stack have a size.
+  _WonMetrics? _measure(BuildContext context) {
+    final stack = _stackKey.currentContext?.findRenderObject();
+    final board = _boardKey.currentContext?.findRenderObject();
+    final divider = _dividerKey.currentContext?.findRenderObject();
+    if (stack is! RenderBox || board is! RenderBox || divider is! RenderBox) {
+      return null;
+    }
+    if (!stack.hasSize || !board.hasSize || !divider.hasSize) return null;
+    if (!stack.attached || !board.attached || !divider.attached) return null;
+    final snap = _snap;
+    if (snap == null) return null;
+
+    final stackTop = stack.localToGlobal(Offset.zero).dy;
+    final boardTopLeft = board.localToGlobal(Offset.zero, ancestor: stack);
+    final dividerBottom = divider
+        .localToGlobal(Offset(0, divider.size.height), ancestor: stack)
+        .dy;
+    final tile = PuzzleBoard.tileSizeFor(board.size.width, _c.gridSize);
+    final stride = tile + PlayTheme.tileGap;
+    return _WonMetrics(
+      rowLeft: boardTopLeft.dx + PlayTheme.platePadding,
+      homeTop: boardTopLeft.dy + PlayTheme.platePadding + snap.row * stride,
+      tile: tile,
+      geometry: WonGeometry.compute(
+        screenHeight: MediaQuery.sizeOf(context).height,
+        stackTopGlobal: stackTop,
+        stackBottomGlobal: stackTop + stack.size.height,
+        dividerBottomLocal: dividerBottom,
+        tile: tile,
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final controller = widget.controller;
+    final strings = widget.strings;
     final won = controller.phase == PlaySessionPhase.won;
+    final retiring = !won && _snap != null && _retire.isAnimating;
 
     return Stack(
+      key: _stackKey,
       children: <Widget>[
         LayoutBuilder(
           builder: (context, constraints) {
@@ -286,7 +465,7 @@ class _PlayBody extends StatelessWidget {
                   word: controller.targetWord,
                   tileSize: board / controller.gridSize,
                 ),
-                const _DividerGlow(),
+                _DividerGlow(key: _dividerKey),
                 const SizedBox(height: PlayTheme.zoneGap),
                 Expanded(
                   child: Center(
@@ -295,9 +474,16 @@ class _PlayBody extends StatelessWidget {
                           '${strings.boardSemantics}. '
                           '${strings.targetLabel}: ${controller.targetWord}. '
                           '${strings.movesLabel}: ${controller.moveCount}.',
-                      child: PuzzleBoard(
-                        controller: controller,
-                        boardSize: board,
+                      // §16: the board hands its winning row to the dock overlay
+                      // from the moment the dock begins (ghost outlines).
+                      child: AnimatedBuilder(
+                        animation: _timeline,
+                        builder: (context, _) => PuzzleBoard(
+                          key: _boardKey,
+                          controller: controller,
+                          boardSize: board,
+                          rowVacated: won && _tl.dockStarted(_timeline.value),
+                        ),
                       ),
                     ),
                   ),
@@ -309,40 +495,163 @@ class _PlayBody extends StatelessWidget {
             );
           },
         ),
-        // F04 completion panel + scrim (over F03's dimmed + receded board).
-        IgnorePointer(
-          ignoring: !won,
-          child: AnimatedOpacity(
-            opacity: won ? 1 : 0,
-            duration: const Duration(milliseconds: 220),
-            child: const ColoredBox(color: PlayTheme.sheetScrim),
-          ),
-        ),
-        Positioned(
-          left: 0,
-          right: 0,
-          bottom: 0,
-          child: AnimatedSlide(
-            offset: won ? Offset.zero : const Offset(0, 1),
-            duration: const Duration(milliseconds: 320),
-            curve: PlayTheme.shiftCurve,
-            child: won
-                ? CompletionPanel(
-                    strings: strings,
-                    rating: RatingStrings.of(controller.lang),
-                    result: controller.completion,
-                    ratingUnavailable: controller.ratingUnavailable,
-                    bareWord: controller.targetWord,
-                    bareMoves: controller.moveCount,
-                    onRetry: controller.retryFromCompletion,
-                    onClose: () => _popToCaller(context),
-                    onNextLevel: onNextLevel,
-                  )
-                : const SizedBox.shrink(),
-          ),
-        ),
+        if (won || retiring) _buildWonLayers(context, won: won),
       ],
     );
+  }
+
+  /// Scrim → docked answer row → completion panel (`ui-design.md` §16.2).
+  Widget _buildWonLayers(BuildContext context, {required bool won}) {
+    final controller = widget.controller;
+    if (won) {
+      _pResult = controller.completion;
+      _pUnavailable = controller.ratingUnavailable;
+      _pWord = controller.targetWord;
+      _pMoves = controller.moveCount;
+    }
+    final snap = _snap;
+    return Positioned.fill(
+      child: AnimatedBuilder(
+        animation: Listenable.merge(<Listenable>[_timeline, _retire]),
+        builder: (context, _) {
+          final v = _timeline.value;
+          final fade = won ? 1.0 : 1.0 - _retire.value;
+          final metrics = _measure(context);
+          final dockP = _tl.dock(v);
+          final panelP = _tl.panel(v);
+          final atRest = _tl.atRest(v);
+
+          return Stack(
+            children: <Widget>[
+              // 40 % scrim — never before T0 + 600 ms.
+              IgnorePointer(
+                child: Opacity(
+                  opacity: (_tl.scrim(v) * fade).clamp(0.0, 1.0),
+                  child: const SizedBox.expand(
+                    child: ColoredBox(color: PlayTheme.sheetScrim),
+                  ),
+                ),
+              ),
+              // The docked answer row: home slot → dock, from T0 + 600 ms.
+              if (snap != null && metrics != null && _tl.dockStarted(v))
+                Positioned(
+                  left: metrics.rowLeft,
+                  top: _tl.reduceMotion
+                      ? metrics.geometry.dockTopLocal
+                      : metrics.homeTop +
+                            (metrics.geometry.dockTopLocal - metrics.homeTop) *
+                                dockP,
+                  child: Opacity(
+                    opacity: (_tl.reduceMotion ? dockP : 1.0) * fade,
+                    child: DockedAnswerRow(
+                      letters: snap.letters,
+                      statuses: snap.statuses,
+                      tile: metrics.tile,
+                      dockProgress: dockP,
+                      scale: metrics.geometry.dockScale,
+                    ),
+                  ),
+                ),
+              // The panel exists only from its own start (never before 600 ms).
+              if (_tl.panelStarted(v) || !won)
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: IgnorePointer(
+                    ignoring: !won || !atRest,
+                    child: _slide(
+                      progress: won ? panelP : 1.0,
+                      fade: fade,
+                      child: _WonPanelHost(
+                        maxHeight:
+                            metrics?.geometry.panelMaxHeight ?? double.infinity,
+                        builder: (density) => CompletionPanel(
+                          strings: widget.strings,
+                          rating: RatingStrings.of(controller.lang),
+                          result: _pResult,
+                          ratingUnavailable: _pUnavailable,
+                          bareWord: _pWord,
+                          bareMoves: _pMoves,
+                          onRetry: controller.retryFromCompletion,
+                          onClose: () => _popToCaller(context),
+                          onNextLevel: widget.onNextLevel,
+                          density: density,
+                          startReveal: atRest || !won,
+                          spineGlow: false,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  /// Regular: slide up from below the stack (clipped by it); reduced: fade.
+  Widget _slide({
+    required double progress,
+    required double fade,
+    required Widget child,
+  }) {
+    if (_tl.reduceMotion) {
+      return Opacity(opacity: (progress * fade).clamp(0.0, 1.0), child: child);
+    }
+    return Opacity(
+      opacity: fade.clamp(0.0, 1.0),
+      child: FractionalTranslation(
+        translation: Offset(0, 1 - progress),
+        child: child,
+      ),
+    );
+  }
+}
+
+/// Hosts the completion panel and applies the §16.3 concessions: if its natural
+/// height exceeds [maxHeight] (`0.64 H`), step the density (compact → tight) on
+/// the next frame. Layout is measured after the fact, while the panel is still
+/// sliding in from below the stack, so the step is not visible.
+class _WonPanelHost extends StatefulWidget {
+  const _WonPanelHost({required this.maxHeight, required this.builder});
+
+  final double maxHeight;
+  final Widget Function(PanelDensity density) builder;
+
+  @override
+  State<_WonPanelHost> createState() => _WonPanelHostState();
+}
+
+class _WonPanelHostState extends State<_WonPanelHost> {
+  final GlobalKey _panelKey = GlobalKey(debugLabel: 'play.panel');
+  PanelDensity _density = PanelDensity.regular;
+
+  void _fit() {
+    if (!mounted || !widget.maxHeight.isFinite) return;
+    final box = _panelKey.currentContext?.findRenderObject();
+    if (box is! RenderBox || !box.hasSize) return;
+    if (box.size.height > widget.maxHeight + 0.5 &&
+        _density != PanelDensity.tight) {
+      setState(() {
+        _density = _density == PanelDensity.regular
+            ? PanelDensity.compact
+            : PanelDensity.tight;
+      });
+    } else if (box.size.height > widget.maxHeight + 0.5) {
+      debugPrint(
+        'play: completion panel ${box.size.height.toStringAsFixed(1)} pt '
+        'exceeds the ${widget.maxHeight.toStringAsFixed(1)} pt cap even at '
+        'tight density (ui-design §16.3 — Needs Tech Lead Clarification)',
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) => _fit());
+    return KeyedSubtree(key: _panelKey, child: widget.builder(_density));
   }
 }
 
@@ -388,7 +697,7 @@ class _TopBar extends StatelessWidget {
 }
 
 class _DividerGlow extends StatelessWidget {
-  const _DividerGlow();
+  const _DividerGlow({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -7,6 +7,13 @@ import '../play/play_theme.dart';
 import 'completion_result.dart';
 import 'rating_strings.dart';
 
+/// Vertical density of the panel. F03 `ui-design.md` §16.3 concessions when the
+/// panel would exceed the 64 %-of-screen cap (large OS text scale, long
+/// strings), applied in this order and no other: [compact] = gaps × 0.6 and
+/// stars × 0.88; [tight] = [compact] and the `n / 3` caption dropped. Actions
+/// are never clipped, scrolled or shrunk below 44 pt.
+enum PanelDensity { regular, compact, tight }
+
 /// F04's real completion panel (`architecture.md` §7, `ui-design.md` Direction A
 /// "The seam becomes the panel"). Replaces F03's minimal `CompletionSheet`.
 ///
@@ -30,6 +37,9 @@ class CompletionPanel extends StatefulWidget {
     required this.onRetry,
     required this.onClose,
     this.onNextLevel,
+    this.density = PanelDensity.regular,
+    this.startReveal = true,
+    this.spineGlow = true,
     super.key,
   });
 
@@ -53,6 +63,18 @@ class CompletionPanel extends StatefulWidget {
   /// affordance. F05 supplies the Journey-advance handler.
   final VoidCallback? onNextLevel;
 
+  /// See [PanelDensity]. Defaults to the F04 layout.
+  final PanelDensity density;
+
+  /// Whether the one-shot star reveal may run. F03 §16 holds it until the panel
+  /// is at rest (the panel is built while it is still sliding in). Standalone
+  /// use (tests, F04) keeps the default `true` = reveal at build time.
+  final bool startReveal;
+
+  /// Outer glow of the amber spine bar. F03 §16.3 turns it off while the docked
+  /// answer row (which carries the one glow) is on screen.
+  final bool spineGlow;
+
   @override
   State<CompletionPanel> createState() => _CompletionPanelState();
 }
@@ -73,10 +95,14 @@ class _CompletionPanelState extends State<CompletionPanel>
       vsync: this,
       duration: const Duration(milliseconds: 220),
     );
-    _startOrSettle();
+    if (widget.startReveal) _startOrSettle();
   }
 
+  bool _revealStarted = false;
+
   void _startOrSettle() {
+    if (_revealStarted) return;
+    _revealStarted = true;
     final reduceMotion = WidgetsBinding
         .instance
         .platformDispatcher
@@ -98,6 +124,7 @@ class _CompletionPanelState extends State<CompletionPanel>
   @override
   void didUpdateWidget(CompletionPanel oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (!oldWidget.startReveal && widget.startReveal) _startOrSettle();
     // The personal-best read-back resolved after the reveal started. If it turned
     // into a "new best", wipe the underline in now (once).
     final becameNewBest =
@@ -141,9 +168,14 @@ class _CompletionPanelState extends State<CompletionPanel>
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          const _Spine(),
+          _Spine(glow: widget.spineGlow),
           Padding(
-            padding: const EdgeInsets.fromLTRB(28, 22, 28, 0),
+            padding: EdgeInsets.fromLTRB(
+              28,
+              widget.density == PanelDensity.regular ? 22 : 13,
+              28,
+              0,
+            ),
             child: bare
                 ? _BareBody(
                     strings: widget.strings,
@@ -157,6 +189,7 @@ class _CompletionPanelState extends State<CompletionPanel>
                     result: result,
                     reveal: _reveal,
                     underline: _underline,
+                    density: widget.density,
                   ),
           ),
           _Actions(
@@ -166,6 +199,7 @@ class _CompletionPanelState extends State<CompletionPanel>
             onClose: widget.onClose,
             onNextLevel: widget.onNextLevel,
             isPerfect: widget.result?.isPerfect ?? false,
+            density: widget.density,
           ),
         ],
       ),
@@ -176,7 +210,10 @@ class _CompletionPanelState extends State<CompletionPanel>
 /// The docked seam bar — a 3 pt amber rule flush with the panel top, fading to
 /// transparent at both ends with a soft glow. Mirrors F03's win seam.
 class _Spine extends StatelessWidget {
-  const _Spine();
+  const _Spine({this.glow = true});
+
+  /// Outer glow; off while F03's docked answer row carries the one glow.
+  final bool glow;
 
   @override
   Widget build(BuildContext context) {
@@ -192,12 +229,14 @@ class _Spine extends StatelessWidget {
           ],
           stops: const <double>[0.0, 0.5, 1.0],
         ),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: PlayTheme.amber.withValues(alpha: 0.18),
-            blurRadius: 12,
-          ),
-        ],
+        boxShadow: glow
+            ? <BoxShadow>[
+                BoxShadow(
+                  color: PlayTheme.amber.withValues(alpha: 0.18),
+                  blurRadius: 12,
+                ),
+              ]
+            : const <BoxShadow>[],
       ),
     );
   }
@@ -214,6 +253,7 @@ class _RatedBody extends StatelessWidget {
     required this.result,
     required this.reveal,
     required this.underline,
+    this.density = PanelDensity.regular,
   });
 
   final PlayStrings strings;
@@ -221,34 +261,42 @@ class _RatedBody extends StatelessWidget {
   final CompletionResult result;
   final Animation<double> reveal;
   final Animation<double> underline;
+  final PanelDensity density;
 
   @override
   Widget build(BuildContext context) {
+    // §16.3 concessions: gaps × 0.6 (compact+), stars × 0.88 (compact+),
+    // caption dropped (tight). Regular = the F04 layout, unchanged.
+    final f = density == PanelDensity.regular ? 1.0 : 0.6;
+    final starScale = density == PanelDensity.regular ? 1.0 : 0.88;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         if (result.isPerfect)
           _PerfectPlate(label: rating.perfect, reveal: reveal),
-        if (result.isPerfect) const SizedBox(height: 10),
+        if (result.isPerfect) SizedBox(height: 10 * f),
         _StarRow(
           stars: result.stars,
           isPerfect: result.isPerfect,
           reveal: reveal,
+          scale: starScale,
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10 * f),
         Semantics(
           label: rating.starGroupSemantics(
             stars: result.stars,
             perfect: result.isPerfect,
           ),
-          child: ExcludeSemantics(
-            child: Text(
-              rating.starsCaption(result.stars),
-              style: PlayTheme.microLabel.copyWith(letterSpacing: 2),
-            ),
-          ),
+          child: density == PanelDensity.tight
+              ? const SizedBox.shrink()
+              : ExcludeSemantics(
+                  child: Text(
+                    rating.starsCaption(result.stars),
+                    style: PlayTheme.microLabel.copyWith(letterSpacing: 2),
+                  ),
+                ),
         ),
-        const SizedBox(height: 20),
+        SizedBox(height: 20 * f),
         Text(
           strings.solvedKicker,
           style: PlayTheme.microLabel.copyWith(
@@ -256,7 +304,7 @@ class _RatedBody extends StatelessWidget {
             letterSpacing: 3,
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8 * f),
         Text(
           result.targetWord,
           textAlign: TextAlign.center,
@@ -266,9 +314,9 @@ class _RatedBody extends StatelessWidget {
             color: PlayTheme.amber.withValues(alpha: 0.85),
           ),
         ),
-        const SizedBox(height: 22),
+        SizedBox(height: 22 * f),
         _Triptych(strings: rating, result: result, underline: underline),
-        const SizedBox(height: 22),
+        SizedBox(height: 22 * f),
       ],
     );
   }
@@ -326,11 +374,15 @@ class _StarRow extends StatelessWidget {
     required this.stars,
     required this.isPerfect,
     required this.reveal,
+    this.scale = 1.0,
   });
 
   final int stars;
   final bool isPerfect;
   final Animation<double> reveal;
+
+  /// §16.3 density: 1.0 regular, 0.88 compact/tight.
+  final double scale;
 
   @override
   Widget build(BuildContext context) {
@@ -341,11 +393,12 @@ class _StarRow extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             for (var i = 0; i < 3; i++) ...<Widget>[
-              if (i > 0) const SizedBox(width: 18),
+              if (i > 0) SizedBox(width: 18 * scale),
               _Star(
                 earned: i < stars,
                 strike: _strikeFor(i),
                 perfectPulse: isPerfect ? _perfectPulse : 0,
+                scale: scale,
               ),
             ],
           ],
@@ -378,19 +431,21 @@ class _Star extends StatelessWidget {
     required this.earned,
     required this.strike,
     required this.perfectPulse,
+    this.scale = 1.0,
   });
 
   final bool earned;
   final double strike;
   final double perfectPulse;
+  final double scale;
 
   @override
   Widget build(BuildContext context) {
     final t = earned ? strike : 0.0;
     final pulse = earned ? perfectPulse : 0.0;
     return SizedBox(
-      width: 46,
-      height: 46,
+      width: 46 * scale,
+      height: 46 * scale,
       child: CustomPaint(
         painter: _StarPainter(struck: t, pulse: pulse),
       ),
@@ -802,7 +857,11 @@ class _Actions extends StatelessWidget {
     required this.onClose,
     required this.onNextLevel,
     required this.isPerfect,
+    this.density = PanelDensity.regular,
   });
+
+  /// §16.3: gaps × 0.6 for compact/tight; controls keep their 44 pt+ boxes.
+  final PanelDensity density;
 
   final PlayStrings strings;
   final RatingStrings rating;
@@ -843,20 +902,23 @@ class _Actions extends StatelessWidget {
         28,
         0,
         28,
-        18 + MediaQuery.of(context).viewPadding.bottom,
+        (density == PanelDensity.regular ? 18 : 12) +
+            MediaQuery.of(context).viewPadding.bottom,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           primary,
-          const SizedBox(height: 10),
+          SizedBox(height: density == PanelDensity.regular ? 10 : 6),
           secondary,
-          const SizedBox(height: 4),
+          SizedBox(height: density == PanelDensity.regular ? 4 : 2),
           GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: onClose,
             child: Container(
               alignment: Alignment.center,
+              // ≥ 44 pt tap target (ui-design §16.5 rule 5; was 42 pt).
+              constraints: const BoxConstraints(minHeight: 44),
               padding: const EdgeInsets.symmetric(vertical: 12),
               child: Text(
                 strings.close,

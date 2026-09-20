@@ -10,18 +10,18 @@ Rework
 
 ## Current Owner
 
-Frontend/Mobile Developer
+Tech Lead
 
 ## Next Role
 
-Frontend/Mobile Developer
+Tech Lead
 
 ## Active Task Ledger
 
 - [x] Task ID: F03-QA-RUNTIME | Assigned Role: QA | Status: Done | Summary: Final-stage runtime QA on rev 7a907dd returned verdict Rejected (qa.md 2026-09-20); residual scenarios live in Pending Evidence | Depends On: -
 - [x] Task ID: F03-UI-WON | Assigned Role: UI Designer | Status: Done | Summary: DELIVERED 2026-09-20 (ui-design.md §16 Won composition, rubric self-review 92). F03-QA-01 geometry: deliver a `Won composition` section in F03 ui-design.md so the winning row + docked seam stay visible above the F04 panel for rows 0–4 and every F04 variant, per architecture.md §18 (2026-09-20); see Current UI Brief | Depends On: -
-- [ ] Task ID: F03-FE-WON | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: F03-QA-01: implement win-sequence-then-panel sequencing (panel not before T0+600 ms) and the UI Designer's Won composition; add widget/golden layout assertions; update frontend.md | Depends On: F03-UI-WON
-- [ ] Task ID: F03-FE-INTEG | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: F03-QA-02: make integration_test/play_session_test.dart group 4 complete and exit 0 on a live simulator on 2 widths; no product-semantics change | Depends On: -
+- [x] Task ID: F03-FE-WON | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: DELIVERED 2026-09-20 (frontend.md; F03.WIN-LAYOUT 33/33). F03-QA-01: implement win-sequence-then-panel sequencing (panel not before T0+600 ms) and the UI Designer's Won composition; add widget/golden layout assertions; update frontend.md | Depends On: F03-UI-WON
+- [x] Task ID: F03-FE-INTEG | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: DELIVERED 2026-09-20 (12/12 exit 0 on 3 simulator widths). F03-QA-02: make integration_test/play_session_test.dart group 4 complete and exit 0 on a live simulator on 2 widths; no product-semantics change | Depends On: -
 - [ ] Task ID: F03-QA-REVERIFY | Assigned Role: QA | Status: Queued | Summary: Re-verify F03 final on the changed win path per Planned QA Re-verify Brief; independent verdict | Depends On: F03-FE-WON, F03-FE-INTEG
 
 ## Open Tasks
@@ -88,7 +88,8 @@ None
   * Prerequisite / External Decision: F03-UI-WON delivered
   * Re-evaluation Trigger: F03-FE-WON delivery
   * Blocks: F03 final acceptance
-  * Result: PENDING
+  * Result: PASS
+  * Provenance / Note: 2026-09-20, working tree on HEAD a136a9b (uncommitted): `flutter test test/play/won_composition_test.dart` 33/33 (8 pure + 25 widget) — rows 0–4 × Perfect/2★ × 390×844 and 440×956, 393×852 row 4, text scale 1.3, F04 variants (first-clear/matched/newBest+Perfect via Retry), reduce-motion, panel absent before T0+600 ms; mutation check proved the ordering assertions live. In-memory DB, injected Puzzle, not the production root. Full gates: analyze 0, format 0, 197 package + 214 app tests
 
 - Evidence ID: F03.INTEG-DEVICE
   * Scenario: `flutter test integration_test/play_session_test.dart -d <simulator>` exits 0, all groups incl. group 4 (paused mid-drag, paused mid-animation) complete
@@ -98,8 +99,8 @@ None
   * Prerequisite / External Decision: None
   * Re-evaluation Trigger: F03-FE-INTEG delivery
   * Blocks: F03 final acceptance
-  * Result: PENDING
-  * Provenance / Note: 2026-09-20 QA: groups 1–3 10/10 PASS, group 4 test 1 did not complete after 16m46s, test 2 not run (F03-QA-02)
+  * Result: PASS
+  * Provenance / Note: 2026-09-20, working tree on HEAD a136a9b: `flutter test integration_test/play_session_test.dart -d <UDID>` 12/12 PASS, exit 0 on iPhone 16 (393×852, 56 s), iPhone 16e (390×844, 74 s) and iPhone 16 Pro Max (440×956, 57 s), iOS 18.6. Earlier 2026-09-20 QA run: group 4 hung 16m46 s (F03-QA-02). Root cause: frames stop while paused on a live binding; group 4 now never pumps while paused, asserts the settled state from the store at pause, 90 s hang guard. Harness uses in-memory DB, not the production root
 
 - Evidence ID: F03.LIFECYCLE-LIVE
   * Scenario: App paused while a touch is held (mid-drag) and within the ~190 ms shift on a live target; resulting state is settled, no lost/half move
@@ -175,7 +176,7 @@ None
 
 ## Next Action
 
-Run Frontend/Mobile Developer on F03-FE-WON and F03-FE-INTEG using the Planned Frontend Brief below and ui-design.md §16 (Won composition, incl. the rect-testable rule §16.5) plus architecture.md §18 (Won-sequence authority). Delivery returns to Tech Lead for reconciliation before F03-QA-REVERIFY. F03.RUNTIME-LIMITS is RESOLVED = A; the user still has to grant macOS Accessibility before the QA re-verify.
+Run Tech Lead: reconcile the frontend delivery (frontend.md "F03-FE-WON / F03-FE-INTEG": task coverage, contract compliance vs architecture.md §18 and ui-design.md §16, preserved behavior, evidence quality; note the F04 panel edits — density, startReveal, spineGlow, Close 44 pt), set Delivery Review, then activate F03-QA-REVERIFY (QA Stage final) with the Planned QA Re-verify Brief. The user still has to grant macOS Accessibility (F03.RUNTIME-LIMITS = A) before that QA run.
 
 ## Last Decision
 
@@ -183,9 +184,9 @@ Run Frontend/Mobile Developer on F03-FE-WON and F03-FE-INTEG using the Planned F
 
 ## Last Update
 
-* Updated By: UI Designer
+* Updated By: Frontend/Mobile Developer
 * Timestamp: 2026-09-20
-* Summary: F03-UI-WON delivered: ui-design.md §16 Won composition (Direction A "The answer docks": win sequence, then the winning row glides to a fixed dock under the target rail, then the panel capped at ≤ 64 % H); Frontend tasks activated per the planned handoff.
+* Summary: F03-FE-WON and F03-FE-INTEG delivered (won timeline + docked row + capped panel; integration group 4 fixed). Delivery Review stays Pending for Tech Lead reconciliation.
 
 ## Context & Follow-ups
 
@@ -206,6 +207,7 @@ F03 implementation is retained; F04/F05 integration code stays. Delivery Review 
 * 2026-09-20 — Tech Lead: rework routed (UI Designer → Frontend/Mobile Developer → Tech Lead → QA); decision F03.RUNTIME-LIMITS prepared as a planned gate.
 * 2026-09-20 — Tech Lead: F03.RUNTIME-LIMITS RESOLVED = A on the user's decision; Accessibility grant is a pending user action.
 * 2026-09-20 — UI Designer: F03-UI-WON delivered (ui-design.md §16); F03-FE-WON and F03-FE-INTEG activated.
+* 2026-09-20 — Frontend/Mobile Developer: F03-FE-WON and F03-FE-INTEG delivered; owner → Tech Lead.
 
 ## Current UI Brief
 

@@ -269,19 +269,76 @@ Carried from `ui-design.md` §14 (non-blocking — sensible defaults are impleme
 
 `flutter analyze` (app, incl. `integration_test/`) + `dart analyze` (6 packages) clean; `dart format --output=none --set-exit-if-changed .` clean; `flutter test` (app) **112/112** green (99 + **13 new F03-FE9**), no regression; the 196 package tests unchanged → **308 workspace tests**. `flutter build ios --release --no-codesign` unaffected (no product-code change). The `integration_test/` suite is analyze-clean and wired into CI as best-effort; its authoritative device-matrix run is `flutter test integration_test -d <emulator>`.
 
+## F03-FE-WON / F03-FE-INTEG — win-sequence rework (2026-09-20)
+
+**Tasks:** `F03-FE-WON` (F03-QA-01: win sequence *then* panel + the `Won composition` of `ui-design.md` §16) and `F03-FE-INTEG` (F03-QA-02: the device-form suite must complete). Authority: `architecture.md` §18 "Won-sequence authority" (contract), `ui-design.md` §16 (design). No controller / persistence / product-AC change.
+
+### Impacted files
+
+| File | Change | Why |
+| --- | --- | --- |
+| `app/lib/play/won_composition.dart` | **new** — `WonTimeline` (regular 940 ms / reduced 660 ms; dock, scrim, panel intervals) and `WonGeometry.compute` (fixed dock, `panelTop ≥ 0.36 H`, 0.8 scale fallback) | one testable source for the §16.2 timeline and §16.3 geometry |
+| `app/lib/play/widgets/docked_row.dart` | **new** — `DockedAnswerRow` (row tiles + drawn seam as one `RepaintBoundary` unit, contact shadow, `ExcludeSemantics`) | §16.3 docked row |
+| `app/lib/play/play_session_screen.dart` | `_PlayBody` → stateful won coordinator: one timeline `AnimationController`, live layout measurement (board / divider / stack), scrim → docked row → panel layers, panel built only from `T0+680 ms`, Retry fade-out (180 ms), `_WonPanelHost` (density fit) | F03-QA-01 sequencing + geometry |
+| `app/lib/play/widgets/puzzle_board.dart` | `rowVacated` (ghost outlines, no board seam/bloom once docked), static win under OS reduce-motion, `tileSizeFor` shared metric | §16.3 ghost slot, §16.2 reduce-motion |
+| `app/lib/rating/completion_panel.dart` | `PanelDensity` (regular / compact / tight), `startReveal` (reveal held until at rest), `spineGlow` (off while the dock carries the glow), **Close tap target 42 → 44 pt** | §16.3 concessions, §16.2 star reveal at rest, §16.5 rule 5 |
+| `app/integration_test/play_session_test.dart` | group 4 rewritten (no frame requested while paused; state asserted from the store at pause; 90 s hang guard) | F03-QA-02 |
+| `app/test/play/won_composition_test.dart` | **new** — 33 tests (pure timeline/geometry + on-screen §16.5 rule) | `F03.WIN-LAYOUT` |
+
+### Task-to-code traceability
+
+| Task | Status | Where | Behaviour |
+| --- | --- | --- | --- |
+| F03-FE-WON — sequencing | **Complete** | `won_composition.dart` `WonTimeline`; `_PlayBodyState._enterWon` / `_buildWonLayers` | T0 = the frame `won` starts; win sequence 0–600 ms unchanged (board `_win`); scrim from 620, dock 600–840, panel built and sliding from 680–940, star reveal (`startReveal`) only at rest ≥ 940; panel/scrim absent before 600 |
+| F03-FE-WON — geometry | **Complete** | `WonGeometry.compute`, `_measure`, `_WonPanelHost`, `DockedAnswerRow`, `PuzzleBoard.rowVacated` | dock centred in `[dividerBottom+12, 0.36 H−16]`, fixed for all rows/variants; panel max height = `stackBottom − 0.36 H`; ghost outlines at home; one glow (panel spine glow off) |
+| F03-FE-WON — reduce motion | **Complete** | `WonTimeline.reduced`, `AnimationBehavior.preserve` on the timeline/retire controllers | static amber row + seam, ≥ 300 ms hold, dock fade 160 ms, scrim + panel fade from 460, at rest ≈ 660 ms |
+| F03-FE-WON — exits | **Complete** | `_leaveWon` / `_retire` | Retry: panel + docked row fade out (180 ms), board re-lights on the restarted grid, `idle`; Next / Close unchanged |
+| F03-FE-INTEG | **Complete** | `integration_test/play_session_test.dart` group 4 | see evidence; hang cause confirmed as harness (frames stop while paused), product behaviour unchanged |
+
+### Authority reconciliation
+
+* Sequencing: F03 §10, F03 `ui-design.md`, F04 `ui-design.md` §4 and `architecture.md` §18 agree — implemented as specified.
+* Geometry: `ui-design.md` §16 wins over F04 `ui-design.md` §5 where they conflict (strip 34–42 % → dock; panel ≤ 64 %; spine glow off) per `architecture.md` §18. The F04 panel's content, copy, ACs, star logic and personal-best logic are untouched.
+* Constants (`dividerGap` 12, `panelGap` 16, `0.36`) are `WonGeometry` statics; the reference-device numbers in §16.3 are not used at runtime — layout is measured.
+* Preserved deviation: §18 perf clarification (12 % dim only, no backdrop blur) stays.
+
+### Behavior preserved
+
+Controller state machine and persistence timing (`completed` snapshot + clear, F04 personal-best write, F05 `_resolveJourneyUnlock`) still trigger at `won`; input stays locked and the back chevron hidden from T0; Retry restarts in place; Next Level (`pushReplacement`), Close (`_popToCaller`) and column-tutorial overlay are unchanged; `CompletionPanel` defaults (`density regular`, `startReveal true`, `spineGlow true`) keep every F04 test and standalone use identical.
+
+### Test evidence by task
+
+| Task / behaviour | Class | Command / action | Target | Result | Provenance / isolation |
+| --- | --- | --- | --- | --- | --- |
+| F03.WIN-LAYOUT: rows 0–4 × Perfect/2★ × 390×844 and 440×956 (20), 393×852 row 4, text scale 1.3, F04 variants first-clear → matched → newBest+Perfect (with Retry), reduce-motion, timeline before/after 600 ms | automated functional | `flutter test test/play/won_composition_test.dart` (part of `melos run test`) | app widget tests, in-memory DB, custom `Puzzle` injected via `playSessionSetupProvider`, `NeverValidWordValidator` | **33/33 PASS** (8 pure + 25 widget) | working tree on HEAD `a136a9b` (uncommitted), 2026-09-20; not the production bootstrap graph |
+| Mutation check | automated | panel start set to 100 ms in `WonTimeline.regular` | same | unit tests **and** the on-screen timeline test FAIL as they must; source restored | proves the ordering assertions are live |
+| F03.INTEG-DEVICE | repeatable integration | `flutter test integration_test/play_session_test.dart -d <UDID>` | iPhone 16 (393×852), iPhone 16e (390×844), iPhone 16 Pro Max (440×956), iOS 18.6 simulators | **12/12 PASS, exit 0** on each (≈ 56 s / 74 s / 57 s; earlier run: group 4 hung 16m46 s) | same tree; integration harness uses in-memory DB + `_bootTo`, not the production root |
+| Regression | automated functional | `melos run analyze` / `melos run format:check` / `melos run test` | workspace | analyze exit 0 (only the pre-existing `looplet_solver` info lint), format exit 0 (152 files, 0 changed), **197 package + 214 app tests pass** (was 181 app) | same tree |
+| Real-app check (developer self-check, **not QA evidence**) | runtime | debug build on iPhone 16, `smoke-tr-06` row-2 win, `simctl recordVideo` + 60 ms frame sheet | iPhone 16 sim | sequence as designed: amber row at home ≈ 0.7 s → ghost + glide → panel rises as the row lands → star reveal after rest; row 2 (previously fully hidden) now visible above the panel | debug build, real `main.dart` root; QA re-verifies independently |
+
+### Findings and notes from this delivery
+
+1. **New bug caught by the tests:** `AnimationController` defaults to `AnimationBehavior.normal`, which collapses durations to ~5 % under OS reduce-motion; the reduced timeline's hold would have vanished. Both won controllers use `AnimationBehavior.preserve`.
+2. **F04 defect fixed in passing:** the Close ("Kapat") tap target was 42 pt tall; §16.5 requires ≥ 44 pt → `minHeight: 44`.
+3. **F03-QA-02 root cause (confirmed by the fix):** on a live binding `handleAppLifecycleStateChanged(paused)` disables frame scheduling, so `pumpAndSettle` issued while paused never completes. Product behaviour was not at fault; `onAppPaused` commits synchronously (now asserted from the store at pause).
+4. **Visual note (design, not a defect claim):** at rest the dimmed board's row 0 remains as a half-cut strip between the docked row and the panel (`Y C D F G` on `smoke-tr-06`). It sits under the 12 % dim + 40 % scrim; the dock overlays the plate's top edge exactly as specified. Tech Lead / QA may judge whether it reads clean.
+5. **Pre-existing, not in scope:** `ui-design.md` §8/§16.2 describe a 30 ms L→R stagger of the amber fill; the tiles switch to `winning` together (one 90 ms scale). Left unchanged.
+6. **Density concessions:** `PanelDensity` steps (compact → tight) on the next frame when the measured panel exceeds `0.64 H − inset`. At scale 1.0 no step is needed on the three simulator sizes; whether the step engaged in the 1.3 text-scale test is not separately asserted (the rule-2 assertion passes either way).
+7. **Not proven here (QA owns):** greyscale legibility, rotation, HOME during a held touch (F03.RUNTIME-LIMITS route A), AC9 highlight capture, and the win frames on real reachable rows through home/CONTINUE.
+
 ---
 
 # WORKFLOW HANDOFF SUGGESTION (NON-AUTHORITATIVE)
 
-* **Completed Tasks:** F03-FE1…FE8 (the playable screen) + **F03-FE9** (the runtime-validation suite + CI wiring + the manual device list).
-* **Remaining Tasks:** F03 QA re-verify — confirm the `play_session_runtime_test.dart` suite covers the automatable `qa.md §17` slice (1–4), review the manual device list (5–7), and re-adjudicate the verdict. Then Tech Lead close.
-* **Blockers:** none. The 6 open clarifications were resolved by the Tech Lead into `architecture.md §18` before this task.
-* **Status Suggestion:** Ready for QA.
+* **Completed Tasks:** F03-FE1…FE9 (earlier) + **F03-FE-WON** and **F03-FE-INTEG** (2026-09-20).
+* **Remaining Tasks:** Tech Lead delivery reconciliation, then F03-QA-REVERIFY (QA).
+* **Blockers:** none.
+* **Status Suggestion:** Needs Tech Lead Review (then Ready for QA).
 
 ---
 
 ## 19. Sonraki Komut
 
 ```
-Run QA
+Run Tech Lead
 ```

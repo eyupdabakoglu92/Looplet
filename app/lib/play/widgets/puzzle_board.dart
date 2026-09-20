@@ -19,11 +19,25 @@ class PuzzleBoard extends StatefulWidget {
   const PuzzleBoard({
     required this.controller,
     required this.boardSize,
+    this.rowVacated = false,
     super.key,
   });
 
   final PlaySessionController controller;
   final double boardSize;
+
+  /// F03 `ui-design.md` §16: while `won`, once the winning row has lifted off to
+  /// its dock, its home cells show a faint amber outline ("ghost") and the
+  /// board's own seam bar / bloom stop drawing (the docked overlay carries them).
+  final bool rowVacated;
+
+  /// Tile edge for a [boardSize] board of [gridSize]² cells — the single source
+  /// of the tile math, shared with the docked-row overlay.
+  static double tileSizeFor(double boardSize, int gridSize) =>
+      (boardSize -
+          2 * PlayTheme.platePadding -
+          (gridSize - 1) * PlayTheme.tileGap) /
+      gridSize;
 
   @override
   State<PuzzleBoard> createState() => _PuzzleBoardState();
@@ -83,7 +97,17 @@ class _PuzzleBoardState extends State<PuzzleBoard>
       return;
     }
     if (phase == PlaySessionPhase.won && _lastPhase != PlaySessionPhase.won) {
-      _win.forward(from: 0);
+      // OS reduce-motion: the amber row + seam render static (no stagger/bloom).
+      final reduceMotion = WidgetsBinding
+          .instance
+          .platformDispatcher
+          .accessibilityFeatures
+          .disableAnimations;
+      if (reduceMotion) {
+        _win.value = 1;
+      } else {
+        _win.forward(from: 0);
+      }
     } else if (phase != PlaySessionPhase.won && _win.value != 0) {
       _win.value = 0;
     }
@@ -203,6 +227,7 @@ class _PuzzleBoardState extends State<PuzzleBoard>
     final letters = _c.displayLetters;
     final statuses = _c.tileStatuses;
     final wonRow = _c.phase == PlaySessionPhase.won ? _c.wonRow : null;
+    final vacated = wonRow != null && widget.rowVacated;
     final lineActive =
         line != null &&
         (_c.phase == PlaySessionPhase.tracking ||
@@ -247,24 +272,30 @@ class _PuzzleBoardState extends State<PuzzleBoard>
                         top: _plate + r * _stride,
                         width: _tile,
                         height: _tile,
-                        child: BoardTile(
-                          letter: letters[r][c],
-                          size: _tile,
-                          status: statuses[r][c],
-                          winning: wonRow != null && r == wonRow,
-                          pressed:
-                              _pressedCell?.row == r && _pressedCell?.col == c,
-                          dim: (wonRow != null && r != wonRow)
-                              ? 0.12
-                              : (_inActiveLine(line, r, c) ? 0 : dimInactive),
-                        ),
+                        child: vacated && r == wonRow
+                            ? _GhostCell(size: _tile)
+                            : BoardTile(
+                                letter: letters[r][c],
+                                size: _tile,
+                                status: statuses[r][c],
+                                winning: wonRow != null && r == wonRow,
+                                pressed:
+                                    _pressedCell?.row == r &&
+                                    _pressedCell?.col == c,
+                                dim: (wonRow != null && r != wonRow)
+                                    ? 0.12
+                                    : (_inActiveLine(line, r, c)
+                                          ? 0
+                                          : dimInactive),
+                              ),
                       ),
                 // Moving active line (with wrap ghosts).
                 if (lineActive) _buildMovingLine(line, letters, statuses),
-                // Winning seam bar.
-                if (wonRow != null) _buildSeam(wonRow),
-                // Win bloom.
-                if (wonRow != null && _win.value > 0) _buildBloom(wonRow),
+                // Winning seam bar (the docked overlay draws it once vacated).
+                if (wonRow != null && !vacated) _buildSeam(wonRow),
+                // Win bloom (finished by T0+600, i.e. before the dock).
+                if (wonRow != null && !vacated && _win.value > 0)
+                  _buildBloom(wonRow),
               ],
             ),
           ),
@@ -420,6 +451,27 @@ class _PuzzleBoardState extends State<PuzzleBoard>
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// The vacated slot of a docked winning row (`ui-design.md` §16.3): a 1 pt
+/// `amber` @ 25 % outline at the tile radius on the plate colour, no fill, so
+/// the board reads "this row left", not "broken".
+class _GhostCell extends StatelessWidget {
+  const _GhostCell({required this.size});
+
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(
+          size * PlayTheme.tileRadiusFraction,
+        ),
+        border: Border.all(color: PlayTheme.amber.withValues(alpha: 0.25)),
       ),
     );
   }
