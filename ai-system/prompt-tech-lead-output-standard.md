@@ -220,6 +220,9 @@ QA stratejisi gerektiginde su boyutlari kapsar:
 * integration
 * scope: backend-only / client-only / end-to-end / content-only ve uygulanabilir compliance
 * QA Stage: functional / final; required kanıtı stage'e göre tanımla
+* QA Modules: `core` + yalnız uygulanabilir koşullu modüller
+* Regression Depth: targeted / impacted / full ve risk gerekçesi
+* Evidence Reuse: allowed / invalidated / not-applicable ve fingerprint gerekçesi
 * kanit sinifi: `runtime`, `repeatable integration`, `automated functional`, `source-only`
 * runtime zorunlu senaryolar ve approval bar'i
 
@@ -236,6 +239,8 @@ Kural:
 * QA brief'i generic "AC + edge case kontrol et" seviyesinde birakilmaz; kritik journey ve misuse sinirlari feature'a ozel yazilir
 * Runtime proof gerektiren bir feature'da Tech Lead, source-audit ile kapanabilecek bir QA beklentisi yazmaz
 * "Tech Lead sonra manuel bakar" modeli, QA approval yerine gecmez; runtime exit criteria QA kapsaminda net yazilmalidir
+* Modül seçimi koşullu kontrolleri ortadan kaldırmaz: Visual Scope, release scope, backend/security, stateful flow, Unity/iOS ve content tetikleyicileri karşılık gelen QA modülünü zorunlu yapar
+* Full regression coverage, fingerprint'i hâlâ geçerli kanıtı gerekçesiz tekrar çalıştırmak değildir; değişen ve belirsiz risk yüzeyi yeniden yürütülür
 
 ### 14. Release / DevOps Strategy
 

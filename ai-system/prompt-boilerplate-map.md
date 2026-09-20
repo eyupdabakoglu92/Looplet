@@ -41,6 +41,9 @@ Tamamlanan extraction'lar:
 * Shared input integrity standardı çıkarıldı
 * Shared input authority standardı çıkarıldı
 * Shared evidence integrity standardı çıkarıldı
+* QA evidence reuse/regression depth standardı çıkarıldı
+* Monolitik QA prompt'u küçük core + koşullu `qa-modules/` yapısına ayrıldı; kalite gate'leri silinmeden scope'a göre yüklenir
+* Read-only `qa-preflight.mjs`, QA module/depth/reuse planını execution öncesi doğrular
 * Role prompt'lardaki uzun `EXECUTION AUTHORITY BINDING` blokları kısa compatibility-preserving cümleye indirildi
 * `Consumed Signals` lifecycle'ı read optimization sinyali olarak eklendi
 * `tools/token-cost-audit.sh` ile tekrar çalıştırılabilir maliyet ölçümü eklendi
@@ -360,7 +363,7 @@ Dosya:
 
 Hüküm:
 
-* Uzun ama tekrar değil; kalite guard'ı
+* Uzun ama tekrar değil; rendered exploration, selection provenance ve visual evidence guard'ı
 
 Risk:
 
@@ -368,7 +371,7 @@ Risk:
 
 Öneri:
 
-* Ancak appendix çıkarımı ile sadeleştirilmeli
+* Normatif ortak kısım `design/visual-quality-gate.md` içindedir; prompt role-specific output ve davranışı taşır
 
 ---
 

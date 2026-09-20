@@ -13,6 +13,11 @@
 * Yeni alanlar eski canlı dosyalara Tech Lead resync ile eklenir; audit otomatik dosya düzeltmez.
 * Bütçe: varsayılan 40,000 bayt; uzun geçmiş ayrı history artifact'ına taşınır.
 * QA Scope: none / backend-only / client-only / end-to-end / content-only; uygulanabilir compliance kapsamı eklenebilir.
+* QA Modules: `core` her zaman zorunlu; koşullu değerler `backend-security, client-ui, visual-quality, stateful-flow, unity-ios, content, release`.
+* Regression Depth: `not-set / targeted / impacted / full`. Final/release ve yüksek riskli ortak yüzeylerde full coverage gerekir.
+* Evidence Reuse: `not-evaluated / allowed / invalidated / not-applicable`; karar fingerprint ile gerekçelendirilir.
+* Visual Scope: none / existing-parity / new-surface / motion-critical / design-system.
+* Visual Quality Gate ve evidence kuralları `/ai-system/design/visual-quality-gate.md` içindedir.
 * Current Phase, Consumed Signals ve Rework Plan yalnız gerekliyse ayrı bölümlerdir.
 
 ## Feature ID
@@ -47,9 +52,37 @@ None
 
 Pending
 
+## Visual Scope
+
+none
+
+## Design Foundation
+
+Not Required
+
+## Visual Quality Gate
+
+Not Required
+
+## Visual Evidence
+
+None
+
 ## QA Scope
 
 none
+
+## QA Modules
+
+none
+
+## Regression Depth
+
+not-set
+
+## Evidence Reuse
+
+not-evaluated
 
 ## QA Stage
 

@@ -29,10 +29,12 @@ Sen aynı zamanda yüksek görsel kaliteye sahip, modern, tutarlı, production-g
 * /ai-system/system-state.md
 * /ai-system/design/design-doctrine.md
 * /ai-system/design/premium-ui-rubric.md
+* /ai-system/design/visual-quality-gate.md
 
 Opsiyonel:
 
 * /ai-system/project-authority/platform.md (stack ve tooling belirsizse zorunlu hale gelir)
+* /ai-system/project-authority/design-foundation.md (Visual Scope `none` değilse zorunlu)
 * /ai-system/project-authority/release.md (frontend build output, Docker/container, env config veya deployment davranışını etkiliyorsa zorunlu hale gelir)
 * /ai-system/features/{feature-name}/analysis.md
 * /ai-system/features/{feature-name}/backend.md
@@ -180,6 +182,7 @@ Not:
 * State design korunmalıdır
 * Background / surface / type / spacing niyeti korunmalıdır
 * Frontend uygulaması tasarımı ucuzlaştırmamalıdır
+* Visual Evidence Manifest içindeki selected-source artefact'lar implementation parity referansıdır
 
 Teknik sebeple birebir uygulama mümkün değilse:
 * intent korunur
@@ -190,16 +193,19 @@ Teknik sebeple birebir uygulama mümkün değilse:
 
 # FE VISUAL IMPLEMENTATION RULES (CRITICAL)
 
+Visual Scope `none` değilse implementasyona yalnız `Visual Quality Gate = Ready for Implementation` iken başla. Gate pending ise kodla direction seçmeye çalışma; Tech Lead'e dön.
+
 Aşağıdakiler varsayılan olarak başarısız implementasyon sayılır:
 
-* düz beyaz kart stack’i
-* ucuz görünen varsayılan mavi gradient primary button
+* bağlamdan bağımsız default kart/input/button stack'i
+* default font, icon, illustration, avatar veya placeholder copy'yi final asset gibi bırakmak
 * sadece border ile selected state
 * generic outline input
 * fazla boş ama kompozisyonsuz ekran
 * placeholder gibi görünen seçim öğeleri
-* sistem default’una çok yakın component görünümü
+* sistem/framework default’una çok yakın component görünümü
 * designer intent’ini sadeleştirme bahanesiyle sıradanlaştırmak
+* static screenshot ile motion parity iddia etmek
 
 Aşağıdakiler zorunludur:
 
@@ -207,9 +213,11 @@ Aşağıdakiler zorunludur:
 * spacing ritmi tutarlı olmalı
 * component ailesi tek ürün dili taşımalı
 * selected/focus/error/loading state’leri hissedilir olmalı
-* CTA baskın ama pahalı görünmeli
+* CTA baskın, bağlama uygun ve bitmiş görünmeli
 * helper text / label / value / state hiyerarşisi net olmalı
-* yüzeyler flat ve ucuz görünmemeli
+* yüzey yaklaşımı Design Foundation ile uyumlu olmalı; depth/gradient/glow zorunlu varsayılmamalı
+* gerçek font/asset/content kullanılmalı; substitution varsa onaylı ve kayıtlı olmalı
+* source render ile aynı viewport/state üzerinde runtime karşılaştırması yapılmalı
 
 ---
 
@@ -357,7 +365,9 @@ Teslimden önce kendine sor:
 * Selected state tatmin edici mi?
 * Input ve surface’ler pahalı görünüyor mu?
 * Boşluklar anlamlı mı?
-* Bu ekran premium-ui-rubric’e göre 90 altına düşer mi?
+* Bu ekran premium-ui-rubric’e göre 93 altına veya herhangi bir boyutta 8 altına düşer mi?
+* Source render ile gerçek runtime capture yan yana karşılaştırıldı mı?
+* Placeholder/default asset kaldı mı?
 
 Eğer cevap zayıfsa revize etmeden teslim etme.
 
@@ -370,6 +380,8 @@ Eğer cevap zayıfsa revize etmeden teslim etme.
 * Error state test edilmelidir
 * Acceptance Criteria test ile doğrulanmalıdır
 * Gerekliyse state bazlı görsel davranışlar da test edilmelidir
+* Visual Scope `none` değilse canonical simulator/device/browser target çalıştırılmalı ve kritik screen/state/viewport screenshot'ları alınmalıdır
+* Motion-critical scope'ta screen recording/video veya çalıştırılabilir prototype kanıtı üretilmelidir; static screenshot yeterli değildir
 * Entry point, bootstrap/init sırası, provider/DI root graph, SDK/auth/config init, persistence hydration/migration, router root veya lifecycle owner değiştiyse Startup / Cold-Boot Gate zorunludur
 * Cold boot, değişen kritik başlangıç bağımlılıklarını atlamayan çalışma yoluyla canonical target'ta doğrulanır; diğer izolasyonlar evidence kaydında açıklanır
 * Required runtime kanıtı çalıştırılamadıysa bunu PASS değil `Pending Evidence` olarak raporla
@@ -516,6 +528,20 @@ Pure wiring / non-UI frontend değişikliğinde bu bölümü atla.
 * ui-design.md ile hizalama notları
 * design-doctrine uyumu
 * premium-ui-rubric self-check özeti
+
+---
+
+## Visual Parity Evidence
+
+Visual Scope `none` değilse bu exact başlık zorunludur:
+
+| Evidence ID | Kind | Screen / State | Viewport / Device | Artifact | Source Revision | Captured By | Captured At | Result / Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+
+* selected-source ile runtime capture'ı eşleştir
+* spacing, typography, wrapping, color, asset, state, safe-area ve motion sapmalarını yaz
+* motion-critical scope'ta runtime-video kaydı ekle
+* required target çalışmadıysa PASS verme; `Pending Evidence` üret
 
 ---
 

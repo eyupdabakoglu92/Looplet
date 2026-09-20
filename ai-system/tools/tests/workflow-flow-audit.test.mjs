@@ -34,6 +34,15 @@ const qaFields = {
   'Current Status': 'In QA', 'Current Owner': 'QA', 'Next Role': 'QA', 'Active Task Ledger': row('sample.qa', 'QA'),
   'Delivery Review': 'Accepted', 'QA Stage': 'functional', 'Release Scope': 'staging',
 };
+const qaPlanFields = {
+  'QA Modules': 'core, content', 'Regression Depth': 'impacted', 'Evidence Reuse': 'not-applicable',
+};
+const visualFields = {
+  'Visual Scope': 'new-surface',
+  'Design Foundation': 'ai-system/project-authority/design-foundation.md',
+  'Visual Quality Gate': 'Ready for Implementation',
+  'Visual Evidence': 'ui-design.md',
+};
 function fixture(t, sources = [sourceFor()]) {
   const root = mkdtempSync(join(tmpdir(), 'workflow-flow-test-'));
   t.after(() => rmSync(root, { recursive: true, force: true }));
@@ -52,6 +61,24 @@ function fixture(t, sources = [sourceFor()]) {
   writeFileSync(join(root, 'system-state.md'), '# System State\n## Active Feature\n' + id + '\n## Current Role\n' + owner + '\n');
   return root;
 }
+function writeVisualArtifacts(root, { runtime = false, score = null, lowest = 8, motion = false } = {}) {
+  mkdirSync(join(root, 'project-authority'), { recursive: true });
+  writeFileSync(join(root, 'project-authority', 'design-foundation.md'),
+    '# Project Design Foundation\n\n> Status: Selected\n\nSelected By: Product Owner\n');
+  const featureDir = join(root, 'features', 'item-0');
+  writeFileSync(join(featureDir, 'ui-design.md'), '# UI Design\n\n## Visual Evidence Manifest\n\n' +
+    '| Evidence ID | Kind | Artifact |\n| --- | --- | --- |\n' +
+    '| sample.UI-A | direction-render | visuals/a.png |\n' +
+    '| sample.UI-B | direction-render | visuals/b.png |\n' +
+    (motion ? '| sample.UI-M | motion-prototype | visuals/motion.mp4 |\n' : ''));
+  if (runtime) writeFileSync(join(featureDir, 'frontend.md'), '# Delivery\n\n## Visual Parity Evidence\n\n' +
+    '| Evidence ID | Kind | Artifact |\n| --- | --- | --- |\n' +
+    '| sample.FE-1 | runtime-screenshot | captures/runtime.png |\n' +
+    (motion ? '| sample.FE-2 | runtime-video | captures/runtime.mp4 |\n' : ''));
+  if (score !== null) writeFileSync(join(featureDir, 'qa.md'), '# QA\n\n## Visual Quality Verdict\n\n' +
+    'Final Score: ' + score + ' / 100\n\nLowest Dimension: Typography — ' + lowest + ' / 10\n\n' +
+    'Fail Conditions: None\n\nRuntime Evidence Complete: Yes\n\nResult: PASS\n');
+}
 const errorsFor = fields => validateFeature(feature(fields));
 const plan = (role = 'Frontend/Mobile Developer') =>
   '| After Tasks | Next Role | Activate Tasks |\n| --- | --- | --- |\n| sample.1 | ' + role + ' | sample.2 |';
@@ -59,6 +86,64 @@ const plan = (role = 'Frontend/Mobile Developer') =>
 test('valid active and reviewed terminal fixtures pass the full audit', t => {
   assert.deepEqual(audit(fixture(t)).errors, []);
   assert.deepEqual(audit(fixture(t, [sourceFor(terminalFields)])).errors, []);
+});
+test('legacy orchestration without visual fields remains compatible', t => {
+  const root = fixture(t);
+  assert.equal(feature().visualDeclared, false);
+  assert.deepEqual(audit(root).errors, []);
+});
+test('declared QA plan validates modules, depth and evidence reuse without breaking legacy files', () => {
+  assert.deepEqual(errorsFor({ ...qaFields, ...qaPlanFields }), []);
+  assert.match(errorsFor({ ...qaFields, ...qaPlanFields, 'QA Modules': 'core' }).join('\n'), /content module/);
+  assert.match(errorsFor({ ...qaFields, ...qaPlanFields, 'Regression Depth': 'not-set' }).join('\n'), /Regression Depth/);
+  assert.match(errorsFor({ ...qaFields, ...qaPlanFields, 'Evidence Reuse': 'not-evaluated' }).join('\n'), /Evidence Reuse/);
+});
+test('final release QA plan requires full coverage and release module', () => {
+  const errors = errorsFor({ ...qaFields, ...qaPlanFields, 'QA Stage': 'final', 'QA Result': 'None',
+    'Release Result': 'Release Ready', 'Regression Depth': 'impacted' }).join('\n');
+  assert.match(errors, /full regression coverage/);
+  assert.match(errors, /release module/);
+  assert.deepEqual(errorsFor({ ...qaFields, ...qaPlanFields, 'QA Stage': 'final', 'QA Result': 'None',
+    'Release Result': 'Release Ready', 'Regression Depth': 'full', 'QA Modules': 'core, content, release' }), []);
+});
+test('visual gate cannot claim implementation readiness without foundation and rendered evidence', t => {
+  const root = fixture(t, [sourceFor(visualFields)]);
+  assert.match(audit(root).errors.join('\n'), /Design Foundation file missing/);
+  assert.match(audit(root).errors.join('\n'), /ui-design\.md/);
+});
+test('selected foundation plus two real directions permits implementation readiness', t => {
+  const root = fixture(t, [sourceFor(visualFields)]);
+  writeVisualArtifacts(root);
+  assert.deepEqual(audit(root).errors, []);
+});
+test('visual QA requires runtime parity evidence and Ready for QA gate', t => {
+  const source = sourceFor({ ...qaFields, ...visualFields, 'Visual Quality Gate': 'Ready for QA',
+    'Visual Evidence': 'ui-design.md, frontend.md' });
+  const root = fixture(t, [source]);
+  writeVisualArtifacts(root);
+  assert.match(audit(root).errors.join('\n'), /runtime-screenshot/);
+  writeVisualArtifacts(root, { runtime: true });
+  assert.deepEqual(audit(root).errors, []);
+  assert.match(errorsFor({ ...qaFields, ...visualFields }).join('\n'), /Ready for QA/);
+});
+test('terminal visual gate requires independent 93+ QA verdict and dimension floor', t => {
+  const fields = { ...terminalFields, ...visualFields, 'Visual Quality Gate': 'Passed',
+    'Visual Evidence': 'ui-design.md, frontend.md, qa.md' };
+  const root = fixture(t, [sourceFor(fields)]);
+  writeVisualArtifacts(root, { runtime: true, score: 92 });
+  assert.match(audit(root).errors.join('\n'), /Final Score >= 93/);
+  writeVisualArtifacts(root, { runtime: true, score: 93, lowest: 8 });
+  assert.deepEqual(audit(root).errors, []);
+});
+test('motion-critical scope requires prototype and runtime video evidence', t => {
+  const fields = { ...qaFields, ...visualFields, 'Visual Scope': 'motion-critical',
+    'Visual Quality Gate': 'Ready for QA', 'Visual Evidence': 'ui-design.md, frontend.md' };
+  const root = fixture(t, [sourceFor(fields)]);
+  writeVisualArtifacts(root, { runtime: true });
+  assert.match(audit(root).errors.join('\n'), /motion-prototype/);
+  assert.match(audit(root).errors.join('\n'), /runtime-video/);
+  writeVisualArtifacts(root, { runtime: true, motion: true });
+  assert.deepEqual(audit(root).errors, []);
 });
 test('main shell entry point runs semantic checks by default', t => {
   const root = fixture(t, [sourceFor({ 'Active Task Ledger': 'None' })]);
@@ -230,12 +315,15 @@ test('canonical roles agree with the normative contract and global templates', (
   assert.deepEqual(match[1].trim().split('\n').map(line => line.slice(2)), roles);
   assert.match(readFileSync(join(core, 'templates/system-state.template.md'), 'utf8'), /Content Designer/);
 });
-test('QA domain checks survive routing edits and verdict sections stay explicit', () => {
+test('QA core verdict contract and conditional domain modules remain explicit', () => {
   const qa = readFileSync(join(core, 'prompts/qa.md'), 'utf8');
-  for (const heading of ['8. Test Findings', '9. Positive Scenarios', '10. Negative / Edge Cases', '14c. Authored Content Compliance', '16. Regression Risk', '17. Final Verdict']) {
+  for (const heading of ['0. QA Execution Plan', '1. Evidence Ledger', '2. Acceptance & Critical Journey Coverage', '3. Findings', '5. Regression & Evidence Reuse', '6. Final Verdict']) {
     assert.ok(qa.includes('\n## ' + heading + '\n'), heading);
   }
   assert.match(qa, /Functional Approved/); assert.match(qa, /Decision Pending/);
+  const modules = ['backend-security', 'client-ui', 'visual-quality', 'stateful-flow', 'unity-ios', 'content', 'release'];
+  for (const module of modules) assert.ok(existsSync(join(core, 'prompts', 'qa-modules', module + '.md')), module);
+  assert.match(readFileSync(join(core, 'prompts/qa-modules/visual-quality.md'), 'utf8'), /## Visual Quality Verdict/);
 });
 
 test('full release cycle replays delivery, checkpoints, QA re-entry, and closure', t => {

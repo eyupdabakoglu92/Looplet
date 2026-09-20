@@ -62,6 +62,8 @@ Opsiyonel (yeni HUD sistemi, premium visual moment veya görsel kalite ürün ba
 
 * /ai-system/design/design-doctrine.md
 * /ai-system/design/premium-ui-rubric.md
+* /ai-system/design/visual-quality-gate.md
+* /ai-system/project-authority/design-foundation.md
 
 Opsiyonel:
 
@@ -266,6 +268,8 @@ Aşağıdakiler varsayılan olarak bug sayılır:
 
 # MODERN GAME QUALITY BAR (CRITICAL)
 
+Visual Scope `none` değilse implementasyona yalnız `Visual Quality Gate = Ready for Implementation` iken başla. Gate pending ise kendi başına art direction seçme; Tech Lead'e dön.
+
 Feature scope'u aşağıdakilerden birini etkiliyorsa açıkça ele alınmalı; aksi halde varsayılan olarak zayıf/yarım implementasyon sayılır:
 
 * **Game feel / juice:** temel etkileşimler (tap, hit, collect, win/lose) hissedilir görsel/hareket geri bildirimi taşımalı; düz/tepkisiz input bırakılmamalı
@@ -291,6 +295,8 @@ Teslimden önce kendine sor:
 * Safe area ve farklı ekran boyutlarında test ettim mi?
 * Kritik aksiyonlarda hissedilir feedback (haptic/audio/VFX) var mı, Modern Game Quality Bar'ı karşılıyor mu?
 * Bu kapsam `GAME VISUAL OWNERSHIP MODEL`'e göre UI Designer handoff'u gerektiriyor muydu; gerektiriyorsa handoff'a uydum mu?
+* Selected-source render ile gerçek game runtime aynı device/viewport/state üzerinde karşılaştırıldı mı?
+* Görsel scope'ta 93+ hedefi ve her rubric boyutunda 8+ sağlanıyor mu?
 
 Eğer cevap zayıfsa revize etmeden teslim etme.
 
@@ -304,6 +310,8 @@ Eğer cevap zayıfsa revize etmeden teslim etme.
 * Save/load ve economy edge case'leri test edilmelidir
 * Bootstrap scene, dependency/service initialization, persistence hydration veya root navigation değiştiyse gerçek player/app cold boot zorunludur
 * Edit Mode, Play Mode, simulator ve device kanıtlarının sınırını ayrı yaz; required target çalıştırılamadıysa `Pending Evidence` üret
+* Visual Scope `none` değilse gerçek game runtime screenshot'ları alınır; motion-critical scope'ta screen recording/video zorunludur
+* Placeholder/default sprite, font, icon, audio veya VFX final visual evidence olarak kabul edilmez
 
 ---
 
@@ -361,6 +369,20 @@ Yalnız `GAME VISUAL OWNERSHIP MODEL`'e göre bu kapsam UI Designer handoff'u ge
 * `ui-design.md` handoff'u ile hizalanan visual hierarchy / motion language / feedback dili kararları
 * Teknik sebeple birebir uygulanamayan handoff öğeleri (varsa) ve korunan intent
 * Reference-title target'a göre kendi değerlendirmen
+
+---
+
+## Visual Parity Evidence
+
+Visual Scope `none` değilse bu exact başlık zorunludur:
+
+| Evidence ID | Kind | Screen / State | Viewport / Device | Artifact | Source Revision | Captured By | Captured At | Result / Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+
+* selected-source ile gerçek game runtime capture'ı eşleştir
+* HUD, safe area, typography, sprite/VFX, feedback ve motion sapmalarını yaz
+* motion-critical scope'ta runtime-video kaydı ekle
+* required target çalışmadıysa PASS verme; `Pending Evidence` üret
 
 ---
 

@@ -77,6 +77,7 @@ Bunlar buyuk olcude projeden bagimsizdir:
 * `tools/`
 * `design/design-doctrine.md`
 * `design/premium-ui-rubric.md`
+* `design/visual-quality-gate.md`
 
 ### 3.2 Project-Instance Authority
 
@@ -84,6 +85,7 @@ Bunlar her projede yeniden yazilir:
 
 * `project-authority/platform.md`
 * `project-authority/setup-manifest.md`
+* `project-authority/design-foundation.md` (user-facing projelerde ilk visual gate sırasında)
 * `product/product-prd.md`
 * `feature-board.md`
 * `system-state.md`
@@ -113,7 +115,7 @@ Kural:
 * local/global ownership sinirlari acik
 * Tech Lead orchestration modeli olgun
 * QA gate yapisi guclu
-* UI handoff ve premium kalite authority'si net
+* UI handoff ve premium kalite authority'si rendered/runtime evidence ile doğrulanabilir
 * project authority ile prompt/core katmani artik fiziksel olarak ayrilmis durumda
 
 ### Previously Weak Areas
@@ -167,6 +169,8 @@ Read policy:
 * Release authority yalniz release/deployment gate varsa devreye girer.
 * `Consumed Signals` source artifact'i silmez; yalniz downstream default okuma davranisini optimize eder.
 * `analysis.md` consumed edilmisse ve ilgili unresolved question yoksa downstream roller `architecture.md` authority'sini esas alir.
+* QA her zaman küçük core prompt'u okur; yalnız Tech Lead'in `QA Modules` alanında seçtiği koşullu modülleri ve onların artifact'larını yükler.
+* Regression depth riskten önce seçilir; fingerprint'i geçerli functional/runtime kanıt final turda tekrar kullanılabilir, değişen yüzey yeniden çalıştırılır.
 
 Output policy:
 
@@ -183,11 +187,12 @@ sh ai-system/tools/token-cost-audit.sh ai-system --role qa
 sh ai-system/tools/token-cost-audit.sh ai-system --role unity
 sh ai-system/tools/token-cost-audit.sh ai-system --estimator auto
 sh ai-system/tools/token-cost-audit.sh ai-system --baseline <approved-baseline> --budget <project-budget>
+node ai-system/tools/qa-preflight.mjs ai-system
 ```
 
 Not:
 
-* Token-cost audit manuel maliyet takibidir. Workflow-state audit handoff/Done gate'idir; Node.js 18+ ister, paket kurulumu veya dosya değişikliği yapmaz. Delivery `--local`, Tech Lead full mod kullanır; `--structure-only` yalnız tanıdır.
+* Token-cost audit manuel maliyet takibidir. Workflow-state audit handoff/Done gate'idir. QA preflight aktif QA planındaki module/depth/reuse ve input uyumunu read-only doğrular. Node.js 18+ isterler; paket kurulumu veya dosya değişikliği yapmazlar. Delivery `--local`, Tech Lead full mod kullanır; `--structure-only` yalnız tanıdır.
 * Eski kurulumlarda canlı dosyaları starter ile ezme; README içindeki Mevcut Kurulumda Core Güncellemesi adımlarını ve Tech Lead resync'i uygula. Kanıt olmadan approval üretme.
 * Ilk implementasyonda `--baseline/--budget` zorunlu degildir; once proje baseline'i kaydedilir.
 * Sonraki core guncellemelerinde `--baseline <approved-baseline> --budget <project-budget>` regression kontrolu olarak kullanilir.
@@ -235,6 +240,7 @@ UI role'u kullanilacaksa:
 
 * `design/design-doctrine.md`
 * `design/premium-ui-rubric.md`
+* `design/visual-quality-gate.md`
 
 ### 6.2 Initialize Fresh
 
@@ -243,6 +249,7 @@ Greenfield'da baslangic yuzeyleri su sekilde olusur:
 * `product/product-prd.md` — Product Owner uretir
 * `project-authority/setup-manifest.md` (gerekiyorsa)
 * `project-authority/release.md` (release/deployment gate gerekiyorsa)
+* `project-authority/design-foundation.md` (user-facing projede UI Designer + selection authority üretir)
 * `feature-board.md` — Product Owner uretir
 * `system-state.md` — Product Owner uretir
 * `project-authority/platform.md` — Tech Lead uretir
@@ -365,10 +372,13 @@ Tavsiyem:
 
 * `design/design-doctrine.md`
 * `design/premium-ui-rubric.md`
-  * UI feature'ları ve Unity Game Visual/HUD Direction scope'ları için özellikle önerilir
+* `design/visual-quality-gate.md`
+  * UI feature'ları ve Unity Game Visual/HUD Direction scope'larında zorunlu reusable standartlardır
+* `project-authority/design-foundation.md`
+  * yeni yüzey/motion/design-system scope'unda implementation öncesi `Selected` olmalıdır
 * `analysis.md`
 * `ui-design.md`
-  * standart UI handoff veya Unity Game Visual/HUD Direction gerekiyorsa
+  * standart UI handoff veya Unity Game Visual/HUD Direction gerekiyorsa; rendered alternatives ve Visual Evidence Manifest içerir
 * `release.md`
 
 ### Diagnostic / Non-Activation Files

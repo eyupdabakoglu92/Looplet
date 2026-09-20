@@ -279,6 +279,9 @@ QA handoff oncesi Tech Lead su alanlari feature-level authority'ye acikca yazar:
 * QA brief'i expected verdict veya kanıtla çelişen bir finding'i yasaklayan talimat içermez; root-cause tahmini yalnız hypothesis olarak yazılır
 * approval exit criteria'ni
 * release gate gerekip gerekmedigini ve `Release Scope` degerini
+* `QA Modules`: her zaman core + scope/risk tetikleyicilerinin koşullu modülleri
+* `Regression Depth`: targeted / impacted / full ve gerekçesi
+* `Evidence Reuse`: allowed / invalidated / not-applicable; önceki kanıt fingerprint kararı
 
 Kural:
 
@@ -288,6 +291,8 @@ Kural:
 Sonra:
 
 * Release Scope none ise QA Stage = final, aksi halde ilk QA functional olur
+* Final/release, shared core, startup/routing, persistence/migration, auth/security/payment/economy, dependency/build config, cross-feature state veya geniş refactor varsa Regression Depth = full olur
+* QA modül/depth/reuse planını `node ai-system/tools/qa-preflight.mjs ai-system` ile doğrula; FAIL iken QA'yı aktive etme
 * QA task'larını dependency kontrolüyle aktive et; QA Result = None
 * Current Status = In QA; Current Owner = Next Role = QA
 
@@ -383,6 +388,7 @@ Pending kanıt:
 * Authority, gerçek run/provenance, scope, skip ve rollback gereksinimlerini doğrula.
 * Release Result alanını artifact'la uzlaştır.
 * Release Ready / Release Ready with Notes → Done değil, QA final stage. Delivery Review'u yenile; QA task'ı aç ve QA Result = None yap.
+* Final QA planında release modülünü ekle, Regression Depth = full yap ve functional evidence fingerprint'lerini `allowed` veya `invalidated` olarak yeniden değerlendir.
 * Functional kabul release değişikliklerinden etkilenmişse ilgili functional kapsamı önce yeniden doğrulat.
 * Release Blocked → executable fix için Rework; dış prerequisite için Blocked + Tech Lead.
 * Release Validation Pending → kanıt owner'ına task; dış onay/authority için Tech Lead decision gate.

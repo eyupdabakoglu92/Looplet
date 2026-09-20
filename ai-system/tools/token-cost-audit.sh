@@ -330,6 +330,7 @@ profile() {
 
 add_glob \
   "$ROOT"/prompts/*.md \
+  "$ROOT"/prompts/qa-modules/*.md \
   "$ROOT"/prompt-*.md \
   "$ROOT"/role-execution-contract.md \
   "$ROOT"/orchestration-template.md \
@@ -446,7 +447,8 @@ profile "UI Designer" "uidesigner ui designer" \
   "role-execution-contract.md" \
   "system-state.md" \
   "design/design-doctrine.md" \
-  "design/premium-ui-rubric.md"
+  "design/premium-ui-rubric.md" \
+  "design/visual-quality-gate.md"
 profile "Backend Developer" "backenddeveloper backend be" \
   "prompts/backend-dev.md" \
   "role-execution-contract.md" \
@@ -456,7 +458,8 @@ profile "Frontend Developer" "frontenddeveloper frontend fe" \
   "role-execution-contract.md" \
   "system-state.md" \
   "design/design-doctrine.md" \
-  "design/premium-ui-rubric.md"
+  "design/premium-ui-rubric.md" \
+  "design/visual-quality-gate.md"
 profile "Game Developer Unity" "gamedeveloperunity gamedeveloper gamedev unity game" \
   "prompts/game-developer-unity.md" \
   "role-execution-contract.md" \
@@ -470,8 +473,11 @@ profile "DevOps Release" "devopsrelease devops release" \
 profile "QA" "qa qualityassurance" \
   "prompts/qa.md" \
   "role-execution-contract.md" \
-  "system-state.md" \
-  "prompt-input-integrity-standard.md"
+  "prompt-execution-gating-standard.md" \
+  "prompt-input-authority-standard.md" \
+  "prompt-input-integrity-standard.md" \
+  "prompt-evidence-integrity-standard.md" \
+  "prompt-qa-evidence-reuse-standard.md"
 profile "Project Setup" "projectsetup setup project" \
   "prompts/project-setup.md" \
   "role-execution-contract.md" \
@@ -506,13 +512,16 @@ printf "%-36s %8s   %s\n" "prompt-input-integrity-standard" \
 printf "%-36s %8s   %s\n" "prompt-evidence-integrity-standard" \
   "$(file_tokens_active "$ROOT/prompt-evidence-integrity-standard.md")" \
   "Tech Lead, QA, Project Setup, Developer, DevOps, Content"
+printf "%-36s %8s   %s\n" "prompt-qa-evidence-reuse-standard" \
+  "$(file_tokens_active "$ROOT/prompt-qa-evidence-reuse-standard.md")" \
+  "Tech Lead, QA"
 
 echo
 echo "## Conditional Cost Add-ons"
 printf "%-28s %8s   %s\n" "Add-on" "$TOKEN_HEADER" "Files"
-printf "%-28s %8s   %s\n" "UI doctrine/rubric" \
-  "$(( $(file_tokens_active "$ROOT/design/design-doctrine.md") + $(file_tokens_active "$ROOT/design/premium-ui-rubric.md") ))" \
-  "design/design-doctrine.md, design/premium-ui-rubric.md"
+printf "%-28s %8s   %s\n" "Visual quality standards" \
+  "$(( $(file_tokens_active "$ROOT/design/design-doctrine.md") + $(file_tokens_active "$ROOT/design/premium-ui-rubric.md") + $(file_tokens_active "$ROOT/design/visual-quality-gate.md") ))" \
+  "design doctrine, rubric, visual-quality-gate"
 printf "%-28s %8s   %s\n" "Release authority" \
   "$(file_tokens_active "$ROOT/project-authority/release.md")" \
   "project-authority/release.md"
@@ -522,6 +531,27 @@ printf "%-28s %8s   %s\n" "Platform authority" \
 printf "%-28s %8s   %s\n" "Setup manifest" \
   "$(file_tokens_active "$ROOT/project-authority/setup-manifest.md")" \
   "project-authority/setup-manifest.md"
+printf "%-28s %8s   %s\n" "QA backend-security" \
+  "$(file_tokens_active "$ROOT/prompts/qa-modules/backend-security.md")" \
+  "prompts/qa-modules/backend-security.md"
+printf "%-28s %8s   %s\n" "QA client-ui" \
+  "$(file_tokens_active "$ROOT/prompts/qa-modules/client-ui.md")" \
+  "prompts/qa-modules/client-ui.md"
+printf "%-28s %8s   %s\n" "QA visual-quality" \
+  "$(file_tokens_active "$ROOT/prompts/qa-modules/visual-quality.md")" \
+  "prompts/qa-modules/visual-quality.md"
+printf "%-28s %8s   %s\n" "QA stateful-flow" \
+  "$(file_tokens_active "$ROOT/prompts/qa-modules/stateful-flow.md")" \
+  "prompts/qa-modules/stateful-flow.md"
+printf "%-28s %8s   %s\n" "QA unity-ios" \
+  "$(file_tokens_active "$ROOT/prompts/qa-modules/unity-ios.md")" \
+  "prompts/qa-modules/unity-ios.md"
+printf "%-28s %8s   %s\n" "QA content" \
+  "$(file_tokens_active "$ROOT/prompts/qa-modules/content.md")" \
+  "prompts/qa-modules/content.md"
+printf "%-28s %8s   %s\n" "QA release" \
+  "$(file_tokens_active "$ROOT/prompts/qa-modules/release.md")" \
+  "prompts/qa-modules/release.md"
 
 echo
 echo "## Notes"
@@ -533,5 +563,6 @@ echo "* README, adoption guides, roadmap and validation notes are excluded becau
 echo "* Alignment and boilerplate maps are excluded because they are summary/reference documents."
 echo "* Role baselines count static prompt/core files only; referenced shared supplements are reported as add-ons."
 echo "* Runtime read gating still decides actual cost."
+echo "* QA role baseline is the always-loaded core; QA module rows are conditional and only selected modules should be added."
 
 exit "$EXIT_CODE"

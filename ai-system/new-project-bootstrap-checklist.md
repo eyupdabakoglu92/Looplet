@@ -30,6 +30,7 @@ Bu dosyalar yeni projeye ozeldir. Bos dosya yaratma; template'ten skeleton olara
 * `product/product-prd.md`
 * `project-authority/setup-manifest.md` gerekirse
 * `project-authority/release.md` release/deployment gate gerekiyorsa
+* `project-authority/design-foundation.md` user-facing projede ilk visual gate sırasında
 * `feature-board.md`
 * `system-state.md`
 
@@ -38,6 +39,7 @@ Not:
 * Greenfield'da `project-authority/platform.md` template'ten olusturulmaz; Tech Lead PRD Section 12'yi baz alarak uretir
 * Brownfield'da `project-authority/platform.md` mevcut codebase'den cikarilir; template yalniz referans olarak kullanilabilir
 * `project-authority/release.md` release/deployment gate yoksa zorunlu degildir
+* `project-authority/design-foundation.md`, UI Designer tarafından gerçek rendered direction'larla draft edilir; kullanıcı/Product Owner/yetkili Tech Lead seçmeden `Selected` olmaz
 * `features/{feature-name}/` klasoru ve icindeki `prd.md`, `architecture.md`, `orchestration.md` dosyalari ilk `Run Tech Lead` tarafindan olusturulur
 * Kullanicinin bu klasoru elle acmasina gerek yoktur
 
@@ -293,7 +295,14 @@ Asgari olarak:
 * next role
 * next action
 * qa scope (Tech Lead QA handoff öncesi yazar: `backend-only / client-only / end-to-end / ui-handoff-compliance`)
+* qa modules (`core` + uygulanabilir `backend-security / client-ui / visual-quality / stateful-flow / unity-ios / content / release`)
+* regression depth (`not-set / targeted / impacted / full`)
+* evidence reuse (`not-evaluated / allowed / invalidated / not-applicable`)
 * release scope (Tech Lead release handoff öncesi yazar: `none / ci-cd-only / deploy-preview / staging / production-readiness / rollback-readiness`)
+* visual scope (`none / existing-parity / new-surface / motion-critical / design-system`)
+* design foundation (`Not Required / Pending / ai-system/project-authority/design-foundation.md`)
+* visual quality gate (`Not Required / Pending / Ready for Implementation / Ready for QA / Passed`)
+* visual evidence (artefact referansları veya `None`)
 
 ---
 
@@ -455,6 +464,7 @@ Boot: choose one depending on context
 3. Çıktıları gözden geçir. Değişiklik varsa: `Run Product Owner. Revise: <kapsam>`
 4. `Run Tech Lead. Yeni proje bootstrap yap.` komutu ile devam et.
    * Tech Lead `platform.md` üretir, ilk feature klasörünü açar (`prd.md`, `architecture.md`, `orchestration.md`).
+   * User-facing feature'da Visual Scope belirler; Design Foundation yoksa UI Designer foundation/render task'ını implementation'dan önce açar.
 5. Scaffold, backend veya build/test doğrulaması gerekiyorsa `setup-manifest.md` doldur.
 6. Proje henüz scaffold edilmemişse `Run Project Setup` ile scaffold başlat.
 
@@ -476,11 +486,12 @@ sh ai-system/tools/token-cost-audit.sh ai-system --role qa
 sh ai-system/tools/token-cost-audit.sh ai-system --role unity
 sh ai-system/tools/token-cost-audit.sh ai-system --estimator auto
 sh ai-system/tools/token-cost-audit.sh ai-system --baseline <approved-baseline> --budget <project-budget>
+node ai-system/tools/qa-preflight.mjs ai-system
 ```
 
 Kural:
 
-* Token-cost audit manuel diagnostic'tir. Workflow-state audit ise delivery handoff için `--local`, Tech Lead sync/Done için full modda zorunludur; Node.js 18+ gerekir, ek paket gerekmez.
+* Token-cost audit manuel diagnostic'tir. Workflow-state audit delivery handoff için `--local`, Tech Lead sync/Done için full modda zorunludur. QA preflight yalnız aktif QA planını read-only doğrular; test/verdict üretmez. Node.js 18+ gerekir, ek paket gerekmez.
 * PO state dosyaları henüz yoksa workflow audit eksik dosyaları raporlar; bootstrap sonrası yeniden çalıştır. Starter-only PASS canlı feature akışını kanıtlamaz.
 * Mevcut kurulumların güncelleme/resync adımları README'dedir; canlı project artifact'larını starter ile ezme.
 * Default rapor dependency-free `chars/4` tahminidir; trend takibi ve buyuk dosya tespiti icindir.
@@ -497,6 +508,7 @@ Kural:
 * Yeni bug / problem -> once `Run Tech Lead. Incident: ...`
 * Role execution -> yalniz atanmis role `Run [Role]`
 * QA verdict sonrasi -> tekrar `Run Tech Lead`
+* QA handoff öncesi -> Tech Lead module/depth/reuse planını yazar ve `qa-preflight.mjs` PASS alır
 * Release readiness sonrasi -> tekrar `Run Tech Lead`
 * Scaffold gerekiyorsa -> yalniz o durumda `Run Project Setup`
 * `Consumed Signals` varsa ve ilgili unresolved question yoksa downstream roller consumed artifact'i tekrar okumaz

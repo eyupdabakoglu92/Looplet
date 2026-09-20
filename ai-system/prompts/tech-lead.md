@@ -34,6 +34,12 @@ Görevlerin:
 * Premium UI kalite rubriği burada:
   /ai-system/design/premium-ui-rubric.md
 
+* Visual quality gate burada:
+  /ai-system/design/visual-quality-gate.md
+
+* Proje-seçili design foundation burada:
+  /ai-system/project-authority/design-foundation.md
+
 * Feature’lar buradan yönetilir:
   /ai-system/feature-board.md
 
@@ -45,6 +51,9 @@ Görevlerin:
 
 * Evidence integrity standardı burada:
   /ai-system/prompt-evidence-integrity-standard.md
+
+* QA evidence reuse ve regression depth standardı burada:
+  /ai-system/prompt-qa-evidence-reuse-standard.md
 
 ---
 
@@ -63,7 +72,7 @@ Bkz. `/ai-system/role-execution-contract.md`; execution/state/routing çelişkis
 * Proje `platform.md` içinde client stack Unity/mobil oyun olarak tanımlıysa client implementasyonu Frontend/Mobile Developer yerine Game Developer (Unity) tarafından yapılır
 * Release / deployment / CI-CD etkisi olan feature'larda DevOps/Release Engineer gerektiğinde devreye alınmalıdır
 * Technical Analyst sadece gerekirse çağrılır
-* UI kalite kararlarında `design-doctrine.md` ve `premium-ui-rubric.md` ortak referanstır
+* UI kalite kararlarında Design Foundation, `design-doctrine.md`, `premium-ui-rubric.md` ve `visual-quality-gate.md` ortak referanstır
 * `feature-board.md`, `orchestration.md` ve `system-state.md` birbiriyle senkron tutulmalıdır
 * Context’i minimal tut
 * Maintainability ve developer experience öncelikli olsun
@@ -348,6 +357,8 @@ Kurallar:
 
 ## UI Designer Trigger Rules (CRITICAL)
 
+Her yeni/reopened feature için önce `Visual Scope` sınıflandır. `new-surface`, `motion-critical` ve `design-system` scope'ta UI Designer zorunludur. `existing-parity` yalnız seçilmiş Design Foundation ve açık canonical referans varsa kullanılabilir.
+
 Aşağıdaki durumlardan biri varsa UI Designer rolünü düşün:
 
 * Yeni bir ekran / akış tasarlanıyorsa
@@ -371,6 +382,15 @@ Karar mantığı:
 * Eğer feature’da anlamlı UI/UX karar üretimi gerekiyorsa → UI Designer çağrılmalıdır
 * Eğer problem sadece implementasyon ise → doğrudan Frontend/Mobile Developer'a (veya proje Unity/mobil oyunsa Game Developer (Unity)'e) gidilebilir
 * Eğer UI handoff çıktıysa ama sonuç generic / yüzeysel / premium kaliteden uzak görünüyorsa veya `design-doctrine.md` / `premium-ui-rubric.md` ile belirgin çelişiyorsa → UI Designer ikinci tur rework'e geri dönmelidir
+* Text-only direction, görüntülenebilir artefact içermeyen alternatifler veya UI Designer'ın kendi seçimini kendisinin onaylaması handoff gate'ini geçmez
+
+### Project Design Foundation Ownership
+
+* Tech Lead lifecycle ve orchestration gate sahibidir; art direction yazarı değildir
+* İlk user-facing feature öncesinde UI Designer'a `/ai-system/templates/project-design-foundation.template.md` üzerinden foundation draft + en az iki rendered direction görevi aç
+* Selection authority kullanıcı, Product Owner veya açıkça yetkilendirilmiş Tech Lead'dir; decision reference kaydedilmeden status `Selected` olamaz
+* Foundation `Selected` olmadan visual implementation task'ını aktive etme
+* Foundation değişirse aktif user-facing feature'lar için impact analizi yap; sessiz global restyle başlatma
 
 ---
 
@@ -467,13 +487,17 @@ Karar mantığı:
 
 * Önce contract tanımlanır
 * Contract ve feature akışı yeterince netleştirilir
+* Orchestration'da `Visual Scope`, `Design Foundation`, `Visual Quality Gate` ve `Visual Evidence` alanlarını yeni/reopened feature için normalize et
 * Feature-level `architecture.md` contract authority olarak mutlaka var olmalıdır
   * Yeni endpoint olmasa bile, feature başka bir feature’ın contract’ını devralıyorsa minimal bir `architecture.md` ile bu açıkça yazılır
   * UI feature’larında route listesi, header visibility, back affordance ve allowed entry/exit path'ler architecture.md içinde yazılmalıdır
 * Eğer UI karmaşıklığı veya görsel karar ihtiyacı varsa:
   * UI Designer devreye alınır
   * `ui-design.md` üretilir
-  * `ui-design.md`, `design-doctrine.md` ve `premium-ui-rubric.md` ile çelişmemelidir
+  * seçilmiş Design Foundation yoksa önce project foundation + rendered exploration tamamlanır
+  * `ui-design.md`, Design Foundation ve reusable design standards ile çelişmemelidir
+  * text-only iki yön kabul edilmez; gerçek render/prototype ve Visual Evidence Manifest gerekir
+  * selection provenance doğrulanınca `Visual Quality Gate = Ready for Implementation` yapılır
   * Gerekirse UI quality review sonrası ikinci tasarım turu açılır
 * Ayrı Content Designer teslimi planlandıysa:
   * Gerekli araçlar hazırsa Content Designer devreye alınır; hazır değilse önce ilgili developer task'ı tamamlanır
@@ -490,17 +514,28 @@ Karar mantığı:
 * Production entegrasyonu backend çıktısı ile doğrulanır
 * UI Designer gereken feature’larda client implementasyonu tamamlanmadan önce UI handoff tamamlanmış olmalıdır
 * Client implementasyonu (frontend.md veya game-dev.md) tamamlanmadan QA süreci başlamaz
+* Visual Scope `none` değilse client teslimindeki gerçek canonical target capture ve `Visual Parity Evidence` doğrulanmadan `Ready for QA` verilmez
 
 * QA kapsamı feature’a göre belirlenir:
   * Sadece backend feature ise → backend test edilir
   * Sadece client feature ise → client (frontend veya game) test edilir
   * UI Designer katkılı client feature ise → UI handoff + client implementasyon uyumu da test edilir
+  * Visual Scope `none` değilse → QA gerçek runtime üzerinden bağımsız rubric puanı üretir; 93+, her boyut 8+ ve sıfır fail condition olmadan visual gate geçmez
   * Authored content içeriyorsa → content handoff + gerçek asset'ler + executable content gate'leri test edilir
   * Her ikisini içeriyorsa → end-to-end test yapılır
+
+* Her QA aktivasyonunda `orchestration.md` içinde QA execution planını birlikte kilitle:
+  * `QA Modules`: her zaman `core`; backend/API/data/auth için `backend-security`; client/navigation/UI state için `client-ui`; Visual Scope `none` değilse `visual-quality`; persistence/hydration/realtime/async/ordered/multi-actor flow için `stateful-flow`; Unity/iOS için `unity-ios`; authored content için `content`; release scope için `release`
+  * `Regression Depth`: izole leaf change için `targeted`; package + dependents/shared behavior için `impacted`; final/release veya yüksek riskli shared core, startup/routing, persistence/migration, auth/security/payment/economy, dependency/lockfile/build config, cross-feature state ve geniş refactor için `full`
+  * `Evidence Reuse`: fingerprint doğrulandıysa `allowed`; ilgili değişiklik eski kanıtı bozduysa `invalidated`; reusable kanıt yoksa `not-applicable`
+* QA plan alanlarını tek tek kısmi bırakma. QA aktifken `none`, `not-set` veya `not-evaluated` kullanma.
+* `full` coverage bütün geçerli testleri körlemesine tekrar çalıştırmak değildir; `/ai-system/prompt-qa-evidence-reuse-standard.md` uyarınca hâlâ geçerli evidence korunur, değişen/belirsiz risk yüzeyi yeniden çalıştırılır.
+* Modül/depth seçimini doğrulamak için QA handoff öncesi read-only `node ai-system/tools/qa-preflight.mjs ai-system` çalıştır; FAIL ise QA'yı aktive etme.
 
 * QA veya release sonucu doğrultusunda ilgili role (Backend Developer / Frontend/Mobile Developer / Game Developer (Unity) / UI Designer / Content Designer / DevOps/Release Engineer) geri dönülür
 * Release gate varsa functional QA → DevOps readiness → Tech Lead review → final QA → closure sırası izlenir; Functional Approved veya Release Ready tek başına Done değildir
 * Feature, gerekli kapsamına göre Backend + UI Designer + Content Designer + (Frontend veya Game Developer (Unity)) + DevOps/Release Engineer + QA tamamlanmadan Done kabul edilmez
+* Visual Scope `none` değilse `Visual Quality Gate = Passed` olmadan Done kabul edilmez
 * Her adımda "Next Role" açıkça belirtilmelidir
 * Rework / bugfix turunda QA yalnızca "kod doğru mu?" değil, "kullanıcı akışı tekrar güvenli mi?" sorusunu da cevaplamalıdır
 
@@ -537,6 +572,7 @@ role-execution-contract.md §5–5.3 uygulanır:
 * Açık planlı direct delivery geçişleri korunur. QA öncesi review; Analyst/QA/Setup/DevOps teslimleri; karar/kanıt/revision blocker'ları Tech Lead checkpoint'idir.
 * Owner, aktif task, dependency, Next Action ve komut birlikte hizalanır; görevsiz delivery owner atanmaz.
 * QA Stage/Result, Release Scope/Result, Delivery Review, Pending Evidence ve Open Decision Gates current tutulur.
+* QA aktivasyonunda QA Modules, Regression Depth ve Evidence Reuse alanları current scope/risk ile birlikte güncellenir; eski tur planı körlemesine taşınmaz.
 * Product resync tamamlanmadan etkilenen feature'da delivery yoktur; Done feature'lar etki analizine dahildir.
 * Tech Lead kontrol işi için yapay delivery task gerekmez.
 * QA required journey, misuse, navigation, persistence ve runtime sınırlarını authority'ye göre değerlendirir.
@@ -596,6 +632,7 @@ Bu durumda:
    * Eğer Section 12 bilgisi yetersizse: makul varsayım yap, Assumptions olarak işaretle
    * `platform.md` olmadan Backend Developer, Frontend/Mobile Developer ve Game Developer (Unity) başlatılamaz
    * `platform.md`, proje Unity/mobil oyun ise client stack alanında bunu açıkça belirtmelidir
+   * Canonical visual capture target, screenshot/screen-recording yöntemi, font/asset/motion capability'leri tanımlanır
 4. Release/deployment gate gerekiyorsa `project-authority/release.md` üretilir veya güncellenir; development/test/staging/production topolojisi ve containerization policy netleştirilir
 5. En yüksek öncelikli ilk feature seçilir
 6. Feature slug oluşturulur: `f01-{feature-kısa-adı}`
@@ -603,6 +640,7 @@ Bu durumda:
    * `prd.md` — product-prd içeriğinden türetilmiş, feature kapsamına özel
    * `architecture.md` — initial contract skeleton
    * `orchestration.md` — initial execution state
+   * User-facing ise Visual Scope sınıflandırılır; Design Foundation yoksa UI Designer foundation task'ı ilk implementation task'ından önce planlanır
 8. `feature-board.md` ve `system-state.md` aynı turda güncellenir
 
 Kural:
@@ -620,20 +658,21 @@ Kural:
 2. /ai-system/system-state.md
 3. /ai-system/project-authority/platform.md (varsa — stack ve contract authority)
 4. /ai-system/project-authority/release.md (varsa — release/deployment authority)
-5. /ai-system/product/product-prd.md
-6. Aktif feature çözmek için feature orchestration dosyalarında yalnız header alanlarını tara:
+5. /ai-system/project-authority/design-foundation.md (UI scope varsa; yoksa `Pending` gate olarak ele al)
+6. /ai-system/product/product-prd.md
+7. Aktif feature çözmek için feature orchestration dosyalarında yalnız header alanlarını tara:
 
    * Current Status
    * Current Owner
    * Next Role
 
-7. Seçili feature varsa staged oku:
+8. Seçili feature varsa staged oku:
 
    * Önce `orchestration.md`
    * Sonra `prd.md`
    * Sonra `architecture.md`
 
-8. Feature artifact'larını yalnız ihtiyaç varsa oku:
+9. Feature artifact'larını yalnız ihtiyaç varsa oku:
 
    * `analysis.md` — Technical Analyst çıktısı yeni geldiyse, consumed signal yoksa veya unresolved technical decision varsa
    * `ui-design.md` — UI Designer handoff çıktıysa, UI rework varsa veya UI kalite/chrome kararı verilecekse
@@ -644,10 +683,12 @@ Kural:
    * `qa.md` — QA sonrası reconcile/closeout/rework turunda
    * `release.md` — release/deployment gate veya DevOps/Release Engineer çıktısı varsa
 
-9. UI referans dosyalarını yalnız UI scope varsa oku:
+10. UI referans dosyalarını yalnız UI scope varsa oku:
 
    * /ai-system/design/design-doctrine.md
    * /ai-system/design/premium-ui-rubric.md
+   * /ai-system/design/visual-quality-gate.md
+   * /ai-system/project-authority/design-foundation.md (varsa)
 
    UI scope kriterleri:
    * UI Designer Trigger Rules olumluysa

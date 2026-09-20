@@ -1,6 +1,6 @@
 # Role Execution Contract
 
-Last Updated: 2026-09-17
+Last Updated: 2026-09-21
 
 ---
 
@@ -22,10 +22,13 @@ template, supplement veya generated artifact çelişirse bu dosya kazanır:
 * authoritative text boundaries
 * evidence truth / pending-evidence propagation
 * live snapshot hygiene
+* visual-quality gate ownership and evidence transitions
 
 Bu dosya product requirement, API contract, UI visual authority veya
 project-specific platform kararlarını kendisi üretmez. Bu alanlarda ilgili
 project/feature authority dosyaları geçerlidir.
+
+Görsel kalite semantiği için `/ai-system/design/visual-quality-gate.md` bu contract ile birlikte normatif uygulanır; proje estetik kararları `/ai-system/project-authority/design-foundation.md` içinde kalır.
 
 ---
 
@@ -177,6 +180,8 @@ Sadece Tech Lead şunları authoritative olarak değiştirir:
 * cross-feature öncelik
 * contract kararları
 * global workflow sync
+* `Visual Scope`, `Design Foundation` ve `Visual Quality Gate` sınıflandırması/geçişi
+* `QA Modules`, `Regression Depth` ve `Evidence Reuse` planı
 
 ### Product authority
 
@@ -198,9 +203,10 @@ Aktif rol yalnız current feature'ın `orchestration.md` dosyasındaki execution
 * `Last Update`
 * `Change Log`
 * kendi scenario'larına ait `Pending Evidence` (kanıt/provenance ile)
+* kendi teslimine ait `Visual Evidence` referansları; bu referanslar gate değerini kendiliğinden ilerletmez
 * QA için `QA Result`; DevOps için `Release Result`
 
-`QA Stage`, `Release Scope`, `Delivery Review`, `Handoff Plan` ve `Open Decision Gates` kararları Tech Lead'e aittir. Delivery rolü değişen teslimde Delivery Review = Pending yapabilir; Accepted yapamaz. Başka role ait kanıtı veya kullanıcı kararını kapatamaz.
+`QA Stage`, `QA Scope`, `QA Modules`, `Regression Depth`, `Evidence Reuse`, `Release Scope`, `Delivery Review`, `Handoff Plan` ve `Open Decision Gates` kararları Tech Lead'e aittir. Delivery rolü değişen teslimde Delivery Review = Pending yapabilir; Accepted yapamaz. Başka role ait kanıtı veya kullanıcı kararını kapatamaz.
 
 Aktif rol şunları değiştiremez:
 
@@ -241,7 +247,8 @@ Tüm After Tasks current role'e ait ve Done olmalı; target task'ların role/dep
 
 * Technical Analyst ve QA teslimleri daima Tech Lead'e döner.
 * Project Setup doğrulaması ve DevOps release readiness sonrası Tech Lead'e dönülür.
-* QA'ya her girişten önce Tech Lead reconciliation yapar; Delivery Review = Accepted, QA Stage, scope ve QA task'larını yazar. Delivery rolü doğrudan QA aktive edemez.
+* QA'ya her girişten önce Tech Lead reconciliation yapar; Delivery Review = Accepted, QA Stage, scope, QA modules, regression depth, evidence reuse kararı ve QA task'larını yazar. Delivery rolü doğrudan QA aktive edemez.
+* Visual Scope `none` değilse UI Designer → implementation ve implementation → QA geçişleri Tech Lead checkpoint'i gerektirir; ilgili visual gate kanıtını Tech Lead doğrular.
 * Product revision, authority conflict, insan kararı, eksik required evidence ve plansız rework Tech Lead'e gider.
 * UI → client veya developer → content gibi açık planlı, prerequisite'i tamamlanmış doğrudan delivery geçişleri korunur.
 * Tech Lead kontrol çalışması için yapay delivery task gerekmez.
@@ -270,11 +277,17 @@ Run [updated canonical role]
 QA Stage: `functional / final / none`.
 QA Result: `None / Functional Approved / Approved / Approved with Notes / Rejected / Runtime Validation Pending / Decision Pending`.
 
+QA Modules: `core` + uygulanabilir koşullu modüller (`backend-security / client-ui / visual-quality / stateful-flow / unity-ios / content / release`).
+
+Regression Depth: `targeted / impacted / full`. Evidence Reuse: `allowed / invalidated / not-applicable`.
+
 * Release gate yoksa ilk QA final'dır.
 * Release gate varsa önce functional QA yapılır. Ürün/uygulama kriterleri değerlendirilir; authority'de açıkça sonraya planlanmış release kanıtı henüz yok diye başarısız sayılmaz. Eksik functional runtime kanıtı ise pending kalır.
 * Functional kapsam geçerse Functional Approved üretilir; feature Done değildir. Tech Lead release task'larını aktive eder.
-* DevOps Release Ready / Release Ready with Notes verirse Tech Lead QA'yı final stage'de aktive eder. QA geçerli functional kanıtı tekrar kullanır; release kanıtını ve değişen riskleri hedefli doğrular.
+* DevOps Release Ready / Release Ready with Notes verirse Tech Lead QA'yı final stage'de aktive eder. QA `/ai-system/prompt-qa-evidence-reuse-standard.md` fingerprint'i hâlâ geçerli functional kanıtı tekrar kullanır; release kanıtını ve değişen riskleri hedefli doğrular.
 * Release değişikliği functional kabulü etkilediyse önce o QA kapsamı yenilenir.
+* Final/release gate, shared core, startup/routing, persistence/migration, auth/security/payment/economy, dependency/lockfile/build config, cross-feature state veya geniş refactor `Regression Depth = full` gerektirir. Full coverage, geçerli fresh evidence'ı körlemesine yeniden çalıştırmak anlamına gelmez.
+* Her QA turunda riskle orantılı en az bir kritik scenario QA tarafından bağımsız çalıştırılır; yüksek riskli gate yalnız delivery sahibinin özetine dayanmaz.
 * Approved / Approved with Notes yalnız final stage'de, tüm required kanıt ve kararlar tamamlandığında verilir.
 * Bilinen blocking defect varsa Rejected; defect yok ama current stage'i engelleyen ürün/authority/onay kararı eksikse Decision Pending; karar net ama required runtime ortam/kanıtı eksikse Runtime Validation Pending.
 * Decision Pending developer bugfix talebi değildir; Tech Lead decision gate veya PO revision açar.
@@ -354,7 +367,8 @@ Authoritative:
 * `Next Role`
 * `Next Action`
 * `Handoff Plan`, `Pending Evidence`, `Open Decision Gates`
-* `QA Stage`, `QA Result`, `Release Scope`, `Release Result`, `Delivery Review`
+* `QA Scope`, `QA Modules`, `Regression Depth`, `Evidence Reuse`, `QA Stage`, `QA Result`, `Release Scope`, `Release Result`, `Delivery Review`
+* `Visual Scope`, `Design Foundation`, `Visual Quality Gate`, `Visual Evidence`
 
 Authoritative olmayan alanlar:
 
@@ -388,6 +402,27 @@ Normatif minimum:
 * Ortak runtime, veri, config veya araç akışına ait pending scenario, aynı yolu kullanan downstream feature'a taşınır.
 * Boş/no-op test gerekli davranışı kanıtlamaz. Kontrol başka araca devredildiyse rule → check → negatif örnek eşlemesi yapılır.
 * QA, Tech Lead'in delivery kabulünden bağımsız verdict üretir; eski approval yalnız kanıtın kapsamı hâlâ geçerliyse kullanılabilir.
+
+## 9.1 Visual Quality Evidence (CRITICAL)
+
+Yeni veya yeniden açılan kullanıcı-yüzü işlerinde `orchestration.md` şu alanları taşır:
+
+* `Visual Scope`
+* `Design Foundation`
+* `Visual Quality Gate`
+* `Visual Evidence`
+
+Kurallar:
+
+* Allowed değerler ve stage geçişleri `/ai-system/design/visual-quality-gate.md` içinde tanımlıdır.
+* `none` dışındaki scope için text-only direction visual evidence değildir.
+* `Ready for Implementation`, seçilmiş Design Foundation ve görüntülenebilir UI exploration/handoff kanıtı olmadan verilemez.
+* `Ready for QA`, canonical target runtime capture ve implementation parity kaydı olmadan verilemez.
+* `Passed`, bağımsız QA score 93+, her boyut en az 8 ve sıfır fail condition olmadan verilemez.
+* UI Designer/developer self-score'u provisional'dır; acceptance authority üretmez.
+* Static screenshot motion kanıtı değildir. Motion-critical scope video, recording, prototype veya zamanlanmış frame sequence ister.
+* Canonical simulator/device/browser/game runtime çalıştırılamadıysa ilgili visual claim `Pending Evidence` olur; feature görsel PASS veya terminal olamaz.
+* Legacy canlı orchestration bu alanlar yok diye otomatik reddedilmez; yeni/reopened visual işte Tech Lead şemayı normalize eder.
 
 ---
 

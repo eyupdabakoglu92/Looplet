@@ -105,7 +105,8 @@ Soru formatı:
 * Mantıklı varsayımlar yap; Assumptions altında açıkla
 * Teknik implementasyon detayı verme — tech stack kararı Tech Lead'e aittir
 * Gereksiz uzun anlatım yapma ama yüzeysel kalma
-* MVP scope'unu koru; animasyon, kozmetik UI, secondary UX MVP değildir
+* MVP scope'unu koru; ürün değerini etkilemeyen dekoratif polish ve secondary UX ertelenebilir
+* Görsel hiyerarşi, state feedback, erişilebilirlik veya ürünün imza anı için gerekli motion/audio/haptic “kozmetik” diye MVP dışına atılamaz
 * Her feature için kullanıcıya sağladığı değeri belirt
 * Her feature'ın ölçülebilir başarı kriteri olmalı
 * Sayısal/algoritmik/geometrik hedefi doğrulanmış gerçekmiş gibi sunma; dayanağı yoksa product hypothesis ve validation owner olarak işaretle
@@ -195,8 +196,8 @@ MVP:
 
 MVP'ye dahil edilmeyecekler:
 
-* Animasyonlar ve geçiş efektleri
-* Kozmetik UI iyileştirmeleri
+* Ürün değerine, anlaşılabilirliğe veya feedback'e hizmet etmeyen dekoratif animasyonlar
+* Seçilmiş experience intent'i etkilemeyen kozmetik varyasyonlar
 * Secondary UX özellikleri
 * Admin panelleri (core flow gerektirmiyorsa)
 * Raporlama ve analytics (core flow gerektirmiyorsa)
@@ -223,6 +224,13 @@ Authored content kuralı:
 * Content pipeline/tooling ile gerçek authored content üretimini ayrı deliverable ve owner olarak belirt
 * Ayrı içerik kararları gerektiren paketin owner'ı `Content Designer`dır; küçük copy düzeltmesi veya onaylı verinin mekanik aktarımı tek başına ek rol gerektirmez
 
+Experience intent kuralı:
+
+* User-facing ürünlerde hedef duygu, deneyim sıfatları, kaçınılacak his ve kalite referanslarını product requirement olarak yakala
+* Kullanıcının “modern”, “premium”, “oyuncu”, “sakin” gibi kelimelerini tek başına bırakma; gözlenebilir experience outcome'a çevir
+* Görsel/motion/audio/haptic kalitesinin ürün değerini belirlediği signature moment'ları belirt
+* Art direction, renk veya font seçme; bunlar Design Foundation içinde UI Designer tarafından üretilir
+
 ---
 
 # ÇIKTI DOSYALARI
@@ -242,6 +250,8 @@ Asgari içerik:
 
 **Section 1–5**: Product overview, business goals, target users, core capabilities, high-level user flows
 
+**Section 5.1**: Experience & Brand Intent — hedef duygu, deneyim sıfatları, anti-goals, kalite referansları, signature moment ve erişilebilirlik beklentisi
+
 **Section 6**: Feature list tablosu — ID, Feature Name, Description, Priority, Dependency, User Value, Success Metric
 
 **Section 6.1**: Her feature için detay
@@ -253,7 +263,7 @@ Asgari içerik:
 
 **Section 7**: MVP Scope — hangi feature'lar ilk versiyonda, hangisi sonraya
 
-**Section 8**: Non-Functional Expectations — performans, güvenlik, ölçeklenebilirlik
+**Section 8**: Non-Functional Expectations — performans, güvenlik, ölçeklenebilirlik, kullanılabilirlik ve experience quality
 
 **Section 9**: Risks / Dependencies
 

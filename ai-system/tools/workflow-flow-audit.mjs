@@ -1,13 +1,18 @@
 #!/usr/bin/env node
 // Read-only, product-independent workflow checks. No repository mutations.
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 export const roles = ['Product Owner', 'Tech Lead', 'Technical Analyst', 'Content Designer', 'UI Designer', 'Backend Developer', 'Frontend/Mobile Developer', 'Game Developer (Unity)', 'DevOps/Release Engineer', 'QA', 'Project Setup'];
 export const statuses = ['Not Started', 'In Progress', 'In QA', 'In Release', 'Rework', 'Done', 'Blocked', 'Closed'];
 export const taskStatuses = ['Queued', 'Open', 'In Progress', 'Blocked', 'Done', 'Cancelled'];
 export const qaResults = ['None', 'Functional Approved', 'Approved', 'Approved with Notes', 'Rejected', 'Runtime Validation Pending', 'Decision Pending'];
 export const releaseResults = ['None', 'Release Ready', 'Release Ready with Notes', 'Release Blocked', 'Release Validation Pending'];
+export const visualScopes = ['none', 'existing-parity', 'new-surface', 'motion-critical', 'design-system'];
+export const visualGates = ['Not Required', 'Pending', 'Ready for Implementation', 'Ready for QA', 'Passed'];
+export const qaModules = ['core', 'backend-security', 'client-ui', 'visual-quality', 'stateful-flow', 'unity-ios', 'content', 'release'];
+export const regressionDepths = ['not-set', 'targeted', 'impacted', 'full'];
+export const evidenceReuseValues = ['not-evaluated', 'allowed', 'invalidated', 'not-applicable'];
 const controls = new Set(['Tech Lead', 'Product Owner']);
 const terminal = value => ['Done', 'Closed'].includes(value);
 const executable = value => statuses.includes(value) && !['Done', 'Closed', 'Blocked'].includes(value);
@@ -126,6 +131,10 @@ export function table(body) {
 }
 export function parseFeature(source) {
   const doc = document(source), errors = doc.errors;
+  const visualHeadings = ['Visual Scope', 'Design Foundation', 'Visual Quality Gate', 'Visual Evidence'];
+  const visualDeclared = visualHeadings.some(heading => doc.sections.has(heading));
+  const qaPlanHeadings = ['QA Modules', 'Regression Depth', 'Evidence Reuse'];
+  const qaPlanDeclared = qaPlanHeadings.some(heading => doc.sections.has(heading));
   const evidence = records(doc.body('Pending Evidence'), 'Evidence ID', errors);
   const decisions = records(doc.body('Open Decision Gates'), 'Decision ID', errors);
   const planBody = doc.body('Handoff Plan'), rows = table(planBody);
@@ -142,7 +151,14 @@ export function parseFeature(source) {
     next: doc.scalar('Next Role'), action: doc.body('Next Action')?.trim() ?? '',
     tasks: parseTasks(doc.body('Active Task Ledger'), errors), review: doc.scalar('Delivery Review'),
     qaScope: doc.scalar('QA Scope'), qaStage: doc.scalar('QA Stage'), qaResult: doc.scalar('QA Result'),
+    qaPlanDeclared, qaModules: list(doc.scalar('QA Modules', qaPlanDeclared)),
+    regressionDepth: doc.scalar('Regression Depth', qaPlanDeclared),
+    evidenceReuse: doc.scalar('Evidence Reuse', qaPlanDeclared),
     releaseScope: doc.scalar('Release Scope'), releaseResult: doc.scalar('Release Result'),
+    visualDeclared, visualScope: doc.scalar('Visual Scope', visualDeclared),
+    designFoundation: doc.scalar('Design Foundation', visualDeclared),
+    visualGate: doc.scalar('Visual Quality Gate', visualDeclared),
+    visualEvidence: doc.body('Visual Evidence'),
     evidence, decisions, pendingEvidence: evidence.some(e => e.Result !== 'PASS'),
     openDecisions: decisions.some(d => d.Status === 'OPEN'), blockers: !none(blocks ?? ''), openInventory,
     plan: rows.map(row => ({ after: list(row['After Tasks'] ?? ''), role: row['Next Role'], activate: list(row['Activate Tasks'] ?? '') })), errors };
@@ -220,6 +236,29 @@ export function validateFeature(f) {
   check(releaseResults.includes(f.releaseResult), 'invalid Release Result');
   check(['none', 'ci-cd-only', 'container-build', 'deploy-development', 'deploy-test', 'deploy-preview', 'staging', 'production-readiness', 'rollback-readiness'].includes(f.releaseScope), 'invalid Release Scope');
   check(f.releaseScope !== 'none' || !f.decisions.some(d => d.Status === 'OPEN' && d['Blocking Scope'] === 'release'), 'release-only decision requires Release Scope');
+  if (f.visualDeclared) {
+    check(visualScopes.includes(f.visualScope), 'invalid Visual Scope');
+    check(visualGates.includes(f.visualGate), 'invalid Visual Quality Gate');
+    check(f.visualEvidence !== null, 'Visual Evidence section required');
+    if (f.visualScope === 'none') {
+      check(f.designFoundation === 'Not Required', 'non-visual scope requires Design Foundation = Not Required');
+      check(f.visualGate === 'Not Required', 'non-visual scope requires Visual Quality Gate = Not Required');
+      check(none(f.visualEvidence ?? ''), 'non-visual scope requires Visual Evidence = None');
+    } else if (visualScopes.includes(f.visualScope)) {
+      check(['Pending', 'ai-system/project-authority/design-foundation.md'].includes(f.designFoundation), 'visual scope requires pending or canonical Design Foundation');
+      check(f.visualGate !== 'Not Required', 'visual scope cannot use Not Required gate');
+      if (['Ready for Implementation', 'Ready for QA', 'Passed'].includes(f.visualGate)) {
+        check(f.designFoundation === 'ai-system/project-authority/design-foundation.md', 'ready visual gate requires selected Design Foundation reference');
+        check(!none(f.visualEvidence ?? ''), 'ready visual gate requires Visual Evidence references');
+      }
+    }
+  }
+  if (f.qaPlanDeclared) {
+    check(f.qaModules.every(module => qaModules.includes(module)), 'invalid QA Modules');
+    check(new Set(f.qaModules).size === f.qaModules.length, 'duplicate QA Module');
+    check(regressionDepths.includes(f.regressionDepth), 'invalid Regression Depth');
+    check(evidenceReuseValues.includes(f.evidenceReuse), 'invalid Evidence Reuse');
+  }
   const tasks = f.tasks ?? [], ids = new Set();
   for (const task of tasks) {
     check(Boolean(task.id) && !ids.has(task.id), 'duplicate/empty Task ID'); ids.add(task.id);
@@ -262,6 +301,19 @@ export function validateFeature(f) {
       check(['functional', 'final'].includes(f.qaStage) && !none(f.qaScope), 'QA stage/scope required');
       check(f.qaResult === 'None', 'active QA must reset its previous verdict');
       if (f.qaStage === 'final' && f.releaseScope !== 'none') check(ready(f.releaseResult), 'final QA requires release readiness');
+      if (f.visualDeclared && f.visualScope !== 'none') check(f.visualGate === 'Ready for QA', 'active visual QA requires Visual Quality Gate = Ready for QA');
+      if (f.qaPlanDeclared) {
+        const modules = new Set(f.qaModules), scope = f.qaScope.toLowerCase();
+        check(modules.has('core'), 'active QA Modules must include core');
+        check(f.regressionDepth !== 'not-set', 'active QA requires Regression Depth');
+        check(f.evidenceReuse !== 'not-evaluated', 'active QA requires Evidence Reuse decision');
+        if (scope.includes('backend') || scope.includes('end-to-end')) check(modules.has('backend-security'), 'backend QA scope requires backend-security module');
+        if (scope.includes('client') || scope.includes('end-to-end') || scope.includes('ui')) check(modules.has('client-ui'), 'client/UI QA scope requires client-ui module');
+        if (scope.includes('content')) check(modules.has('content'), 'content QA scope requires content module');
+        if (f.visualDeclared && f.visualScope !== 'none') check(modules.has('visual-quality'), 'visual QA scope requires visual-quality module');
+        if (f.qaStage === 'final') check(f.regressionDepth === 'full', 'final QA requires full regression coverage');
+        if (f.qaStage === 'final' && f.releaseScope !== 'none') check(modules.has('release'), 'final release QA requires release module');
+      }
     }
   }
   if (f.qaResult !== 'None' && qaResults.includes(f.qaResult)) {
@@ -281,6 +333,57 @@ export function validateFeature(f) {
     check(!f.openDecisions && !f.blockers, 'terminal feature contains open decision/blocker');
     check(f.review === 'Accepted' && f.qaStage === 'final' && ['Approved', 'Approved with Notes'].includes(f.qaResult), 'terminal feature requires reviewed final QA approval');
     check(f.releaseScope === 'none' || ready(f.releaseResult), 'terminal feature requires release readiness');
+    if (f.visualDeclared && f.visualScope !== 'none') check(f.visualGate === 'Passed', 'terminal visual feature requires Visual Quality Gate = Passed');
+  }
+  return errors;
+}
+
+function visualArtifactErrors(feature, root) {
+  if (!feature.visualDeclared || feature.visualScope === 'none') return [];
+  const errors = [], check = (condition, message) => { if (!condition) errors.push(message); };
+  const selected = ['Ready for Implementation', 'Ready for QA', 'Passed'].includes(feature.visualGate);
+  const featureDir = dirname(feature.path);
+  if (selected) {
+    const foundationPath = join(root, 'project-authority', 'design-foundation.md');
+    check(existsSync(foundationPath), 'selected Design Foundation file missing');
+    if (existsSync(foundationPath)) {
+      const foundation = readFileSync(foundationPath, 'utf8');
+      check(/^>\s*Status:\s*Selected\s*$/mi.test(foundation) || /^Status:\s*Selected\s*$/mi.test(foundation), 'Design Foundation must have Status: Selected');
+      check(!/^Selected By:\s*(Pending|None|-)\s*$/mi.test(foundation), 'Design Foundation selection authority missing');
+    }
+    const uiPath = join(featureDir, 'ui-design.md');
+    check(existsSync(uiPath), 'ready visual gate requires ui-design.md');
+    if (existsSync(uiPath)) {
+      const ui = readFileSync(uiPath, 'utf8');
+      check(/^##\s+(?:\d+[a-z]?\.\s+)?Visual Evidence Manifest\s*$/mi.test(ui), 'ui-design.md requires Visual Evidence Manifest');
+      const rendered = ui.match(/\|\s*[^|{}\n]+\s*\|\s*direction-render\s*\|/gi) ?? [];
+      if (['new-surface', 'motion-critical', 'design-system'].includes(feature.visualScope)) check(rendered.length >= 2, 'visual exploration requires two real direction-render records');
+      if (feature.visualScope === 'existing-parity') check(/\|\s*[^|{}\n]+\s*\|\s*(selected-source|canonical-reference)\s*\|/i.test(ui), 'existing-parity requires a real selected-source/canonical-reference record');
+      if (feature.visualScope === 'motion-critical') check(/\|\s*[^|{}\n]+\s*\|\s*motion-prototype\s*\|/i.test(ui), 'motion-critical handoff requires motion-prototype evidence');
+    }
+  }
+  if (['Ready for QA', 'Passed'].includes(feature.visualGate)) {
+    const deliveryPaths = [join(featureDir, 'frontend.md'), join(featureDir, 'game-dev.md')].filter(existsSync);
+    check(deliveryPaths.length > 0, 'Ready for QA requires frontend.md or game-dev.md');
+    const delivery = deliveryPaths.map(path => readFileSync(path, 'utf8')).join('\n');
+    check(/^##\s+(?:\d+[a-z]?\.\s+)?Visual Parity Evidence\s*$/mi.test(delivery), 'client delivery requires Visual Parity Evidence');
+    check(/\|\s*[^|{}\n]+\s*\|\s*runtime-screenshot\s*\|/i.test(delivery), 'visual parity requires a real runtime-screenshot record');
+    if (feature.visualScope === 'motion-critical') check(/\|\s*[^|{}\n]+\s*\|\s*runtime-video\s*\|/i.test(delivery), 'motion-critical parity requires runtime-video evidence');
+  }
+  if (feature.visualGate === 'Passed') {
+    const qaPath = join(featureDir, 'qa.md');
+    check(existsSync(qaPath), 'Passed visual gate requires qa.md');
+    if (existsSync(qaPath)) {
+      const qa = readFileSync(qaPath, 'utf8');
+      check(/^##\s+Visual Quality Verdict\s*$/mi.test(qa), 'qa.md requires Visual Quality Verdict');
+      const score = qa.match(/Final Score:\s*(\d+)\s*\/\s*100/i);
+      const lowest = qa.match(/Lowest Dimension:\s*[^\n]*?\b(\d+)\s*\/\s*10/i);
+      check(Boolean(score) && Number(score?.[1]) >= 93, 'visual PASS requires Final Score >= 93');
+      check(Boolean(lowest) && Number(lowest?.[1]) >= 8, 'visual PASS requires every rubric dimension >= 8');
+      check(/Fail Conditions:\s*None\b/i.test(qa), 'visual PASS requires no fail conditions');
+      check(/Runtime Evidence Complete:\s*Yes\b/i.test(qa), 'visual PASS requires complete runtime evidence');
+      check(/Result:\s*PASS\b/i.test(qa), 'visual PASS requires QA Result: PASS');
+    }
   }
   return errors;
 }
@@ -294,6 +397,7 @@ export function audit(root, { local = false } = {}) {
     if (!entry.isDirectory() || !existsSync(path)) continue;
     const feature = parseFeature(readFileSync(path, 'utf8')); feature.path = path; features.push(feature);
     errors.push(...validateFeature(feature).map(message => feature.id + ': ' + message));
+    errors.push(...visualArtifactErrors(feature, root).map(message => feature.id + ': ' + message));
   }
   const check = (condition, message) => { if (!condition) errors.push(message); };
   const ids = new Set(), decisionIds = new Set();

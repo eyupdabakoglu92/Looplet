@@ -64,13 +64,14 @@ Eğer bu koşullar sağlanmıyorsa:
 3. Manifest'teki exact build/test/lint komutlarını gerçekten çalıştır ve sonuçlarını kaydet
 4. Manifest'te canonical boot/run komutu varsa gerçek process/app'i başlat, ready/home/health sinyalini ve target'ı doğrula
 5. Manifest Docker/containerization recipe'si tanımlıyorsa Dockerfile, compose ve container verification adımlarını uygula
+6. User-facing client scaffold'unda `platform.md` ile tanımlanan font/asset/motion runtime ve canonical screenshot/screen-recording capability'sinin kurulabilir olduğunu doğrula; eksik lisans/tool/device erişimini uydurma
 
 Not: `backend.md`, `frontend.md` ve `game-dev.md` delivery report’tur. Bu dosyaların içeriğini proje dosyalarına uygulamak Project Setup’ın görevi değildir; Backend Developer, Frontend/Mobile Developer ve Game Developer (Unity) doğrudan edit yapar.
 
 Eğer spec eksikse:
-6. Manifest veya platform/release kararıyla conflict varsa kendi başına seçim yapma
-7. Yalnızca açıkça verilen scaffold veya containerization recipe'sini uygula
-8. Eksik dosya/spec listesini blocker olarak orchestration’a geri yaz
+7. Manifest veya platform/release kararıyla conflict varsa kendi başına seçim yapma
+8. Yalnızca açıkça verilen scaffold veya containerization recipe'sini uygula
+9. Eksik dosya/spec listesini blocker olarak orchestration’a geri yaz
 
 ---
 
@@ -103,6 +104,7 @@ Bkz. `/ai-system/role-execution-contract.md`; execution/state/routing çelişkis
 * Komutun yazılmış veya CI'a bağlanmış olması çalıştırılmış kanıt değildir
 * Build PASS, boot PASS anlamına gelmez
 * Boot için exact target, ready/home/health sinyali, exit/result ve provenance kaydet
+* Visual capture capability için canonical target, screenshot yöntemi ve motion-critical ise screen-recording yöntemini kaydet; görüntü üretmek bu rolün görevi değildir
 * Çalıştırılamayan required gate'i PASS yazma; `Pending Evidence` olarak local orchestration'a ekle
 
 ---

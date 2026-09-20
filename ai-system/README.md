@@ -14,12 +14,12 @@ Bu sistem, herhangi bir AI aracını **11 farklı yazılım rolünde** çalışt
 | Tech Lead | `Run Tech Lead` | platform.md, orchestration.md, architecture.md |
 | Technical Analyst | `Run Technical Analyst` | analysis.md |
 | Content Designer | `Run Content Designer` | content-design.md + gerçek authored content asset'leri |
-| UI Designer | `Run UI Designer` | ui-design.md |
+| UI Designer | `Run UI Designer` | ui-design.md + rendered visual evidence; ilk UI işinde gerekirse project Design Foundation |
 | Backend Developer | `Run Backend Developer` | backend.md + gerçek kod |
 | Frontend/Mobile Developer | `Run Frontend/Mobile Developer` | frontend.md + gerçek kod |
 | Game Developer (Unity) | `Run Game Developer (Unity)` | game-dev.md + gerçek Unity proje dosyaları (yalnız client stack Unity/mobil oyunsa) |
 | DevOps/Release Engineer | `Run DevOps/Release Engineer` | release.md + CI/CD/deployment config |
-| QA | `Run QA` | qa.md + test verdict |
+| QA | `Run QA` | modüler QA planına göre qa.md + bağımsız test verdict |
 | Project Setup | `Run Project Setup` | scaffold/bootstrap |
 
 ---
@@ -48,6 +48,7 @@ Her dosya için yapılacak tek bir aksiyon var:
 | `project-authority/platform.md` | Greenfield: Tech Lead üretir / Brownfield: **sen doldurursun** | Tech Lead veya sen |
 | `project-authority/setup-manifest.md` | Scaffold veya backend/build doğrulaması varsa **doldurulur** | sen veya Tech Lead |
 | `project-authority/release.md` | Release/deployment gate gerekiyorsa Greenfield: Tech Lead üretir / Brownfield: **sen doldurursun** | Tech Lead veya sen |
+| `project-authority/design-foundation.md` | İlk user-facing işte UI Designer draft/render üretir; kullanıcı/Product Owner/yetkili Tech Lead direction seçer | UI Designer + selection authority |
 | — | — | — |
 | `features/{feature}/` | **dokunma** — Tech Lead oluşturur | Tech Lead |
 | `bugs/`, `incidents/` | **dokunma** — delivery sırasında oluşur | AI rolleri |
@@ -118,6 +119,8 @@ Tech Lead şunları üretir:
 - `features/<ilk-feature>/architecture.md`
 - `features/<ilk-feature>/orchestration.md`
 - `feature-board.md` ve `system-state.md` güncellenir
+
+İlk user-facing feature ise Tech Lead ayrıca `Visual Scope` sınıflandırır. Seçilmiş Design Foundation yoksa UI Designer foundation + rendered direction task'ı implementation'dan önce planlanır.
 
 ### Adım 4 — Scaffold (Gerekiyorsa)
 
@@ -231,10 +234,10 @@ Run [atanmış delivery rolü]
   → açık planla delivery rollerine geçebilir; QA öncesi Tech Lead gerekir
 
 Run Tech Lead
-  → delivery reconciliation; QA scope/stage/task ataması
+  → delivery reconciliation; QA scope/stage/modules/depth/evidence-reuse/task ataması
 
 Run QA
-  → release yoksa final; release gerekiyorsa functional stage
+  → yalnız seçili QA modüllerini yükler; release yoksa final, release gerekiyorsa functional stage
 Run Tech Lead
   → defect / decision / missing evidence için ilgili recovery rotası
 
@@ -265,6 +268,7 @@ Unity mobil oyunlarda ek farklar:
 * Yeni HUD sistemi, FTUE/tutorial overlay, win/lose/reward reveal, premium polish veya reference-title hedefi varsa UI Designer `Game Visual/HUD Direction` üretir; Game Developer (Unity) bunu Unity içinde uygular.
 * QA `client-only` scope'u `frontend.md` veya `game-dev.md` üzerinden yorumlar; Unity scope'ta Game Client Quality, Game Visual & Feel Quality ve iOS Platform Compliance kontrolleri devreye girebilir.
 * Release gate varsa DevOps/Release Engineer Unity batchmode build, Xcode archive/signing, TestFlight, IAP catalog, ATT ve `PrivacyInfo.xcprivacy` readiness yüzeylerini değerlendirir.
+* Visual scope'ta text-only handoff yetmez: selected source render, gerçek game runtime capture ve motion-critical işte video evidence gerekir.
 
 Pratik kural: Unity oyun projesinde client work için komutu kendin seçme; `orchestration.md -> Next Role` ne diyorsa onu çalıştır. Belirsizse `Run Tech Lead` ile routing netleştirilir.
 
@@ -278,6 +282,9 @@ Bu sistemde token optimizasyonu prompt davranışını zayıflatmak için değil
 * `orchestration.md` içindeki opsiyonel `Consumed Signals` yalnız okuma optimizasyonudur; authority üretmez ve source artifact'i silmez.
 * `analysis.md` consumed edilmişse ve ilgili unresolved question yoksa downstream roller `architecture.md` authority'siyle devam eder.
 * Backend, Frontend, Game Developer ve DevOps delivery artifact'ları brief-first / scope-gated yazılır; boş `N/A`, `Yok` veya placeholder bölümleri üretilmez.
+* QA her turda küçük core prompt'u yükler; `backend-security`, `client-ui`, `visual-quality`, `stateful-flow`, `unity-ios`, `content` ve `release` modüllerinden yalnız Tech Lead'in scope/risk planında seçtiklerini okur.
+* Regression depth `targeted / impacted / full` olarak önceden kilitlenir. Full coverage geçerli fingerprint'li kanıtı körlemesine yeniden çalıştırmaz; değişen ve belirsiz yüzeyi yeniden doğrular.
+* Functional/final turlar arasında evidence ancak source/config/dependency/target fingerprint'i geçerliyse yeniden kullanılır. Her QA turunda en az bir kritik bağımsız probe korunur.
 * Blocker, unresolved conflict, missing evidence veya partial delivery hiçbir zaman scope-gating gerekçesiyle saklanmaz.
 * Testin yazılması/CI'a eklenmesi çalıştırılmış kanıt değildir; build, boot değildir; mock/override production-shaped runtime değildir.
 * Live snapshot'lar yalnız current state taşır; geçmiş `system-history.md` veya feature history artifact'ına gider.
@@ -296,6 +303,7 @@ sh ai-system/tools/token-cost-audit.sh ai-system --role qa
 sh ai-system/tools/token-cost-audit.sh ai-system --role unity
 sh ai-system/tools/token-cost-audit.sh ai-system --estimator auto
 sh ai-system/tools/token-cost-audit.sh ai-system --baseline <approved-baseline> --budget <project-budget>
+node ai-system/tools/qa-preflight.mjs ai-system
 ```
 
 Kurulum notu:
@@ -305,6 +313,7 @@ Kurulum notu:
 * Sonraki core güncellemelerinde `--baseline <approved-baseline> --budget <project-budget>` regression kontrolü olarak kullanılır.
 * `--estimator auto`, `python3+tiktoken` varsa tokenizer sayımı kullanır; yoksa mevcut `chars/4` tahminine güvenli şekilde düşer.
 * `--estimator tiktoken` explicit moddur ve paket yoksa kontrollü hata verir.
+* `qa-preflight.mjs` aktif QA feature'ının modül/depth/reuse planını ve required input'larını read-only doğrular; test veya verdict üretmez.
 
 ### Yeni Feature Ekle
 
@@ -379,6 +388,7 @@ Exact canonical label kullan. Alias ve kısaltma yasak.
 7. **Production deploy varsayılan değildir.** Release authority ve explicit approval olmadan DevOps/Release Engineer production deploy yapmaz.
 8. **Scope-gating bilgi saklama değildir.** Conflict, blocker veya eksik kanıt varsa ilgili rol bunu açıkça raporlar.
 9. **Handoff/Done öncesi state audit zorunludur.** Delivery local handoff için `--local`, Tech Lead global sync/kapanış için varsayılan full modu kullanır; görev, owner, QA/release ve kapanış gate'leri denetlenir.
+10. **Görsel kalite runtime'da kanıtlanır.** Visual scope'ta seçilmiş Design Foundation, rendered exploration, implementation parity ve bağımsız QA 93+ olmadan feature kapanmaz.
 
 State audit'in genel regresyon testleri (Node.js 18+):
 
@@ -397,7 +407,7 @@ Testler geçici, ürün bağımsız fixture'lar kullanır. Workflow audit Node.j
 
 Reusable prompt/standard/template/tools güncellenir; canlı PRD, authority, board, system-state ve feature artifact'ları starter dosyalarla ezilmez. Önce değişiklikleri incele, ardından `Run Tech Lead. Core güncellemesi sonrası state resync yap.`
 
-Tech Lead, canlı orchestration'ları yeni şemaya dönüştürür: gerçek Feature ID, explicit ledger/dependency/status, Handoff Plan, Delivery Review, QA Stage/Result, Release Result, Pending Evidence ve Open Decision Gates. Global board'a Pending Product Revision / Revision Affected Features eklenir. Eski Next Role'un anlamı tahmin edilmez; mevcut görevden current owner ve sonraki plan ayrı çözülür. Geçmiş kanıt incelenmeden Accepted, Approved veya PASS üretilmez. Eksik kanıt açık kalır; geçersiz Done durumları yeniden değerlendirilir. Yeni full audit eski eksik şemayı reddeder; bu otomatik migration veya veri kaybı değildir.
+Tech Lead, canlı orchestration'ları yeni şemaya dönüştürür: gerçek Feature ID, explicit ledger/dependency/status, Handoff Plan, Delivery Review, QA Stage/Result, QA Modules/Regression Depth/Evidence Reuse, Release Result, Pending Evidence ve Open Decision Gates. Yeni/reopened UI işlerinde ayrıca Visual Scope, Design Foundation, Visual Quality Gate ve Visual Evidence alanları eklenir. Global board'a Pending Product Revision / Revision Affected Features eklenir. Eski Next Role'un anlamı tahmin edilmez; mevcut görevden current owner ve sonraki plan ayrı çözülür. Geçmiş kanıt fingerprint doğrulanmadan Accepted, Approved veya PASS için yeniden kullanılmaz. Eksik kanıt açık kalır; geçersiz Done durumları yeniden değerlendirilir. Legacy visual veya QA-plan alanlarının yokluğu tek başına geçmiş feature'ı bozmaz; yeni teslim/QA checkpoint'inde normalize edilir.
 
 Bütçe ve scope sınırları: `role-execution-contract.md → Live Snapshot Hygiene`.
 

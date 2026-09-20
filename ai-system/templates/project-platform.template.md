@@ -43,6 +43,12 @@ Bu dokuman:
 * Framework: `{framework}`
 * State Management: `{state strategy}`
 * Navigation / Routing: `{routing strategy}`
+* Font loading / licensing: `{strategy}`
+* Image / icon / illustration pipeline: `{strategy}`
+* Animation / motion runtime: `{strategy}`
+* Audio / haptic capability: `{strategy or not applicable}`
+* Canonical visual capture target: `{browser / simulator / device / game runtime}`
+* Screenshot / screen-recording method: `{tooling}`
 
 Client Type `game (Unity)` ise:
 
@@ -138,6 +144,8 @@ Client Type `game (Unity)` ise:
 * client testing
 * integration / e2e expectations
 * QA runtime expectations
+* visual regression / screenshot expectations
+* simulator/device matrix and motion capture expectations
 
 ---
 

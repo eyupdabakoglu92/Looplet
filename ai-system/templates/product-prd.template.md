@@ -45,6 +45,17 @@ Beklenen çıktı:
 
 ---
 
+# 5.1 Experience & Brand Intent
+
+* Desired user feeling: {feeling}
+* Experience adjectives: {three adjectives}
+* The product must never feel: {anti-goals}
+* Category quality references named by the user: {references or "Not specified"}
+* Signature moments where visual/motion/audio/haptic quality affects product value: {moments or "None identified"}
+* Accessibility and reduced-motion expectations: {expectations}
+
+---
+
 # 6. Feature List
 
 | ID | Feature Name | Description | Priority | Dependency | User Value | Success Metric |
@@ -107,6 +118,7 @@ MVP dışında bırakılanlar:
 * Güvenlik: {beklenti}
 * Ölçeklenebilirlik: {beklenti}
 * Kullanılabilirlik: {beklenti}
+* Experience quality: {görsel, motion ve feedback kalite beklentisi}
 
 ---
 
