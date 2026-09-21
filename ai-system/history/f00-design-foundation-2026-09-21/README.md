@@ -1,0 +1,3 @@
+# F00 working record — 2026-09-21 (Frontend delivery checkpoint)
+
+`orchestration-at-frontend-delivery.md` is the byte-for-byte working orchestration of F00 as committed in `78b22e3` (F00-FE-DESIGN-SYSTEM delivered, Delivery Review Pending): the full Last Decision log of the design track (Direction A/B rejection incident, Direction C checkpoint, plain-language decision guide, `B: 2=2, 5=Looplet` selection, UI-Designer finalize and visual-gate checkpoint), the earlier briefs' evidence provenance and the change log. The live `features/f00-design-foundation/orchestration.md` keeps a short summary of those entries plus the current state so it stays within the snapshot byte budget.
