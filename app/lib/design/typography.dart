@@ -1,0 +1,126 @@
+import 'package:flutter/painting.dart';
+
+import 'tokens.dart';
+
+/// Type roles of the selected Design Foundation (ui-design §10): **Space
+/// Grotesk** for display, headings, tile glyphs and numerals; **Manrope** for
+/// body, labels and CTAs. Both are variable fonts, so every style selects the
+/// weight axis explicitly with a [FontVariation] (the file default is the
+/// lightest instance). Numerals use tabular figures.
+///
+/// Sizes are the 358-pt reference values; pass the scale from [LoopScale.of].
+abstract final class LoopText {
+  static const String heading = 'SpaceGrotesk';
+  static const String body = 'Manrope';
+
+  static const List<FontFeature> _tnum = <FontFeature>[
+    FontFeature.tabularFigures(),
+  ];
+
+  static TextStyle _sg(
+    double size,
+    double weight, {
+    double? height,
+    double letterSpacing = 0,
+    Color color = LoopColors.text,
+    List<FontFeature>? features,
+  }) => TextStyle(
+    fontFamily: heading,
+    fontSize: size,
+    fontWeight: _bucket(weight),
+    fontVariations: <FontVariation>[FontVariation('wght', weight)],
+    height: height,
+    letterSpacing: letterSpacing,
+    color: color,
+    fontFeatures: features,
+  );
+
+  static TextStyle _mr(
+    double size,
+    double weight, {
+    double? height,
+    double letterSpacing = 0,
+    Color color = LoopColors.text,
+    List<FontFeature>? features,
+  }) => TextStyle(
+    fontFamily: body,
+    fontSize: size,
+    fontWeight: _bucket(weight),
+    fontVariations: <FontVariation>[FontVariation('wght', weight)],
+    height: height,
+    letterSpacing: letterSpacing,
+    color: color,
+    fontFeatures: features,
+  );
+
+  /// Nearest `FontWeight` for semantics/fallback (the variation carries the real weight).
+  static FontWeight _bucket(double w) {
+    if (w < 350) return FontWeight.w300;
+    if (w < 450) return FontWeight.w400;
+    if (w < 550) return FontWeight.w500;
+    if (w < 650) return FontWeight.w600;
+    return FontWeight.w700;
+  }
+
+  /// "Döngü tamamlandı." — 33 / 1.13, 500.
+  static TextStyle display(double s) =>
+      _sg(33 * s, 500, height: 1.13, letterSpacing: -0.005 * 33 * s);
+
+  /// "Sıradaki döngüyü çöz." — 28 / 1.16, 500.
+  static TextStyle headline(double s) =>
+      _sg(28 * s, 500, height: 1.16, letterSpacing: -0.005 * 28 * s);
+
+  /// Stat numeral — 24, 500, tabular.
+  static TextStyle stat(double s) => _sg(24 * s, 500, features: _tnum);
+
+  /// Moves counter — 22, 500, tabular.
+  static TextStyle counter(double s) => _sg(22 * s, 500, features: _tnum);
+
+  /// Tile glyph — 38 % of the tile edge, 500, tabular.
+  static TextStyle tileGlyph(double tile, {Color color = LoopColors.tileInk}) =>
+      _sg(tile * 0.38, 500, color: color, height: 1, features: _tnum);
+
+  /// Node numeral (loop track).
+  static TextStyle node(double size, {Color color = LoopColors.limeInk}) =>
+      _sg(size, 500, color: color, height: 1, features: _tnum);
+
+  /// Wordmark "Looplet" — 25, 500, −0.01 em.
+  static TextStyle wordmark(double size, {Color color = LoopColors.text}) =>
+      _sg(size, 500, color: color, height: 1, letterSpacing: -0.01 * size);
+
+  /// CTA label — 16, 500.
+  static TextStyle cta(double s, {Color color = LoopColors.limeInk}) =>
+      _mr(16 * s, 500, height: 1, color: color);
+
+  /// Body — 14.5, 500, muted by default.
+  static TextStyle bodyText(double s, {Color color = LoopColors.muted}) =>
+      _mr(14.5 * s, 500, height: 1.25, color: color);
+
+  /// Link / secondary label — 15.5, 500.
+  static TextStyle link(double s, {Color color = LoopColors.muted}) =>
+      _mr(15.5 * s, 500, height: 1, color: color);
+
+  /// Small caps label — 11.5, 600, +0.2 em. Author the string in uppercase
+  /// (or use `turkishUpper`); never rely on locale-blind uppercasing.
+  static TextStyle caption(double s, {Color color = LoopColors.muted}) => _mr(
+    11.5 * s,
+    600,
+    height: 1,
+    letterSpacing: 0.2 * 11.5 * s,
+    color: color,
+  );
+
+  /// Stat/HAMLE small label — 11 (raised from the render's 10.4–10.5, ui-design
+  /// §17.3), 600, +0.14 em.
+  static TextStyle label(double s, {Color color = LoopColors.muted}) =>
+      _mr(11 * s, 600, height: 1, letterSpacing: 0.14 * 11 * s, color: color);
+
+  /// Badge label — 11, 600, +0.14 em, lime.
+  static TextStyle badge(double s) => _mr(
+    11 * s,
+    600,
+    height: 1,
+    letterSpacing: 0.14 * 11 * s,
+    color: LoopColors.limeMid,
+  );
+}

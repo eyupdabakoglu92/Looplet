@@ -62,3 +62,16 @@ flutter:
   # truth `content/journey/<lang>/`, mirrored here by `melos run content:sync`).
   assets:
     - assets/journey/tr/
+
+  # F00 design system (Design Foundation Selected 2026-09-21): Space Grotesk
+  # (headings, tile glyphs, numerals) and Manrope (body, labels, CTAs), both
+  # variable fonts under the SIL Open Font License 1.1 — licence texts sit
+  # beside the files. The weight axis is selected with FontVariation('wght'),
+  # see lib/design/typography.dart.
+  fonts:
+    - family: SpaceGrotesk
+      fonts:
+        - asset: assets/fonts/SpaceGrotesk.ttf
+    - family: Manrope
+      fonts:
+        - asset: assets/fonts/Manrope.ttf
