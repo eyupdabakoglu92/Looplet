@@ -1,9 +1,9 @@
 # Feature Board — LOOPLET
 
 Last Updated: 2026-09-21
-Active Phase: F03 final QA re-verify 2 (F03-QA-03 / F03-QA-04 fixes)
-Active Owner: QA
-Active Feature: F03
+Active Phase: F00 Design Foundation (Phase B)
+Active Owner: UI Designer
+Active Feature: F00
 Pending Product Revision: None
 Revision Affected Features: None
 
@@ -11,14 +11,15 @@ Revision Affected Features: None
 
 | ID | Feature | Status | Owner | QA | Priority | Notes |
 | --- | --- | --- | --- | --- | --- | --- |
+| F00 | design-foundation | In Progress | UI Designer | - | P1 | Cross-cutting project track (not a PRD feature): Design Adoption Route Phase B. F00-UI-FOUNDATION: Draft Design Foundation with >= 2 rendered directions; selection by user / Product Owner only. Visual Scope design-system. |
 | F01 | dictionary-service | Done | - | Approved with Notes (historical scope) | P0 | Dictionary implementation accepted historically; production corpus review and Android confirmation remain follow-ups. |
 | F02 | grid-engine | Done | - | Approved with Notes (historical scope) | P0 | Engine accepted historically; future scope/CI notes retained in workflow-follow-ups.md. |
 | F06 | puzzle-content-and-solver-tooling | Done | - | Approved with Notes (historical scope) | P0 | Done covers toolchain + smoke set only. Journey acceptance now F05; OPEN Daily content follow-on belongs to F07 (workflow-follow-ups.md). |
-| F03 | puzzle-play-session | In QA | QA | Final QA re-verify 2 active (F03-QA-REVERIFY2) | P0 | F03-QA-03 (real OS interruption commits a held drag) and F03-QA-04 (iOS Reduce Motion) fixed and accepted at HEAD cf747f8 (Tech Lead reproduced the gates; device suite 13/13). QA re-verifies both on the real simulator plus the touched gesture / reduce-motion paths, reusing unchanged evidence by fingerprint. Visual Scope none for this reopen; whole-surface visual conformance stays in the Design Adoption Route. |
-| F04 | star-rating-and-personal-best | Done | - | Approved with Notes (historical scope) | P1 | Historical scoped automated acceptance retained; later device-feel and shared persistence notes remain explicit. F04's panel reduce-motion reads (completion_panel.dart) were changed by F03-QA-04 (accessibility only, ACs unchanged, tests green); F03 rework changed panel timing/geometry and code (F03 architecture §18, 2026-09-20: deferred reveal, density, spine glow, Close tap target 44 pt); F04 ACs unchanged, F04 tests green, stays Done. |
-| F05 | journey-progression | In Progress | Tech Lead | Pending current acceptance | P0 | Strict 30-level content delivered; F05-QA-STRICT queued behind F03 rework + re-QA (its shared win/exit path is changing). F05's home ring / column tutorial reduce-motion reads were changed by F03-QA-04 (accessibility only). Not activated for QA. |
+| F03 | puzzle-play-session | Done | - | Approved with Notes (final, 2026-09-21) | P0 | Closed 2026-09-21: win-sequence rework, F03-QA-01..04 and the final QA (real OS interruption x3, device lock, real iOS Reduce Motion ON/OFF) done. Visual Scope none covered behaviour/accessibility only; the F03 visual surface is not accepted under the new rubric and is re-evaluated in the Design Adoption Route (may reopen as visual rework). Notes: workflow-follow-ups.md. |
+| F04 | star-rating-and-personal-best | Done | - | Approved with Notes (historical scope) | P1 | Historical scoped automated acceptance retained; later device-feel and shared persistence notes remain explicit. F04's panel reduce-motion reads (completion_panel.dart) were changed by F03-QA-04 (accessibility only, ACs unchanged, tests green; verified at runtime by the F03 final QA); F03 rework changed panel timing/geometry and code (F03 architecture §18, 2026-09-20: deferred reveal, density, spine glow, Close tap target 44 pt); F04 ACs unchanged, F04 tests green, stays Done. |
+| F05 | journey-progression | In Progress | Tech Lead | Pending current acceptance | P0 | Strict 30-level content delivered; F05-QA-STRICT queued: the F03 lock is released; needs Tech Lead delivery reconciliation first, then QA (one QA feature at a time). F05's home ring / column tutorial reduce-motion reads were changed by F03-QA-04 (accessibility only). Not activated for QA. |
 | F07 | daily-challenge | Not Started | - | - | P1 | Not activated. Depends on F03/F04/F06/F08. OPEN F06-CONTENT Daily pool (~60), real producer/offline proof and manifest require F07 planning; see workflow-follow-ups.md. |
-| F08 | offline-persistence-and-sync | In Progress | Tech Lead | Runtime Validation Pending | P0 | Local/emulator validation pending, queued behind F03 QA (one QA feature at a time); not dependent on paid deploy. Release task Blocked on explicit billing/deploy authorization; final QA still required. |
+| F08 | offline-persistence-and-sync | In Progress | Tech Lead | Runtime Validation Pending | P0 | Local/emulator validation pending, queued (one QA feature at a time; F03 QA is complete); not dependent on paid deploy. Release task Blocked on explicit billing/deploy authorization; final QA still required. |
 | F09 | onboarding-tutorial | Not Started | - | - | P1 | Interactive 3-step tutorial (row / column / form target), action-gated, < 60s, flows into Level 1, shown once. Depends on F03. KPI gate: > 85% completion. |
 | F10 | main-menu-and-settings | Not Started | - | - | P1 | LOOPLET logo, CONTINUE (primary), DAILY (secondary), Journey Progress, Daily Streak, Settings (Sound / Haptics toggles). No Shop/Battle Pass/Clan/Events. Accessibility baseline. Depends on F05, F07. |
 | F11 | audio-and-haptics | Not Started | - | - | P2 | Fixed SFX set + light/medium/success haptics, independent on/off toggles, no BGM, game completable with both off. Depends on F03, F10. |
@@ -27,11 +28,10 @@ Revision Affected Features: None
 
 ## Current Routing
 
-* Next command: Run QA (task F03-QA-REVERIFY2 in F03 orchestration; QA Stage = final; run `node ai-system/tools/qa-preflight.mjs ai-system` first).
-* F03 fix delivery is reconciled (Delivery Review = Accepted at HEAD cf747f8). QA re-verifies the real OS interruption during a held drag, the real iOS Reduce Motion toggle on F03 win / F04 reveal / F05 ring, genuine-release regression and gates; unchanged evidence is reused by fingerprint. Every QA outcome returns to Tech Lead.
-* Rework-control rule still applies: no QA, DevOps or client-developer owner is assigned to F05/F08 until F03's re-QA verdict is reconciled. F05-QA-STRICT and F08 local evidence stay queued with Owner Tech Lead.
-* Design adoption (ai-system upgrade cfd6b59): Design Adoption Route in [workflow-follow-ups.md](workflow-follow-ups.md). Phase B (Design Foundation, UI Designer, user selection decision) activates after F03's re-QA verdict is reconciled; no feature with Visual Scope other than none is activated before a Selected Foundation.
-* F08 release authorization gates the release stage only; no paid service, deployment, production action or store distribution is authorized. F09–F13 remain Not Started.
+* Next command: Run UI Designer (task F00-UI-FOUNDATION in F00 orchestration; Design Adoption Route Phase B). The delivery returns to Tech Lead, who opens the Foundation selection decision for the user / Product Owner.
+* F03 is Done (final QA Approved with Notes, 2026-09-21). The rework-control lock is released. Queue while the Foundation is being drafted and decided: (1) F05-QA-STRICT — needs Tech Lead delivery reconciliation of F05 (strict pack + code), then QA; F05.SHARED-RUNTIME can reuse F03's fresh runtime evidence for unchanged paths; (2) F08 local evidence (F08-LOCAL-EVIDENCE, then F08-QA-FUNCTIONAL). One QA feature at a time.
+* Design adoption: [Design Adoption Route](workflow-follow-ups.md) — Phase A done; Phase B active as F00; no feature with Visual Scope other than none activates before a Selected Foundation; Phase C/D (conformance, incl. F03/F04/F05 surfaces) follow the selection.
+* F08 release authorization gates the release stage only; no paid service, deployment, production action or store distribution is authorized. F07, F09–F13 remain Not Started.
 
 ## Open Portfolio Follow-ups
 

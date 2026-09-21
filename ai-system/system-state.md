@@ -32,38 +32,39 @@ feature-board.md for portfolio; features/*/orchestration.md for execution; role-
 
 ## Active Feature
 
-F03
+F00
 
 ## Active Orchestration Path
 
-features/f03-puzzle-play-session/orchestration.md
+features/f00-design-foundation/orchestration.md
 
 ## Current Phase
 
-F03 final QA re-verify 2 (F03-QA-03 / F03-QA-04 fixes)
+F00 Design Foundation (Design Adoption Route, Phase B)
 
 ## Current Role
 
-QA
+UI Designer
 
 ## Current Reason
 
-F03 re-verify QA (2026-09-20, rev c0cba44) closed F03-QA-01/02 and rejected on F03-QA-03 (an OS interruption during a held drag committed the move) and F03-QA-04 (iOS Reduce Motion ignored). The Frontend/Mobile Developer fixed both (a render pointer-cancel listener + `cancelDrag`; one shared `reduceMotionRequested()` at six sites incl. F04/F05 surfaces); the Tech Lead reproduced the gates at clean HEAD cf747f8 and accepted the delivery. QA re-verifies on the real simulator (real app switch, real Reduce Motion toggle) plus the touched paths, reusing unchanged evidence by fingerprint. Visual Scope none for this reopen.
+F03 is Done: the final QA (2026-09-21, HEAD 5be4dc6) returned Approved with Notes after real OS interruption (x3) and device-lock checks and the real iOS Reduce Motion toggle on F03 / F04 / F05 surfaces. The Tech Lead closed F03, released the rework-control lock and opened F00 — the carrier for the Design Adoption Route: the project has no Selected Design Foundation and shipped visuals have not passed the independent Visual Quality Gate. The UI Designer drafts a Foundation with at least two rendered directions; the selection belongs to the user / Product Owner.
 
 ## Last Completed Action
 
-Tech Lead delivery reconciliation 2026-09-21: melos analyze 0, format:check 0, 197 package + 243 app tests, device suite 13/13 (iPhone 16) reproduced at cf747f8; Delivery Review Accepted; F03-QA-REVERIFY2 activated; affected QA evidence reset to PENDING. No app, package, product or release file changed by the Tech Lead.
+Tech Lead closure review 2026-09-21: F03 Done (terminal orchestration; full working record archived in history/f03-closure-2026-09-21); F00 created with architecture.md scope contract and the Phase B brief; board, follow-ups and F05/F08 routing synced. No app code, package, product or release file changed by the Tech Lead.
 
 ## Next Expected Action
 
-Run QA on F03-QA-REVERIFY2 (final stage; qa-preflight first). The verdict returns to Tech Lead, who then activates F05-QA-STRICT, rework, or the Design Foundation phase.
+Run UI Designer on F00-UI-FOUNDATION. Then Tech Lead checkpoint: open the Foundation selection decision for the user. In parallel queue positions: F05 delivery reconciliation + F05-QA-STRICT; F08 local evidence.
 
 ## Portfolio Summary
 
 * F01, F02, F04, F06: historical scoped Done retained.
-* F03: In QA (final re-verify 2); F03-QA-01/02 closed, F03-QA-03/04 fixed and accepted, awaiting the independent real-target verdict; Visual Scope none for this reopen; whole-surface visual conformance pending the Design Adoption Route.
-* F05: In Progress; real strict content delivered (bundle mirrors content/journey), QA queued behind F03 rework + re-QA, final verdict None.
-* F08: In Progress, queued behind F03 rework; independent local/emulator validation pending, release task Blocked, release/final acceptance pending.
+* F03: Done — final QA Approved with Notes (2026-09-21); Visual Scope none covered behaviour/accessibility only; visual surface pending the Design Adoption Route.
+* F00: In Progress (UI Designer) — cross-cutting Design Foundation track, Visual Scope design-system, Foundation Pending.
+* F05: In Progress; real strict content delivered (bundle mirrors content/journey); F03 lock released; Tech Lead delivery reconciliation then QA-STRICT queued; final verdict None.
+* F08: In Progress, queued; independent local/emulator validation pending, release task Blocked, release/final acceptance pending.
 * F07, F09–F13: Not Started. Pending follow-ons are in workflow-follow-ups.md.
 
 ## Release Decision
@@ -72,7 +73,7 @@ F08.DEPLOY-AUTHORIZATION is OPEN with Blocking Scope = release. The old deferral
 
 ## Global Risks
 
-* F03-QA-03 / F03-QA-04 are fixed in code and covered by widget, integration and negative-control tests, but not yet proven on a real OS interruption or the real iOS Reduce Motion toggle (QA).
+* F03-QA-03 / F03-QA-04 are fixed and verified on the real target (F03 final QA); not verified: physical finger, Android, terminal 30/30 bloom under Reduce Motion at runtime.
 * No Design Foundation exists; shipped visuals (default font, Material icons, text-only legacy ui-designs, self-scores only) have not passed the independent Visual Quality Gate. Any surface reopened as visual work will be gated (>= 93 total, every dimension >= 8). See Design Adoption Route.
 * Rotation, AC9 highlight, back/exit and won-moment regular motion passed runtime QA (rev c0cba44); live lifecycle and reduced-motion runtime remain FAIL/pending until the fixes land. Info.plist still allows landscape; the portrait lock rests on runtime behaviour (rotation PASS).
 * Required device/manual evidence is not established by a widget test, build or a planned CI job.

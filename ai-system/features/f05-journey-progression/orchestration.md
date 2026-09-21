@@ -84,7 +84,7 @@ None
 
 ## Next Action
 
-Wait for the F03 rework (win sequence/panel geometry) and F03's re-QA; F03's first final QA returned Rejected on 2026-09-20 and the shared win/exit path is changing. Tech Lead then activates F05-QA-STRICT, reusing F03 provenance for F05.SHARED-RUNTIME only for unchanged paths. Keep F05-QA-STRICT queued; do not activate F09 while F05 acceptance is unfinished. Use the QA brief below instead of stale command/verdict suggestions in the archived snapshot.
+F03 is Done (2026-09-21): the rework-control lock is released. Tech Lead: reconcile F05's current delivery (strict 30-level pack, code incl. the F03-QA-04 reduce-motion reads; verify bundle == content/journey, reproduce gates) and set Delivery Review = Accepted, then activate F05-QA-STRICT (one QA feature at a time; the board's single active owner is the F00 Phase B UI Designer turn until it returns, so this is the next queue position). F05.SHARED-RUNTIME may reuse the F03 final QA evidence (qa.md E4-E15, R1-R7) for unchanged paths; F08 local items stay F08's. Do not activate F09.
 
 ## Last Decision
 
@@ -112,6 +112,7 @@ F05 code and the promoted strict pack are unchanged. Previous qa.md approved the
 * 2026-09-18 — migrated state; see the immutable pre-migration snapshot for all earlier tasks, decisions and evidence.
 * 2026-09-20 — Tech Lead: QA sequencing set to F03 first; F05 routing note only.
 * 2026-09-20 — Tech Lead: F03 QA Rejected; F05 stays queued behind F03 rework + re-QA (rework-control rule).
+* 2026-09-21 — Tech Lead: F03 Done; lock released; F05 Next Action re-pointed (delivery reconciliation, then QA-STRICT).
 
 ## Consumed Signals
 

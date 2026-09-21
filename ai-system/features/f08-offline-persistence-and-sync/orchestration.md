@@ -143,7 +143,7 @@ None
 
 ## Next Action
 
-Queued behind the F03 rework (F03 final QA returned Rejected 2026-09-20; rework-control rule blocks other-feature client/QA activation); F08-LOCAL-EVIDENCE and F08-QA-FUNCTIONAL stay Queued and none waits for paid deployment. Tech Lead reviews F03's runtime provenance (resume/kill PASS on rev 7a907dd) before deciding whether F08.LOCAL-RESUME can reuse any of it for the identical scope after F03 re-QA. The release task remains Blocked and no deployment/billing action is authorized by this migration. After functional QA, resolve the release decision explicitly, run the scoped DevOps task, then Tech Lead review and final QA; DevOps Ready alone never closes F08.
+F03 is Done (2026-09-21): the rework-control lock is released. Queued behind the current single-owner turn (F00 Phase B, then F05 delivery reconciliation + F05-QA-STRICT); F08-LOCAL-EVIDENCE and F08-QA-FUNCTIONAL stay Queued and none waits for paid deployment. Tech Lead reviews the F03 final QA provenance (qa.md E4-E15, R1-R7: real kill/relaunch resume, resume after interruption, idle/paused lifecycle on the real store) before deciding what F08.LOCAL-RESUME / F08.LIFECYCLE can reuse for the identical scope; F08's own scenarios (storage-full, offline Journey, emulator) remain open. The release task remains Blocked and no deployment/billing action is authorized.
 
 ## Last Decision
 
