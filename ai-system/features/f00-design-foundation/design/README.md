@@ -9,3 +9,10 @@ Generated design evidence for `project-authority/design-foundation.md` (Status: 
 
 Regenerate: `cd src && node gen.mjs . && sh render.sh && python3 sheets.py`.
 Names: `A-…` / `B-…` = Direction A (Backlit Stage) / B (Gazette); `01–07` states, `08–10` won-moment stills (not motion evidence), `v-` device variants, `90-specimen` type/icon/contrast sheet, `compare-*` / `sheet-*` composites.
+
+## Round 2 (Direction C — Loop Glass)
+
+* `src/gen-c.mjs` — Direction C generator (job list `src/jobs-c.txt`); `src/sheets-c.py` — parity comparisons (`parity-*.png`), `sheet-C.png`, `compare-C-*.png`, `compare-ABC.png`.
+* `reference/` — the user's three reference screens (canonical-reference; supplied 2026-09-21).
+* Regenerate: `cd src && node gen-c.mjs . && sh render.sh "" jobs-c.txt && python3 sheets-c.py`. `render.sh` retries a headless-Chrome flake up to 3 times.
+* Fonts added: Space Grotesk and Manrope (SIL OFL 1.1) with licence texts in `src/fonts/`.

@@ -1,0 +1,22 @@
+C-01-play-idle 393 852
+C-02-play-lifted-row 393 852
+C-02b-play-lifted-row-reference-literal 393 852
+C-03-play-locked-frozen 393 852
+C-04-won-perfect 393 852
+C-05-won-two-star 393 852
+C-04b-won-full-screen-reference-composition 393 852
+C-04c-won-reference-semantics 393 852
+C-06-home-in-progress 393 852
+C-06b-home-shipped-scope 393 852
+C-07-tutorial-column 393 852
+C-08-motion-t0-hold 393 852
+C-09-motion-t600-glide 393 852
+C-10-motion-t760-panel 393 852
+C-v-16e-play-idle 390 844
+C-v-16e-won-perfect 390 844
+C-v-promax-play-idle 440 956
+C-v-promax-won-perfect 440 956
+C-P1-home-ref-frame 358 717
+C-P2-play-ref-frame 358 717
+C-P3-completion-ref-frame 358 717
+C-90-specimen 786 1180 1

@@ -11,7 +11,7 @@ Selected At: Pending
 Selected By: Pending
 Decision Reference: Pending
 
-> **This file is a Draft. Nothing here is selected. Directions A and B were rejected by the user on 2026-09-21 (see §6); Direction C is being rendered from the user's reference screens.** Two rendered directions (A, B) are compared on identical content; the UI Designer's recommendation (§6) is not a selection. Visual artefacts live in `features/f00-design-foundation/design/` (sources in `design/src/`, regenerate with `node gen.mjs . && sh render.sh && python3 sheets.py`).
+> **This file is a Draft. Nothing here is selected. Directions A and B were rejected by the user on 2026-09-21 (see §6); Direction C ("Loop Glass", §17) is rendered from the user's reference screens and awaits the user's confirmation.** Two rendered directions (A, B) are compared on identical content; the UI Designer's recommendation (§6) is not a selection. Visual artefacts live in `features/f00-design-foundation/design/` (sources in `design/src/`, regenerate with `node gen.mjs . && sh render.sh && python3 sheets.py`).
 
 ---
 
@@ -82,14 +82,16 @@ Reviewed 2026-09-21 in the built-in browser (product web pages / marketing sites
 
 ## 6. Selection Record
 
-* **Rejected by the selection authority (user), 2026-09-21: Direction A and Direction B** — "neither is modern; not the style I expect". The user supplied three reference screens (`features/f00-design-foundation/design/reference/`) as the expected style; **Direction C** is being rendered from them (task F00-UI-DIRECTION-C). Recorded by the Tech Lead; the sections below describe A/B as explored alternatives.
-* Selected direction: **Pending Selection** (Direction C, once rendered and confirmed by the user)
+* **Rejected by the selection authority (user), 2026-09-21: Direction A and Direction B** — "neither is modern; not the style I expect". The user supplied three reference screens (`features/f00-design-foundation/design/reference/`) as the expected style; **Direction C — Loop Glass (§17)** was rendered from them (task F00-UI-DIRECTION-C). Recorded by the Tech Lead; §4–§5 describe A/B as explored alternatives.
+* Selected direction: **Pending Selection** — Direction C is rendered (§17); it becomes Selected only when the user confirms it (the confirmations needed are listed in §17.9).
 * Decision maker / delegated authority: **Pending** (user / Product Owner, or an explicit delegation to the Tech Lead)
 * Decision reference: **Pending**
 * Why this direction fits the product: —
 * Rejected direction and reason: —
 
-**UI Designer recommendation (not a selection):** **Direction B — Gazette**, *if* the selection authority accepts a full restyle of the shipped surfaces. Reasons: it is the only direction whose identity comes from this product's audience (the Turkish newspaper bulmaca habit) rather than from the game-UI category default; its non-colour cues are structural, matching the PRD's "playable without colour" need; and it removes the glow-on-dark recipe that Direction A shares with most puzzle games. **Choose Direction A instead if** protecting shipped work and time-to-launch matters more than distinctiveness: it is a refinement of what players have already seen, with a much smaller migration than B (see the size estimate in §15, which is a rough judgement, not a measurement). A hybrid is not recommended (the two materially differ in ground, type, edge language and motion; mixing them reproduces the "isolated visual language" fail condition).
+**Round-1 recommendation (superseded — the user rejected A and B):** Direction B — Gazette, *if* the selection authority accepts a full restyle of the shipped surfaces. Reasons: it is the only direction whose identity comes from this product's audience (the Turkish newspaper bulmaca habit) rather than from the game-UI category default; its non-colour cues are structural, matching the PRD's "playable without colour" need; and it removes the glow-on-dark recipe that Direction A shares with most puzzle games. **Choose Direction A instead if** protecting shipped work and time-to-launch matters more than distinctiveness: it is a refinement of what players have already seen, with a much smaller migration than B (see the size estimate in §15, which is a rough judgement, not a measurement). A hybrid is not recommended (the two materially differ in ground, type, edge language and motion; mixing them reproduces the "isolated visual language" fail condition).
+
+**Round-2 recommendation (not a selection): Direction C — Loop Glass (§17).** It is the direction the selection authority asked for; it is rendered on the same states as A/B plus reference-frame parity renders. Judged on its merits it is polished and modern; its weakest dimension is Originality (§17.7): the navy-glass-plus-lime recipe is current and widely used, so the product-specific signature (the loop track, the open-loop wordmark, the swirl arcs) must be carried through implementation.
 
 ## 7. Brand and Visual System (shared rules; per-direction values in §4 / §5)
 
@@ -182,7 +184,9 @@ Source revision for every record: HEAD `1d1ae14` + uncommitted working tree (des
 | DR-B-90 | accessibility | B · specimen | 786×1100 | …/design/B-90-specimen.png | 1d1ae14 + working tree | UI Designer | 2026-09-21 | Turkish capitals, tabular default, contrast computed |
 | DR-CMP | direction-render | side-by-side A | B: play, won, home/tutorial, devices; contact sheets | mixed | …/design/compare-play.png, compare-won.png, compare-home-tutorial.png, compare-devices.png, sheet-A.png, sheet-B.png | 1d1ae14 + working tree | UI Designer | 2026-09-21 | composites of the records above |
 
-**Limits stated:** renders are HTML/CSS (Blink text metrics), not Flutter (Skia); implementation fidelity is unproven until Phase D runtime capture. No motion prototype or video. No OS-text-scale render. No Android frame. The dark/light companion of each direction is not rendered.
+**Direction C records:** see §17.8 (DR-C-…, parity records, canonical-reference records of the user's screens).
+
+**Limits stated (A/B):** renders are HTML/CSS (Blink text metrics), not Flutter (Skia); implementation fidelity is unproven until Phase D runtime capture. No motion prototype or video. No OS-text-scale render. No Android frame. The dark/light companion of each direction is not rendered.
 
 ## 14. Provisional Self-Review Against `premium-ui-rubric.md`
 
@@ -235,3 +239,132 @@ Asset/plumbing tasks either way (Frontend/Tech Lead): bundle the selected font(s
 * The renders are HTML, not Flutter; if a Flutter-rendered comparison is wanted before selection, that is a Frontend prototype task (not done here).
 
 **Assumptions:** the shipped copy and puzzles (real level 1, 4, 26 data) are used as-is; the status-bar/dynamic-island strip is device chrome drawn for realism; audio/haptic are language notes only.
+
+---
+
+## 17. Direction C — "Loop Glass" (round 2, rendered from the user's reference screens)
+
+Source: three screens supplied by the user on 2026-09-21 (`design/reference/user-ref-1-home.png`, `user-ref-2-play.webp`, `user-ref-3-completion.webp`; 716×1434 = a 358×717 frame at 2×). They are recorded as `canonical-reference`; they are **not** yet a `selected-source` (nothing is Selected). Directions A and B were rejected by the user ("not modern, not the expected style"). Everything below is an original render in that visual language; no third-party brand assets are used.
+
+### 17.1 Thesis
+
+* **Name / thesis:** *Loop Glass* — a deep-navy night ground lit by soft top-right light; frosted glass cards hold the content; **lime** marks the moment that matters (the emphasised word, the primary action, resolution); **periwinkle** marks "where you are"; cream tiles are the only warm, tactile objects. Friendly, human Turkish microcopy ("Sıradaki döngüyü çöz.").
+* **Material difference from A and B:** a *cool* ground with *frosted, large-radius glass* (A: dark stage with a hard-lit keycap board; B: paper and ink); *lime + periwinkle* dual accent (A amber/cyan, B vermilion/blue); *grotesque* Space Grotesk + Manrope (A Sora; B Newsreader); *thin outline* icons; *pill* controls and rounded-square tiles at ≈ 33 % radius; centred, card-based compositions with a curved journey track; motion = soft spring and light.
+* **Strengths:** exactly the language the user asked for; the most current-feeling of the three; strong legibility and contrast; a clear two-accent semantic system; friendly tone; the panel is bottom-anchored and content-driven, which also fixes the round-1 tall-frame gap.
+* **Risks:** the navy + glass + lime recipe is widely used in 2025–26 apps, so **Originality** is the weakest dimension — the loop identity must be carried by the journey track, the open-loop swirl arcs and the `looplet` wordmark (lime `let`); glass needs contrast discipline (every small label was measured, see 17.4); lime is used for several jobs in the reference (the emphasised word, CTA, resolution, the active row) and must be rationed (17.5); the won moment as rendered has three luminous elements (docked row, star glow, CTA shadow) versus the contracted "single glow" (flagged in 17.6).
+
+### 17.2 System
+
+| Area | Decision |
+| --- | --- |
+| Type | **Space Grotesk** (variable 300–700, SIL OFL 1.1) for headings, tile letters and numerals (`tnum` verified); **Manrope** (variable 200–800, SIL OFL 1.1) for body, labels, CTAs (`tnum` verified). Both identified as the closest match to the reference typography (single-storey `g` and the flagged `1` are Space Grotesk; the geometric body is Manrope); if the user's designer used other faces, say so — the identification is a visual judgement, not a lookup. Both cover İ ı Ş Ğ Ç Ö Ü (specimen `C-90-specimen`). Sizes (at 358 pt): headline 28–33, tile letter 0.38 × tile, stat numeral 24, CTA 16, body 13.5–14.5, cap labels 9.5–11.5 (reference values; 10.4–12.6 pt at 393 pt — the HAMLE card label stays 10.4 pt and should be raised in Phase D). Licences stored beside the files (`design/src/fonts/OFL-*.txt`); unsubsetted ≈ 133 KB + 161 KB. |
+| Colour (measured, 17.4) | ground `#050A1E → #0D132D` with a top-right light `≈ #2D365C`; glass `≈ #2A345A`; **lime** `#DDFA6B` (tile `#E3FB7E → #CDEB4B`, ink `#0B1020`); **periwinkle** `#A8B4F9 → #8792F0`; cream tile `#FCF7F0 → #F0E9DC`, ink `#141826`; text `#F4F6FF`; muted label `#AEB4CA`; stats-card slate `#27394B`. |
+| Shape / surface | cards 30–34 pt radius, 1 px `rgba(255,255,255,.10)` edge and a soft light spill; tiles 33 % radius; pills fully round; depth only for hierarchy (glass cards, lifted row, docked row, sheet). |
+| Icons | drawn for this project, thin (1.7–1.9 px) rounded outline: back, sliders, flame, sparkle, undo, restart, arrow-up-right, arrow-right, lock, snowflake, up/down chevrons, outline/filled star. No third-party icon licence involved. |
+| Signature motif | **the loop track**: a curved line of numbered rounded-square nodes that ends at the current level (periwinkle) inside a glass card with large translucent swirl arcs; echoed by the lime `let` in the lowercase wordmark and the lime dots of the undo quota. Not applied to every card. |
+| Non-colour cues | active/lifted row = raised + periwinkle rim + rails + dimmed rest (17.5); winning row = lime **+ docked position + dashed ghost slot**; locked = indigo tile + **lock icon**; frozen = pale-ice tile + **snowflake + dashed border**; earned star = filled lime, empty = outline. |
+
+### 17.3 Motion and sensory language
+
+Timeline and reduced-motion path stay as contracted (F03 §16.2). Stills `C-08…10` illustrate the choreography; **no prototype/video exists**.
+
+* Shift ≈ 190 ms `cubic-bezier(.22,1,.36,1)` with a ≤ 1.5 % spring settle; lift: periwinkle rim fades in over 90 ms, the rest dims to 42 %; wrap ghost at 30 %.
+* Win row: tiles fill lime left → right (30 ms stagger — the stagger F03 §8 specified but never implemented), one soft bloom; the row then **glides to where the target rail was** (240 ms, the rail fades) — see 17.6 for why; the sheet rises 260 ms with a 1.5 % overshoot; stars fill lime with a 90 ms pop each once the sheet is at rest.
+* Audio/haptic: language intent only (F11 not scheduled): a soft tick per shift, a light haptic on settle, a success haptic on resolution. Reduced motion / silent / haptic-off: unchanged from F03 §16.2 / F04 §4 / F05 §13.
+
+### 17.4 What was measured from the reference (not guessed)
+
+Pixel samples of the user's screens (sRGB): ground top-right `#1F2849 / #2D365C`, ground bottom `#0D132D`, deepest `#050A1E`; glass card `#2A345A`; chip `#262D3C`; stats card `#27394B`; lime CTA `#DEFB6D–#E4FA87`, lime tile `#D0EF58 / #DDFB6C`; periwinkle node `#A8B4F9`; cream tile `#FCF7F0`; target tile `#28254A`. **Small-label text colours** (brightest text pixel vs adjacent background): `#AEB3C7` on glass `#273155` = 6.1 : 1; `#AEB3C7` on chip `#2E353E` = 5.9 : 1; `#ACB8C6` on the stats card `#2B3D4C` = 5.6 : 1; subtitle `#B7BACE` on the ground = 9.1 : 1; captions on the ground 9.3–9.6 : 1. **Correction to the round-2 brief:** the brief assumed the reference's small caps were a likely contrast weakness; the measurement shows they are not (the "HAMLE" label was not measured — the region sample failed). Direction C therefore uses `#AEB4CA` for muted labels (my first draft used a darker `#9BA3C6`).
+
+### 17.5 Resolved design conflict — one accent, two jobs (the "lime active row")
+
+In the reference's Play screen the **active row is lime**, while lime is also the resolution / primary-action colour. With the contracted separation (F03: resolution vs drag energy) a player could not tell "the row I am dragging" from "a matching row". **Primary render (`C-02`):** the active row keeps cream tiles and gains a **periwinkle rim + glow, lift, rails and a dimmed rest**; lime is reserved for resolution, the emphasised word and primary actions. **Reference-literal alternative (`C-02b`):** the active row is lime exactly as in the reference. Recommendation: the resolved version; the choice is the user's (17.9).
+
+### 17.6 Contract conflicts found (flagged, not applied)
+
+1. **Docked row location.** F03 §16.3 docks the answer row *under the target rail* in `[dividerBottom + 12, 0.36 H − 16]`. In the reference layout the header (moves card, "HEDEF DÖNGÜ" caption, taller rail) fills that zone (it collapses to a negative height at 393×852). Direction C therefore lands the row **in the place of the target rail** (the rail fades out; the answer *becomes* the target) and anchors the sheet to the bottom with content-driven spacing (top ≥ 0.365 H). The row-0 strip that A/B left visible is gone. **Requires a contract change to F03 §16.3** (Tech Lead / Frontend), or the header must be compacted.
+2. **Full-screen completion.** The reference completion has no board and no Close; F03 §16 / F04 keep the docked row + sheet over the dimmed board and Close is an F04 AC. Primary render `C-04` conforms; the reference composition is rendered as `C-04b` for comparison and would change F03 §16 and F04.
+3. **Completion semantics.** The reference stats are `SEN 1 = OPTİMAL +3 YILDIZ` (no personal best); F04 shows `SEN / OPTİMAL / EN İYİ`. Primary renders keep the shipped semantics; `C-04c` renders the reference semantics for comparison. The reference's three **outlined** stars next to "+3 YILDIZ" read as *not earned*; Direction C fills earned stars and outlines empty ones.
+4. **One-glow rule.** F03 §16 allows a single glow at the won moment; C shows the docked-row glow, star glow and a soft CTA shadow. Flagged for a decision.
+
+### 17.7 Provisional self-review (advisory; independent QA scores implemented surfaces only)
+
+| Dimension | C — Loop Glass |
+| --- | --- |
+| 1 Experience Fit | 9 — the user's stated style; friendly and clear |
+| 2 Visual Hierarchy | 9 |
+| 3 Layout, Rhythm, Responsiveness | 9 — bottom-anchored content-driven sheet; header/dock conflict flagged (17.6) |
+| 4 Typography and Content Craft | 9 — two OFL families, Turkish casing fixed, tabular numerals |
+| 5 Color, Surface, Asset System | 9 — measured palette, contrast verified |
+| 6 Interaction, State, Feedback | 9 — non-colour cues on every state; accent conflict resolved |
+| 7 Motion and Sensory | 8 — specified, not prototyped |
+| 8 Originality and Product Identity | 8 — current recipe; identity rests on the loop track / swirl / wordmark |
+| 9 Accessibility and Inclusive | 9 — muted-label pairs computed ≥ 5.9 : 1 (reference measured ≥ 5.6 : 1); targets ≈ 44 pt (restart and settings 43.9 at 393 pt) |
+| 10 Implementation Fidelity and Polish | 8 — unbuilt |
+| **Total (provisional)** | **87** |
+
+To reach the ≥ 93 / every-dimension ≥ 8 bar after selection: a motion prototype of the win sequence and a runtime parity pass (dims 7, 10); a stronger product-specific signature carried through the surfaces (dim 8).
+
+### 17.8 Deviations from the user's references (each one is intentional)
+
+| # | Reference | Direction C | Why |
+| --- | --- | --- | --- |
+| D1 | "YENİ EN **I**YI", "OPT**I**MAL" (dotless) | `YENİ EN İYİ`, `OPTİMAL` | Turkish casing bug in the reference (locale-blind uppercasing) |
+| D2 | three outlined stars beside "+3 YILDIZ" | earned = filled lime, empty = outline | outlines read as "not earned" |
+| D3 | journey nodes overlap; node 1 is hidden behind the info card | five evenly spaced nodes, none covered | legibility |
+| D4 | info-card helper wraps to three lines | two lines (wider column) | legibility |
+| D5 | small caps ≈ 9.5–11.5 pt (at 358 pt) | 10.4–12.6 pt at 393 pt (most ≥ 11.5; the HAMLE card label is 10.4 pt — flagged) | modest accessibility uplift, not a full floor yet |
+| D6 | three white dots as status icons; phone bezel | real signal/battery glyphs; no bezel | device chrome |
+| D7 | muted label colour (measured `#AEB3C7`) | `#AEB4CA` | matched, not weakened |
+| D8 | lime active row | periwinkle-rim active row (literal variant provided) | 17.5 |
+| D9 | full-screen completion, no Close | sheet + docked row, Close kept (reference variant provided) | 17.6 |
+| D10 | stats "SEN = OPTİMAL +3 YILDIZ" | shipped semantics (reference variant provided) | F04 ACs |
+| D11 | slightly flatter lime, darker stats slate | tuned to match after side-by-side | parity |
+
+### 17.9 Content deltas (visual language adopted; new product content = proposal) and confirmations needed
+
+| Ref | Element | Shipped / contract | Handling in the renders | Decision owner |
+| --- | --- | --- | --- | --- |
+| H1 | lowercase `looplet` with lime `let` | uppercase `LOOPLET` | adopted (brand decision) | user |
+| H2 | settings icon button | none until F10 | rendered, labelled proposal (`C-06` / `C-P1`); absent in `C-06b` | user / F10 |
+| H3 | Home card "YOLCULUK · 4 / 30", headline "Sıradaki döngüyü çöz.", loop track | F05 30-tick ring + count | rendered (new composition) | user / F05 |
+| H4 | level info card "Seviye 5 / Yeni mekanik · sütun kaydırma" + target preview | none | rendered, proposal (needs per-level metadata) | user / PO |
+| H5 | CTA "5. bölüme devam ↗" | `DEVAM ET` + "Seviye N · sürüyor" | reference copy in `C-06`; shipped-scope copy in `C-06b` | PO / localization |
+| H6 | chips "4 günlük seri", "12 yıldız" | streak = F07 (not started); no star aggregate | rendered, proposals | user / F07 |
+| P1 | top bar "‹ SEVİYE 05" + HAMLE card top-right | HUD bottom-left | adopted as the layout | user (F03 UI-owned) |
+| P2 | "HEDEF DÖNGÜ" | `HEDEF` | reference copy | PO / localization |
+| P3 | hint "Satırı tut · kaydır · bırak" | none (F09) | rendered, proposal | user / F09 |
+| C2 | badge "YENİ EN İYİ", "Döngü tamamlandı.", data-driven subtitle ("Hedef üç hamlede yerine oturdu.") | `YENİ REKOR`, `ÇÖZÜLDÜ` + word | reference copy; subtitle needs count-aware copy | PO / localization |
+| C4 | CTAs "Sonraki bölüm →", "Tekrar oyna", no Close | `SONRAKİ` / `Yeniden` / `Kapat` | reference copy; Close kept | PO / F04 |
+
+**What the user should confirm** (the UI Designer cannot decide): (1) Direction C as the selected direction; (2) the active row — periwinkle-rimmed (`C-02`, recommended) or lime as in the reference (`C-02b`); (3) the completion — contract-conforming sheet with the row landing where the rail was (`C-04`, recommended) or the full-screen reference composition (`C-04b`); (4) completion stats — shipped `SEN / OPTİMAL / EN İYİ` (recommended) or `+3 YILDIZ` (`C-04c`); (5) which of settings button, streak chip, stars chip, level card and gesture hint are wanted at all (otherwise `C-06b`); (6) lowercase `looplet`; (7) the reference copy as *proposed* copy (final Turkish copy remains PO / localization).
+
+### 17.10 Evidence manifest additions
+
+Source revision for every record: HEAD `8b1a3d5` + uncommitted working tree (generator `design/src/gen-c.mjs`, HTML/CSS → PNG with headless Chrome at devicePixelRatio 2; specimen at 1). Captured By: UI Designer. Captured At: 2026-09-21. Generated design artefacts, not app runtime captures.
+
+| Evidence ID | Kind | Screen / State | Viewport / Device | Artifact | Source Revision | Captured By | Captured At | Result / Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| REF-1 | canonical-reference | User reference — Home | 716×1434 (358×717 @2×) | features/f00-design-foundation/design/reference/user-ref-1-home.png | user-supplied 2026-09-21 | User | 2026-09-21 | not a selected-source |
+| REF-2 | canonical-reference | User reference — Play | 716×1434 | …/design/reference/user-ref-2-play.webp | user-supplied | User | 2026-09-21 | — |
+| REF-3 | canonical-reference | User reference — Completion | 716×1434 | …/design/reference/user-ref-3-completion.webp | user-supplied | User | 2026-09-21 | — |
+| DR-C-01 | direction-render | C · Play idle (level 5, BULUT) | 393×852 | …/design/C-01-play-idle.png | 8b1a3d5 + working tree | UI Designer | 2026-09-21 | rendered |
+| DR-C-02 / 02b | direction-render | C · row lifted: resolved (periwinkle) / reference-literal (lime) | 393×852 | …/design/C-02-play-lifted-row.png, C-02b-…reference-literal.png | 8b1a3d5 + working tree | UI Designer | 2026-09-21 | rendered |
+| DR-C-03 | direction-render | C · locked pivots + frozen tiles (level 26) | 393×852 | …/design/C-03-play-locked-frozen.png | 8b1a3d5 + working tree | UI Designer | 2026-09-21 | rendered |
+| DR-C-04 / 05 | direction-render | C · Won Perfect / 2★ (docked row + bottom-anchored sheet) | 393×852 | …/design/C-04-won-perfect.png, C-05-won-two-star.png | 8b1a3d5 + working tree | UI Designer | 2026-09-21 | rendered |
+| DR-C-04b / 04c | direction-render | C · full-screen completion (reference composition) / reference stat semantics | 393×852 | …/design/C-04b-…png, C-04c-…png | 8b1a3d5 + working tree | UI Designer | 2026-09-21 | comparison alternatives |
+| DR-C-06 / 06b | direction-render | C · Home with the reference composition / shipped-scope only | 393×852 | …/design/C-06-home-in-progress.png, C-06b-home-shipped-scope.png | 8b1a3d5 + working tree | UI Designer | 2026-09-21 | rendered |
+| DR-C-07 | direction-render | C · column tutorial (level 4) | 393×852 | …/design/C-07-tutorial-column.png | 8b1a3d5 + working tree | UI Designer | 2026-09-21 | rendered |
+| DR-C-08…10 | direction-render | C · won-moment stills (T0 hold, ~T0+600 glide, ~T0+760 panel) | 393×852 | …/design/C-08…10-*.png | 8b1a3d5 + working tree | UI Designer | 2026-09-21 | stills only, not motion evidence |
+| DR-C-V | direction-render | C · Play idle + Won Perfect on 16e and Pro Max | 390×844, 440×956 | …/design/C-v-*.png | 8b1a3d5 + working tree | UI Designer | 2026-09-21 | rendered |
+| PC-1 / 2 / 3 | parity-comparison | reference vs C on the reference frame: Home / Play / Completion | 716×1434 each | …/design/parity-1-home.png, parity-2-play.png, parity-3-completion.png (render frames C-P1/P2/P3) | 8b1a3d5 + working tree | UI Designer | 2026-09-21 | deviations D1–D11 |
+| DR-C-90 | accessibility | C · glyph / tabular / icon / measured-contrast specimen | 786×1180 | …/design/C-90-specimen.png | 8b1a3d5 + working tree | UI Designer | 2026-09-21 | Turkish capitals, tnum, contrast computed + measured |
+| DR-C-CMP | direction-render | composites | mixed | …/design/sheet-C.png, compare-C-alternatives.png, compare-C-devices.png, compare-ABC.png | 8b1a3d5 + working tree | UI Designer | 2026-09-21 | composites of the records above |
+
+**Limits stated (C):** HTML/CSS (Blink), not Flutter; no motion prototype/video; no OS-text-scale render; no Android frame; dark/light companions not rendered; typography is identified by visual match, not by the reference author; blur/glass is drawn with gradients and shadows (no backdrop blur — consistent with the F03 §18 perf clarification).
+
+### 17.11 Needs Tech Lead clarification (round 2)
+
+* **Contract change decision** for 17.6 (docked row replaces the rail; completion composition; semantics; one-glow rule) before any Phase D task.
+* **Content deltas** in 17.9 need owners: several are new product scope (streak chip = F07, stars aggregate, settings = F10, per-level info, hint line = F09) — none is implemented or required by this Foundation.
+* The 93 bar for a Foundation draft (as in §16): C is provisionally 87 for the same reason as A/B.

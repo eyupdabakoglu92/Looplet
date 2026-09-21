@@ -10,16 +10,16 @@ In Progress
 
 ## Current Owner
 
-UI Designer
+Tech Lead
 
 ## Next Role
 
-UI Designer
+Tech Lead
 
 ## Active Task Ledger
 
 - [x] Task ID: F00-UI-FOUNDATION | Assigned Role: UI Designer | Status: Done | Summary: DELIVERED 2026-09-21 — project-authority/design-foundation.md (Status Draft, nothing selected): two materially different rendered directions (A Backlit Stage, B Gazette) on identical Play / lifted-row / locked+frozen / Won Perfect + 2★ / Journey home / tutorial states with won-moment stills, device variants, Turkish glyph + tabular + contrast specimens, motion language, recommendation, shipped-surface impact list | Depends On: -
-- [ ] Task ID: F00-UI-DIRECTION-C | Assigned Role: UI Designer | Status: Open | Summary: Directions A and B were REJECTED by the user (2026-09-21: not modern; not the expected style). Render Direction C from the three user-supplied reference screens (design/reference/) on the same states plus a reference-parity comparison; separate visual language (adopt) from new product content (flag as proposals, not requirements); update design-foundation.md (A/B recorded as rejected, C recommended, Status stays Draft, nothing selected until the user confirms the C render) | Depends On: F00-UI-FOUNDATION
+- [x] Task ID: F00-UI-DIRECTION-C | Assigned Role: UI Designer | Status: Done | Summary: DELIVERED 2026-09-21 — Direction C (Loop Glass) rendered from the user's reference screens on the same states as A/B (+ resolved/literal, sheet/full-screen and semantics alternatives, device variants, specimen with measured contrast) and three reference-frame parity comparisons; design-foundation.md §17 (system, motion, measured tokens, contract conflicts, deviations D1-D11, content-delta table, confirmations needed); A/B recorded as rejected; Status stays Draft | Depends On: F00-UI-FOUNDATION
 
 ## Open Tasks
 
@@ -31,7 +31,7 @@ None
 
 ## Delivery Review
 
-Accepted
+Pending
 
 ## QA Scope
 
@@ -102,7 +102,8 @@ not-evaluated
   * Prerequisite / External Decision: None
   * Re-evaluation Trigger: F00-UI-DIRECTION-C delivery
   * Blocks: Foundation selection; every visual implementation task
-  * Result: PENDING
+  * Result: PASS
+  * Provenance / Note: 2026-09-21 UI Designer, HEAD 8b1a3d5 + uncommitted working tree: Direction C x 14 frames at 393x852 (Play idle, row lifted resolved + reference-literal, locked+frozen, Won Perfect + 2-star as a bottom-anchored sheet, full-screen completion and reference-semantics alternatives, Home with the reference composition and shipped-scope only, column tutorial, three won-moment stills), 16e and Pro Max variants, a specimen with computed and measured contrast, composites — in features/f00-design-foundation/design/ (generator src/gen-c.mjs; HTML/CSS rendered with headless Chrome at DPR 2). Generated design artefacts, not app runtime captures; no motion prototype or video, no OS text-scale render, no Android frame; Blink not Flutter. Folder now holds ~27 MB of PNGs (65 files) — prune or compress if repo size matters.
 
 - Evidence ID: F00.REFERENCE-PARITY
   * Scenario: Side-by-side parity between each user reference screen (Home, Play, Completion) and the corresponding Direction C render on the reference frame, with every deviation (contrast fixes, contract conflicts, shipped-content substitutions) listed and justified
@@ -112,7 +113,8 @@ not-evaluated
   * Prerequisite / External Decision: None
   * Re-evaluation Trigger: F00-UI-DIRECTION-C delivery
   * Blocks: Foundation selection
-  * Result: PENDING
+  * Result: PASS
+  * Provenance / Note: 2026-09-21 UI Designer: parity-1-home.png, parity-2-play.png, parity-3-completion.png (user reference | Direction C render on the same 358x717 @2x frame; renders C-P1/P2/P3). Deviations D1-D11 listed in design-foundation.md §17.8 (Turkish casing fixes, earned stars filled, node overlap and text wrap fixed, status chrome, active-row accent resolved with a literal variant, contract-conforming completion with a reference variant). Palette and small-label colours MEASURED from the reference pixels (§17.4); the brief's assumption that the reference's small caps were a contrast weakness was disproved by measurement (5.6-9.6:1).
 
 ## Open Decision Gates
 
@@ -124,7 +126,7 @@ None
 
 ## Next Action
 
-Run UI Designer on F00-UI-DIRECTION-C using the Current UI Brief (Direction C from the user's reference screens; A and B stay in the Foundation as rejected). The delivery returns to the Tech Lead, who then asks the user to confirm the C render (selection decision); the UI Designer never marks the Foundation Selected.
+Tech Lead: review the F00-UI-DIRECTION-C delivery (design-foundation.md §17, design/parity-*.png, design/sheet-C.png, design/compare-C-*.png) and record it; ask the user to CONFIRM Direction C (selection decision F00.FOUNDATION-SELECTION) with the seven confirmations in §17.9 (direction; lifted-row accent resolved vs lime-literal; completion sheet vs full-screen; completion semantics; which non-shipped Home/Play content is wanted; lowercase wordmark; reference copy as proposed copy). Decide the contract questions in §17.11 before any Phase D task (F03 §16.3 dock location, completion composition, semantics, one-glow rule). Visual Quality Gate stays Pending; nothing visual is implemented before Status: Selected.
 
 ## Last Decision
 
@@ -134,9 +136,9 @@ Run UI Designer on F00-UI-DIRECTION-C using the Current UI Brief (Direction C fr
 
 ## Last Update
 
-* Updated By: Tech Lead
+* Updated By: UI Designer
 * Timestamp: 2026-09-21
-* Summary: incident intake — A and B rejected by the user; Direction C task F00-UI-DIRECTION-C activated; user references stored; F00-UI-FOUNDATION delivery Accepted (as a delivery; its outcome was rejected by the selection authority).
+* Summary: F00-UI-DIRECTION-C delivered (Direction C rendered from the user's references, parity comparisons, §17); F00.DIRECTION-C-RENDERS and F00.REFERENCE-PARITY PASS; Delivery Review Pending; owner Tech Lead. Nothing selected.
 
 ## Context & Follow-ups
 
@@ -153,8 +155,9 @@ Why now: the ai-system upgrade (cfd6b59) made an independent visual gate (>= 93 
 * 2026-09-21 — Tech Lead: F00 created; F00-UI-FOUNDATION activated.
 * 2026-09-21 — UI Designer: F00-UI-FOUNDATION delivered; owner -> Tech Lead (selection decision to be opened).
 * 2026-09-21 — Tech Lead: incident — user rejected A and B and supplied reference screens; delivery Accepted; F00-UI-DIRECTION-C activated for the UI Designer.
+* 2026-09-21 — UI Designer: F00-UI-DIRECTION-C delivered; owner -> Tech Lead (user confirmation of Direction C to be requested).
 
-## Current UI Brief (F00-UI-DIRECTION-C — activated 2026-09-21)
+## Current UI Brief (F00-UI-DIRECTION-C — activated 2026-09-21; DELIVERED, see design-foundation.md §17)
 
 Read: the three user-supplied reference screens in `features/f00-design-foundation/design/reference/` (`user-ref-1-home.png` Home, `user-ref-2-play.webp` Play, `user-ref-3-completion.webp` Completion; 716×1434 = 2× a 358×717 frame), this orchestration, `architecture.md`, `project-authority/design-foundation.md` (A/B sections and §14), `design/design-doctrine.md`, `design/premium-ui-rubric.md`, `design/visual-quality-gate.md`, the shipped tokens in `app/lib/play/play_theme.dart` and F03 §16 / F04 / F05 ui-design for contracts.
 
