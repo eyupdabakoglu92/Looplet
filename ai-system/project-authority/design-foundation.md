@@ -282,7 +282,7 @@ In the reference's Play screen the **active row is lime**, while lime is also th
 
 ### 17.6 Contract conflicts found (flagged, not applied)
 
-1. **Docked row location.** F03 §16.3 docks the answer row *under the target rail* in `[dividerBottom + 12, 0.36 H − 16]`. In the reference layout the header (moves card, "HEDEF DÖNGÜ" caption, taller rail) fills that zone (it collapses to a negative height at 393×852). Direction C therefore lands the row **in the place of the target rail** (the rail fades out; the answer *becomes* the target) and anchors the sheet to the bottom with content-driven spacing (top ≥ 0.365 H). The row-0 strip that A/B left visible is gone. **Requires a contract change to F03 §16.3** (Tech Lead / Frontend), or the header must be compacted.
+1. **Docked row location.** F03 §16.3 docks the answer row *under the target rail* in `[dividerBottom + 12, 0.36 H − 16]`. In the reference layout the header (moves card, "HEDEF DÖNGÜ" caption, taller rail) fills that zone (it collapses to a negative height at 393×852). Direction C therefore lands the row **in the place of the target rail** (the rail fades out; the answer *becomes* the target) and anchors the sheet to the bottom with content-driven spacing (top ≥ 0.365 H). The row-0 strip that A/B left visible is gone. **Requires a contract change to F03 §16.3** (Tech Lead / Frontend), or the header must be compacted. **SUPERSEDED 2026-09-21** by the user's decision 2 (full-screen result, §18): the dock/sheet composition no longer applies.
 2. **Full-screen completion.** The reference completion has no board and no Close; F03 §16 / F04 keep the docked row + sheet over the dimmed board and Close is an F04 AC. Primary render `C-04` conforms; the reference composition is rendered as `C-04b` for comparison and would change F03 §16 and F04.
 3. **Completion semantics.** The reference stats are `SEN 1 = OPTİMAL +3 YILDIZ` (no personal best); F04 shows `SEN / OPTİMAL / EN İYİ`. Primary renders keep the shipped semantics; `C-04c` renders the reference semantics for comparison. The reference's three **outlined** stars next to "+3 YILDIZ" read as *not earned*; Direction C fills earned stars and outlines empty ones.
 4. **One-glow rule.** F03 §16 allows a single glow at the won moment; C shows the docked-row glow, star glow and a soft CTA shadow. Flagged for a decision.
@@ -391,3 +391,12 @@ The user decided through six plain-language sub-decisions (visual guide `design/
 3. **One-glow rule.** With the sheet gone, the full-screen result carries the lime tile row glow only as its single glow; star fill and CTA are non-glow emphasis (contract position kept).
 4. **Wordmark `Looplet`** replaces `LOOPLET` on the Home surface; the lime `let` is kept; a final drawn asset is a Phase D item.
 5. The five future-scope items stay owned by their features (F07 streak, F10 settings, F09 hint, F05 level info, an aggregate-stars decision) — see `workflow-follow-ups.md` (USER-REFERENCE-CONTENT-DELTAS).
+
+---
+
+## 19. Finalization (task F00-UI-FINALIZE, 2026-09-21)
+
+* Selected-source renders reflecting the final decision set: `design/S-*.png` (Play, row lifted, locked + frozen, **full-screen Result** in three variants, Home in *design* and *today* forms, tutorial, device variants), the executable transition prototype `design/src/S-transition-prototype.html` with timed stills, and the component/token sheet `design/S-91-components.png`. Generator: `design/src/gen-s.mjs`.
+* The design-system handoff is **`features/f00-design-foundation/ui-design.md`** (tokens, components, states, motion spec incl. reduced motion, screen/state/viewport matrix, Visual Evidence Manifest with `selected-source` and `motion-prototype` records).
+* The earlier `C-*` renders show the lowercase `looplet`; the selected wordmark is **`Looplet`** (capital L, last three letters lime) — the `S-*` renders and the handoff are authoritative where they differ.
+* Two UI Designer proposals await the Tech Lead / user: the Result's visible exit (a back chevron) and the one-glow rule on the Result (CTA and stars non-glow, which differs from the user's reference) — ui-design.md §17.

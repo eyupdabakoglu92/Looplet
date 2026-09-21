@@ -1,0 +1,24 @@
+S-01-play-idle 393 852
+S-01b-play-idle-today 393 852
+S-02-play-lifted-row 393 852
+S-03-play-locked-frozen 393 852
+S-04-result-perfect 393 852
+S-04b-result-new-best 393 852
+S-05-result-two-star 393 852
+S-06-home-design 393 852
+S-06b-home-today 393 852
+S-07-tutorial-column 393 852
+S-08-transition-t0000 393 852
+S-09-transition-t0150 393 852
+S-10-transition-t0600 393 852
+S-11-transition-t0720 393 852
+S-12-transition-t0840 393 852
+S-13-transition-t0940-rest 393 852
+S-14-transition-t1400-stars 393 852
+S-15-transition-reduced-t0300 393 852
+S-16-transition-reduced-t0660-rest 393 852
+S-v-16e-play-idle 390 844
+S-v-16e-result-perfect 390 844
+S-v-promax-play-idle 440 956
+S-v-promax-result-perfect 440 956
+S-91-components 1240 1500 1

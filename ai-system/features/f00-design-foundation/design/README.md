@@ -16,3 +16,10 @@ Names: `A-…` / `B-…` = Direction A (Backlit Stage) / B (Gazette); `01–07` 
 * `reference/` — the user's three reference screens (canonical-reference; supplied 2026-09-21).
 * Regenerate: `cd src && node gen-c.mjs . && sh render.sh "" jobs-c.txt && python3 sheets-c.py`. `render.sh` retries a headless-Chrome flake up to 3 times.
 * Fonts added: Space Grotesk and Manrope (SIL OFL 1.1) with licence texts in `src/fonts/`.
+
+## Round 3 (selected source — F00-UI-FINALIZE)
+
+* `src/gen-s.mjs` — selected-source generator (job list `src/jobs-s.txt`): wordmark `Looplet`, full-screen Result, the board-to-Result transition as a real animation (`src/S-transition-prototype.html`; the `S-08…S-16` stills are frames taken from it), the component/token sheet `S-91-components.png`. `src/sheets-s.py` builds `sheet-S.png` and `sheet-S-transition.png`.
+* Regenerate: `cd src && node gen-s.mjs . && sh render.sh "" jobs-s.txt && python3 sheets-s.py`.
+* `src/guide.py` builds the plain-language decision guide (`guide-0…7`) used for F00.FOUNDATION-SELECTION.
+* Handoff document: `../ui-design.md`.

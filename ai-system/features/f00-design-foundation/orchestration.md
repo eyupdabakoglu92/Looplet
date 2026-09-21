@@ -10,17 +10,17 @@ In Progress
 
 ## Current Owner
 
-UI Designer
+Tech Lead
 
 ## Next Role
 
-UI Designer
+Tech Lead
 
 ## Active Task Ledger
 
 - [x] Task ID: F00-UI-FOUNDATION | Assigned Role: UI Designer | Status: Done | Summary: DELIVERED 2026-09-21 — project-authority/design-foundation.md (Status Draft, nothing selected): two materially different rendered directions (A Backlit Stage, B Gazette) on identical Play / lifted-row / locked+frozen / Won Perfect + 2★ / Journey home / tutorial states with won-moment stills, device variants, Turkish glyph + tabular + contrast specimens, motion language, recommendation, shipped-surface impact list | Depends On: -
 - [x] Task ID: F00-UI-DIRECTION-C | Assigned Role: UI Designer | Status: Done | Summary: DELIVERED 2026-09-21 — Direction C (Loop Glass) rendered from the user's reference screens on the same states as A/B (+ resolved/literal, sheet/full-screen and semantics alternatives, device variants, specimen with measured contrast) and three reference-frame parity comparisons; design-foundation.md §17 (system, motion, measured tokens, contract conflicts, deviations D1-D11, content-delta table, confirmations needed); A/B recorded as rejected; Status stays Draft | Depends On: F00-UI-FOUNDATION
-- [ ] Task ID: F00-UI-FINALIZE | Assigned Role: UI Designer | Status: Open | Summary: The Foundation is SELECTED (Direction C, decision set in design-foundation.md §18). Produce the selected-source renders for the final decisions (Looplet wordmark; full-screen solved result incl. the 2-star variant and the board-to-result transition; a proposed visible exit affordance; home with future-scope items) and the design-system handoff `ui-design.md` (tokens, type, icons, components, states, motion incl. reduced-motion, Visual Evidence Manifest with selected-source records) so the Tech Lead can set Visual Quality Gate = Ready for Implementation | Depends On: F00-UI-DIRECTION-C
+- [x] Task ID: F00-UI-FINALIZE | Assigned Role: UI Designer | Status: Done | Summary: DELIVERED 2026-09-21 — selected-source renders for the final decision set (Play, lifted row, locked+frozen, full-screen Result perfect / new best / 2-star, Home design + today, tutorial, device variants), an executable board-to-result transition prototype with timed and reduced-motion stills, a component/token sheet, and the design-system handoff features/f00-design-foundation/ui-design.md (Visual Evidence Manifest with selected-source and motion-prototype records); Foundation stays Selected | Depends On: F00-UI-DIRECTION-C
 
 ## Open Tasks
 
@@ -32,7 +32,7 @@ None
 
 ## Delivery Review
 
-Accepted
+Pending
 
 ## QA Scope
 
@@ -125,7 +125,8 @@ not-evaluated
   * Prerequisite / External Decision: None (F00.FOUNDATION-SELECTION RESOLVED)
   * Re-evaluation Trigger: F00-UI-FINALIZE delivery
   * Blocks: Visual Quality Gate = Ready for Implementation; every visual implementation task
-  * Result: PENDING
+  * Result: PASS
+  * Provenance / Note: 2026-09-21 UI Designer, HEAD cc7fe3f + uncommitted working tree: 24 selected-source PNGs (S-01 … S-16, S-v-*, S-91) plus contact sheets in features/f00-design-foundation/design/, the executable prototype design/src/S-transition-prototype.html (frames S-08…S-16 are captured from it), and ui-design.md with a Visual Evidence Manifest (3 direction-render, 3 canonical-reference, parity-comparison, selected-source and motion-prototype records). Generated HTML/CSS renders (Blink), not Flutter or simulator captures; no OS-text-scale, loading/error/recovery or Android renders; the motion prototype is not a Flutter prototype. Independent QA scoring pending implementation.
 
 ## Open Decision Gates
 
@@ -145,7 +146,7 @@ None
 
 ## Next Action
 
-Run UI Designer on F00-UI-FINALIZE using the Current UI Brief. The delivery returns to the Tech Lead (visual-gate checkpoint), who reconciles it and — if the handoff, selected-source records and Visual Evidence Manifest are complete — sets Visual Quality Gate = Ready for Implementation and plans the Frontend design-system task (bundle fonts, tokens/theme, icon set, wordmark asset) and Phase C (conformance audit of F03 / F04 / F05 surfaces).
+Tech Lead (mandatory visual-gate checkpoint): review F00-UI-FINALIZE — ui-design.md, the S-* selected-source renders, the transition prototype and the manifest — and record the delivery. If complete, set Visual Quality Gate = Ready for Implementation (the audit then requires the selected Foundation reference, ui-design.md with a Visual Evidence Manifest, and >= 2 direction-render records — all present). Ask the user about the two open proposals (visible exit chevron on the Result; one-glow rule on the Result) or decide them. Then plan the Frontend design-system task (bundle fonts, tokens/theme, drawn icon set, `Looplet` wordmark, shared components) and Phase C (conformance audit of F03 / F04 / F05 surfaces; contract amendments DESIGN-ADOPTION-CONTRACT-AMENDMENTS at each visual-rework activation).
 
 ## Last Decision
 
@@ -159,11 +160,13 @@ Run UI Designer on F00-UI-FINALIZE using the Current UI Brief. The delivery retu
 
 2026-09-21 (selection) — The user decided F00.FOUNDATION-SELECTION as `B: 2=2, 5=Looplet`: Direction C selected; the solved screen is the FULL-SCREEN composition with NO Close button (override of the recommendation); the wordmark is `Looplet` (capital L only, last three letters `let` lime — the user's own variant); decisions 1, 3, 4, 6 keep the recommendations. Tech Lead: gate RESOLVED; design-foundation.md Status Selected (Selected By: user; Decision Reference: this gate); the decision set is recorded in §18. Interpretation: (1) Close is defined in F03/F04 feature architecture, not in the PRD, so removing it is a Tech Lead contract amendment, not a Product Owner revision; it is deferred to the F03/F04 visual-rework activation and logged in workflow-follow-ups.md (DESIGN-ADOPTION-CONTRACT-AMENDMENTS); (2) a player must still have a way home — system back/edge swipe stays and the UI Designer proposes a visible affordance the user may veto; (3) the earlier contract positions (row lands where the rail was; content-driven sheet) are superseded; the one-glow rule stays. Next: F00-UI-FINALIZE (selected-source renders + design-system handoff).
 
+2026-09-21 (finalize) — UI Designer delivered F00-UI-FINALIZE: selected-source renders for the decision set, an executable transition prototype (frames taken from it), a component/token sheet and the design-system handoff ui-design.md. Foundation stays Selected (the UI Designer changed no selection). Open proposals for the Tech Lead / user: (a) a visible back chevron as the Result's way home (the user removed the Close button, a way home is still required); (b) one-glow rule on the Result — CTA and stars non-glow, which differs from the user's reference; plus the count-aware subtitle copy (PO / localization) and lifting 43.9 pt targets to 44 / the HAMLE caption to >= 11 pt in Phase D. Provisional self-review 87 (motion, originality, fidelity capped at 8).
+
 ## Last Update
 
-* Updated By: Tech Lead
+* Updated By: UI Designer
 * Timestamp: 2026-09-21
-* Summary: F00.FOUNDATION-SELECTION RESOLVED (B: 2=2, 5=Looplet); Foundation Status Selected; F00-UI-FINALIZE activated for the UI Designer.
+* Summary: F00-UI-FINALIZE delivered (selected-source renders, transition prototype, component sheet, ui-design.md); F00.SELECTED-SOURCE PASS; Delivery Review Pending; owner Tech Lead for the visual-gate checkpoint.
 
 ## Context & Follow-ups
 
@@ -184,8 +187,9 @@ Why now: the ai-system upgrade (cfd6b59) made an independent visual gate (>= 93 
 * 2026-09-21 — Tech Lead: delivery Accepted; gate F00.FOUNDATION-SELECTION OPEN (user); clarification items ruled.
 * 2026-09-21 — Tech Lead: incident — decision request re-presented as a plain-language visual guide (design/guide-*.png).
 * 2026-09-21 — Tech Lead: decision F00.FOUNDATION-SELECTION RESOLVED (B: 2=2, 5=Looplet); Foundation Selected; F00-UI-FINALIZE activated.
+* 2026-09-21 — UI Designer: F00-UI-FINALIZE delivered; owner -> Tech Lead (visual-gate checkpoint).
 
-## Current UI Brief (F00-UI-FINALIZE — activated 2026-09-21)
+## Current UI Brief (F00-UI-FINALIZE — activated 2026-09-21; DELIVERED, see ui-design.md)
 
 Read: `project-authority/design-foundation.md` (Status **Selected**; §17 Direction C; **§18 the user's decision set**), this orchestration, the A/B/C renders and the user's reference screens (`design/reference/`), `design/design-doctrine.md`, `design/premium-ui-rubric.md`, `design/visual-quality-gate.md`, `templates/feature-ui-design.template.md`, F03 `ui-design.md` §16 and F03 `architecture.md` §18 (current won-moment contract), F04 `architecture.md` (exit behaviour) and `ui-design.md`.
 
