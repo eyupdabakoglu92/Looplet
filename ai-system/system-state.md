@@ -40,23 +40,23 @@ features/f00-design-foundation/orchestration.md
 
 ## Current Phase
 
-F00 Foundation SELECTED — finalize selected-source and design-system handoff
+F00 design-system implementation (Visual Quality Gate: Ready for Implementation)
 
 ## Current Role
 
-UI Designer
+Frontend/Mobile Developer
 
 ## Current Reason
 
-The user resolved F00.FOUNDATION-SELECTION as B (2=2, 5=Looplet): Direction C (Loop Glass) is selected with a full-screen solved result (no Close button) and the wordmark `Looplet`; the other recommendations stand. The Tech Lead recorded the decision, set the Foundation to Status Selected, logged the contract consequences (F03 §18 won composition, F04 Close) for the visual-rework activation, and activated F00-UI-FINALIZE for the UI Designer. No app code, contract or product file changed.
+The UI Designer delivered the selected-source renders, an executable transition prototype and the design-system handoff (ui-design.md). The Tech Lead passed the visual-gate checkpoint: Visual Quality Gate = Ready for Implementation, delivery Accepted, the UI Designer's proposals defaulted (back chevron as the Result's way home; one-glow rule kept), platform.md §14 updated (fonts and icons decided) and F00 architecture.md §7 added as the implementation contract. F00-FE-DESIGN-SYSTEM is active: the shared design layer with no shipped-surface change; F00-QA-VISUAL is queued.
 
 ## Last Completed Action
 
-Tech Lead 2026-09-21: recorded the selection, Foundation Status Selected (Selected By: user; Decision Reference: F00.FOUNDATION-SELECTION), decision set in §18, gate RESOLVED, follow-ups updated (DESIGN-ADOPTION-CONTRACT-AMENDMENTS), F00-UI-FINALIZE activated.
+Tech Lead visual-gate checkpoint 2026-09-21: reviewed F00-UI-FINALIZE (Accepted), set Visual Quality Gate = Ready for Implementation, wrote architecture.md §7, updated platform.md §14, activated F00-FE-DESIGN-SYSTEM and queued F00-QA-VISUAL. No app code, package, product or release file changed.
 
 ## Next Expected Action
 
-Run UI Designer on F00-UI-FINALIZE. Then Tech Lead visual-gate checkpoint (Visual Quality Gate → Ready for Implementation if complete), then the Frontend design-system task and Phase C. The F05 / F08 queue continues in parallel positions.
+Run Frontend/Mobile Developer on F00-FE-DESIGN-SYSTEM. Then Tech Lead reconciliation, Visual Quality Gate = Ready for QA, F00-QA-VISUAL. The F05 / F08 queue continues in parallel positions; Phase C (per-feature conformance rework) follows the design system.
 
 ## Portfolio Summary
 

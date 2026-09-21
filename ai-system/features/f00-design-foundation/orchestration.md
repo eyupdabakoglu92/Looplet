@@ -10,17 +10,19 @@ In Progress
 
 ## Current Owner
 
-Tech Lead
+Frontend/Mobile Developer
 
 ## Next Role
 
-Tech Lead
+Frontend/Mobile Developer
 
 ## Active Task Ledger
 
 - [x] Task ID: F00-UI-FOUNDATION | Assigned Role: UI Designer | Status: Done | Summary: DELIVERED 2026-09-21 — project-authority/design-foundation.md (Status Draft, nothing selected): two materially different rendered directions (A Backlit Stage, B Gazette) on identical Play / lifted-row / locked+frozen / Won Perfect + 2★ / Journey home / tutorial states with won-moment stills, device variants, Turkish glyph + tabular + contrast specimens, motion language, recommendation, shipped-surface impact list | Depends On: -
 - [x] Task ID: F00-UI-DIRECTION-C | Assigned Role: UI Designer | Status: Done | Summary: DELIVERED 2026-09-21 — Direction C (Loop Glass) rendered from the user's reference screens on the same states as A/B (+ resolved/literal, sheet/full-screen and semantics alternatives, device variants, specimen with measured contrast) and three reference-frame parity comparisons; design-foundation.md §17 (system, motion, measured tokens, contract conflicts, deviations D1-D11, content-delta table, confirmations needed); A/B recorded as rejected; Status stays Draft | Depends On: F00-UI-FOUNDATION
 - [x] Task ID: F00-UI-FINALIZE | Assigned Role: UI Designer | Status: Done | Summary: DELIVERED 2026-09-21 — selected-source renders for the final decision set (Play, lifted row, locked+frozen, full-screen Result perfect / new best / 2-star, Home design + today, tutorial, device variants), an executable board-to-result transition prototype with timed and reduced-motion stills, a component/token sheet, and the design-system handoff features/f00-design-foundation/ui-design.md (Visual Evidence Manifest with selected-source and motion-prototype records); Foundation stays Selected | Depends On: F00-UI-DIRECTION-C
+- [ ] Task ID: F00-FE-DESIGN-SYSTEM | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: Implement the design-system layer from ui-design.md and architecture.md §7 in app/lib/design (tokens, typography, drawn icon set, Looplet wordmark, Turkish uppercasing helper, shared components) with the two OFL fonts bundled, plus a debug-only component gallery for runtime parity; NO shipped surface changes; automated tests, analyzer, format green; runtime gallery screenshots compared with S-91-components.png | Depends On: F00-UI-FINALIZE
+- [ ] Task ID: F00-QA-VISUAL | Assigned Role: QA | Status: Queued | Summary: Independent visual QA of the implemented design system on the canonical simulator (visual-quality module, rubric 93 plus, every dimension 8 plus) against the selected-source renders; activated only after Tech Lead reconciliation | Depends On: F00-FE-DESIGN-SYSTEM
 
 ## Open Tasks
 
@@ -32,7 +34,7 @@ None
 
 ## Delivery Review
 
-Pending
+Accepted
 
 ## QA Scope
 
@@ -64,11 +66,11 @@ ai-system/project-authority/design-foundation.md
 
 ## Visual Quality Gate
 
-Pending
+Ready for Implementation
 
 ## Visual Evidence
 
-User-supplied canonical-reference screens: features/f00-design-foundation/design/reference/user-ref-1-home.png, user-ref-2-play.webp, user-ref-3-completion.webp (provided by the user 2026-09-21; not yet a selected-source).
+Selected-source and reference records: features/f00-design-foundation/ui-design.md § Visual Evidence Manifest (3 direction-render, canonical-reference, parity-comparison, selected-source and motion-prototype records); artefacts under features/f00-design-foundation/design/ (S-*.png, S-91-components.png, parity-*.png, sheet-S*.png, src/S-transition-prototype.html); user references in design/reference/.
 
 ## QA Modules
 
@@ -128,6 +130,36 @@ not-evaluated
   * Result: PASS
   * Provenance / Note: 2026-09-21 UI Designer, HEAD cc7fe3f + uncommitted working tree: 24 selected-source PNGs (S-01 … S-16, S-v-*, S-91) plus contact sheets in features/f00-design-foundation/design/, the executable prototype design/src/S-transition-prototype.html (frames S-08…S-16 are captured from it), and ui-design.md with a Visual Evidence Manifest (3 direction-render, 3 canonical-reference, parity-comparison, selected-source and motion-prototype records). Generated HTML/CSS renders (Blink), not Flutter or simulator captures; no OS-text-scale, loading/error/recovery or Android renders; the motion prototype is not a Flutter prototype. Independent QA scoring pending implementation.
 
+- Evidence ID: F00.DS-AUTOMATED
+  * Scenario: Token values, Turkish uppercasing cases, component state tests, analyzer, format, full melos test suite and the F03 device suite stay green with no shipped-surface change
+  * Required Class: automated functional
+  * Target / Environment: workspace (melos) plus the F03 integration suite on one simulator
+  * Owner Role: Frontend/Mobile Developer
+  * Prerequisite / External Decision: None
+  * Re-evaluation Trigger: F00-FE-DESIGN-SYSTEM delivery
+  * Blocks: Visual Quality Gate = Ready for QA
+  * Result: PENDING
+
+- Evidence ID: F00.DS-PARITY
+  * Scenario: Runtime gallery screenshots of every component and state next to design/S-91-components.png and per-component crops (Visual Parity Evidence with runtime-screenshot and parity-comparison records), a Turkish-glyph and weight-axis check, deviations listed
+  * Required Class: runtime
+  * Target / Environment: iOS Simulator iPhone 16 (393x852) plus 16e and Pro Max variants (platform.md §14)
+  * Owner Role: Frontend/Mobile Developer
+  * Prerequisite / External Decision: None (fonts and icons decided, platform.md §14)
+  * Re-evaluation Trigger: F00-FE-DESIGN-SYSTEM delivery
+  * Blocks: Visual Quality Gate = Ready for QA
+  * Result: PENDING
+
+- Evidence ID: F00.VISUAL-QA
+  * Scenario: Independent premium-rubric scoring of the implemented design system on the canonical target (final score, lowest dimension, fail conditions, complete runtime evidence)
+  * Required Class: runtime
+  * Target / Environment: iOS Simulator, debug build of the exact revision, gallery plus any surface that already consumes the design system
+  * Owner Role: QA
+  * Prerequisite / External Decision: F00-FE-DESIGN-SYSTEM delivered and reconciled; Visual Quality Gate = Ready for QA
+  * Re-evaluation Trigger: Tech Lead activates F00-QA-VISUAL
+  * Blocks: Visual Quality Gate = Passed; F00 Done
+  * Result: PENDING
+
 ## Open Decision Gates
 
 - Decision ID: F00.FOUNDATION-SELECTION
@@ -146,7 +178,7 @@ None
 
 ## Next Action
 
-Tech Lead (mandatory visual-gate checkpoint): review F00-UI-FINALIZE — ui-design.md, the S-* selected-source renders, the transition prototype and the manifest — and record the delivery. If complete, set Visual Quality Gate = Ready for Implementation (the audit then requires the selected Foundation reference, ui-design.md with a Visual Evidence Manifest, and >= 2 direction-render records — all present). Ask the user about the two open proposals (visible exit chevron on the Result; one-glow rule on the Result) or decide them. Then plan the Frontend design-system task (bundle fonts, tokens/theme, drawn icon set, `Looplet` wordmark, shared components) and Phase C (conformance audit of F03 / F04 / F05 surfaces; contract amendments DESIGN-ADOPTION-CONTRACT-AMENDMENTS at each visual-rework activation).
+Run Frontend/Mobile Developer on F00-FE-DESIGN-SYSTEM using the Current Frontend Brief and architecture.md §7. The delivery returns to the Tech Lead for reconciliation; then the Tech Lead sets Visual Quality Gate = Ready for QA and activates F00-QA-VISUAL (QA plan: visual-quality module). Phase C (conformance of F03 / F04 / F05 surfaces, each as visual rework with its contract amendment) is planned after the design system exists.
 
 ## Last Decision
 
@@ -162,11 +194,13 @@ Tech Lead (mandatory visual-gate checkpoint): review F00-UI-FINALIZE — ui-desi
 
 2026-09-21 (finalize) — UI Designer delivered F00-UI-FINALIZE: selected-source renders for the decision set, an executable transition prototype (frames taken from it), a component/token sheet and the design-system handoff ui-design.md. Foundation stays Selected (the UI Designer changed no selection). Open proposals for the Tech Lead / user: (a) a visible back chevron as the Result's way home (the user removed the Close button, a way home is still required); (b) one-glow rule on the Result — CTA and stars non-glow, which differs from the user's reference; plus the count-aware subtitle copy (PO / localization) and lifting 43.9 pt targets to 44 / the HAMLE caption to >= 11 pt in Phase D. Provisional self-review 87 (motion, originality, fidelity capped at 8).
 
+2026-09-21 (visual-gate checkpoint) — Tech Lead reviewed F00-UI-FINALIZE: ui-design.md, the S-* selected-source renders, the executable transition prototype (frames taken from it), the component/token sheet and the manifest are complete and consistent with design-foundation.md §17/§18; Delivery Review = Accepted; Visual Quality Gate = Ready for Implementation (Foundation Selected, ui-design.md with a Visual Evidence Manifest and three direction-render records present). Rulings on the UI Designer's proposals (defaults stand unless the user vetoes): (1) a visible back chevron is the Result's way home — the user removed the Close BUTTON, F04 architecture keeps 'Close / system back pops to the caller', so system back / edge swipe plus the chevron satisfy the contract; (2) the one-glow rule stays on the Result — CTA and stars non-glow (differs from the user's reference; a user request would be a contract amendment); (3) count-aware subtitle copy stays a PO / localization item; the 43.9 pt targets and the 10.4 pt HAMLE caption are corrected in Phase D. Next: the design-system layer is implemented first (F00-FE-DESIGN-SYSTEM) with NO shipped-surface change, then independently QA'd; per-feature conformance follows. platform.md §14 updated (fonts and icons decided).
+
 ## Last Update
 
-* Updated By: UI Designer
+* Updated By: Tech Lead
 * Timestamp: 2026-09-21
-* Summary: F00-UI-FINALIZE delivered (selected-source renders, transition prototype, component sheet, ui-design.md); F00.SELECTED-SOURCE PASS; Delivery Review Pending; owner Tech Lead for the visual-gate checkpoint.
+* Summary: visual-gate checkpoint passed; Visual Quality Gate = Ready for Implementation; F00-FE-DESIGN-SYSTEM activated for the Frontend/Mobile Developer; F00-QA-VISUAL queued.
 
 ## Context & Follow-ups
 
@@ -188,17 +222,18 @@ Why now: the ai-system upgrade (cfd6b59) made an independent visual gate (>= 93 
 * 2026-09-21 — Tech Lead: incident — decision request re-presented as a plain-language visual guide (design/guide-*.png).
 * 2026-09-21 — Tech Lead: decision F00.FOUNDATION-SELECTION RESOLVED (B: 2=2, 5=Looplet); Foundation Selected; F00-UI-FINALIZE activated.
 * 2026-09-21 — UI Designer: F00-UI-FINALIZE delivered; owner -> Tech Lead (visual-gate checkpoint).
+* 2026-09-21 — Tech Lead: visual-gate checkpoint passed (Ready for Implementation); F00-FE-DESIGN-SYSTEM activated; F00-QA-VISUAL queued.
 
-## Current UI Brief (F00-UI-FINALIZE — activated 2026-09-21; DELIVERED, see ui-design.md)
+## Current Frontend Brief (F00-FE-DESIGN-SYSTEM — activated 2026-09-21)
 
-Read: `project-authority/design-foundation.md` (Status **Selected**; §17 Direction C; **§18 the user's decision set**), this orchestration, the A/B/C renders and the user's reference screens (`design/reference/`), `design/design-doctrine.md`, `design/premium-ui-rubric.md`, `design/visual-quality-gate.md`, `templates/feature-ui-design.template.md`, F03 `ui-design.md` §16 and F03 `architecture.md` §18 (current won-moment contract), F04 `architecture.md` (exit behaviour) and `ui-design.md`.
+Read: `features/f00-design-foundation/architecture.md` **§7 (the implementation contract — binding)**, `ui-design.md` (tokens §7–§8, motion §11, accessibility §13, handoff §14), `project-authority/design-foundation.md` (Selected; §17, §18), `design/S-91-components.png` (component/token reference), the S-* selected-source renders, `project-authority/platform.md` §14 (capture methods; fonts/icons decided), `design/visual-quality-gate.md`, `app/lib/play/play_theme.dart` (the shipped tokens you must NOT restyle) and `app/lib/reduce_motion.dart`.
 
-**What the user decided (§18):** Direction C. Active row = cream + periwinkle rim. **Solved screen = full-screen result, no board behind, no Close button.** Third stat = EN İYİ. The five items the game does not have yet stay in the design as future scope. **Wordmark = `Looplet`** (capital L only, last three letters `let` lime). Reference Turkish wording as proposed copy.
+Deliver: the `app/lib/design/` layer exactly as architecture.md §7 lists it — bundled Space Grotesk and Manrope (variable, OFL texts, `pubspec.yaml`; verify the weight axis, tabular figures and every Turkish capital and lowercase on the simulator), tokens (colour roles, gradients, radii, shadows, spacing scaled from the 358-pt reference), type roles, the drawn icon set (no new package without approval), the `Looplet` wordmark widget (capital L, `let` lime), `turkishUpper()`, the components (glass card and slate variant, board card, tile face in all seven states, target-rail tile, lime primary pill with glow and neutral-shadow variants, outline pill, text link incl. disabled, badge, moves card, round/square/undo buttons, stat card, loop-track node, star, wordmark) and a debug-only `DesignGalleryScreen` laid out like S-91.
 
-**Deliver (task F00-UI-FINALIZE):**
-1. **Selected-source renders** (same evidence discipline: real images under `design/`, generator source kept, recorded as `selected-source` in the manifest) for: Play idle · lifted row · locked + frozen · **full-screen solved result** (Perfect, and the 2★ variant with Retry as the primary action) · Home (with the future-scope items, marked so) · column tutorial. The wordmark is `Looplet` everywhere it appears. Correct any remaining case bug (`İ`/`ı`).
-2. **Solved-result design decisions the user left to you:** (a) a **visible way home** without a Close button (a small, reference-consistent affordance — e.g. a back chevron consistent with the Play screen — plus system back/edge swipe); the user may veto it; (b) the **board → full-screen result transition**: how the winning row and the result content arrive, keeping the contracted intent (input locked at the win, the result not shown before the win sequence has been seen, ≤ 940 ms total, one glow, the reduced-motion path of F03 §16.2); provide timed frame stills and, if feasible, a short timed frame sequence — note that a working prototype is a Phase D task; (c) how **2★ / new-best** variants read on the same composition.
-3. **`features/f00-design-foundation/ui-design.md`** — the design-system handoff (use the feature template): tokens (colour roles, type roles and scale, spacing, radii, shadows/glow rules), the two OFL font families and the drawn icon set (delivery mechanism is a Frontend decision), component decisions (glass card, tile states incl. active/locked/frozen/winning, pills, stat card, node track, badges), state design, motion/sensory spec incl. reduced motion, screen/state/viewport matrix, **Visual Evidence Manifest with `selected-source` records**, provisional self-review (honest), Frontend handoff.
-4. Update `design-foundation.md` only where the final renders change it (e.g. the §17.6 items now superseded); keep it Selected — you never change the selection.
+Hard rules: **no shipped screen changes** (F03/F04/F05/F08 look and behaviour untouched; their suites unchanged and green); no game-logic/contract change; one-glow rule and the semantic colour separation (lime resolution, periwinkle active row/position) are part of the components; reduced motion via `reduceMotionRequested()`; the HAMLE caption and the 44-pt targets are built to the corrected values (>= 11 pt caption, 44 pt targets), noted as deviations from S-91 if they differ; anything needing a dependency or a bootstrap change is a Needs-Tech-Lead-Clarification.
 
-Constraints that do not move: portrait, 5×5 wrap-shift interaction, ≥ 44 pt targets, no colour-only state, measured contrast (labels ≥ 4.5 : 1), Turkish casing rule, bundled OFL fonts, no third-party assets. Non-goals: no app code; no product decision; no contract edit (contract amendments for F03 §16/§18 and F04 belong to the Tech Lead at the visual-rework activation). Return to the Tech Lead (mandatory visual-gate checkpoint) with `Next Role` = Tech Lead.
+Evidence (frontend.md, exact commands/targets/results): analyzer, format, `melos run test`, the F03 device suite on one simulator; Visual Parity Evidence — runtime gallery screenshots on iPhone 16 (393x852) and the 16e / Pro Max variants beside S-91 and per-component crops, a Turkish-glyph screenshot, bundle-size cost, deviations list. Mock/override limits stated. Close F00-FE-DESIGN-SYSTEM, Delivery Review = Pending, owner -> Tech Lead.
+
+## Earlier briefs
+
+The UI Designer briefs for F00-UI-FOUNDATION, F00-UI-DIRECTION-C and F00-UI-FINALIZE are delivered; their content lives in design-foundation.md (§4–§19), ui-design.md and the change log above.
