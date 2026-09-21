@@ -40,7 +40,7 @@ features/f00-design-foundation/orchestration.md
 
 ## Current Phase
 
-F00 Design Foundation (Design Adoption Route, Phase B round 2: Direction C)
+F00 Foundation SELECTED — finalize selected-source and design-system handoff
 
 ## Current Role
 
@@ -48,15 +48,15 @@ UI Designer
 
 ## Current Reason
 
-F00 round 1 delivered two rendered directions (A Backlit Stage, B Gazette); the user rejected both as not modern / not the expected style and supplied three reference screens (Home, Play, Completion). The Tech Lead recorded the rejection, stored the references, and activated F00-UI-DIRECTION-C: render a Direction C in that visual language on the same states, keep new product content as flagged proposals, and return for the user's confirmation. Nothing is selected.
+The user resolved F00.FOUNDATION-SELECTION as B (2=2, 5=Looplet): Direction C (Loop Glass) is selected with a full-screen solved result (no Close button) and the wordmark `Looplet`; the other recommendations stand. The Tech Lead recorded the decision, set the Foundation to Status Selected, logged the contract consequences (F03 §18 won composition, F04 Close) for the visual-rework activation, and activated F00-UI-FINALIZE for the UI Designer. No app code, contract or product file changed.
 
 ## Last Completed Action
 
-Tech Lead incident intake 2026-09-21: recorded the rejection of A/B, stored the user references (design/reference/), accepted the round-1 delivery, activated F00-UI-DIRECTION-C with a brief that separates visual language from new content, added USER-REFERENCE-CONTENT-DELTAS to the follow-ups. No app code, contract or product file changed.
+Tech Lead 2026-09-21: recorded the selection, Foundation Status Selected (Selected By: user; Decision Reference: F00.FOUNDATION-SELECTION), decision set in §18, gate RESOLVED, follow-ups updated (DESIGN-ADOPTION-CONTRACT-AMENDMENTS), F00-UI-FINALIZE activated.
 
 ## Next Expected Action
 
-Run UI Designer on F00-UI-DIRECTION-C. Then Tech Lead checkpoint: ask the user to confirm the C render (selection). Queue unchanged: F05 delivery reconciliation + F05-QA-STRICT, then F08 local evidence.
+Run UI Designer on F00-UI-FINALIZE. Then Tech Lead visual-gate checkpoint (Visual Quality Gate → Ready for Implementation if complete), then the Frontend design-system task and Phase C. The F05 / F08 queue continues in parallel positions.
 
 ## Portfolio Summary
 

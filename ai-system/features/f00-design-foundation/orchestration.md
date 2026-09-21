@@ -10,16 +10,17 @@ In Progress
 
 ## Current Owner
 
-Tech Lead
+UI Designer
 
 ## Next Role
 
-Tech Lead
+UI Designer
 
 ## Active Task Ledger
 
 - [x] Task ID: F00-UI-FOUNDATION | Assigned Role: UI Designer | Status: Done | Summary: DELIVERED 2026-09-21 — project-authority/design-foundation.md (Status Draft, nothing selected): two materially different rendered directions (A Backlit Stage, B Gazette) on identical Play / lifted-row / locked+frozen / Won Perfect + 2★ / Journey home / tutorial states with won-moment stills, device variants, Turkish glyph + tabular + contrast specimens, motion language, recommendation, shipped-surface impact list | Depends On: -
 - [x] Task ID: F00-UI-DIRECTION-C | Assigned Role: UI Designer | Status: Done | Summary: DELIVERED 2026-09-21 — Direction C (Loop Glass) rendered from the user's reference screens on the same states as A/B (+ resolved/literal, sheet/full-screen and semantics alternatives, device variants, specimen with measured contrast) and three reference-frame parity comparisons; design-foundation.md §17 (system, motion, measured tokens, contract conflicts, deviations D1-D11, content-delta table, confirmations needed); A/B recorded as rejected; Status stays Draft | Depends On: F00-UI-FOUNDATION
+- [ ] Task ID: F00-UI-FINALIZE | Assigned Role: UI Designer | Status: Open | Summary: The Foundation is SELECTED (Direction C, decision set in design-foundation.md §18). Produce the selected-source renders for the final decisions (Looplet wordmark; full-screen solved result incl. the 2-star variant and the board-to-result transition; a proposed visible exit affordance; home with future-scope items) and the design-system handoff `ui-design.md` (tokens, type, icons, components, states, motion incl. reduced-motion, Visual Evidence Manifest with selected-source records) so the Tech Lead can set Visual Quality Gate = Ready for Implementation | Depends On: F00-UI-DIRECTION-C
 
 ## Open Tasks
 
@@ -31,7 +32,7 @@ None
 
 ## Delivery Review
 
-Pending
+Accepted
 
 ## QA Scope
 
@@ -59,7 +60,7 @@ design-system
 
 ## Design Foundation
 
-Pending
+ai-system/project-authority/design-foundation.md
 
 ## Visual Quality Gate
 
@@ -116,9 +117,27 @@ not-evaluated
   * Result: PASS
   * Provenance / Note: 2026-09-21 UI Designer: parity-1-home.png, parity-2-play.png, parity-3-completion.png (user reference | Direction C render on the same 358x717 @2x frame; renders C-P1/P2/P3). Deviations D1-D11 listed in design-foundation.md §17.8 (Turkish casing fixes, earned stars filled, node overlap and text wrap fixed, status chrome, active-row accent resolved with a literal variant, contract-conforming completion with a reference variant). Palette and small-label colours MEASURED from the reference pixels (§17.4); the brief's assumption that the reference's small caps were a contrast weakness was disproved by measurement (5.6-9.6:1).
 
+- Evidence ID: F00.SELECTED-SOURCE
+  * Scenario: Selected-source renders reflecting the final decision set (§18): Play idle / lifted row / locked+frozen, full-screen solved result (Perfect and 2-star) with the board-to-result transition and a proposed visible exit, Home with future-scope items and the `Looplet` wordmark, column tutorial — recorded as `selected-source` in a Visual Evidence Manifest inside the F00 ui-design.md handoff
+  * Required Class: manual
+  * Target / Environment: iPhone 16 393x852 reference frame (platform.md §14); 16e and Pro Max variants for the critical states
+  * Owner Role: UI Designer
+  * Prerequisite / External Decision: None (F00.FOUNDATION-SELECTION RESOLVED)
+  * Re-evaluation Trigger: F00-UI-FINALIZE delivery
+  * Blocks: Visual Quality Gate = Ready for Implementation; every visual implementation task
+  * Result: PENDING
+
 ## Open Decision Gates
 
-None
+- Decision ID: F00.FOUNDATION-SELECTION
+  * Question: Which direction becomes the project Design Foundation (Status: Selected)? Directions A and B were rejected by the user on 2026-09-21; Direction C ("Loop Glass", design-foundation.md §17) was rendered from the user's reference screens.
+  * Options / Trade-offs: The choice is presented to the user as a plain-language visual guide (design/guide-0 … guide-7, Turkish) with six sub-decisions, each with two options and a recommendation: (1) dragged row: 1 = cream tile with a periwinkle rim (recommended) · 2 = lime as in the user's reference; (2) solved screen: 1 = bottom sheet over the board with Close kept (recommended) · 2 = full-screen result; (3) result numbers: 1 = SEN / OPTİMAL / EN İYİ (recommended) · 2 = SEN / OPTİMAL / +3 YILDIZ; (4) the five items in the user's screens that the game does not have yet (settings button, streak chip, stars chip, level-info card, gesture hint): 1 = remove from the design · 2 = keep in the design as future scope, not implemented until their feature exists (recommended); (5) wordmark: 1 = lowercase `looplet` (recommended) · 2 = uppercase `LOOPLET`; (6) Turkish copy: 1 = the reference's wording as proposed copy (recommended) · 2 = the current game's wording. Answers: A) select Direction C with every recommendation; B) select Direction C with overrides written as `B: <decision>=<option>, ...` (unlisted decisions keep the recommendation); C) do not select — request a revision (state it).
+  * Recommendation: A
+  * Blocks: Foundation Status Selected, Design Adoption Route Phase C/D and every visual implementation task; not the F05 / F08 queue
+  * Blocking Scope: feature
+  * Status: RESOLVED
+  * Resolution: B — the user selected Direction C (Loop Glass) with two overrides (`B: 2=2, 5=Looplet`): decision 2 = full-screen solved result with no Close button (option 2); decision 5 = wordmark `Looplet` (capital L only, the last three letters `let` lime) — a variant of their own; decisions 1, 3, 4, 6 keep the recommendations (periwinkle-rim active row; EN İYİ personal best; the five not-yet-existing items stay in the design as future scope; the reference's Turkish wording as proposed copy). Recorded in design-foundation.md §18; the Foundation is Status: Selected.
+  * Resolved At: 2026-09-21
 
 ## Blockers
 
@@ -126,7 +145,7 @@ None
 
 ## Next Action
 
-Tech Lead: review the F00-UI-DIRECTION-C delivery (design-foundation.md §17, design/parity-*.png, design/sheet-C.png, design/compare-C-*.png) and record it; ask the user to CONFIRM Direction C (selection decision F00.FOUNDATION-SELECTION) with the seven confirmations in §17.9 (direction; lifted-row accent resolved vs lime-literal; completion sheet vs full-screen; completion semantics; which non-shipped Home/Play content is wanted; lowercase wordmark; reference copy as proposed copy). Decide the contract questions in §17.11 before any Phase D task (F03 §16.3 dock location, completion composition, semantics, one-glow rule). Visual Quality Gate stays Pending; nothing visual is implemented before Status: Selected.
+Run UI Designer on F00-UI-FINALIZE using the Current UI Brief. The delivery returns to the Tech Lead (visual-gate checkpoint), who reconciles it and — if the handoff, selected-source records and Visual Evidence Manifest are complete — sets Visual Quality Gate = Ready for Implementation and plans the Frontend design-system task (bundle fonts, tokens/theme, icon set, wordmark asset) and Phase C (conformance audit of F03 / F04 / F05 surfaces).
 
 ## Last Decision
 
@@ -134,11 +153,17 @@ Tech Lead: review the F00-UI-DIRECTION-C delivery (design-foundation.md §17, de
 
 2026-09-21 (incident) — The user rejected BOTH rendered directions (A Backlit Stage, B Gazette): "neither is modern; not the style I expect" — and supplied three reference screens (Home, Play, Completion) as the expected style. Tech Lead decisions: (1) A and B are recorded as rejected by the selection authority; their renders stay as the explored alternatives in the Foundation (the exploration gate — two rendered, materially different directions — was met by them; C makes three rendered). (2) The user's screens are treated as a canonical-reference for VISUAL LANGUAGE (palette, type feel, radii, glass surfaces, icon style, tone, composition). Content in those screens that is not in the shipped product is NOT treated as a requirement: it is flagged as a proposal with an owner (see Current UI Brief, Content deltas) — the user may override this interpretation. (3) Direction C is rendered and confirmed by the user before it can be Selected; the recommendation is C. (4) Process lesson: the first exploration did not collect the user's aesthetic references before rendering; future direction rounds start from user references when they exist. No app, contract or product file changed.
 
+2026-09-21 (checkpoint) — Tech Lead reviewed the F00-UI-DIRECTION-C delivery: artefacts present and consistent with design-foundation.md §17; no app/package/content file changed; the Foundation stays Draft. Delivery Review = Accepted. Rulings on the UI Designer's clarification items: (1) the 93 / every-dimension-≥8 bar applies to implemented surfaces scored by independent QA; a Foundation draft's self-review is advisory and dimensions 7 and 10 are capped at 8 before a prototype and a runtime build — no rework needed for 87. (2) No Flutter-rendered comparison is required before selection (the user chose the style from renders); a working win-sequence motion prototype and a runtime parity pass become Phase D tasks. (3) Contract positions, effective only if the user selects C and each needing a TL contract amendment at Phase D activation: the answer row landing where the target rail was (F03 §16.3) is approved in principle because the reference header leaves no dock zone; F03 §16 sheet-over-dimmed-board and Close (F04 AC) stay; completion stats keep the shipped personal-best semantics; the one-glow rule stays unless the user asks otherwise — Phase D handoff must show one glow (the docked row) with star fill and CTA as non-glow emphasis. (4) Content deltas (settings, streak chip, stars chip, level-info card, gesture hint, copy) are not requirements; they stay proposals in workflow-follow-ups.md (USER-REFERENCE-CONTENT-DELTAS) with named owners. (5) The design folder holds ~27 MB of PNGs; after selection the rejected-direction variants may be pruned — logged as a follow-up, not done now.
+
+2026-09-21 (incident) — The user could not understand the selection request: file codes (C-02, C-04…) and "lowercase / uppercase looplet" meant nothing to them. Tech Lead action: no state change to the decision itself, but the request was rewritten in plain language and rebuilt as an eight-image Turkish visual guide (design/guide-*.png; source src/guide.py) with side-by-side options and a one-line reply format; the gate's options above now mirror it. One recommendation changed while simplifying: decision 4 (items the game does not have yet) is recommended as "keep in the design as future scope, not implemented now" instead of removing them — it keeps the user's vision at no scope cost. Process lesson: decisions put to the user must be visual, in the user's language, with named options instead of internal codes.
+
+2026-09-21 (selection) — The user decided F00.FOUNDATION-SELECTION as `B: 2=2, 5=Looplet`: Direction C selected; the solved screen is the FULL-SCREEN composition with NO Close button (override of the recommendation); the wordmark is `Looplet` (capital L only, last three letters `let` lime — the user's own variant); decisions 1, 3, 4, 6 keep the recommendations. Tech Lead: gate RESOLVED; design-foundation.md Status Selected (Selected By: user; Decision Reference: this gate); the decision set is recorded in §18. Interpretation: (1) Close is defined in F03/F04 feature architecture, not in the PRD, so removing it is a Tech Lead contract amendment, not a Product Owner revision; it is deferred to the F03/F04 visual-rework activation and logged in workflow-follow-ups.md (DESIGN-ADOPTION-CONTRACT-AMENDMENTS); (2) a player must still have a way home — system back/edge swipe stays and the UI Designer proposes a visible affordance the user may veto; (3) the earlier contract positions (row lands where the rail was; content-driven sheet) are superseded; the one-glow rule stays. Next: F00-UI-FINALIZE (selected-source renders + design-system handoff).
+
 ## Last Update
 
-* Updated By: UI Designer
+* Updated By: Tech Lead
 * Timestamp: 2026-09-21
-* Summary: F00-UI-DIRECTION-C delivered (Direction C rendered from the user's references, parity comparisons, §17); F00.DIRECTION-C-RENDERS and F00.REFERENCE-PARITY PASS; Delivery Review Pending; owner Tech Lead. Nothing selected.
+* Summary: F00.FOUNDATION-SELECTION RESOLVED (B: 2=2, 5=Looplet); Foundation Status Selected; F00-UI-FINALIZE activated for the UI Designer.
 
 ## Context & Follow-ups
 
@@ -156,39 +181,20 @@ Why now: the ai-system upgrade (cfd6b59) made an independent visual gate (>= 93 
 * 2026-09-21 — UI Designer: F00-UI-FOUNDATION delivered; owner -> Tech Lead (selection decision to be opened).
 * 2026-09-21 — Tech Lead: incident — user rejected A and B and supplied reference screens; delivery Accepted; F00-UI-DIRECTION-C activated for the UI Designer.
 * 2026-09-21 — UI Designer: F00-UI-DIRECTION-C delivered; owner -> Tech Lead (user confirmation of Direction C to be requested).
+* 2026-09-21 — Tech Lead: delivery Accepted; gate F00.FOUNDATION-SELECTION OPEN (user); clarification items ruled.
+* 2026-09-21 — Tech Lead: incident — decision request re-presented as a plain-language visual guide (design/guide-*.png).
+* 2026-09-21 — Tech Lead: decision F00.FOUNDATION-SELECTION RESOLVED (B: 2=2, 5=Looplet); Foundation Selected; F00-UI-FINALIZE activated.
 
-## Current UI Brief (F00-UI-DIRECTION-C — activated 2026-09-21; DELIVERED, see design-foundation.md §17)
+## Current UI Brief (F00-UI-FINALIZE — activated 2026-09-21)
 
-Read: the three user-supplied reference screens in `features/f00-design-foundation/design/reference/` (`user-ref-1-home.png` Home, `user-ref-2-play.webp` Play, `user-ref-3-completion.webp` Completion; 716×1434 = 2× a 358×717 frame), this orchestration, `architecture.md`, `project-authority/design-foundation.md` (A/B sections and §14), `design/design-doctrine.md`, `design/premium-ui-rubric.md`, `design/visual-quality-gate.md`, the shipped tokens in `app/lib/play/play_theme.dart` and F03 §16 / F04 / F05 ui-design for contracts.
+Read: `project-authority/design-foundation.md` (Status **Selected**; §17 Direction C; **§18 the user's decision set**), this orchestration, the A/B/C renders and the user's reference screens (`design/reference/`), `design/design-doctrine.md`, `design/premium-ui-rubric.md`, `design/visual-quality-gate.md`, `templates/feature-ui-design.template.md`, F03 `ui-design.md` §16 and F03 `architecture.md` §18 (current won-moment contract), F04 `architecture.md` (exit behaviour) and `ui-design.md`.
 
-**What happened:** the user rejected A and B as not modern and supplied these screens as the style they expect. This is now the design source. Reproduce its visual language faithfully; do not "improve" it back toward A or B.
+**What the user decided (§18):** Direction C. Active row = cream + periwinkle rim. **Solved screen = full-screen result, no board behind, no Close button.** Third stat = EN İYİ. The five items the game does not have yet stay in the design as future scope. **Wordmark = `Looplet`** (capital L only, last three letters `let` lime). Reference Turkish wording as proposed copy.
 
-**Visual language to carry (measured from the screens, not guessed):** very deep navy ground `#050A1E → #0D132D` with a soft lighter top-right glow (`≈ #2D365C`); frosted / glass rounded cards (`≈ #2A345A`, large radius ≈ 28–32 pt, 1 px light edge, soft light spill); one **lime** accent (`≈ #D0EF58 → #E4FA87`, ink text on it) for the emphasised word, primary CTA, resolution and the active row; **periwinkle** secondary (`≈ #A8B4F9`) for the current node / secondary emphasis; warm cream tiles (`≈ #FCF7F0`) with a large radius (≈ 28 % of tile); dark bordered target tiles; pill buttons; thin rounded **outline** icons (sliders, flame, sparkle, star, undo, restart); a modern grotesque for headings (the emphasised word coloured lime) and a tabular/mono-feeling face for tile letters; friendly sentence-case Turkish microcopy; lowercase wordmark `looplet` with `let` in lime; generous spacing; a curved journey track with numbered nodes on the home card. Identify the closest **OFL** faces (confirm İ ı Ş Ğ Ç Ö Ü, tabular figures, licence, app-size cost) — do not assume the reference's fonts; say "not identified" if you cannot.
+**Deliver (task F00-UI-FINALIZE):**
+1. **Selected-source renders** (same evidence discipline: real images under `design/`, generator source kept, recorded as `selected-source` in the manifest) for: Play idle · lifted row · locked + frozen · **full-screen solved result** (Perfect, and the 2★ variant with Retry as the primary action) · Home (with the future-scope items, marked so) · column tutorial. The wordmark is `Looplet` everywhere it appears. Correct any remaining case bug (`İ`/`ı`).
+2. **Solved-result design decisions the user left to you:** (a) a **visible way home** without a Close button (a small, reference-consistent affordance — e.g. a back chevron consistent with the Play screen — plus system back/edge swipe); the user may veto it; (b) the **board → full-screen result transition**: how the winning row and the result content arrive, keeping the contracted intent (input locked at the win, the result not shown before the win sequence has been seen, ≤ 940 ms total, one glow, the reduced-motion path of F03 §16.2); provide timed frame stills and, if feasible, a short timed frame sequence — note that a working prototype is a Phase D task; (c) how **2★ / new-best** variants read on the same composition.
+3. **`features/f00-design-foundation/ui-design.md`** — the design-system handoff (use the feature template): tokens (colour roles, type roles and scale, spacing, radii, shadows/glow rules), the two OFL font families and the drawn icon set (delivery mechanism is a Frontend decision), component decisions (glass card, tile states incl. active/locked/frozen/winning, pills, stat card, node track, badges), state design, motion/sensory spec incl. reduced motion, screen/state/viewport matrix, **Visual Evidence Manifest with `selected-source` records**, provisional self-review (honest), Frontend handoff.
+4. Update `design-foundation.md` only where the final renders change it (e.g. the §17.6 items now superseded); keep it Selected — you never change the selection.
 
-**Deliver (same evidence discipline as before):**
-1. **Direction C** rendered on the same states as A/B at 393×852 — Play idle; row lifted (AC9); locked pivots + frozen tiles; Won Perfect (docked row + F04 panel) and 2★; Journey home in progress; column tutorial; three won-moment stills — plus 16e and Pro Max variants of Play idle and Won Perfect, a Turkish glyph / tabular / computed-contrast specimen, and composites. Store under `design/`, record each as `direction-render` in the manifest.
-2. **Reference parity (`F00.REFERENCE-PARITY`):** for the three reference screens, a side-by-side of the reference and your render on the reference frame, recorded as `parity-comparison`; list every deviation and why (contrast fixes, contract conflicts, shipped-content substitutions).
-3. **Update `design-foundation.md`:** add Direction C (thesis, system, motif, motion language incl. reduced-motion, accessibility, impact list), record A and B as **rejected by the user on 2026-09-21** in §6, recommend C, keep Status **Draft** (the user confirms the C render; you never write Selected), refresh the manifest and the provisional self-review (honest; motion/fidelity dimensions stay capped without a prototype).
-
-**Content deltas — visual language is adopted; new product content is a PROPOSAL, not a requirement.** For each row give a "Content delta" table entry (reference element → shipped equivalent → contract/AC affected → proposed handling → decision owner) and render only what is marked:
-
-| Ref | Element in the user's screen | Shipped / contract | Default handling |
-| --- | --- | --- | --- |
-| H1 | lowercase wordmark `looplet` | uppercase `LOOPLET` | adopt (brand decision flagged to the user) |
-| H2 | settings icon button (top right of Home) | no Settings until F10 | render as a labelled proposal; not required |
-| H3 | Home card: "YOLCULUK · 4 / 30", headline "Sıradaki döngüyü çöz.", curved numbered journey track | F05 = 30-tick ring + count | render the new composition; flag F05 layout change |
-| H4 | level info card "Seviye 5 / Yeni mekanik · sütun kaydırma" with target preview | no per-level info / mechanic note in F05 | render as a proposal; flag content-metadata need |
-| H5 | CTA "5. bölüme devam ↗" | `DEVAM ET` + "Seviye N · sürüyor" | adopt style; copy flagged to PO/localization |
-| H6 | chips "4 günlük seri" and "12 yıldız" | daily streak = F07 (not started); no total-stars aggregate | render as proposals clearly labelled; not required |
-| P1 | top bar "‹ SEVİYE 05" + moves card "2 HAMLE" top-right | HUD bottom-left; back chevron | adopt as a layout proposal (F03 layout is UI-owned); keep AC and touch targets |
-| P2 | caption "HEDEF DÖNGÜ" | `HEDEF` | copy flagged |
-| P3 | permanent hint "Satırı tut · kaydır · bırak" | none (onboarding is F09) | proposal |
-| P4 | lime = the active/lifted row | F03: amber = resolution, cyan = drag | **resolve the semantic collision** (one accent doing two jobs) and keep non-colour cues; justify |
-| C1 | full-screen completion, no board | F03 §16: docked row + sheet over the dimmed board (contract) | render the contract-conforming composition as primary; render the reference composition as an alternative and flag the contract change |
-| C2 | badge "YENİ EN İYİ", headline "Döngü tamamlandı.", sub "Hedef tek hamlede yerine oturdu." | `YENİ REKOR`, `ÇÖZÜLDÜ` + word | copy flagged to PO/localization; final TR copy is not decided here |
-| C3 | stats "SEN 1 = OPTİMAL +3 YILDIZ", three **outlined** stars | `SEN / OPTİMAL / EN İYİ`; earned stars filled (F04 ACs: personal best) | render the shipped semantics as primary and the reference semantics as a marked variant; **earned stars must read as earned** (the reference shows all outlines) |
-| C4 | CTAs "Sonraki bölüm →", "Tekrar oyna"; no Close | `SONRAKİ` / `Yeniden` / `Kapat` (Close is an F04 AC) | keep a Close path or flag the AC change |
-
-**Constraints that do not move:** F03 §16 timeline and reduced-motion path; 5×5 wrap-shift interaction and contracts; F04/F05 ACs; ≥ 44 pt targets; no colour-only state (locked / frozen / winning / earned-star / active row); body text ≥ 4.5 : 1 (measure the muted labels — the reference's grey-blue small caps are the likely weak spot; fix and log it as a deviation); bundled OFL font(s) and a bundled/drawn icon set with licences recorded (a permissively licensed open icon set is acceptable if its licence is recorded); Turkish casing rule.
-
-Non-goals: no app code; no product decision; no selection; do not copy a third party's brand assets — the reference is the user's own supplied direction, render your own original artefacts in that language. Return to the Tech Lead (checkpoint) with `Next Role` = Tech Lead.
+Constraints that do not move: portrait, 5×5 wrap-shift interaction, ≥ 44 pt targets, no colour-only state, measured contrast (labels ≥ 4.5 : 1), Turkish casing rule, bundled OFL fonts, no third-party assets. Non-goals: no app code; no product decision; no contract edit (contract amendments for F03 §16/§18 and F04 belong to the Tech Lead at the visual-rework activation). Return to the Tech Lead (mandatory visual-gate checkpoint) with `Next Role` = Tech Lead.

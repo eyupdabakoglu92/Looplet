@@ -1,17 +1,17 @@
 # Project Design Foundation — LOOPLET
 
-> Status: Draft
+> Status: Selected
 >
 > Owner: Tech Lead (lifecycle) / UI Designer (design authorship)
 >
 > Selection Authority: User / Product Owner / explicitly delegated Tech Lead
 
 Last Updated: 2026-09-21
-Selected At: Pending
-Selected By: Pending
-Decision Reference: Pending
+Selected At: 2026-09-21
+Selected By: User (project owner), via decision F00.FOUNDATION-SELECTION — `B: 2=2, 5=Looplet` (Direction C selected with two overrides)
+Decision Reference: features/f00-design-foundation/orchestration.md → Open Decision Gates → F00.FOUNDATION-SELECTION (RESOLVED 2026-09-21); user message "Run Tech Lead. Decision: F00.FOUNDATION-SELECTION — B: 2=2, 5=Sadece ilk harf büyük olsun (Looplet) fakat son 3 harfi yine yeşil olsun"
 
-> **This file is a Draft. Nothing here is selected. Directions A and B were rejected by the user on 2026-09-21 (see §6); Direction C ("Loop Glass", §17) is rendered from the user's reference screens and awaits the user's confirmation.** Two rendered directions (A, B) are compared on identical content; the UI Designer's recommendation (§6) is not a selection. Visual artefacts live in `features/f00-design-foundation/design/` (sources in `design/src/`, regenerate with `node gen.mjs . && sh render.sh && python3 sheets.py`).
+> **Status: SELECTED on 2026-09-21 — Direction C ("Loop Glass", §17), with the decision set recorded in §18. Directions A and B were rejected by the user (§6). The Foundation is the authority for visual implementation; the selected-source renders that reflect the final decision set are being produced (task F00-UI-FINALIZE).** Two rendered directions (A, B) are compared on identical content; the UI Designer's recommendation (§6) is not a selection. Visual artefacts live in `features/f00-design-foundation/design/` (sources in `design/src/`, regenerate with `node gen.mjs . && sh render.sh && python3 sheets.py`).
 
 ---
 
@@ -83,11 +83,11 @@ Reviewed 2026-09-21 in the built-in browser (product web pages / marketing sites
 ## 6. Selection Record
 
 * **Rejected by the selection authority (user), 2026-09-21: Direction A and Direction B** — "neither is modern; not the style I expect". The user supplied three reference screens (`features/f00-design-foundation/design/reference/`) as the expected style; **Direction C — Loop Glass (§17)** was rendered from them (task F00-UI-DIRECTION-C). Recorded by the Tech Lead; §4–§5 describe A/B as explored alternatives.
-* Selected direction: **Pending Selection** — Direction C is rendered (§17); it becomes Selected only when the user confirms it (the confirmations needed are listed in §17.9).
-* Decision maker / delegated authority: **Pending** (user / Product Owner, or an explicit delegation to the Tech Lead)
-* Decision reference: **Pending**
-* Why this direction fits the product: —
-* Rejected direction and reason: —
+* **Selected direction: Direction C — Loop Glass (§17), on 2026-09-21, by the user, with the decision set in §18** (two overrides of the UI Designer's recommendations: the solved screen is the full-screen composition, and the wordmark is `Looplet`).
+* Decision maker / delegated authority: **the user (selection authority)**
+* Decision reference: F00.FOUNDATION-SELECTION (RESOLVED 2026-09-21) — see the header and §18
+* Why this direction fits the product: it is the visual language the user asked for (their own reference screens), rendered with parity, with measured colours and contrast and Turkish casing corrected. Its weakest dimension is Originality (§17.7); the loop identity must be carried by the journey track, the swirl arcs and the `Looplet` wordmark.
+* Rejected directions and reason: A (Backlit Stage) and B (Gazette) — rejected by the user 2026-09-21: "neither is modern, not the style I expect".
 
 **Round-1 recommendation (superseded — the user rejected A and B):** Direction B — Gazette, *if* the selection authority accepts a full restyle of the shipped surfaces. Reasons: it is the only direction whose identity comes from this product's audience (the Turkish newspaper bulmaca habit) rather than from the game-UI category default; its non-colour cues are structural, matching the PRD's "playable without colour" need; and it removes the glow-on-dark recipe that Direction A shares with most puzzle games. **Choose Direction A instead if** protecting shipped work and time-to-launch matters more than distinctiveness: it is a refinement of what players have already seen, with a much smaller migration than B (see the size estimate in §15, which is a rough judgement, not a measurement). A hybrid is not recommended (the two materially differ in ground, type, edge language and motion; mixing them reproduces the "isolated visual language" fail condition).
 
@@ -368,3 +368,26 @@ Source revision for every record: HEAD `8b1a3d5` + uncommitted working tree (gen
 * **Contract change decision** for 17.6 (docked row replaces the rail; completion composition; semantics; one-glow rule) before any Phase D task.
 * **Content deltas** in 17.9 need owners: several are new product scope (streak chip = F07, stars aggregate, settings = F10, per-level info, hint line = F09) — none is implemented or required by this Foundation.
 * The 93 bar for a Foundation draft (as in §16): C is provisionally 87 for the same reason as A/B.
+
+---
+
+## 18. Selection decisions (authority: the user, 2026-09-21)
+
+The user decided through six plain-language sub-decisions (visual guide `design/guide-0 … guide-7`). Recommended options were kept except where marked.
+
+| # | Decision | Result | Source render / note |
+| --- | --- | --- | --- |
+| 1 | Dragged (active) row | **Cream tile with a periwinkle rim + lift + rails + dimmed rest** (recommended); lime stays reserved for resolution and primary actions | `C-02-play-lifted-row.png` |
+| 2 | Solved screen | **Full-screen result, no board behind, no Close button** — *the user overrode the recommendation* | `C-04b-won-full-screen-reference-composition.png` (the 2★ full-screen variant is to be produced) |
+| 3 | Third stat in the result box | **`EN İYİ` (personal best) — shipped semantics kept** (recommended) | `C-04b` |
+| 4 | Items in the user's screens the game does not have yet (settings button, "4 günlük seri", "12 yıldız", "Seviye 5 / Yeni mekanik" card, gesture hint) | **Keep in the design as future scope; not implemented until the owning feature exists** (recommended) | `C-06-home-in-progress.png`, `C-01-play-idle.png` |
+| 5 | Wordmark | **`Looplet`** — capital `L` only; the last three letters `let` stay lime — *the user's own variant, neither of the two options offered* | to be rendered (the current renders show lowercase `looplet`) |
+| 6 | Turkish copy | **The reference's wording as proposed copy** (recommended); final Turkish copy remains with the PO / localization | design-foundation §17.9 |
+
+**Consequences recorded by the Tech Lead (not yet applied):**
+
+1. **The won moment changes composition.** Decision 2 replaces the F03 §16 composition (answer row docked under the target rail + bottom sheet over the dimmed board) with a full-screen result. The earlier §17.6 proposals (row lands where the rail was; content-driven sheet) are **superseded**. The contracted intent stays: input locks at the win, the result is not shown before the win sequence has been seen (the T0 + 600 ms rule's purpose), the reduced-motion path exists, controller/persistence timing is unchanged. The transition from the board to the full-screen result must be designed (UI Designer) and contracted (Tech Lead: `architecture.md` §18 amendment at the F03 visual-rework activation).
+2. **No Close button.** Close is specified in F03 `architecture.md` (§13/§10) and F04 `architecture.md` (Close / system back pops to the caller), **not in the PRD**, so this is a feature-contract amendment (Tech Lead), not a Product Owner revision. A player must still have a way home: system back / edge swipe stays; the UI Designer must propose a visible, reference-consistent exit affordance for the full-screen result (the user may veto it). F04 tests that reference `Kapat` change with that rework.
+3. **One-glow rule.** With the sheet gone, the full-screen result carries the lime tile row glow only as its single glow; star fill and CTA are non-glow emphasis (contract position kept).
+4. **Wordmark `Looplet`** replaces `LOOPLET` on the Home surface; the lime `let` is kept; a final drawn asset is a Phase D item.
+5. The five future-scope items stay owned by their features (F07 streak, F10 settings, F09 hint, F05 level info, an aggregate-stars decision) — see `workflow-follow-ups.md` (USER-REFERENCE-CONTENT-DELTAS).
