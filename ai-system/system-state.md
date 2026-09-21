@@ -40,7 +40,7 @@ features/f00-design-foundation/orchestration.md
 
 ## Current Phase
 
-F00 Design Foundation (Design Adoption Route, Phase B)
+F00 Design Foundation (Design Adoption Route, Phase B round 2: Direction C)
 
 ## Current Role
 
@@ -48,15 +48,15 @@ UI Designer
 
 ## Current Reason
 
-F03 is Done: the final QA (2026-09-21, HEAD 5be4dc6) returned Approved with Notes after real OS interruption (x3) and device-lock checks and the real iOS Reduce Motion toggle on F03 / F04 / F05 surfaces. The Tech Lead closed F03, released the rework-control lock and opened F00 — the carrier for the Design Adoption Route: the project has no Selected Design Foundation and shipped visuals have not passed the independent Visual Quality Gate. The UI Designer drafts a Foundation with at least two rendered directions; the selection belongs to the user / Product Owner.
+F00 round 1 delivered two rendered directions (A Backlit Stage, B Gazette); the user rejected both as not modern / not the expected style and supplied three reference screens (Home, Play, Completion). The Tech Lead recorded the rejection, stored the references, and activated F00-UI-DIRECTION-C: render a Direction C in that visual language on the same states, keep new product content as flagged proposals, and return for the user's confirmation. Nothing is selected.
 
 ## Last Completed Action
 
-Tech Lead closure review 2026-09-21: F03 Done (terminal orchestration; full working record archived in history/f03-closure-2026-09-21); F00 created with architecture.md scope contract and the Phase B brief; board, follow-ups and F05/F08 routing synced. No app code, package, product or release file changed by the Tech Lead.
+Tech Lead incident intake 2026-09-21: recorded the rejection of A/B, stored the user references (design/reference/), accepted the round-1 delivery, activated F00-UI-DIRECTION-C with a brief that separates visual language from new content, added USER-REFERENCE-CONTENT-DELTAS to the follow-ups. No app code, contract or product file changed.
 
 ## Next Expected Action
 
-Run UI Designer on F00-UI-FOUNDATION. Then Tech Lead checkpoint: open the Foundation selection decision for the user. In parallel queue positions: F05 delivery reconciliation + F05-QA-STRICT; F08 local evidence.
+Run UI Designer on F00-UI-DIRECTION-C. Then Tech Lead checkpoint: ask the user to confirm the C render (selection). Queue unchanged: F05 delivery reconciliation + F05-QA-STRICT, then F08 local evidence.
 
 ## Portfolio Summary
 

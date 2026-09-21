@@ -1,7 +1,7 @@
 # Feature Board — LOOPLET
 
 Last Updated: 2026-09-21
-Active Phase: F00 Design Foundation (Phase B)
+Active Phase: F00 Design Foundation (Phase B, round 2: Direction C)
 Active Owner: UI Designer
 Active Feature: F00
 Pending Product Revision: None
@@ -11,7 +11,7 @@ Revision Affected Features: None
 
 | ID | Feature | Status | Owner | QA | Priority | Notes |
 | --- | --- | --- | --- | --- | --- | --- |
-| F00 | design-foundation | In Progress | UI Designer | - | P1 | Cross-cutting project track (not a PRD feature): Design Adoption Route Phase B. F00-UI-FOUNDATION: Draft Design Foundation with >= 2 rendered directions; selection by user / Product Owner only. Visual Scope design-system. |
+| F00 | design-foundation | In Progress | UI Designer | - | P1 | Cross-cutting Design Foundation track. Round 1 (Directions A, B) rejected by the user 2026-09-21; round 2 = Direction C rendered from the user's reference screens (F00-UI-DIRECTION-C). Selection by the user only. Visual Scope design-system. |
 | F01 | dictionary-service | Done | - | Approved with Notes (historical scope) | P0 | Dictionary implementation accepted historically; production corpus review and Android confirmation remain follow-ups. |
 | F02 | grid-engine | Done | - | Approved with Notes (historical scope) | P0 | Engine accepted historically; future scope/CI notes retained in workflow-follow-ups.md. |
 | F06 | puzzle-content-and-solver-tooling | Done | - | Approved with Notes (historical scope) | P0 | Done covers toolchain + smoke set only. Journey acceptance now F05; OPEN Daily content follow-on belongs to F07 (workflow-follow-ups.md). |
@@ -28,7 +28,7 @@ Revision Affected Features: None
 
 ## Current Routing
 
-* Next command: Run UI Designer (task F00-UI-FOUNDATION in F00 orchestration; Design Adoption Route Phase B). The delivery returns to Tech Lead, who opens the Foundation selection decision for the user / Product Owner.
+* Next command: Run UI Designer (task F00-UI-DIRECTION-C in F00 orchestration; Design Adoption Route Phase B, round 2). The user rejected Directions A and B and supplied reference screens; the delivery returns to Tech Lead, who asks the user to confirm the C render.
 * F03 is Done (final QA Approved with Notes, 2026-09-21). The rework-control lock is released. Queue while the Foundation is being drafted and decided: (1) F05-QA-STRICT — needs Tech Lead delivery reconciliation of F05 (strict pack + code), then QA; F05.SHARED-RUNTIME can reuse F03's fresh runtime evidence for unchanged paths; (2) F08 local evidence (F08-LOCAL-EVIDENCE, then F08-QA-FUNCTIONAL). One QA feature at a time.
 * Design adoption: [Design Adoption Route](workflow-follow-ups.md) — Phase A done; Phase B active as F00; no feature with Visual Scope other than none activates before a Selected Foundation; Phase C/D (conformance, incl. F03/F04/F05 surfaces) follow the selection.
 * F08 release authorization gates the release stage only; no paid service, deployment, production action or store distribution is authorized. F07, F09–F13 remain Not Started.
