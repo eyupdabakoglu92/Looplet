@@ -40,29 +40,29 @@ features/f00-design-foundation/orchestration.md
 
 ## Current Phase
 
-F00 design-system accessibility rework (Visual Quality Gate: Ready for QA; QA Result: Rejected)
+F00 design-system accessibility rework — final-stage re-verify (Visual Quality Gate: Ready for QA; QA Result: None)
 
 ## Current Role
 
-Frontend/Mobile Developer
+QA
 
 ## Current Reason
 
-The Frontend/Mobile Developer delivered F00-FE-DESIGN-SYSTEM (commit 78b22e3): the design-system layer in app/lib/design (tokens, two bundled OFL fonts, drawn icons, the Looplet wordmark, Turkish casing, every component in every state) and a debug-only gallery, with no shipped-surface change. QA ran an independent final-stage visual review with its own runtime captures and a standalone probe target and returned verdict Rejected (qa.md): score 80/100, lowest dimension Accessibility 6/10 — components clip or overflow at OS text sizes at and above accessibility-medium (QA-01), interactive controls expose duplicate VoiceOver nodes/labels (QA-02), and the ui-design §8 focus ring was not implemented (QA-03; Tech Lead ruled it must be implemented, not documented as a deviation). The Tech Lead reconciled the verdict, spot-checked QA-02's root cause against the code, and opened F00-FE-A11Y-REWORK for the Frontend/Mobile Developer with F00-QA-VISUAL2 queued behind it for a targeted re-verify.
+QA returned Rejected on F00's design-system layer (qa.md, score 80/100): components clipped/overflowed at OS accessibility text sizes (QA-01), interactive controls exposed duplicate VoiceOver nodes (QA-02), and the ui-design §8 focus ring was missing (QA-03; Tech Lead ruled it must be implemented). The Frontend/Mobile Developer delivered F00-FE-A11Y-REWORK (commit 0ce257c): a first QA-01 fix (text-scale cap alone) passed every widget test but still overflowed by 1.5 pt on a real device at accessibility-medium — found by a runtime capture, not the automated suite — and was fixed with a `minHeight`-based approach; QA-02 fixed with `excludeSemantics`; QA-03 with a `FocusableActionDetector` focus ring. The Tech Lead independently re-ran analyzer/format/tests/F03 device suite, verified the code changes directly, and found and corrected one evidence-packaging mistake (a mis-cropped "before" screenshot); Delivery Review = Accepted. F00-QA-VISUAL2 is now active for a targeted re-verify.
 
 ## Last Completed Action
 
-Tech Lead reconciliation 2026-09-23: reviewed the F00-QA-VISUAL Rejected verdict, confirmed evidence quality and spot-checked QA-02, ruled QA-03 (focus ring) must be implemented rather than deferred, opened F00-FE-A11Y-REWORK (Frontend/Mobile Developer) with a full fix brief, queued F00-QA-VISUAL2, and synced the board. Visual Quality Gate stays Ready for QA; no app, package, product or release file was changed by the Tech Lead.
+Tech Lead reconciliation 2026-09-23: independently re-ran analyzer, format (app-scoped and full), the full melos test suite (197 + 313) and the F03 device suite (13/13) on commit 0ce257c; read the code diff directly against each QA finding; found and corrected a mis-cropped "before" evidence screenshot in design/rework/; set Delivery Review = Accepted and activated F00-QA-VISUAL2 (QA Result reset to None) with a targeted re-verify brief. No app, package, product or release file was changed by the Tech Lead (one evidence JPEG corrected).
 
 ## Next Expected Action
 
-Run Frontend/Mobile Developer on F00-FE-A11Y-REWORK (fix QA-01 Dynamic Type overflow/clip, QA-02 duplicate semantics, QA-03 focus ring; QA-04 optional). The delivery returns to Tech Lead, who activates F00-QA-VISUAL2 (targeted final-stage re-verify: cold launch, accessibility, coexistence). F05-QA-STRICT and F08 local evidence stay queued behind the F00 QA slot (one QA feature at a time).
+Run QA on F00-QA-VISUAL2: targeted final-stage re-verify of F00-FE-A11Y-REWORK with QA's own runtime evidence (QA-01 at 1.65x and a larger size, QA-02 semantics dump, QA-03 focus ring, coexistence/regression), rescoring all ten rubric dimensions. Then Tech Lead reconciles the verdict; only a qualifying PASS moves Visual Quality Gate to Passed and opens Phase C (conformance audit of F03/F04/F05). F05-QA-STRICT and F08 local evidence stay queued behind the F00 QA slot.
 
 ## Portfolio Summary
 
 * F01, F02, F04, F06: historical scoped Done retained.
 * F03: Done — final QA Approved with Notes (2026-09-21); Visual Scope none covered behaviour/accessibility only; visual surface pending the Design Adoption Route.
-* F00: Rework — cross-cutting Design Foundation track, Visual Scope design-system; Foundation Selected (Direction C, 2026-09-21); design-system layer delivered (78b22e3), independent visual QA Rejected (score 80/100, accessibility findings); F00-FE-A11Y-REWORK active, F00-QA-VISUAL2 queued.
+* F00: In QA — cross-cutting Design Foundation track, Visual Scope design-system; Foundation Selected (Direction C, 2026-09-21); accessibility rework delivered and Accepted (0ce257c); F00-QA-VISUAL2 active (targeted re-verify).
 * F05: In Progress; real strict content delivered (bundle mirrors content/journey); F03 lock released; Tech Lead delivery reconciliation then QA-STRICT queued; final verdict None.
 * F08: In Progress, queued; independent local/emulator validation pending, release task Blocked, release/final acceptance pending.
 * F07, F09–F13: Not Started. Pending follow-ons are in workflow-follow-ups.md.
