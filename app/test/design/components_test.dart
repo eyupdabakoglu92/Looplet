@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:ui' show SemanticsFlag;
 
+import 'package:flutter/material.dart' show MaterialApp, Scaffold;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -321,6 +322,141 @@ void main() {
     });
   });
 
+  group('accessibility rework (F00-FE-A11Y-REWORK)', () {
+    testWidgets(
+      'QA-02: every pressable and the badge are a single semantics node '
+      '(no duplicate/merged label)',
+      (tester) async {
+        Future<void> checkSingle(
+          Widget widget,
+          Finder finder, {
+          String? expectSubstring,
+        }) async {
+          await tester.pumpWidget(host(widget));
+          final node = tester.getSemantics(finder);
+          expect(
+            node.childrenCount,
+            0,
+            reason:
+                'no descendant semantics node under $finder — otherwise '
+                'VoiceOver/TalkBack would stop on it a second time',
+          );
+          expect(
+            node.label.contains('\n'),
+            isFalse,
+            reason:
+                'label should not be a merged/duplicated string: '
+                '"${node.label}"',
+          );
+          if (expectSubstring != null) {
+            expect(node.label, contains(expectSubstring));
+          }
+        }
+
+        await checkSingle(
+          LimePill(label: 'Sonraki bölüm', onPressed: () {}, width: 300),
+          find.byType(LimePill),
+        );
+        await checkSingle(
+          OutlinePill(label: 'Secondary', onPressed: () {}, width: 300),
+          find.byType(OutlinePill),
+        );
+        await checkSingle(
+          const TextLink(label: 'Tekrar oyna', onPressed: null),
+          find.byType(TextLink),
+        );
+        await checkSingle(
+          GlassIconButton(
+            icon: LoopIcon.back,
+            onPressed: () {},
+            semanticLabel: 'Ana ekrana dön',
+          ),
+          find.byType(GlassIconButton),
+        );
+        await checkSingle(
+          UndoPill(quota: 2, onPressed: () {}, semanticLabel: 'Geri al'),
+          find.byType(UndoPill),
+          expectSubstring: '2 / 3',
+        );
+        await checkSingle(
+          const LoopBadge(label: 'HARİKA'),
+          find.byType(LoopBadge),
+        );
+      },
+    );
+
+    testWidgets(
+      'QA-02: LoopNode announces done vs current, not just the number',
+      (tester) async {
+        await tester.pumpWidget(host(const LoopNode(number: 4)));
+        expect(tester.getSemantics(find.byType(LoopNode)).label, contains('4'));
+        expect(
+          tester.getSemantics(find.byType(LoopNode)).label,
+          isNot(equals('4')),
+        );
+        await tester.pumpWidget(host(const LoopNode(number: 5, current: true)));
+        expect(
+          tester.getSemantics(find.byType(LoopNode)).label,
+          contains('geçerli'),
+        );
+      },
+    );
+
+    testWidgets(
+      'QA-03: focus ring shows only while focused (no size change) and '
+      'Enter/Space activates',
+      (tester) async {
+        FocusManager.instance.highlightStrategy =
+            FocusHighlightStrategy.alwaysTraditional;
+        addTearDown(
+          () => FocusManager.instance.highlightStrategy =
+              FocusHighlightStrategy.automatic,
+        );
+        var taps = 0;
+        await tester.pumpWidget(
+          MaterialApp(
+            debugShowCheckedModeBanner: false,
+            home: Scaffold(
+              body: Center(
+                child: LoopScale(
+                  value: 1,
+                  child: LimePill(
+                    label: 'Sonraki bölüm',
+                    onPressed: () => taps++,
+                    width: 300,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+
+        bool ringVisible() => tester
+            .widgetList<DecoratedBox>(find.byType(DecoratedBox))
+            .any((d) => d.position == DecorationPosition.foreground);
+
+        final sizeUnfocused = tester.getSize(find.byType(LimePill));
+        expect(ringVisible(), isFalse);
+
+        await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+        await tester.pumpAndSettle();
+        expect(ringVisible(), isTrue);
+        expect(tester.getSize(find.byType(LimePill)), sizeUnfocused);
+
+        await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+        await tester.pump();
+        expect(taps, 1);
+        await tester.sendKeyEvent(LogicalKeyboardKey.space);
+        await tester.pump();
+        expect(taps, 2);
+
+        FocusManager.instance.primaryFocus?.unfocus();
+        await tester.pumpAndSettle();
+        expect(ringVisible(), isFalse);
+      },
+    );
+  });
+
   group('info components', () {
     testWidgets('LoopBadge renders its caps label (Turkish İ preserved)', (
       tester,
@@ -535,25 +671,76 @@ void main() {
       });
     }
 
-    testWidgets('OS text scale 1.3: no exception', (tester) async {
-      tester.view.physicalSize = const Size(393, 852);
-      tester.view.devicePixelRatio = 1;
-      addTearDown(tester.view.reset);
-      await tester.pumpWidget(
-        const MediaQuery(
-          data: MediaQueryData(
-            size: Size(393, 852),
-            textScaler: TextScaler.linear(1.3),
+    // F00-FE-A11Y-REWORK (QA-01): the original coverage stopped at 1.3, just
+    // under the 1.35 (xxxLarge) point where `MovesCard` first overflowed, and
+    // well under 1.65 (accessibility-medium, the `platform.md` §14 floor)
+    // where `MovesCard` and `StatCard` both did. `SingleChildScrollView` lays
+    // out its whole child regardless of scroll position, so a single pump
+    // already exercises every section — no drag needed to reach them.
+    for (final scale in <double>[1.3, 1.35, 1.65, 2.35, 3.12]) {
+      testWidgets('OS text scale ${scale}x: no exception', (tester) async {
+        tester.view.physicalSize = const Size(393, 852);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+        await tester.pumpWidget(
+          MediaQuery(
+            data: MediaQueryData(
+              size: const Size(393, 852),
+              textScaler: TextScaler.linear(scale),
+            ),
+            child: const Directionality(
+              textDirection: TextDirection.ltr,
+              child: DesignGalleryScreen(),
+            ),
           ),
-          child: Directionality(
-            textDirection: TextDirection.ltr,
-            child: DesignGalleryScreen(),
-          ),
-        ),
-      );
-      await tester.pump();
-      expect(tester.takeException(), isNull);
-    });
+        );
+        await tester.pump();
+        expect(tester.takeException(), isNull);
+      });
+    }
+
+    testWidgets(
+      'QA-01: MovesCard, StatCard, LoopNode and LoopletWordmark hold their '
+      'longest realistic content at any OS text scale',
+      (tester) async {
+        for (final scale in <double>[1.35, 1.65, 2.35, 3.12]) {
+          await tester.pumpWidget(
+            MediaQuery(
+              data: MediaQueryData(
+                size: const Size(393, 852),
+                textScaler: TextScaler.linear(scale),
+              ),
+              child: const Directionality(
+                textDirection: TextDirection.ltr,
+                child: Center(
+                  child: LoopScale(
+                    value: 393 / 358,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        MovesCard(moves: 100),
+                        StatCard(
+                          width: 309,
+                          cells: <StatCell>[
+                            StatCell(value: '128', label: 'SEN'),
+                            StatCell(value: '12', label: 'OPTİMAL'),
+                            StatCell(value: '9', label: 'EN İYİ', star: true),
+                          ],
+                        ),
+                        LoopNode(number: 30, current: true),
+                        LoopletWordmark(fontSize: 44),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+          await tester.pump();
+          expect(tester.takeException(), isNull, reason: 'scale=$scale');
+        }
+      },
+    );
   });
 
   group('font assets (F00 architecture §7.3)', () {

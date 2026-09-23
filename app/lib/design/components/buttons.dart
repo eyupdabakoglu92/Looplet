@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart';
 
 import '../../reduce_motion.dart';
@@ -6,18 +7,27 @@ import '../tokens.dart';
 import '../typography.dart';
 
 /// Pressable wrapper shared by every button: a 98 % press scale (skipped under
-/// OS reduced motion) instead of Material ink ripples, and correct button
-/// semantics (`enabled`, label).
+/// OS reduced motion) instead of Material ink ripples; correct button
+/// semantics as a *single* announced node (`enabled`, label — the visible
+/// icon/text underneath carries its own implicit semantics otherwise, which
+/// duplicated the announcement, F00-FE-A11Y-REWORK QA-02); and a 2 px
+/// periwinkle focus ring for keyboard / Switch Control focus (ui-design §8,
+/// QA-03) that also activates on Enter/Space while focused.
 class _Pressable extends StatefulWidget {
   const _Pressable({
     required this.child,
     required this.onPressed,
     required this.semanticLabel,
+    this.focusRadius = LoopRadii.pillFull,
   });
 
   final Widget child;
   final VoidCallback? onPressed;
   final String? semanticLabel;
+
+  /// Corner radius of the focus ring, matched to the wrapped control's own
+  /// shape (pill, round button, small text link, …).
+  final double focusRadius;
 
   @override
   State<_Pressable> createState() => _PressableState();
@@ -25,6 +35,7 @@ class _Pressable extends StatefulWidget {
 
 class _PressableState extends State<_Pressable> {
   bool _down = false;
+  bool _focused = false;
 
   bool get _enabled => widget.onPressed != null;
 
@@ -36,16 +47,45 @@ class _PressableState extends State<_Pressable> {
       enabled: _enabled,
       label: widget.semanticLabel,
       onTap: widget.onPressed,
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTapDown: _enabled ? (_) => setState(() => _down = true) : null,
-        onTapUp: _enabled ? (_) => setState(() => _down = false) : null,
-        onTapCancel: _enabled ? () => setState(() => _down = false) : null,
-        onTap: widget.onPressed,
-        child: AnimatedScale(
-          scale: scale,
-          duration: const Duration(milliseconds: 90),
-          child: widget.child,
+      excludeSemantics: true,
+      child: FocusableActionDetector(
+        enabled: _enabled,
+        onShowFocusHighlight: (value) => setState(() => _focused = value),
+        actions: <Type, Action<Intent>>{
+          ActivateIntent: CallbackAction<ActivateIntent>(
+            onInvoke: (_) => widget.onPressed?.call(),
+          ),
+        },
+        shortcuts: const <ShortcutActivator, Intent>{
+          SingleActivator(LogicalKeyboardKey.enter): ActivateIntent(),
+          SingleActivator(LogicalKeyboardKey.space): ActivateIntent(),
+        },
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTapDown: _enabled ? (_) => setState(() => _down = true) : null,
+          onTapUp: _enabled ? (_) => setState(() => _down = false) : null,
+          onTapCancel: _enabled ? () => setState(() => _down = false) : null,
+          onTap: widget.onPressed,
+          child: AnimatedScale(
+            scale: scale,
+            duration: const Duration(milliseconds: 90),
+            child: Container(
+              // `foregroundDecoration` paints on top of the child at its own
+              // size — it never changes layout, so the ring adds no size
+              // shift between focused and unfocused (unlike padding/border on
+              // a normal `decoration`).
+              foregroundDecoration: _focused
+                  ? BoxDecoration(
+                      borderRadius: BorderRadius.circular(widget.focusRadius),
+                      border: Border.all(
+                        color: LoopColors.periwinkle,
+                        width: 2,
+                      ),
+                    )
+                  : null,
+              child: widget.child,
+            ),
+          ),
         ),
       ),
     );
@@ -79,8 +119,13 @@ class LimePill extends StatelessWidget {
     final h = (height ?? LoopSpacing.ctaHeight * s).clamp(44.0, 200.0);
     final pill = Container(
       width: width,
-      height: h,
-      padding: EdgeInsets.symmetric(horizontal: 23 * s),
+      // A minimum, not a fixed height: at large OS text sizes the label can
+      // wrap to two lines, and the pill grows to fit instead of clipping it
+      // (F00-FE-A11Y-REWORK QA-01). At the default 1-line size this renders
+      // identically to the old fixed height — the content never needs more
+      // than `h`, so the minimum is what wins.
+      constraints: BoxConstraints(minHeight: h),
+      padding: EdgeInsets.symmetric(horizontal: 23 * s, vertical: 10 * s),
       decoration: BoxDecoration(
         gradient: LoopGradients.cta,
         borderRadius: BorderRadius.circular(LoopRadii.pillFull),
@@ -101,7 +146,13 @@ class LimePill extends StatelessWidget {
       ),
       child: Row(
         children: <Widget>[
-          Expanded(child: Text(label, style: LoopText.cta(s))),
+          Expanded(
+            child: Text(
+              label,
+              style: LoopText.cta(s),
+              textAlign: TextAlign.start,
+            ),
+          ),
           if (icon != null)
             LoopIconView(icon!, color: LoopColors.limeInk, size: 20 * s),
         ],
@@ -141,13 +192,21 @@ class OutlinePill extends StatelessWidget {
         opacity: onPressed == null ? 0.45 : 1,
         child: Container(
           width: width,
-          height: h,
+          // A minimum, not a fixed height — see LimePill (QA-01); this also
+          // adds the horizontal breathing room the label never had, so a long
+          // label no longer reaches the border (QA-04).
+          constraints: BoxConstraints(minHeight: h),
+          padding: EdgeInsets.symmetric(horizontal: 20 * s, vertical: 10 * s),
           alignment: Alignment.center,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(LoopRadii.pillFull),
             border: Border.all(color: LoopColors.outlineEdge),
           ),
-          child: Text(label, style: LoopText.link(s, color: LoopColors.text)),
+          child: Text(
+            label,
+            style: LoopText.link(s, color: LoopColors.text),
+            textAlign: TextAlign.center,
+          ),
         ),
       ),
     );
@@ -178,6 +237,7 @@ class TextLink extends StatelessWidget {
     return _Pressable(
       onPressed: onPressed,
       semanticLabel: text,
+      focusRadius: 12,
       child: ConstrainedBox(
         constraints: const BoxConstraints(minHeight: 44, minWidth: 44),
         child: Center(
@@ -218,6 +278,7 @@ class GlassIconButton extends StatelessWidget {
     return _Pressable(
       onPressed: onPressed,
       semanticLabel: semanticLabel,
+      focusRadius: radius * s,
       child: Opacity(
         opacity: onPressed == null ? 0.55 : 1,
         child: Container(
@@ -256,7 +317,12 @@ class UndoPill extends StatelessWidget {
     final s = LoopScale.of(context);
     return _Pressable(
       onPressed: onPressed,
-      semanticLabel: semanticLabel,
+      // The remaining quota is drawn only as dots (colour, not shape or
+      // text); a caller-supplied label alone (e.g. "Geri al") wouldn't say
+      // how many are left, so it's appended here (F00-FE-A11Y-REWORK QA-02),
+      // matching the "$earned / $total …" pattern of `StarRow`.
+      semanticLabel: '$semanticLabel, $quota / $total hak',
+      focusRadius: 22 * s,
       child: Opacity(
         opacity: onPressed == null ? 0.55 : 1,
         child: Container(

@@ -176,16 +176,45 @@ All commands ran on 2026-09-21 against HEAD 9a72481 + the uncommitted working tr
 
 ---
 
-# WORKFLOW HANDOFF SUGGESTION (NON-AUTHORITATIVE)
+## F00-FE-A11Y-REWORK — accessibility rework (2026-09-23)
 
-* Completed: F00-FE-DESIGN-SYSTEM.
-* Remaining: Tech Lead reconciliation (evidence F00.DS-AUTOMATED and F00.DS-PARITY), then — if accepted — Visual Quality Gate = Ready for QA and activation of F00-QA-VISUAL.
-* Blockers: none.
-* Status suggestion: Ready for QA (after Tech Lead reconciliation; the Frontend role does not advance the gate).
+> Fixes the defects `qa.md` found in F00-FE-DESIGN-SYSTEM (verdict Rejected, score 80/100, lowest dimension Accessibility 6/10): QA-01 (Dynamic Type overflow/clip), QA-02 (duplicate VoiceOver semantics), QA-03 (missing focus ring; Tech Lead ruled implement, not defer), QA-04 (polish, bundled). Source revision: this section's diff on top of commit `5f18c89` (clean tree at start; not committed by this delivery). No shipped surface, dependency, or contract changed — every change is inside `app/lib/design/` (+ its own tests).
 
----
+### Impacted files
 
-## 19. Sonraki Komut
+| File | Change |
+| --- | --- |
+| `app/lib/design/components/buttons.dart` | `_Pressable`: `excludeSemantics: true` (QA-02, single node); `FocusableActionDetector` + `Actions`/`Shortcuts` for a 2 px periwinkle focus ring and Enter/Space activation (QA-03), painted via `foregroundDecoration` so it never shifts layout; new `focusRadius` param, set per control's own shape. `LimePill`/`OutlinePill`: fixed height → `minHeight` (grow instead of clip if a label wraps, QA-01); `OutlinePill` gained horizontal/vertical padding it never had (QA-04). `UndoPill`: semantic label now states the remaining quota, not just "Geri al" (QA-02 note). |
+| `app/lib/design/components/info.dart` | `LoopBadge`: `excludeSemantics: true` (QA-02). `MovesCard`, `StatCard`: fixed height → `minHeight` + `mainAxisSize: MainAxisSize.min` on the inner `Column`(s), **plus** kept `loopCappedTextScaler` on their texts (QA-01 — see "What actually fixed it" below). `LoopNode`: semantic label states done vs current, not just the bare number (QA-02 note); numeral capped with `loopCappedTextScaler`. |
+| `app/lib/design/components/surfaces.dart` | `GlassCard` gained an optional `minHeight` (a floor, not a fixed size) so `StatCard` didn't have to reimplement border/padding-aware sizing itself. |
+| `app/lib/design/tokens.dart` | New `loopCappedTextScaler(context)` — `MediaQuery.textScalerOf(context).clamp(maxScaleFactor: 1.3)` — for pieces whose width can't reflow. |
+| `app/lib/design/typography.dart` | `caption` role: line height 1.0 → 1.3, so a wrapped two-line caption's lines don't touch (QA-04). `label` role: left at 1.0 — it is always a short single word inside the now-`minHeight` `MovesCard`/`StatCard` boxes and never reaches a second line (documented in the token's own doc comment, not a silent skip). |
+| `app/lib/design/wordmark.dart` | `LoopletWordmark` capped with `loopCappedTextScaler`: uncapped, "Looplet" wrapped **mid-word** ("Loo" / "plet") at the largest OS sizes wherever it sits in a width-constrained header. |
+| `app/test/design/components_test.dart` | +8 tests (70 total, was 62, unchanged since F00-FE-DESIGN-SYSTEM): new group `accessibility rework (F00-FE-A11Y-REWORK)`, 3 tests (single-semantics-node check across every pressable + the badge; `LoopNode` state label; focus-ring + Enter/Space activation with a `MaterialApp` host for real Tab/keyboard shortcuts); `gallery layout` group's single OS-scale check (1.3x) expanded to five (1.3/1.35/1.65/2.35/3.12x), +4; one new dedicated `MovesCard`/`StatCard`/`LoopNode`/`LoopletWordmark` stress test at the same four larger scales with their longest realistic content (`moves: 100`, `128`/`OPTİMAL`/`9★`, node `30` current, 44 pt wordmark), +1. |
+
+### What actually fixed it (and what didn't, by itself)
+
+The **first** attempt was `loopCappedTextScaler` alone on `MovesCard`'s fixed-height box (matching `qa.md`'s own suggested direction). It passed every widget test, including a dedicated one added for this task that stress-tested `MovesCard`/`StatCard`/`LoopNode`/`LoopletWordmark` at OS scale up to 3.12x with real fonts. It still failed on a **real device**: a runtime capture at accessibility-medium (1.65x, the required floor) showed a genuine `BOTTOM OVERFLOWED BY 1.5 PIXELS` banner on `MovesCard` (evidence: `design/rework/before-overflow-movescard-1.65x.jpg`) — real font hinting on the simulator doesn't match `flutter_test`'s rendering closely enough to trust a hand-picked ceiling for the very last pixel. This was caught only because the brief asked for a real capture at the platform floor, not because any automated check flagged it.
+
+Fix: `MovesCard` and `StatCard` switched their **height** from fixed to `minHeight` (with `mainAxisSize: MainAxisSize.min` on the inner `Column`(s), since `Column`'s default `MainAxisSize.max` otherwise fills all available space the moment the outer constraint stops being tight — the first version of this fix rendered the cards at 600 pt tall in a test before that was added). The text-scale cap stayed **on both**: `MovesCard`'s width is fixed at 60 pt with no `Expanded`/`Row`-sharing to reflow, and `StatCard`'s three cells each have a fixed `Expanded` width share — removing the cap to test the reflow-only idea was tried and immediately reproduced a **different**, genuine overflow (`RenderFlex overflowed by 18 pixels on the right` at 2.35x, in the stress test, from an uncapped 3-digit stat value no longer fitting its cell). So both components now carry **two** protections for two different axes: the cap bounds *width* (which can't reflow), `minHeight` absorbs *height* (including the last real-device pixel a cap alone couldn't predict). `GlassCard` gained a `minHeight` option (border/padding-aware, unlike a plain `ConstrainedBox` wrapped around its child — an earlier version of the `StatCard` fix that wrapped the child directly landed at 76 pt instead of 74 because it constrained the content *inside* `GlassCard`'s 1 px border, and the border's own implicit padding then added on top; `GlassCard.minHeight` constrains the whole card, correctly reproducing the exact 74 pt at rest).
+
+`LoopNode` and `LoopletWordmark` kept the cap alone (no `minHeight` — a circle can't grow taller than wide without breaking its own shape, and the wordmark isn't boxed): both were re-verified in the same 1.65x runtime capture with no overflow and no mid-word wrap, and their sizes are exact-shape assertions in the automated suite (`Size(38,38)` / `Size(76,76)` unchanged) that a `minHeight` swap would have broken anyway.
+
+### Evidence
+
+| Evidence ID | Kind | Scenario | Command / Target | Result | Provenance |
+| --- | --- | --- | --- | --- | --- |
+| RW-1 | automated functional | Analyzer, format, full test suite | `melos run analyze`; `dart format --output=none --set-exit-if-changed app` (workspace-wide `melos run format:check` fails on one **pre-existing, unrelated** file outside this task's scope — see Notes); `melos run test` | analyze exit 0; app-scoped format exit 0 (110 files, 0 changed); tests exit 0 — packages 197 (unchanged), app **313** (was 305 at the F00-QA-VISUAL baseline; +8, see the test-file row above) | this session, final code |
+| RW-2 | automated functional | New accessibility tests pass | `flutter test test/design` | exit 0, 70/70 (see file list above for what each new test proves) | this session, final code |
+| RW-3 | runtime | The real defect that automated tests missed, and its fix | `flutter build ios --simulator --debug -t lib/main_gallery.dart`; `xcrun simctl ui <udid> content_size accessibility-medium`; `capture-gallery.sh` | before: real `BOTTOM OVERFLOWED BY 1.5 PIXELS` on `MovesCard`; after: same frame and all 5 gallery sections, no overflow banner anywhere | iPhone 16, iOS 18.6 simulator; `design/rework/` (before/after JPEGs + README) |
+| RW-4 | runtime | Coexistence unaffected | `flutter build ios --simulator --debug`; cold launch | shipped Home identical to the F00-QA-VISUAL baseline capture (system font, amber, Material icons) — no shipped file imports `app/lib/design` | iPhone 16 |
+| RW-5 | runtime | F03 device suite unaffected | `flutter test integration_test -d <iPhone 16>` | `+13 All tests passed`, exit 0 | iPhone 16, run twice across this task (mid-way and on the final code) |
+
+**Limits, stated plainly:** QA-02 (single semantics node) and QA-03 (focus ring, Enter/Space activation) are verified by widget tests only — the same `SemanticsNode`/`Focus` APIs a real screen reader or keyboard reads, but not a real VoiceOver speech pass or a real hardware/Bluetooth keyboard on a device; no consuming screen exists yet to test either in a real composition. `LoopNode`'s 2-digit case (`30`) and the wordmark's 44 pt case at extreme scale were verified by the widget-test suite and, at the required 1.65x floor, by the runtime capture; they were **not** individually re-verified by a *dedicated* runtime capture at 3.12x the way `MovesCard` was after its bug — the general lesson (widget-test pass ≠ real-device pass, by as little as 1.5 pt) applies to them too, in principle, though neither showed a problem at any tested scale. Bundle-size, on-device performance and Android remain unmeasured (unchanged from the original delivery, `F00-DS-UNMEASURED`).
+
+**Note on `melos run format:check`.** It fails at the full-workspace level on `ai-system/features/f00-design-foundation/qa/src/qa_probe_main.dart` — QA's own evidence file, added in a prior commit, outside `app/` and outside this task's scope. Not touched here (altering another role's committed evidence without being asked isn't this role's call); flagged for whoever owns that path to run `dart format` on it. `app/`-scoped formatting (this task's actual surface) is clean.
+
+## Sonraki Komut
 
 ```text
 Run Tech Lead

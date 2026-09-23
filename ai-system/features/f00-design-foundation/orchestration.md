@@ -6,15 +6,15 @@ F00
 
 ## Current Status
 
-Rework
+In Progress
 
 ## Current Owner
 
-Frontend/Mobile Developer
+Tech Lead
 
 ## Next Role
 
-Frontend/Mobile Developer
+Tech Lead
 
 ## Active Task Ledger
 
@@ -23,7 +23,7 @@ Frontend/Mobile Developer
 - [x] Task ID: F00-UI-FINALIZE | Assigned Role: UI Designer | Status: Done | Summary: DELIVERED 2026-09-21 — selected-source renders for the final decision set (Play, lifted row, locked+frozen, full-screen Result perfect / new best / 2-star, Home design + today, tutorial, device variants), an executable board-to-result transition prototype with timed and reduced-motion stills, a component/token sheet, and the design-system handoff features/f00-design-foundation/ui-design.md (Visual Evidence Manifest with selected-source and motion-prototype records); Foundation stays Selected | Depends On: F00-UI-DIRECTION-C
 - [x] Task ID: F00-FE-DESIGN-SYSTEM | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: DELIVERED 2026-09-21 — app/lib/design layer (tokens, type roles on the bundled Space Grotesk and Manrope variable fonts, 12 drawn icons, Looplet wordmark, Turkish casing helpers, every component in every state) plus the debug-only gallery lib/main_gallery.dart; no shipped surface changed (only tracked change is the pubspec.yaml font declaration, no dependency); analyzer, format, melos test (197 package tests, 305 app tests of which 62 new) and the F03 device suite 13 of 13 green; runtime parity on iPhone 16, 16e and 16 Pro Max beside S-91 with one deviation found and fixed (frozen tile ring and dash rhythm) and the rest listed; evidence in features/f00-design-foundation/frontend.md | Depends On: F00-UI-FINALIZE
 - [x] Task ID: F00-QA-VISUAL | Assigned Role: QA | Status: Done | Summary: DONE 2026-09-21 — verdict Rejected (qa.md; final stage, revision 78b22e3 content, app tree d9709ad): final score 80 of 100, lowest dimension Accessibility 6 of 10; blocking QA-01 (design-system components not Dynamic Type safe — MovesCard overflows from 1.35x, MovesCard and StatCard at the platform floor accessibility-medium, pills and nodes clip at the largest size), QA-02 (duplicate semantic nodes and labels on buttons, badge and disabled link), QA-03 (ui-design §8 focus state not implemented and not declared); QA-04 polish; independent runtime evidence in features/f00-design-foundation/qa/ | Depends On: F00-FE-DESIGN-SYSTEM
-- [ ] Task ID: F00-FE-A11Y-REWORK | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: ACTIVATED 2026-09-23 by the Tech Lead after F00-QA-VISUAL Rejected (qa.md): fix QA-01 (Dynamic Type overflow/clip in MovesCard, StatCard, LimePill, OutlinePill, LoopNode, LoopletWordmark), QA-02 (duplicate semantic nodes/labels from _Pressable and LoopBadge), QA-03 (implement the ui-design §8 focus ring — Tech Lead ruling: implement, not a deviation); QA-04 optional in the same pass; see Current Frontend Brief | Depends On: F00-QA-VISUAL
+- [x] Task ID: F00-FE-A11Y-REWORK | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: DELIVERED 2026-09-23 — QA-01 (Dynamic Type: MovesCard/StatCard switched fixed height to minHeight + mainAxisSize.min, kept the text-scale cap for width; GlassCard gained a minHeight option; LoopNode/LoopletWordmark kept the cap alone), QA-02 (excludeSemantics: true on _Pressable and LoopBadge — one announced node, not two; UndoPill/LoopNode labels now state quota/state), QA-03 (2 px periwinkle focus ring + Enter/Space activation via FocusableActionDetector, painted with foregroundDecoration so it never shifts layout), QA-04 (caption line-height 1.3, OutlinePill padding); a first cap-only attempt for QA-01 passed every widget test but still overflowed 1.5 pt on a real device at accessibility-medium — found and fixed via a real runtime capture, not by the automated suite; 8 new tests (70 total); analyze/format(app-scoped)/melos test/F03 device suite all green; evidence in frontend.md (F00-FE-A11Y-REWORK section) and design/rework/ | Depends On: F00-QA-VISUAL
 - [ ] Task ID: F00-QA-VISUAL2 | Assigned Role: QA | Status: Queued | Summary: Targeted final-stage re-verify of F00-FE-A11Y-REWORK (scenarios 1, 4, 5 of the QA brief: cold launch, accessibility, coexistence gates); same rubric bar (93 plus, every dimension 8 plus, no fail condition); probe in qa/src is reusable; activates only after F00-FE-A11Y-REWORK delivers and Tech Lead reconciles | Depends On: F00-FE-A11Y-REWORK
 
 ## Open Tasks
@@ -36,7 +36,7 @@ None
 
 ## Delivery Review
 
-Accepted
+Pending
 
 ## QA Scope
 
@@ -165,6 +165,17 @@ allowed
   * Result: FAIL
   * Provenance / Note: 2026-09-21 QA, revision 78b22e3 content (app tree d9709ad858e4eda876f00e664281fa208409f6ca, HEAD a499e5d), iOS Simulator 18.6 (iPhone 16, 16e, 16 Pro Max), debug builds of the gallery and of an out-of-repo QA probe: independent rubric score 80 of 100, lowest dimension Accessibility 6 of 10, Fail Conditions None, Runtime Evidence Complete Yes, Result FAIL. Measured PASS: token colours delta E 0.00, gradients at most 1.2, geometry within 0.1 pt of spec on three devices, glow versus neutral shadow, Turkish glyphs and weight axis, Reduce Motion press feedback 0.978 (off) versus 1.000 (on) on the real OS setting, shipped app cold launch, F03 device suite 13 of 13, analyzer and format and 197 plus 305 tests exit 0. FAIL: QA-01 Dynamic Type overflow and clipping, QA-02 duplicate semantics, QA-03 focus state missing (QA-04 polish, non-blocking). Limits: no VoiceOver speech run, no Android, no physical device, synthetic pointer, no consuming surface, release size unmeasured. Detail: qa.md and qa/README.md.
 
+- Evidence ID: F00.DS-A11Y-REWORK
+  * Scenario: F00-FE-A11Y-REWORK fixes QA-01 (Dynamic Type overflow/clip), QA-02 (duplicate semantics), QA-03 (focus ring + keyboard activation) and QA-04 (polish) with automated and real-device evidence
+  * Required Class: automated functional + runtime
+  * Target / Environment: workspace (melos); iOS Simulator 18.6 iPhone 16 for the runtime captures and the F03 device suite
+  * Owner Role: Frontend/Mobile Developer
+  * Prerequisite / External Decision: None (Tech Lead ruling on QA-03 recorded in Last Decision)
+  * Re-evaluation Trigger: F00-FE-A11Y-REWORK delivery
+  * Blocks: F00-QA-VISUAL2 (re-verify)
+  * Result: PASS
+  * Provenance / Note: 2026-09-23 Frontend/Mobile Developer, working tree on top of commit 5f18c89 (not committed by this delivery; 7 files changed under app/lib/design and app/test/design only, no shipped file, dependency or pubspec change): melos run analyze exit 0; dart format --output=none --set-exit-if-changed app exit 0 (110 files, 0 changed — the workspace-wide melos run format:check fails only on a pre-existing, unrelated file outside this task, ai-system/features/f00-design-foundation/qa/src/qa_probe_main.dart, not touched here); melos run test exit 0 (packages 197 unchanged, app 313 = 305 + 8 new); flutter test integration_test on iPhone 16 iOS 18.6 -> +13 All tests passed, exit 0, run twice (mid-task and on the final code). Runtime: gallery rebuilt and captured at OS accessibility-medium (1.65x, the platform.md §14 floor) on iPhone 16 — a first QA-01 fix (text-scale cap alone) passed every widget test including a dedicated stress test up to 3.12x, but the real capture showed a genuine BOTTOM OVERFLOWED BY 1.5 PIXELS on MovesCard; fixed by switching MovesCard/StatCard to a minHeight (kept the cap for width, which a real overflow-free re-capture of all 5 gallery sections then confirmed) -- design/rework/ (before/after captures, README). Shipped app cold launch re-verified unchanged (system font, Material icons, no file under app/lib/design imported). Limits: QA-02/QA-03 verified by widget tests (SemanticsNode / Focus APIs), not a real VoiceOver speech pass or a real hardware keyboard on a device; LoopNode's 2-digit case and the 44 pt wordmark were stress-tested by widget test and confirmed at the required 1.65x floor by the runtime capture, not individually re-captured at 3.12x the way MovesCard was after its bug. Detail: frontend.md (F00-FE-A11Y-REWORK section).
+
 ## Open Decision Gates
 
 - Decision ID: F00.FOUNDATION-SELECTION
@@ -183,7 +194,7 @@ None
 
 ## Next Action
 
-Run Frontend/Mobile Developer on F00-FE-A11Y-REWORK using the Current Frontend Brief below. The delivery returns to the Tech Lead for reconciliation, which activates F00-QA-VISUAL2 (targeted final-stage re-verify). Visual Quality Gate stays Ready for QA (the runtime-parity evidence it rests on is unaffected; the rejection is an implementation-quality result, not a missing-evidence one). F00 is not Done. F05-QA-STRICT and F08 local evidence stay queued behind the F00 QA slot.
+Run Tech Lead to reconcile the F00-FE-A11Y-REWORK delivery (frontend.md F00-FE-A11Y-REWORK section: QA-01/02/03 fixed, QA-04 bundled, 8 new tests, a real-device overflow found and fixed after a widget-test-only attempt passed but a real capture didn't — see design/rework/): verify the fix against qa.md's findings, decide whether the note on the pre-existing unrelated qa_probe_main.dart formatting gap needs action, then activate F00-QA-VISUAL2 (targeted final-stage re-verify; the QA probe in qa/src is reusable). Visual Quality Gate stays Ready for QA. F00 is not Done. F05-QA-STRICT and F08 local evidence stay queued behind the F00 QA slot.
 
 ## Last Decision
 
@@ -195,9 +206,9 @@ Earlier decisions of this track (full text in [the archived working orchestratio
 
 ## Last Update
 
-* Updated By: Tech Lead
+* Updated By: Frontend/Mobile Developer
 * Timestamp: 2026-09-23
-* Summary: F00-QA-VISUAL Rejected verdict reconciled; findings accepted (QA-01, QA-02, QA-04) with a ruling to implement QA-03 (focus ring) rather than defer it; F00-FE-A11Y-REWORK opened for the Frontend/Mobile Developer; F00-QA-VISUAL2 queued; owner -> Frontend/Mobile Developer; global board and state synced.
+* Summary: F00-FE-A11Y-REWORK delivered — QA-01, QA-02, QA-03 fixed and QA-04 bundled; a cap-only QA-01 attempt passed all widget tests but still overflowed by 1.5 pt on a real device at accessibility-medium, found by a runtime capture and fixed with a minHeight-based approach; 8 new tests (70 total); analyze, app-scoped format, melos test (313 app / 197 packages) and the F03 device suite all green. Delivery Review = Pending; owner -> Tech Lead.
 
 ## Context & Follow-ups
 
@@ -225,6 +236,7 @@ Why now: the ai-system upgrade (cfd6b59) made an independent visual gate (>= 93 
 * 2026-09-21 — Tech Lead: F00-FE-DESIGN-SYSTEM reconciled (commit 78b22e3); Delivery Review Accepted; Visual Quality Gate Ready for QA; QA plan locked (final, client-only, core + client-ui + visual-quality + stateful-flow, full, allowed); F00-QA-VISUAL activated; prd.md added; working orchestration archived to history/f00-design-foundation-2026-09-21.
 * 2026-09-21 — QA: F00-QA-VISUAL Done with verdict Rejected (qa.md: score 80 of 100, QA-01 Dynamic Type overflow and clipping, QA-02 duplicate semantics, QA-03 focus state missing, QA-04 polish); F00.VISUAL-QA FAIL; QA Result Rejected; status Rework; owner -> Tech Lead.
 * 2026-09-23 — Tech Lead: F00-QA-VISUAL verdict reconciled (Rejected accepted; QA-03 ruled to be implemented, not deferred); F00-FE-A11Y-REWORK activated for the Frontend/Mobile Developer; F00-QA-VISUAL2 queued.
+* 2026-09-23 — Frontend/Mobile Developer: F00-FE-A11Y-REWORK delivered (QA-01/02/03 fixed, QA-04 bundled; real-device overflow found and fixed after a widget-test-only fix passed but didn't hold on device); task Done; Delivery Review = Pending; owner -> Tech Lead.
 
 ## Current Frontend Brief (F00-FE-A11Y-REWORK — activated 2026-09-23)
 

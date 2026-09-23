@@ -13,6 +13,7 @@ class GlassCard extends StatelessWidget {
     this.padding,
     this.width,
     this.height,
+    this.minHeight,
     super.key,
   });
 
@@ -23,12 +24,21 @@ class GlassCard extends StatelessWidget {
   final double? width;
   final double? height;
 
+  /// A floor, not a fixed size — the card is exactly this tall if `child`
+  /// fits, taller if it doesn't (F00-FE-A11Y-REWORK QA-01). Mutually
+  /// exclusive with `height` in practice: a fixed `height` still wins if both
+  /// are given (`BoxConstraints.tighten` behaviour).
+  final double? minHeight;
+
   @override
   Widget build(BuildContext context) {
     final s = LoopScale.of(context);
     return Container(
       width: width,
       height: height,
+      constraints: minHeight == null
+          ? null
+          : BoxConstraints(minHeight: minHeight!),
       padding: padding,
       decoration: BoxDecoration(
         gradient: slate ? LoopGradients.slate : LoopGradients.glass,

@@ -21,6 +21,10 @@ class LoopBadge extends StatelessWidget {
     final s = LoopScale.of(context);
     return Semantics(
       label: label,
+      // Without this, the icon (decorative) and the child `Text` (whose
+      // content equals `label`) leak their own implicit semantics and the
+      // label is announced twice (F00-FE-A11Y-REWORK QA-02).
+      excludeSemantics: true,
       child: Container(
         height: 42 * s,
         padding: EdgeInsets.symmetric(horizontal: 17 * s),
@@ -44,7 +48,15 @@ class LoopBadge extends StatelessWidget {
   }
 }
 
-/// The HAMLE (moves) card: counter over a caps label.
+/// The HAMLE (moves) card: counter over a caps label, 60 wide × a *minimum*
+/// of 63 tall (F00-FE-A11Y-REWORK QA-01). Two protections, not one:
+/// [loopCappedTextScaler] keeps the digits from ever needing more than the
+/// fixed 60-pt width, and `minHeight` (not a fixed height) lets the card grow
+/// a touch if it still needs more than 63 — a fixed height plus the text cap
+/// alone was still 1.5 pt short on a real device at the OS accessibility-medium
+/// floor; real font hinting doesn't match a widget test closely enough to
+/// trust a hand-picked ceiling for the last pixel. At the default OS text
+/// size this renders at exactly 60 × 63, identical to the old fixed size.
 class MovesCard extends StatelessWidget {
   const MovesCard({required this.moves, this.label = 'HAMLE', super.key});
 
@@ -59,18 +71,27 @@ class MovesCard extends StatelessWidget {
       excludeSemantics: true,
       child: Container(
         width: 60 * s,
-        height: 63 * s,
+        constraints: BoxConstraints(minHeight: 63 * s),
         decoration: BoxDecoration(
           gradient: LoopGradients.moves,
           borderRadius: BorderRadius.circular(22 * s),
           border: Border.all(color: const Color(0x17FFFFFF)),
         ),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text('$moves', style: LoopText.counter(s)),
+            Text(
+              '$moves',
+              style: LoopText.counter(s),
+              textScaler: loopCappedTextScaler(context),
+            ),
             SizedBox(height: 7 * s),
-            Text(label, style: LoopText.label(s)),
+            Text(
+              label,
+              style: LoopText.label(s),
+              textScaler: loopCappedTextScaler(context),
+            ),
           ],
         ),
       ),
@@ -88,6 +109,11 @@ class StatCell {
   final bool star;
 }
 
+/// A card of value/label cells, at least 74 pt tall — `minHeight`, not a
+/// fixed height, plus [loopCappedTextScaler] on each cell's texts (both
+/// protections, see [MovesCard]; the cap matters more here since a cell's
+/// *width* is fixed by its `Expanded` share and can't grow the way the
+/// card's height can) (F00-FE-A11Y-REWORK QA-01).
 class StatCard extends StatelessWidget {
   const StatCard({required this.cells, this.width, super.key});
 
@@ -111,13 +137,18 @@ class StatCard extends StatelessWidget {
             label: '${c.label} ${c.value}',
             excludeSemantics: true,
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text(c.value, style: LoopText.stat(s)),
+                    Text(
+                      c.value,
+                      style: LoopText.stat(s),
+                      textScaler: loopCappedTextScaler(context),
+                    ),
                     if (c.star)
                       Padding(
                         padding: EdgeInsets.only(left: 2 * s, top: 2 * s),
@@ -132,7 +163,11 @@ class StatCard extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: 9 * s),
-                Text(c.label, style: LoopText.label(s)),
+                Text(
+                  c.label,
+                  style: LoopText.label(s),
+                  textScaler: loopCappedTextScaler(context),
+                ),
               ],
             ),
           ),
@@ -143,7 +178,7 @@ class StatCard extends StatelessWidget {
       slate: true,
       radius: 26,
       width: width,
-      height: 74 * s,
+      minHeight: 74 * s,
       padding: EdgeInsets.symmetric(horizontal: 6 * s),
       child: Row(children: children),
     );
@@ -179,7 +214,11 @@ class LoopNode extends StatelessWidget {
           ),
         ],
       ),
-      child: Text('$number', style: LoopText.node((current ? 17 : 14) * s)),
+      child: Text(
+        '$number',
+        style: LoopText.node((current ? 17 : 14) * s),
+        textScaler: loopCappedTextScaler(context),
+      ),
     );
     final child = current
         ? Container(
@@ -196,8 +235,11 @@ class LoopNode extends StatelessWidget {
             child: node,
           )
         : node;
+    // The bare digit doesn't say whether this stop is done or the current
+    // one; the colour distinction alone isn't available to a screen reader
+    // (F00-FE-A11Y-REWORK QA-02 note).
     return Semantics(
-      label: '$number',
+      label: current ? '$number, geçerli seviye' : '$number, tamamlandı',
       child: ExcludeSemantics(child: child),
     );
   }

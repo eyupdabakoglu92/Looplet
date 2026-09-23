@@ -190,3 +190,19 @@ class LoopScale extends InheritedWidget {
   @override
   bool updateShouldNotify(LoopScale oldWidget) => value != oldWidget.value;
 }
+
+/// A scale ceiling for compact, fixed-geometry pieces (a card numeral/label,
+/// the wordmark) so OS Dynamic Type still grows them, but never past a size
+/// their token box can hold (F00-FE-A11Y-REWORK, QA-01). Capped at 1.3 — the
+/// top of the OS *standard* content-size range, just below where the
+/// Accessibility sizes begin — verified with no `RenderFlex` overflow up to
+/// the largest OS accessibility size (`components_test.dart`). The reading
+/// itself stays available at full OS size through VoiceOver/TalkBack: every
+/// piece this is used on carries its own `Semantics` label read from the
+/// value, not from the glyphs.
+///
+/// Not used on primary actionable text (button/link labels): those grow with
+/// the full OS scale and their container reflows instead (`LimePill`,
+/// `OutlinePill`).
+TextScaler loopCappedTextScaler(BuildContext context) =>
+    MediaQuery.textScalerOf(context).clamp(maxScaleFactor: 1.3);

@@ -102,16 +102,28 @@ abstract final class LoopText {
 
   /// Small caps label — 11.5, 600, +0.2 em. Author the string in uppercase
   /// (or use `turkishUpper`); never rely on locale-blind uppercasing.
+  ///
+  /// Line height 1.3, not 1.0 (F00-FE-A11Y-REWORK QA-04): at 1.0 a caption
+  /// that wraps to two lines (long text, large OS text size) has its lines
+  /// touch. 1.3 keeps a single line's position close to the original render
+  /// while giving a wrapped one room.
   static TextStyle caption(double s, {Color color = LoopColors.muted}) => _mr(
     11.5 * s,
     600,
-    height: 1,
+    height: 1.3,
     letterSpacing: 0.2 * 11.5 * s,
     color: color,
   );
 
   /// Stat/HAMLE small label — 11 (raised from the render's 10.4–10.5, ui-design
   /// §17.3), 600, +0.14 em.
+  ///
+  /// Height stays 1.0, unlike `caption` (QA-04 named both roles, but this one
+  /// is only ever a short single word — SEN, OPTİMAL, HAMLE — inside the
+  /// fixed 60 x 63 / 74-pt-tall `MovesCard`/`StatCard` boxes, capped by
+  /// [loopCappedTextScaler]; it never reaches a second line, so there is
+  /// nothing for a taller line height to protect, and raising it would only
+  /// shrink those boxes' margin against their fixed token size for no gain.
   static TextStyle label(double s, {Color color = LoopColors.muted}) =>
       _mr(11 * s, 600, height: 1, letterSpacing: 0.14 * 11 * s, color: color);
 
