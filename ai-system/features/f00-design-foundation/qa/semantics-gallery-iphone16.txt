@@ -1,0 +1,131 @@
+QAPROBE""
+QAPROBE start mode=gallery
+QAPROBE env mode=gallery logical=393.0x852.0 dpr=3.0 textScale=1.0 reduceMotion=false disableAnimations=false boldText=false reduceMotionRequested=false overflows=0
+QAPROBE semantics-root=true
+QAPROBE sem d=5 size=252.9x13.0 button=false enabled=false hasEnabled=false image=false tap=false label="DESIGN GALLERY · LOOP GLASS"
+QAPROBE sem d=5 size=175.0x48.0 button=false enabled=false hasEnabled=false image=false tap=false label="Looplet"
+QAPROBE sem d=5 size=123.8x13.0 button=false enabled=false hasEnabled=false image=false tap=false label="COLOUR ROLES"
+QAPROBE sem d=5 size=55.4x20.0 button=false enabled=false hasEnabled=false image=false tap=false label="Ground"
+QAPROBE sem d=5 size=41.2x20.0 button=false enabled=false hasEnabled=false image=false tap=false label="Glass"
+QAPROBE sem d=5 size=32.4x20.0 button=false enabled=false hasEnabled=false image=false tap=false label="Text"
+QAPROBE sem d=5 size=48.2x20.0 button=false enabled=false hasEnabled=false image=false tap=false label="Muted"
+QAPROBE sem d=5 size=35.3x20.0 button=false enabled=false hasEnabled=false image=false tap=false label="Lime"
+QAPROBE sem d=5 size=76.5x20.0 button=false enabled=false hasEnabled=false image=false tap=false label="Periwinkle"
+QAPROBE sem d=5 size=76.3x20.0 button=false enabled=false hasEnabled=false image=false tap=false label="Cream tile"
+QAPROBE sem d=5 size=53.7x20.0 button=false enabled=false hasEnabled=false image=false tap=false label="Locked"
+QAPROBE sem d=5 size=49.7x20.0 button=false enabled=false hasEnabled=false image=false tap=false label="Frozen"
+QAPROBE sem d=5 size=38.5x20.0 button=false enabled=false hasEnabled=false image=false tap=false label="Slate"
+QAPROBE sem d=5 size=340.3x26.0 button=false enabled=false hasEnabled=false image=false tap=false label="TYPE ROLES — SPACE GROTESK · MANROPE"
+QAPROBE sem d=5 size=213.3x82.0 button=false enabled=false hasEnabled=false image=false tap=false label="Döngü | tamamlandı."
+QAPROBE sem d=5 size=155.7x12.0 button=false enabled=false hasEnabled=false image=false tap=false label="Display 33 / 1.13 · 500"
+QAPROBE sem d=5 size=325.0x36.0 button=false enabled=false hasEnabled=false image=false tap=false label="Sıradaki döngüyü çöz."
+QAPROBE sem d=5 size=167.7x12.0 button=false enabled=false hasEnabled=false image=false tap=false label="Headline 28 / 1.16 · 500"
+QAPROBE sem d=5 size=86.6x30.8 button=false enabled=false hasEnabled=false image=false tap=false label="3 · 3 · 3"
+QAPROBE sem d=5 size=119.5x12.0 button=false enabled=false hasEnabled=false image=false tap=false label="Stat 24 · tabular"
+QAPROBE sem d=5 size=116.5x18.0 button=false enabled=false hasEnabled=false image=false tap=false label="Sonraki bölüm"
+QAPROBE sem d=5 size=89.6x12.0 button=false enabled=false hasEnabled=false image=false tap=false label="CTA 16 · 500"
+QAPROBE sem d=5 size=242.7x20.0 button=false enabled=false hasEnabled=false image=false tap=false label="Hedef üç hamlede yerine oturdu."
+QAPROBE sem d=5 size=159.7x12.0 button=false enabled=false hasEnabled=false image=false tap=false label="Body 14.5 · 500 muted"
+QAPROBE sem d=5 size=212.3x13.0 button=false enabled=false hasEnabled=false image=false tap=false label="SEVİYE 05 · HEDEF DÖNGÜ"
+QAPROBE sem d=5 size=219.9x12.0 button=false enabled=false hasEnabled=false image=false tap=false label="Label 11.5 · 600 · +0.2 em caps"
+QAPROBE sem d=5 size=101.2x13.0 button=false enabled=false hasEnabled=false image=false tap=false label="TILE STATES"
+QAPROBE sem d=5 size=15.8x25.0 button=false enabled=false hasEnabled=false image=false tap=false label="A"
+QAPROBE sem d=5 size=41.3x12.0 button=false enabled=false hasEnabled=false image=false tap=false label="Normal"
+QAPROBE sem d=5 size=15.8x25.0 button=false enabled=false hasEnabled=false image=false tap=false label="A"
+QAPROBE sem d=5 size=60.2x12.0 button=false enabled=false hasEnabled=false image=false tap=false label="Active row"
+QAPROBE sem d=5 size=15.8x25.0 button=false enabled=false hasEnabled=false image=false tap=false label="A"
+QAPROBE sem d=5 size=47.4x12.0 button=false enabled=false hasEnabled=false image=false tap=false label="Winning"
+QAPROBE sem d=5 size=15.8x25.0 button=false enabled=false hasEnabled=false image=false tap=false label="A"
+QAPROBE sem d=5 size=41.3x12.0 button=false enabled=false hasEnabled=false image=false tap=false label="Locked"
+QAPROBE sem d=5 size=15.8x25.0 button=false enabled=false hasEnabled=false image=false tap=false label="A"
+QAPROBE sem d=5 size=38.3x12.0 button=false enabled=false hasEnabled=false image=false tap=false label="Frozen"
+QAPROBE sem d=5 size=15.8x25.0 button=false enabled=false hasEnabled=false image=false tap=false label="A"
+QAPROBE sem d=5 size=46.1x12.0 button=false enabled=false hasEnabled=false image=false tap=false label="Inactive"
+QAPROBE sem d=5 size=59.5x12.0 button=false enabled=false hasEnabled=false image=false tap=false label="Ghost slot"
+QAPROBE sem d=5 size=11.4x18.0 button=false enabled=false hasEnabled=false image=false tap=false label="A"
+QAPROBE sem d=5 size=42.2x12.0 button=false enabled=false hasEnabled=false image=false tap=false label="Rail tile"
+QAPROBE sem d=5 size=87.6x13.0 button=false enabled=false hasEnabled=false image=false tap=false label="CONTROLS"
+QAPROBE sem d=5 size=340.3x69.7 button=true enabled=true hasEnabled=true image=false tap=true label="Sonraki bölüm"
+QAPROBE sem d=6 size=340.3x69.7 button=false enabled=false hasEnabled=false image=false tap=true label="Sonraki bölüm"
+QAPROBE sem d=5 size=340.3x69.7 button=true enabled=true hasEnabled=true image=false tap=true label="Sonraki bölüm (Result, no glow)"
+QAPROBE sem d=6 size=340.3x69.7 button=false enabled=false hasEnabled=false image=false tap=true label="Sonraki bölüm (Result, no glow)"
+QAPROBE sem d=5 size=340.3x52.7 button=true enabled=true hasEnabled=true image=false tap=true label="Secondary (outline)"
+QAPROBE sem d=6 size=340.3x52.7 button=false enabled=false hasEnabled=false image=false tap=true label="Secondary (outline)"
+QAPROBE sem d=5 size=91.8x44.0 button=true enabled=true hasEnabled=true image=false tap=true label="Tekrar oyna"
+QAPROBE sem d=6 size=91.8x44.0 button=false enabled=false hasEnabled=false image=false tap=true label="Tekrar oyna"
+QAPROBE sem d=5 size=185.0x44.0 button=true enabled=false hasEnabled=true image=false tap=false label="Sonraki bölüm · yakında | Sonraki bölüm · yakında"
+QAPROBE sem d=5 size=108.1x54.9 button=true enabled=true hasEnabled=true image=false tap=true label="Geri al"
+QAPROBE sem d=6 size=108.1x54.9 button=false enabled=false hasEnabled=false image=false tap=true label=""
+QAPROBE sem d=5 size=44.0x44.0 button=true enabled=true hasEnabled=true image=false tap=true label="Baştan"
+QAPROBE sem d=6 size=44.0x44.0 button=false enabled=false hasEnabled=false image=false tap=true label=""
+QAPROBE sem d=5 size=44.0x44.0 button=true enabled=true hasEnabled=true image=false tap=true label="Ana ekrana dön"
+QAPROBE sem d=6 size=44.0x44.0 button=false enabled=false hasEnabled=false image=false tap=true label=""
+QAPROBE sem d=5 size=120.0x46.1 button=false enabled=false hasEnabled=false image=false tap=false label="HARİKA | HARİKA"
+QAPROBE sem d=5 size=65.9x69.2 button=false enabled=false hasEnabled=false image=false tap=false label="HAMLE 3"
+QAPROBE sem d=5 size=109.8x26.3 button=false enabled=false hasEnabled=false image=false tap=false label="2 / 3 yıldız"
+QAPROBE sem d=5 size=181.9x13.0 button=false enabled=false hasEnabled=false image=false tap=false label="CARDS, STATS, TRACK"
+QAPROBE sem d=5 size=107.7x79.2 button=false enabled=false hasEnabled=false image=false tap=false label="SEN 3"
+QAPROBE sem d=5 size=107.7x79.2 button=false enabled=false hasEnabled=false image=false tap=false label="OPTİMAL 3"
+QAPROBE sem d=5 size=107.7x79.2 button=false enabled=false hasEnabled=false image=false tap=false label="EN İYİ 3"
+QAPROBE sem d=5 size=149.0x13.0 button=false enabled=false hasEnabled=false image=false tap=false label="YOLCULUK · 4 / 30"
+QAPROBE sem d=5 size=298.8x72.0 button=false enabled=false hasEnabled=false image=false tap=false label="Sıradaki döngüyü çöz."
+QAPROBE sem d=5 size=41.7x41.7 button=false enabled=false hasEnabled=false image=false tap=false label="1"
+QAPROBE sem d=5 size=41.7x41.7 button=false enabled=false hasEnabled=false image=false tap=false label="2"
+QAPROBE sem d=5 size=41.7x41.7 button=false enabled=false hasEnabled=false image=false tap=false label="3"
+QAPROBE sem d=5 size=41.7x41.7 button=false enabled=false hasEnabled=false image=false tap=false label="4"
+QAPROBE sem d=5 size=83.4x83.4 button=false enabled=false hasEnabled=false image=false tap=false label="5"
+QAPROBE sem d=5 size=148.0x13.0 button=false enabled=false hasEnabled=false image=false tap=false label="ICONS AND STARS"
+QAPROBE sem d=5 size=340.3x26.0 button=false enabled=false hasEnabled=false image=false tap=false label="TURKISH GLYPHS, TABULAR FIGURES, WEIGHT AXIS"
+QAPROBE sem d=5 size=4.7x18.0 button=false enabled=false hasEnabled=false image=false tap=false label="İ"
+QAPROBE sem d=5 size=4.7x18.0 button=false enabled=false hasEnabled=false image=false tap=false label="I"
+QAPROBE sem d=5 size=11.2x18.0 button=false enabled=false hasEnabled=false image=false tap=false label="Ş"
+QAPROBE sem d=5 size=12.1x18.0 button=false enabled=false hasEnabled=false image=false tap=false label="Ğ"
+QAPROBE sem d=5 size=11.8x18.0 button=false enabled=false hasEnabled=false image=false tap=false label="Ç"
+QAPROBE sem d=5 size=12.3x18.0 button=false enabled=false hasEnabled=false image=false tap=false label="Ö"
+QAPROBE sem d=5 size=12.3x18.0 button=false enabled=false hasEnabled=false image=false tap=false label="Ü"
+QAPROBE sem d=5 size=340.3x40.0 button=false enabled=false hasEnabled=false image=false tap=false label="ı ş ğ ç ö ü · HARİKA · YENİ EN İYİ · OPTİMAL · SEVİYE"
+QAPROBE sem d=5 size=340.3x40.0 button=false enabled=false hasEnabled=false image=false tap=false label="turkishUpper: HARİKA · YENİ EN İYİ · OPTİMAL · SEVİYE · ILIK"
+QAPROBE sem d=5 size=135.7x94.0 button=false enabled=false hasEnabled=false image=false tap=false label="0 1 1 1 1 | 8 8 8 8 8"
+QAPROBE sem d=5 size=325.3x33.0 button=false enabled=false hasEnabled=false image=false tap=false label="Space Grotesk 400  İıŞĞ 0123"
+QAPROBE sem d=5 size=325.4x33.0 button=false enabled=false hasEnabled=false image=false tap=false label="Space Grotesk 500  İıŞĞ 0123"
+QAPROBE sem d=5 size=325.5x33.0 button=false enabled=false hasEnabled=false image=false tap=false label="Space Grotesk 600  İıŞĞ 0123"
+QAPROBE sem d=5 size=325.6x33.0 button=false enabled=false hasEnabled=false image=false tap=false label="Space Grotesk 700  İıŞĞ 0123"
+QAPROBE sem d=5 size=238.3x23.0 button=false enabled=false hasEnabled=false image=false tap=false label="Manrope 400  İıŞĞÇÖÜ 0123"
+QAPROBE sem d=5 size=242.2x23.0 button=false enabled=false hasEnabled=false image=false tap=false label="Manrope 500  İıŞĞÇÖÜ 0123"
+QAPROBE sem d=5 size=247.0x23.0 button=false enabled=false hasEnabled=false image=false tap=false label="Manrope 600  İıŞĞÇÖÜ 0123"
+QAPROBE sem d=5 size=249.4x23.0 button=false enabled=false hasEnabled=false image=false tap=false label="Manrope 700  İıŞĞÇÖÜ 0123"
+QAPROBE sem-count=92
+QAPROBE box LoopletWordmark 175.0x48.0 at 26.3,100.5
+QAPROBE box TileFace 65.9x65.9 at 39.5,1034.4
+QAPROBE box TileFace 65.9x65.9 at 138.3,1034.4
+QAPROBE box TileFace 65.9x65.9 at 237.1,1034.4
+QAPROBE box TileFace 65.9x65.9 at 39.5,1144.2
+QAPROBE box TileFace 65.9x65.9 at 138.3,1144.2
+QAPROBE box TileFace 65.9x65.9 at 237.1,1144.2
+QAPROBE box GhostSlot 65.9x65.9 at 39.5,1254.0
+QAPROBE box RailTile 39.5x46.1 at 151.5,1263.9
+QAPROBE box LimePill 340.3x69.7 at 26.3,1402.6
+QAPROBE box LimePill 340.3x69.7 at 26.3,1485.5
+QAPROBE box OutlinePill 340.3x52.7 at 26.3,1568.3
+QAPROBE box TextLink 91.8x44.0 at 26.3,1625.4
+QAPROBE box TextLink 185.0x44.0 at 135.8,1625.4
+QAPROBE box UndoPill 108.1x54.9 at 26.3,1678.2
+QAPROBE box GlassIconButton 44.0x44.0 at 147.6,1683.7
+QAPROBE box GlassIconButton 44.0x44.0 at 204.8,1683.7
+QAPROBE box LoopBadge 120.0x46.1 at 26.3,1746.3
+QAPROBE box MovesCard 65.9x69.2 at 26.3,1805.6
+QAPROBE box StarRow 109.8x26.3 at 108.2,1827.0
+QAPROBE box StatCard 340.3x81.2 at 26.3,1933.8
+QAPROBE box LoopNode 41.7x41.7 at 26.3,2218.4
+QAPROBE box LoopNode 41.7x41.7 at 76.8,2215.1
+QAPROBE box LoopNode 41.7x41.7 at 127.3,2211.8
+QAPROBE box LoopNode 41.7x41.7 at 177.8,2208.5
+QAPROBE box LoopNode 83.4x83.4 at 221.7,2189.9
+QAPROBE box TileFace 48.3x48.3 at 26.3,2496.7
+QAPROBE box TileFace 48.3x48.3 at 81.2,2496.7
+QAPROBE box TileFace 48.3x48.3 at 136.1,2496.7
+QAPROBE box TileFace 48.3x48.3 at 191.0,2496.7
+QAPROBE box TileFace 48.3x48.3 at 245.9,2496.7
+QAPROBE box TileFace 48.3x48.3 at 300.8,2496.7
+QAPROBE box TileFace 48.3x48.3 at 26.3,2551.6
+QAPROBE report-end overflows=0

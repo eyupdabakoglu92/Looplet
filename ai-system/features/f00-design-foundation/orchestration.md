@@ -6,15 +6,15 @@ F00
 
 ## Current Status
 
-In QA
+Rework
 
 ## Current Owner
 
-QA
+Tech Lead
 
 ## Next Role
 
-QA
+Tech Lead
 
 ## Active Task Ledger
 
@@ -22,7 +22,7 @@ QA
 - [x] Task ID: F00-UI-DIRECTION-C | Assigned Role: UI Designer | Status: Done | Summary: DELIVERED 2026-09-21 — Direction C (Loop Glass) rendered from the user's reference screens on the same states as A/B (+ resolved/literal, sheet/full-screen and semantics alternatives, device variants, specimen with measured contrast) and three reference-frame parity comparisons; design-foundation.md §17 (system, motion, measured tokens, contract conflicts, deviations D1-D11, content-delta table, confirmations needed); A/B recorded as rejected; Status stays Draft | Depends On: F00-UI-FOUNDATION
 - [x] Task ID: F00-UI-FINALIZE | Assigned Role: UI Designer | Status: Done | Summary: DELIVERED 2026-09-21 — selected-source renders for the final decision set (Play, lifted row, locked+frozen, full-screen Result perfect / new best / 2-star, Home design + today, tutorial, device variants), an executable board-to-result transition prototype with timed and reduced-motion stills, a component/token sheet, and the design-system handoff features/f00-design-foundation/ui-design.md (Visual Evidence Manifest with selected-source and motion-prototype records); Foundation stays Selected | Depends On: F00-UI-DIRECTION-C
 - [x] Task ID: F00-FE-DESIGN-SYSTEM | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: DELIVERED 2026-09-21 — app/lib/design layer (tokens, type roles on the bundled Space Grotesk and Manrope variable fonts, 12 drawn icons, Looplet wordmark, Turkish casing helpers, every component in every state) plus the debug-only gallery lib/main_gallery.dart; no shipped surface changed (only tracked change is the pubspec.yaml font declaration, no dependency); analyzer, format, melos test (197 package tests, 305 app tests of which 62 new) and the F03 device suite 13 of 13 green; runtime parity on iPhone 16, 16e and 16 Pro Max beside S-91 with one deviation found and fixed (frozen tile ring and dash rhythm) and the rest listed; evidence in features/f00-design-foundation/frontend.md | Depends On: F00-UI-FINALIZE
-- [ ] Task ID: F00-QA-VISUAL | Assigned Role: QA | Status: Open | Summary: ACTIVATED 2026-09-21 by the Tech Lead after reconciliation of F00-FE-DESIGN-SYSTEM (commit 78b22e3): independent final-stage visual QA of the implemented design system on the canonical simulator (iPhone 16 393x852, 16e and 16 Pro Max variants) against the selected-source renders; own runtime captures, ten-dimension rubric (93 plus, every dimension 8 plus, no fail condition, complete runtime evidence); scenarios and limits in the Current QA Brief; writes qa.md Visual Quality Verdict and QA Result only | Depends On: F00-FE-DESIGN-SYSTEM
+- [x] Task ID: F00-QA-VISUAL | Assigned Role: QA | Status: Done | Summary: DONE 2026-09-21 — verdict Rejected (qa.md; final stage, revision 78b22e3 content, app tree d9709ad): final score 80 of 100, lowest dimension Accessibility 6 of 10; blocking QA-01 (design-system components not Dynamic Type safe — MovesCard overflows from 1.35x, MovesCard and StatCard at the platform floor accessibility-medium, pills and nodes clip at the largest size), QA-02 (duplicate semantic nodes and labels on buttons, badge and disabled link), QA-03 (ui-design §8 focus state not implemented and not declared); QA-04 polish; independent runtime evidence in features/f00-design-foundation/qa/ | Depends On: F00-FE-DESIGN-SYSTEM
 
 ## Open Tasks
 
@@ -46,7 +46,7 @@ final
 
 ## QA Result
 
-None
+Rejected
 
 ## Release Scope
 
@@ -160,7 +160,8 @@ allowed
   * Prerequisite / External Decision: met 2026-09-21 — F00-FE-DESIGN-SYSTEM delivered and reconciled (Delivery Review Accepted, commit 78b22e3); Visual Quality Gate = Ready for QA
   * Re-evaluation Trigger: Tech Lead activated F00-QA-VISUAL (2026-09-21)
   * Blocks: Visual Quality Gate = Passed; F00 Done
-  * Result: PENDING
+  * Result: FAIL
+  * Provenance / Note: 2026-09-21 QA, revision 78b22e3 content (app tree d9709ad858e4eda876f00e664281fa208409f6ca, HEAD a499e5d), iOS Simulator 18.6 (iPhone 16, 16e, 16 Pro Max), debug builds of the gallery and of an out-of-repo QA probe: independent rubric score 80 of 100, lowest dimension Accessibility 6 of 10, Fail Conditions None, Runtime Evidence Complete Yes, Result FAIL. Measured PASS: token colours delta E 0.00, gradients at most 1.2, geometry within 0.1 pt of spec on three devices, glow versus neutral shadow, Turkish glyphs and weight axis, Reduce Motion press feedback 0.978 (off) versus 1.000 (on) on the real OS setting, shipped app cold launch, F03 device suite 13 of 13, analyzer and format and 197 plus 305 tests exit 0. FAIL: QA-01 Dynamic Type overflow and clipping, QA-02 duplicate semantics, QA-03 focus state missing (QA-04 polish, non-blocking). Limits: no VoiceOver speech run, no Android, no physical device, synthetic pointer, no consuming surface, release size unmeasured. Detail: qa.md and qa/README.md.
 
 ## Open Decision Gates
 
@@ -180,7 +181,7 @@ None
 
 ## Next Action
 
-Run QA on F00-QA-VISUAL using the Current QA Brief below: independent final-stage visual QA of the design system at commit 78b22e3 on the canonical simulator with QA's own runtime captures; write qa.md (Visual Quality Verdict) and QA Result only. Then Tech Lead: reconcile the verdict, set the gate (Passed only after a qualifying QA), and plan Phase C (conformance audit of the F03 / F04 / F05 surfaces). F05-QA-STRICT and F08 local evidence stay queued (one QA feature at a time).
+Run Tech Lead to reconcile the F00-QA-VISUAL verdict (Rejected, qa.md): confirm the findings against the evidence in qa/, decide the QA-03 focus state (implement or record as a deviation) and whether a UI Designer large-text addendum is wanted, then open the F00 rework task for the Frontend/Mobile Developer (QA-01, QA-02, QA-03; QA-04 optional) and re-queue a targeted final-stage QA re-verify (scenarios 1, 4, 5 of the Current QA Brief; the probe in qa/src is reusable). Visual Quality Gate stays as the Tech Lead sets it (QA does not change it); F00 is not Done. F05-QA-STRICT and F08 local evidence stay queued.
 
 ## Last Decision
 
@@ -190,9 +191,9 @@ Earlier decisions of this track (full text in [the archived working orchestratio
 
 ## Last Update
 
-* Updated By: Tech Lead
+* Updated By: QA
 * Timestamp: 2026-09-21
-* Summary: F00-FE-DESIGN-SYSTEM reconciled; Delivery Review = Accepted; Visual Quality Gate = Ready for QA; F00-QA-VISUAL activated (QA plan locked, preflight PASS); global board and state synced.
+* Summary: F00-QA-VISUAL executed on the canonical target and its two variants with an independent probe: verdict Rejected (score 80 of 100, lowest Accessibility 6 of 10); findings QA-01 to QA-04; F00.VISUAL-QA FAIL; owner -> Tech Lead; qa.md and qa/ evidence added.
 
 ## Context & Follow-ups
 
@@ -218,6 +219,7 @@ Why now: the ai-system upgrade (cfd6b59) made an independent visual gate (>= 93 
 * 2026-09-21 — Tech Lead: visual-gate checkpoint passed (Ready for Implementation); F00-FE-DESIGN-SYSTEM activated; F00-QA-VISUAL queued.
 * 2026-09-21 — Frontend/Mobile Developer: F00-FE-DESIGN-SYSTEM delivered (app/lib/design, fonts, debug gallery, 62 tests, runtime parity on three simulators, frozen-tile deviation found and fixed); task Done; F00.DS-AUTOMATED and F00.DS-PARITY PASS; Delivery Review = Pending; owner -> Tech Lead.
 * 2026-09-21 — Tech Lead: F00-FE-DESIGN-SYSTEM reconciled (commit 78b22e3); Delivery Review Accepted; Visual Quality Gate Ready for QA; QA plan locked (final, client-only, core + client-ui + visual-quality + stateful-flow, full, allowed); F00-QA-VISUAL activated; prd.md added; working orchestration archived to history/f00-design-foundation-2026-09-21.
+* 2026-09-21 — QA: F00-QA-VISUAL Done with verdict Rejected (qa.md: score 80 of 100, QA-01 Dynamic Type overflow and clipping, QA-02 duplicate semantics, QA-03 focus state missing, QA-04 polish); F00.VISUAL-QA FAIL; QA Result Rejected; status Rework; owner -> Tech Lead.
 
 ## Current QA Brief (F00-QA-VISUAL — activated 2026-09-21)
 

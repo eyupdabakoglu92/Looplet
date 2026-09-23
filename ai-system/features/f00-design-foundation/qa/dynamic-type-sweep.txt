@@ -1,0 +1,20 @@
+== gallery
+  large                                scale 1.00  overflows=0   
+  extra-large                          scale 1.12  overflows=0   
+  extra-extra-large                    scale 1.24  overflows=0   
+  extra-extra-extra-large              scale 1.35  overflows=1   3.5px/bottom in MovesCard+_Controls
+  accessibility-medium                 scale 1.65  overflows=4   38px/bottom in MovesCard+_Controls; 13px/bottom in StatCard+GlassCard; 13px/bottom in StatCard+GlassCard; 13px/bottom in StatCard+GlassCard
+  accessibility-large                  scale 1.94  overflows=4   54px/bottom in MovesCard+_Controls; 27px/bottom in StatCard+GlassCard; 50px/bottom in StatCard+GlassCard; 27px/bottom in StatCard+GlassCard
+  accessibility-extra-large            scale 2.35  overflows=4   78px/bottom in MovesCard+_Controls; 48px/bottom in StatCard+GlassCard; 76px/bottom in StatCard+GlassCard; 48px/bottom in StatCard+GlassCard
+  accessibility-extra-extra-large      scale 2.76  overflows=4   135px/bottom in MovesCard+_Controls; 68px/bottom in StatCard+GlassCard; 101px/bottom in StatCard+GlassCard; 68px/bottom in StatCard+GlassCard
+  accessibility-extra-extra-extra-large scale 3.12  overflows=4   163px/bottom in MovesCard+_Controls; 86px/bottom in StatCard+GlassCard; 124px/bottom in StatCard+GlassCard; 124px/bottom in StatCard+GlassCard
+== edge
+  large                                scale 1.00  overflows=0   
+  extra-large                          scale 1.12  overflows=0   
+  extra-extra-large                    scale 1.24  overflows=0   
+  extra-extra-extra-large              scale 1.35  overflows=4   3.5px/bottom in MovesCard; 3.5px/bottom in MovesCard; 3.5px/bottom in MovesCard; 3.5px/bottom in MovesCard
+  accessibility-medium                 scale 1.65  overflows=7   38px/bottom in MovesCard; 38px/bottom in MovesCard; 38px/bottom in MovesCard; 95px/bottom in MovesCard; 13px/bottom in StatCard+GlassCard; 13px/bottom in StatCard+GlassCard; 13px/bottom in StatCard+GlassCard
+  accessibility-large                  scale 1.94  overflows=7   54px/bottom in MovesCard; 54px/bottom in MovesCard; 54px/bottom in MovesCard; 121px/bottom in MovesCard; 27px/bottom in StatCard+GlassCard; 50px/bottom in StatCard+GlassCard; 27px/bottom in StatCard+GlassCard
+  accessibility-extra-large            scale 2.35  overflows=8   78px/bottom in MovesCard; 78px/bottom in MovesCard; 159px/bottom in MovesCard; 240px/bottom in MovesCard; 7.6px/right in StatCard+GlassCard; 48px/bottom in StatCard+GlassCard; 76px/bottom in StatCard+GlassCard; 48px/bottom in StatCard+GlassCard
+  accessibility-extra-extra-large      scale 2.76  overflows=9   135px/bottom in MovesCard; 135px/bottom in MovesCard; 230px/bottom in MovesCard; 325px/bottom in MovesCard; 28px/right in StatCard+GlassCard; 68px/bottom in StatCard+GlassCard; 101px/bottom in StatCard+GlassCard; 68px/bottom in StatCard+GlassCard; 23px/right in ?
+  accessibility-extra-extra-extra-large scale 3.12  overflows=9   163px/bottom in MovesCard; 163px/bottom in MovesCard; 271px/bottom in MovesCard; 379px/bottom in MovesCard; 45px/right in StatCard+GlassCard; 86px/bottom in StatCard+GlassCard; 124px/bottom in StatCard+GlassCard; 124px/bottom in StatCard+GlassCard; 56px/right in ?
