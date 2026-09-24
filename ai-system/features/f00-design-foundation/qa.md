@@ -157,6 +157,102 @@ Result: `FAIL`
 * **Routing:** F00-FE-DESIGN-SYSTEM için rework görevi (Frontend), sonra aynı final stage'de hedefli yeniden QA: senaryo 1, 4 ve 5 (`qa/src` probe'u yeniden kullanılabilir); Regression Depth `full` kalabilir, geçerli kanıt fingerprint ile yeniden kullanılır.
 * **Not:** Kapı `Passed` olamaz; F00 Done değil. Bu bulgular Phase D tüketicilerine taşınmadan katmanda düzeltilirse ucuzdur. Sıra: F05-QA-STRICT ve F08 yerel kanıt QA kuyruğunda bekliyor.
 
+---
+
+# F00 — design-foundation: QA Raporu (F00-QA-VISUAL2, 2026-09-23)
+
+> Hedefli final-stage yeniden doğrulama, F00-FE-A11Y-REWORK'e karşı. Test edilen revizyon: commit `0ce257c` (app ağacı `3753ad31fc301501d2e75db709d9b437838c250d`, `app/lib/design` ağacı `0b125cf11310ae08ae9b722a727af775cd737658`) — HEAD şu an `f021401`, ancak yalnız Tech Lead belge commit'leri üstüne geldi; `git rev-parse HEAD:app` ve `HEAD:app/lib/design` bugün doğrudan doğrulandı ve brief'teki değerlerle **birebir aynı**, dolayısıyla brief hâlâ geçerli. Değişen tam yüzey: `app/lib/design/components/{buttons,info,surfaces}.dart`, `tokens.dart`, `typography.dart`, `wordmark.dart` ve testleri (`git diff --stat 5f18c89 0ce257c -- app`). Hedef: iOS Simulator 18.6, iPhone 16 (393×852, birincil). Ham kanıt: `qa/qa2/` (bu oturumun scratchpad'i; dosya adları aşağıdaki tabloda).
+
+## 0. QA Execution Plan
+
+* **Stage / Scope:** final / client-only (Current QA Brief'ten, Tech Lead tarafından ayarlandı).
+* **Modüller:** `core`, `client-ui`, `visual-quality`, `stateful-flow`. **Regression Depth: full. Evidence Reuse: allowed** — ama yalnız brief'in izin verdiği, bu revizyonun dokunmadığı kanıt için (E6, E6b, E7-varsayılan-ölçek, E9-Türkçe/ağırlık-ekseni, E12, E14); QA-01/02/03'ün kendisi için **hiçbir eski kanıt yeniden kullanılmadı** — hepsi bu turda yeniden üretildi.
+* **Frontend'in `frontend.md`/`design/rework/` anlatımına güvenilmedi:** her üç bulgu da aşağıdaki kendi çalışma-zamanı kanıtımla bağımsız doğrulandı (probe yeniden derlendi, galeri sıfırdan derlendi, kendi test dosyam yazıldı — Frontend'in test dosyası kopyalanmadı/okunarak geçilmedi).
+
+## 1. Evidence Ledger (bu tur)
+
+| Evidence ID | Claim / Scenario | Class | Command / Action | Target | Result / Counts |
+| --- | --- | --- | --- | --- | --- |
+| E15 | Fingerprint geçerli | static | `git rev-parse HEAD`, `HEAD:app`, `HEAD:app/lib/design` | repo | `f021401` / `3753ad3…` / `0b125cf…` — brief'teki app ve design ağaçlarıyla birebir aynı |
+| E16 | Analiz, format, tüm testler | automated | `melos run analyze`; `dart format --output=none --set-exit-if-changed app`; `melos run format:check`; `flutter test` (app) | workspace + app | `looplet_app`: analiz 0 sorun; `looplet_solver`: 1 önceden var olan ilgisiz `info` (bu özelliğin dışında); app-scoped format 110 dosya 0 değişen; workspace `format:check` yalnız önceden var olan ilgisiz `qa/src/qa_probe_main.dart`'ta başarısız (brief'in kendisi de bunu engelleyici saymıyor); `flutter test` (app) **313/313 PASS**, 0 başarısız — F03/F04/F05 dahil tüm paket, regresyon yok |
+| E17 | F03 cihaz paketi (birlikte-var-olma) | runtime | `flutter test integration_test -d D0011CE7…` | iPhone 16, iOS 18.6 | **+13 All tests passed**, çıkış 0 — bu turda yeniden çalıştırıldı (Round 1'in E4'ünü tekrar üretiyor) |
+| E18 | QA-01 kendi galeri karesi, 1,65× (accessibility-medium, platform.md §14 tabanı) | runtime | `xcrun simctl ui … content_size accessibility-medium`; galeri sıfırdan derlendi; kaydırma-ofsetli tam galeri taraması | iPhone 16 | `qa2/am_sheet1.png`, `qa2/am_sheet2.png` — 5 galeri bölümü de taşma/kırpma **0**; `MovesCard` "3 / HAMLE" tam çizili (65,9×69,2 civarı, taşma yok); `StatCard` "3 · 3 · 3★ / SEN OPTİMAL EN İYİ" tam çizili; `LoopNode` izi 1-5 tam çizili; `LimePill`/`OutlinePill` etiketleri kırpılmadan gösteriliyor; wordmark sağlam. QA-04'ün yetim "." satırı hâlâ görünür (beklenen — bu rework'ün kapsamında değildi) |
+| E19 | QA-01 kendi galeri karesi, 3,12× (accessibility-extra-extra-extra-large — sweep'in en büyüğü) | runtime | aynı yöntem, `content_size accessibility-extra-extra-extra-large`; ek hedefli kaydırma (5200/5800/6400) ile Frontend'in "yalnız widget testiyle doğrulandı" dediği CARDS/STATS/TRACK bölümünü de kapsayacak şekilde galeri sonuna kadar tarandı | iPhone 16 | `qa2/xxxl_sheet1.png`, `qa2/xxxl_sheet2.png`, `qa2/qa2_xxxl_cards_5200.png`, `qa2/qa2_xxxl_cards_5800.png` — taşma/kırpma **0**; `StatCard` üç hücre de 3,12×'te tam çizili (Frontend'in yalnız 1,65×'te karede, ötesinde yalnız widget testiyle doğruladığını söylediği boşluk kendi karemle kapatıldı); `LoopNode` izi (1-4 tamamlandı + 5 geçerli, halo'lu) tam çizili; `LimePill` "Sonraki bölüm (Result, no glow)" 3 satıra büyüyerek (minHeight) kırpılmadan sığıyor; galeri wordmark'ı sağlam. QA-04'ün yetim "." bu ölçekte de hâlâ var (beklenen, non-blocking, dokunulmadı) |
+| E20 | QA-02 kendi semantik ağaç dökümü | runtime (probe) | `qa/src/qa_probe_main.dart` + `runprobe2.sh` bu revizyona karşı sıfırdan yeniden derlendi; `probe_mode=gallery` | iPhone 16 | `qa2/qa2_semdump.log` — **sem-count=85** (Round 1: 92); `LimePill`/`OutlinePill`/`TextLink`/`GlassIconButton`/`UndoPill`/`LoopBadge` için sıfır çift-düğüm çifti; `label="HARİKA"` (tekil, eskiden `"HARİKA\nHARİKA"`); `label="Sonraki bölüm · yakında"` (tekil, eskiden ikilenmiş); `label="Geri al, 3 / 3 hak"` (kota artık etikette — QA-02 notu düzeltilmiş); `label="1, tamamlandı"` … `label="5, geçerli seviye"` (durum artık etikette — QA-02 notu düzeltilmiş). "\|" içeren iki etiket ("Döngü \| tamamlandı.", "ı ş ğ ç ö ü · HARİKA · …") incelendi: probe'un çok satırlı gösterim metinlerinde `\n`'i "\|" ile değiştirme kuralı, çift-semantik değil — zararsız |
+| E21 | QA-03 kendi bağımsız odak-halkası testi | runtime (automated, gerçek motor) | Yeni yazılan `qa_focus_check_test.dart` (Frontend'in `components_test.dart`'ından kopyalanmadı/okunarak geçilmedi — kendi kontrol seti, `UndoPill` dahil ki Frontend'in testinde yok); yöntem: `FocusManager.highlightStrategy = alwaysTraditional` + `tester.sendKeyEvent(LogicalKeyboardKey.tab)` (gerçek donanım/Bluetooth klavye bu ortamda da erişilemez — brief'in izin verdiği "simüle klavye tetikleyici" sınıfı) | `flutter test` (yerel) | 3/3 PASS — `LimePill`, `GlassIconButton`, `UndoPill`: halka dinlenmede gizli; yalnız Tab birincil odağı bileşene taşıyınca `DecoratedBox(position: foreground)` çiziliyor; halka boyut değişikliğine yol açmıyor; odak kalkınca temizleniyor |
+| E22 | Gönderilen uygulama soğuk açılış (kendi karesi) | build + runtime | `flutter build ios --simulator --debug -t lib/main.dart`; sıfırdan `simctl install`/`launch` | iPhone 16 | derleme çıkış 0; Ana ekran Round 1'in E13'ü ile **aynı** (eski amber/sistem yazı tipi görünüm — F00 henüz Phase C'de benimsenmedi, beklenen); bir seviyeye girildi (`coldlaunch_play_iphone16.png`): harf ızgarası, HAMLE sayacı, geri-al/sıfırla kontrolleri normal çalışıyor, istisna yok — F00 katmanı gönderilen oyun ekranını etkilemiyor |
+
+## 2. Hedefli Senaryo Sonuçları
+
+| Senaryo (brief) | Round 1 Sonuç | Round 2 Sonuç | Kanıt |
+| --- | --- | --- | --- |
+| QA-01 — Dynamic Type | FAIL (1,35×'te 3,5 px, 1,65×'te 38 px, 3,1×'te 124 px taşma) | **RESOLVED** — 1,65× ve 3,12×'te (ikisi de dahil, ikinci ölçek Frontend'in yalnız testle doğruladığı CARDS/STATS/TRACK boşluğunu da kapatacak şekilde) taşma/kırpma sıfır | E18, E19 |
+| QA-02 — çift semantik | FAIL (92 düğüm, çift etiketler) | **RESOLVED** — 85 düğüm, sıfır çift-düğüm çifti, tüm etiketler tekil ve durum/kota bilgisini içeriyor | E20 |
+| QA-03 — odak durumu | FAIL (hiç uygulanmamış) | **RESOLVED** — 3 farklı bileşen tipinde bağımsız test: halka yalnız `hasPrimaryFocus`'ta çiziliyor, boyutu etkilemiyor, temizleniyor | E21 |
+| Birlikte-var-olma / regresyon | PASS | **PASS** (yeniden doğrulandı) — analiz, format (app), 313 test, F03 cihaz 13/13, soğuk açılış hepsi bu turda taze | E16, E17, E22 |
+
+## Visual Quality Verdict (yeniden puanlama)
+
+Değişmeyen beş boyut (`Experience Fit`, `Visual Hierarchy`, `Color/Surface/Asset`, `Motion and Sensory Quality`, `Originality`) Round 1'in kanıtını fingerprint ile yeniden kullanıyor — bu revizyon oraları hiç etkilemedi (brief'in izin verdiği liste). `Typography and Content Craft` da değişmedi: QA-04 (satır aralığı, yetim nokta) bu rework'ün kapsamında değildi ve E19'da 3,12×'te hâlâ gözlemlendi — puan aynı kalıyor. Dört boyut yeniden puanlandı.
+
+| Rubric Dimension | Round 1 | Round 2 | Runtime Evidence | Not |
+| --- | --- | --- | --- | --- |
+| Experience Fit | 9 | 9 (reuse) | E6 | Değişmedi. |
+| Visual Hierarchy | 9 | 9 (reuse) | E6 | Değişmedi. |
+| Layout, Rhythm and Responsiveness | 7 | **9** | E18, E19 | QA-01 kapandı: platform tabanında (1,65×) ve sweep'in tepesinde (3,12×) taşma sıfır, CARDS/STATS/TRACK boşluğu da kapatıldı. 10 değil, çünkü tüm ara ölçekler (1,94×-2,76×) tek tek yeniden taranmadı (Round 1'in E10 sweep'i fingerprint ile hâlâ geçerli sayılıyor, bu turda tekrar edilmedi). |
+| Typography and Content Craft | 8 | 8 (reuse) | E19 (QA-04 hâlâ gözlemlendi) | Değişmedi — QA-04 açık kaldı (non-blocking, bu rework'ün kapsamında değildi). |
+| Color, Surface and Asset System | 9 | 9 (reuse) | E6 | Değişmedi. |
+| Interaction, State and Feedback | 7 | **9** | E21 | QA-03 kapandı: odak halkası uygulandı ve 3 bileşen tipinde bağımsız doğrulandı. 10 değil, çünkü gerçek donanım/Bluetooth klavye kanıtı hâlâ erişilemez — yalnız simüle tetikleyici. |
+| Motion and Sensory Quality | 8 | 8 (reuse) | E12 | Değişmedi; Phase D sonuç-geçişi hâlâ yok, otomatik 10 yok. |
+| Originality and Product Identity | 9 | 9 (reuse) | E5 | Değişmedi. |
+| Accessibility and Inclusive Quality | 6 | **9** | E18, E19, E20, E21 | Üç engelleyici bulgu da (QA-01/02/03) bu turda kapandı ve taze kanıtla bağımsız doğrulandı. 10 değil: VoiceOver konuşma çıktısı hâlâ cihazda çalıştırılmadı, gerçek donanım klavye hâlâ yok — bunlar Round 1'de de aynı sınırlardı. |
+| Implementation Fidelity and Polish | 8 | **9** | E20, E21 | Beyan edilmemiş odak boşluğu artık kapandı ve `frontend.md`'de dürüstçe belgelendi; kalan tek fark QA-04 (zaten non-blocking, ayrı not). |
+
+**Final Score: `88 / 100`** (Round 1: 80/100)
+
+**Lowest Dimension:** `Typography and Content Craft` ve `Motion and Sensory Quality` — ikisi de 8 (ikisi de bu turun kapsamı dışında, ayrı gerekçeli)
+
+**Fail Conditions:** `None`
+
+**Runtime Evidence Complete:** `Yes` (bu turun hedeflediği üç bulgu için; sınırlar aşağıda, Round 1'dekiyle aynı)
+
+**Result (mekanik, ≥93 eşiğine karşı): `FAIL`** — **ama bu FAIL, bu turun brief'inin engelleyici saydığı hiçbir şeyden kaynaklanmıyor.** 88 puanın 93'e olan 5 puanlık açığı tamamen şu ikisinden geliyor: (1) `Typography and Content Craft` = 8, yalnızca QA-04 yüzünden — Tech Lead Round 1'de QA-04'ü açıkça **non-blocking** ilan etti ve bu rework'ün görev listesine hiç almadı; (2) `Motion and Sensory Quality` = 8, Phase D sonuç-geçişi yüzeyinin **henüz var olmaması** yüzünden — bu bir kusur değil, bu özelliğin bu aşamasında yapısal olarak eksik olan bir yüzey (Round 1'de de aynı gerekçeyle 8'di). Yani: F00'ın bu aşamasında (ekran kompozisyonları henüz yok, Phase D) rubrik matematiksel olarak 88-90 civarında tavana çarpıyor — QA-01/02/03 mükemmel düzeltilse bile ≥93'e ulaşmak, bu iki maddeden biri de kapanmadan mümkün değil. Bu gerilim aşağıda Tech Lead Note'ta açıkça bayraklanıyor; QA bunu sessizce göz ardı etmedi ama kapıyı da kendi kararıyla değiştirmedi.
+
+---
+
+## 4. Findings — durum
+
+* **QA-01 — RESOLVED.** Bkz. E18, E19. Sıfır taşma/kırpma, hem platform tabanında hem sweep'in tepesinde, Frontend'in yalnız-testle-doğruladığı boşluk da dahil.
+* **QA-02 — RESOLVED.** Bkz. E20. 85 düğüm, sıfır çift-etiket, `UndoPill`/`LoopNode` notları da düzeltilmiş.
+* **QA-03 — RESOLVED.** Bkz. E21. Odak halkası uygulanmış ve bağımsız doğrulanmış.
+* **QA-04 — Open, Non-blocking (değişmedi).** Round 1'deki hâliyle duruyor: `caption`/`label` satır aralığı 1,0 sarınca birbirine değiyor; uzun `OutlinePill` etiketi kenarlığa değiyor; display'de ≥1,65×'te yetim "." E19'da 3,12×'te de doğrulandı, hâlâ orada. Bu rework'ün görev listesinde değildi (Tech Lead Round 1 reconciliation'da açıkça saymadı); QA bunu kapanmış gibi göstermiyor.
+* **Yeni bulgu:** Yok. Bu turda hiçbir yeni defekt gözlemlenmedi.
+
+## 5. Regression & Evidence Reuse
+
+* **Bu tur taze üretilen:** E15-E22 (QA-01/02/03'ün kendisi, analiz/format/test/F03/soğuk-açılış).
+* **Fingerprint ile yeniden kullanılan (brief'in izin verdiği liste):** E6/E6b (renk/degrade/glow ölçümü), E7 (varsayılan-ölçek geometri — Frontend'in notu: "varsayılan OS metin boyutunda tam eskisiyle aynı 60×63" doğru, bu turda tekrar ölçülmedi), E9 (Türkçe/tabular/ağırlık ekseni), E12 (Reduce Motion gerçek OS ayarı), E14 (`stateful-flow` olumsuz kontrol — bu revizyon kalıcılık/yaşam döngüsü/yönlendirme eklemedi, `lib/design` diff'i yalnız bileşen/token dosyaları).
+* **Invalidated:** yok.
+* **Sınırlar (Round 1 ile aynı, tekrar):** Android çekilmedi; VoiceOver cihazda/konuşma çıktısıyla çalıştırılmadı (E20 yalnız semantik ağaç, E21 yalnız simüle Tab); gerçek donanım/Bluetooth klavye yok (E21); gerçek cihaz yok, simülatör (Metal) ve debug build; tüketen ekran olmadığından tam ekran kompozisyon uyumu doğrulanamıyor (Phase D); F00'da motion-critical yüzey yok.
+
+---
+
+## 6. Final Verdict (F00-QA-VISUAL2)
+
+* **QA Result: `Approved with Notes`**
+* **Gerekçe:** Tech Lead'in F00-FE-A11Y-REWORK brief'inin engelleyici saydığı üç bulgu (QA-01, QA-02, QA-03) taze, bağımsız çalışma-zamanı kanıtıyla kapandı; regresyon yok (313 test + F03 cihaz 13/13 + soğuk açılış). "Notes": (1) sayısal rubrik 88/100 — genel ≥93 eşiğinin altında, ama açık tamamen QA-04 (zaten non-blocking) ve Motion'ın Phase D boşluğundan (kusur değil, yapısal) geliyor, bu turun brief'i ikisinden hiçbirini istemedi; (2) QA-04 hâlâ açık, non-blocking; (3) Sınırlar bölümündeki kalıcı eksikler (VoiceOver konuşma, gerçek klavye, gerçek cihaz) Round 1 ile aynı.
+* **Blocking Issues:** Yok.
+* **Non-blocking Notes:** QA-04 (değişmedi); F00-DS-UNMEASURED (yayın boyutu, cihazda performans/VoiceOver); Android; sayısal rubrik/93 eşiği gerilimi (yukarıda gerekçeli).
+
+---
+
+## 7. Tech Lead Note
+
+* **Kapıyı ayarlamak Tech Lead'in işi** — bu not, QA'nın kendi kararı değil, dikkat çekmek içindir: Round 2'nin sayısal Visual Quality Verdict'i (88/100) mekanik olarak `FAIL` (≥93 eşiği), ama bu turun brief'inin görev verdiği üç bulgu da (QA-01/02/03) kapandı ve QA Result `Approved with Notes`. Açık, Round 1'de zaten `non-blocking` sayılan QA-04 ve F00'ın bu aşamasında (Phase D'den önce) yapısal olarak var olamayan bir motion yüzeyinden geliyor — F00 şu anki kapsamında muhtemelen hiçbir zaman 93'e ulaşamaz, QA-04 kapanmadan ve/veya rubriğin Motion maddesi bu özelliğin kapsamı için yeniden yorumlanmadan. Tech Lead şunlardan birini seçebilir: (a) Visual Quality Gate'i şu haliyle Passed'e taşımak (üç engelleyici bulgu kapandı, kalan açık zaten non-blocking olarak işaretliydi); (b) QA-04'ü de bir rework turuna açmak (Low/polish, ama kapı eşiğini etkiliyor); (c) bu özellik için (ekran kompozisyonu henüz yokken) ≥93 eşiğini yapısal olarak uygulanamaz kabul edip gate kararını QA Result'a (`Approved with Notes`) dayandırmak. QA üçünü de savunulabilir buluyor ve kararı Tech Lead'e bırakıyor.
+* **Sıra:** F05-QA-STRICT ve F08 yerel kanıt kuyrukta bekliyor.
+
+---
+
 ## Sonraki Komut
 
 ```text

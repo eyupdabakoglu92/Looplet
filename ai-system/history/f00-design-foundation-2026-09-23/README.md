@@ -1,3 +1,5 @@
 # F00 working record — 2026-09-23 (accessibility rework reconciliation checkpoint)
 
 `orchestration-at-a11y-reconciliation.md` is the byte-for-byte working orchestration of F00 at the moment the Tech Lead reconciled F00-FE-A11Y-REWORK and activated F00-QA-VISUAL2 (commit 0ce257c app tree, this document not yet committed): the full Last Decision log of the F00-FE-DESIGN-SYSTEM reconciliation (2026-09-21) and the F00-QA-VISUAL Rejected-verdict reconciliation (2026-09-23), plus the evidence provenance and change log up to that point. The live `features/f00-design-foundation/orchestration.md` keeps a short summary of those entries plus the current state so it stays within the snapshot byte budget.
+
+`orchestration-at-qa-visual2-verdict.md` is the byte-for-byte working orchestration right after QA delivered the F00-QA-VISUAL2 verdict (Approved with Notes, 88/100; commit 0ce257c app tree, re-confirmed unchanged under HEAD f021401): includes the full 2026-09-23 F00-FE-A11Y-REWORK reconciliation paragraph (task coverage, contract compliance, the mis-cropped "before" evidence correction) that the live file trims to a short summary once this snapshot exists.
