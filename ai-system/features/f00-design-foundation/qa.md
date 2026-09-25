@@ -253,6 +253,74 @@ Değişmeyen beş boyut (`Experience Fit`, `Visual Hierarchy`, `Color/Surface/As
 
 ---
 
+# F00 — design-foundation: QA Raporu (F00-QA-VISUAL3, 2026-09-26)
+
+> Hedefli final-stage yeniden doğrulama, F00-FE-A11Y-REWORK2'ye karşı. Test edilen revizyon: çalışma ağacı, commit `0ec7f46` üzerinde (`app/lib/design` ağacı `0b125cf1…`, Round 2'den değişmedi — yalnız bu turun 3 dosyası değişti: `typography.dart`, `gallery/design_gallery_screen.dart`, `test/design/components_test.dart`). Hedef: iOS Simulator 18.6, iPhone 16 (393×852). Tarih: 2026-09-26.
+
+## 0. QA Execution Plan
+
+* **Stage / Scope:** final / client-only. **Regression Depth: full. Evidence Reuse: allowed** — QA-01/02/03'ün kendi kanıtı (Round 2'nin E15-E22) fingerprint ile yeniden kullanıldı, bu turda tekrar doğrulanmadı (kod dokunulmadı). Yalnız QA-04'ün kalan kalemi taze kanıtla doğrulandı, artı tam regresyon.
+* **Bağımsız kanıt:** bu turun tüm galeri kareleri QA'nın kendi taze yakalaması (Frontend'in `frontend.md`'de anlattığı karelere güvenilmedi, aynı sahneler sıfırdan tekrar çekildi).
+
+## 1. Evidence Ledger (bu tur)
+
+| Evidence ID | Claim / Scenario | Class | Command / Action | Target | Result |
+| --- | --- | --- | --- | --- | --- |
+| E23 | Analiz, format, tüm testler | automated | `melos run analyze`; `dart format --output=none --set-exit-if-changed app`; `melos run test` | workspace | `looplet_app` ve `looplet_solver` dışındaki tüm paketler 0 sorun (solver'daki 1 `info` önceden var, ilgisiz); app-scoped format 110 dosya 0 değişen; testler exit 0 — app **314/314** |
+| E24 | F03 cihaz paketi | runtime | `flutter test integration_test -d D0011CE7…` | iPhone 16, iOS 18.6 | `+13 All tests passed`, exit 0 |
+| E25 | QA-04 kendi galeri karesi, 1,65× (accessibility-medium) | runtime | galeri sıfırdan derlendi; `content_size accessibility-medium`; sabit kaydırma ofsetleriyle tam tarama | iPhone 16 | `qa3/g_am_640.png`, `g_am_1920.png`, `g_am_2560.png` — hem `_TypeRoles` örneğinde ("Döngü / tamamlandı.", "Sıradaki döngüyü / çöz.") hem yolculuk `GlassCard`'ında ("Sıradaki / döngüyü çöz.") temiz kelime-sınırı sarması; orta-kelime bölünme yok, izole glif yok |
+| E26 | QA-04 kendi galeri karesi, ~3,12× (accessibility-extra-extra-extra-large) | runtime | aynı yöntem, `content_size accessibility-extra-extra-extra-large`; ek hedefli kaydırma (4400) ile yolculuk kartına ulaşıldı | iPhone 16 | `qa3/g_xxxl_1280.png`, `g_xxxl_cards_4400.png` — her iki örnek de 1,65×'teki ile **birebir aynı** iki satıra sarıyor (1,3× tavan çalışıyor); `StatCard`/`LoopNode` aynı karede bozulmamış (QA-01 sağlam, örnekleme kontrolü) |
+
+## 2. QA-04 — RESOLVED (üçüncü ve son kalem)
+
+Round 2'de açık bırakılan tek kalem ("tamamlandı." → "tama"/"mland"/"ı." orta-kelime bölünmesi, ≥3,12×'te) artık kapalı: `display`/`headline` rolleri `loopCappedTextScaler` ile 1,3×'te tavanlanıyor (E25, E26). Round 1'in diğer iki QA-04 kalemi (caption satır aralığı, `OutlinePill` dolgusu) zaten Round 1'in kendisinde düzeltilmişti ve Tech Lead'in 2026-09-24 uzlaştırmasında doğrulanmıştı — Round 2'nin bunları "değişmedi" diye yazması bir raporlama hatasıydı, kod hatası değil.
+
+## Visual Quality Verdict (yeniden puanlama)
+
+Bu tur yalnız değişen kalemi (QA-04, dolayısıyla Typography ve Implementation Fidelity) yeniden değerlendirdi; geri kalan sekiz boyut Round 2'nin kanıtını fingerprint ile taşıyor. Brief'in isteği üzerine her boyutu kendi rubrik metnine göre **gerçekten** yeniden gözden geçirdim — "yalnız galeri" gerekçesini yalnız bunu haklı çıkaran boyutlarda tuttum, otomatik/kör bir tavan olarak değil.
+
+| Rubric Dimension | Round 2 | Round 3 | Gerekçe |
+| --- | --- | --- | --- |
+| Experience Fit | 9 | 9 (değişmedi) | Boyutun kendi metni ("kullanım ortamına uygun mu") tam kompoze bir deneyim olmadan tam yargılanamaz; QA-04 bunu etkilemiyor. |
+| Visual Hierarchy | 9 | 9 (değişmedi) | Aynı gerekçe; QA-04 hiyerarşiyi etkilemiyor. |
+| Layout, Rhythm and Responsiveness | 9 | 9 (değişmedi) | QA-04 kapandı ama Round 1'in E10 taramasının kapsadığı iOS accessibility kategorileri (9/12) hâlâ tam değil — gerçek, isimlendirilebilir bir boşluk, "yalnız galeri" değil. |
+| Typography and Content Craft | 8 | **9** | QA-04'ün üç kalemi de artık kapalı (satır aralığı, dolgu, orta-kelime bölünmesi); Türkçe glif/ağırlık ekseni zaten kusursuzdu. Bilinen bir tipografi kusuru kalmadı. 10 değil: gerçek ürün metniyle (yalnız demo string'leriyle değil) sarma kalitesi hâlâ görülmedi. |
+| Color, Surface and Asset System | 9 | 9 (değişmedi) | QA-04 renk/yüzeyi etkilemiyor. |
+| Interaction, State and Feedback | 9 | 9 (değişmedi) | Gerçek donanım/Bluetooth klavye kanıtı hâlâ erişilemez — bu turun kapsamında değil. |
+| Motion and Sensory Quality | 8 | 8 (değişmedi) | Rubriğin 7. boyut metni açıkça gerçek motion yüzeyi yokken otomatik 10 vermiyor — F00'da hâlâ yok. Bu, yeniden gözden geçirmeye **açık tutmadığım** tek boyut, çünkü metin şartsız. |
+| Originality and Product Identity | 9 | 9 (değişmedi) | QA-04 özgünlüğü etkilemiyor. |
+| Accessibility and Inclusive Quality | 9 | 9 (değişmedi) | VoiceOver konuşma çıktısı ve gerçek donanım klavye hâlâ bu ortamda erişilemez — QA-04'ün kapanması bu iki boşluğu kapatmıyor. |
+| Implementation Fidelity and Polish | 9 | **10** | Round 2'nin 9'da tutma gerekçesi tam olarak "kalan tek fark QA-04" idi; QA-04 artık kapalı ve bilinen hiçbir sapma/placeholder yok — ölçülen renk/geometri kaynakla birebir, tüm koşullar izlenebilir kanıtla destekli. |
+
+**Final Score: `90 / 100`** (Round 2: 88/100)
+
+**Lowest Dimension:** `Motion and Sensory Quality — 8/10` (rubriğin kendi metni gereği, yapısal — Phase D'den önce değişmez)
+
+**Fail Conditions:** `None`
+
+**Runtime Evidence Complete:** `Yes`, bu ortamın test edebildiği her şey için; kalan boşluklar (VoiceOver konuşma, gerçek donanım klavye, fiziksel cihaz, Android, tam kompoze ekran) bu ortamın **yapısal** sınırları, eksik efor değil.
+
+**Result (mekanik, ≥93 eşiğine karşı): `FAIL`**
+
+### Round 2'den farklı ve daha önemli bir bulgu
+
+Round 2'de "88'in 93'e açığı yalnız QA-04 (zaten non-blocking) ve Motion'ın yapısal tavanından geliyor" demiştim — Tech Lead bunu, rubriğin şartsız diliyle çelişen hatalı bir `Approved with Notes` gerekçesi olarak haklı biçimde düzeltti. Bu turda QA-04'ü **tamamen** kapattım, Implementation Fidelity'yi dürüstçe 10'a çıkardım — ve toplam yalnız 90'a ulaştı, **93'e değil**. Yani Round 2'nin teşhisi eksikti: açık yalnız QA-04'ten gelmiyordu. Gerçek tablo şu: Motion'ın rubrik-metni-zorunlu tavanı (8) artı üç boyutun (Layout, Interaction, Accessibility) her biri kod düzeltmesiyle kapanamayacak, bu ortamın kendi test yeteneğinin sınırından gelen **gerçek ve isimlendirilebilir** boşlukları (sırasıyla: iOS accessibility kategorilerinin tamamı değil 9/12'si taranmış olması, gerçek donanım klavye yokluğu, VoiceOver konuşma çıktısı + donanım klavye yokluğu) — bu üçü de "bir Frontend turu daha" ile kapanacak defect'ler değil; fiziksel cihaz, gerçek VoiceOver ortamı ve/veya iOS simülatöründe eksiksiz kategori taraması gerektiriyor. Motion ise Phase D'nin kendisi olmadan hiç kapanamaz. Bu, "93'e bir adım kaldı" değil, **bu kapsam ve bu test ortamıyla 93'ün yapısal olarak menzil dışında olabileceği** bir bulgu — Tech Lead'e açıkça bırakıyorum.
+
+---
+
+## 3. Final Verdict (F00-QA-VISUAL3)
+
+* **QA Result: `Rejected`** — rubriğin şartsız kuralı gereği (90, "85–92: zorunlu rework" bandında); Round 2'nin hatasını tekrarlamıyorum.
+* **Gerekçe:** QA-04 dahil dört bulgunun hepsi artık gerçekten kapalı ve bağımsız doğrulandı; hiçbir bilinen defect kalmadı. Ama bu, mekanik `Rejected` sonucunu değiştirmiyor çünkü rubrik şartsız. Bu round'un asıl bulgusu: kalan açığın kaynağı artık bir "defect listesi" değil — kısmen rubriğin kendi metninin zorunlu kıldığı (Motion), kısmen bu ortamın test edemediği (fiziksel cihaz, VoiceOver, donanım klavye, eksiksiz kategori taraması) şeyler.
+* **Blocking Issues:** Yok (kod defect'i anlamında). Kalan boşluklar ortam/kapsam sınırı.
+* **Required Fixes:** Yok — bu turda hiçbir kod değişikliği önerilmiyor.
+* **Non-blocking Notes:** F00-DS-UNMEASURED (yayın boyutu, cihazda performans); Android; yukarıdaki yapısal 93-eşiği bulgusu.
+
+## 4. Tech Lead Note
+
+* **Karar Tech Lead'in:** kod tarafında önerecek bir şey yok — dört bulgu da kapalı. Asıl soru artık teknik değil, süreçsel: bu feature (design-system-only, Phase D yok, fiziksel cihaz/VoiceOver bu ortamda yok) **hiçbir zaman** genel 93 eşiğine ulaşamayabilir, ne kadar kod turu daha yapılırsa yapılsın. Üç makul yol görüyorum: (a) fiziksel cihaz/VoiceOver erişimi sağlanana ve Phase D'ye kadar F00'ı `Rejected`/`Ready for QA` durumunda bırakmak — süreç kurallarına en sadık ama F00'ı muhtemelen süresiz bekletir; (b) `premium-ui-rubric.md`/`visual-quality-gate.md`'yi bu tip "taşıyıcı, ekran yok" kapsamlar için farklı bir bar ile güncellemek — bu NORMATİF, proje-çapında bir doküman değişikliği, tek feature kararı değil; (c) kullanıcıya/PO'ya bu yapısal gerilimi açık karar olarak sunmak. Üçü de QA'nın yetkisi dışında; ben yalnız bulguyu net bırakıyorum.
+* **Sıra:** F05-QA-STRICT ve F08 yerel kanıt kuyrukta bekliyor.
+
 ## Sonraki Komut
 
 ```text
