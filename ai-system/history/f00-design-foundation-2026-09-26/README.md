@@ -1,0 +1,3 @@
+# F00 working record — 2026-09-26 (F00-QA-VISUAL3 activation checkpoint)
+
+`orchestration-at-qa-visual3-activation.md` is the byte-for-byte working orchestration of F00 right after the Tech Lead reconciled F00-FE-A11Y-REWORK2 (task coverage, contract compliance and evidence independently re-verified; a base-commit provenance mistake found and corrected — the delivery's own note cited `9371468`, which still carried the stray `app/9.png`, corrected to `0ec7f46`) and activated F00-QA-VISUAL3 for the QA role. The live `features/f00-design-foundation/orchestration.md` keeps a short summary of this reconciliation plus the current state so it stays within the snapshot byte budget.

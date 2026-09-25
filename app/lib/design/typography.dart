@@ -63,10 +63,23 @@ abstract final class LoopText {
   }
 
   /// "Döngü tamamlandı." — 33 / 1.13, 500.
+  ///
+  /// Callers pass `textScaler: loopCappedTextScaler(context)` on the `Text`/
+  /// `Text.rich` itself (F00-FE-A11Y-REWORK2 QA-04): uncapped, a long Turkish
+  /// word ("tamamlandı", "döngüyü") outgrows the line at extreme OS text
+  /// scales (>= accessibility-extra-extra-extra-large, ~3.12x) before the
+  /// whole sentence does, and Flutter's line breaker then splits that single
+  /// word mid-character with no hyphen (observed: "tamamlandı." → "tama" /
+  /// "mland" / "ı.", the trailing "ı." isolated on its own line) — not a
+  /// widow, a forced mid-word break. The cap keeps every word inside the
+  /// line at the cost of the text not growing past 1.3x; softWrap still lets
+  /// the sentence itself take as many lines as it needs.
   static TextStyle display(double s) =>
       _sg(33 * s, 500, height: 1.13, letterSpacing: -0.005 * 33 * s);
 
   /// "Sıradaki döngüyü çöz." — 28 / 1.16, 500.
+  ///
+  /// Same `loopCappedTextScaler` requirement and reasoning as [display].
   static TextStyle headline(double s) =>
       _sg(28 * s, 500, height: 1.16, letterSpacing: -0.005 * 28 * s);
 

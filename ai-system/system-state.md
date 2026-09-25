@@ -1,6 +1,6 @@
 # System State — LOOPLET
 
-Last Updated: 2026-09-24
+Last Updated: 2026-09-26
 
 ## Platform Initialized
 
@@ -40,29 +40,29 @@ features/f00-design-foundation/orchestration.md
 
 ## Current Phase
 
-F00 design-system accessibility rework — narrow polish rework (Visual Quality Gate: Ready for QA; QA Result: Rejected, 88/100)
+F00 design-system accessibility rework — final-stage re-verify (Visual Quality Gate: Ready for QA; QA Result: None)
 
 ## Current Role
 
-Frontend/Mobile Developer
+QA
 
 ## Current Reason
 
-QA-01/02/03 (Dynamic Type overflow, duplicate VoiceOver semantics, missing focus ring) were fixed by F00-FE-A11Y-REWORK and independently re-verified by QA in F00-QA-VISUAL2 with fresh runtime evidence (own gallery captures at 1.65x/3.12x, a rebuilt semantics probe, a new focus-ring widget test) — all three are RESOLVED, and this Tech Lead independently re-ran analyze/format/`flutter test` (313/313) to confirm zero regression. But QA's own reported verdict (`Approved with Notes`, 88/100) was corrected on reconciliation: `premium-ui-rubric.md`'s Verdict Bands are unconditional — 85–92 is "zorunlu rework," and "92 ve altı `Approved with Notes` ile geçirilemez" — so the correct QA Result is `Rejected`, not `Approved with Notes`, regardless of the shortfall's cause. QA's Round 2 report also mis-stated 2 of QA-04's 3 items as still open; reading the code directly showed only one (display/headline mid-word-wrap at extreme OS text scale) is genuinely unfixed. F00-FE-A11Y-REWORK2 is now active, narrowly scoped to that one item.
+QA-01/02/03/04 are all now fixed and independently confirmed. F00-FE-A11Y-REWORK2 closed the one item Round 2 left open (display/headline mid-word-wrap at extreme OS text scale, via a documented `loopCappedTextScaler` cap) with real runtime evidence at 1.65x and ~3.12x, zero regression (314 tests). This Tech Lead independently re-verified task coverage, contract compliance (3 files, no shipped surface) and evidence (re-ran analyze/format/test myself, personally reviewed the runtime captures) — one provenance-only mistake found and corrected (the delivery's note cited a base commit that still carried a stray `app/9.png`; corrected, code diff unaffected). Delivery Review = Accepted. F00-QA-VISUAL3 is now active: verify the fix and rescore all ten rubric dimensions — QA-01/02/03 evidence is reused by fingerprint, not re-verified. The brief explicitly reminds QA not to repeat Round 2's mistake (a total under 93 must be `Rejected`, per `premium-ui-rubric.md`'s unconditional Verdict Bands — no exception for an already-non-blocking cause).
 
 ## Last Completed Action
 
-Tech Lead reconciliation 2026-09-24: independently re-ran analyzer, app-scoped format and the full `flutter test` suite (313/313) on QA's committed tree (9371468); credited QA-01/02/03 as genuinely resolved; corrected QA Result from `Approved with Notes` to `Rejected` per `premium-ui-rubric.md`'s unconditional Verdict Bands; read `typography.dart`/`buttons.dart` directly and found 2 of QA-04's 3 items already fixed (QA's report was stale); removed a stray `app/9.png` QA's own commit had swept into the app tree, restoring a clean fingerprint; activated F00-FE-A11Y-REWORK2 (narrow) for the Frontend/Mobile Developer.
+Tech Lead reconciliation 2026-09-26: independently re-ran analyzer, app-scoped format and the full `flutter test` suite (314/314) on the current working tree; confirmed the diff is exactly the 3 claimed files (75 insertions/1 deletion) with no shipped-surface change; personally reviewed the runtime captures Frontend produced (clean word-boundary wrapping at both 1.65x and ~3.12x, both call sites); found and corrected a base-commit citation error in the delivery's own evidence note (cited `9371468`, which still had the stray `app/9.png`; corrected to `0ec7f46`, the clean commit — the actual code diff is unaffected either way). Delivery Review = Accepted; F00-QA-VISUAL3 activated (QA Result reset to None).
 
 ## Next Expected Action
 
-Run Frontend/Mobile Developer on F00-FE-A11Y-REWORK2: fix the one remaining QA-04 item (mid-word wrap on `display`/`headline` at extreme OS text scale) with real runtime evidence, not a widget test alone. Then Run QA on F00-QA-VISUAL3: verify the fix and rescore all ten dimensions honestly against the rubric's literal text; QA-01/02/03 evidence stays fingerprint-valid. Tech Lead reconciles; only a genuine >= 93 (every dimension >= 8, no fail condition) moves Visual Quality Gate to Passed and opens Phase C. F05-QA-STRICT and F08 local evidence stay queued behind the F00 QA slot.
+Run QA on F00-QA-VISUAL3: verify the QA-04 fix at accessibility-medium and ~3.12x, run the regression set (analyze/format/test/F03 device suite), and rescore all ten rubric dimensions honestly against the rubric's literal per-dimension text — QA-01/02/03 evidence stays fingerprint-valid. A total under 93 must be reported `Rejected`, not `Approved with Notes` (Round 2's mistake). Tech Lead reconciles; only a genuine >= 93 (every dimension >= 8, no fail condition) moves Visual Quality Gate to Passed and opens Phase C. F05-QA-STRICT and F08 local evidence stay queued behind the F00 QA slot.
 
 ## Portfolio Summary
 
 * F01, F02, F04, F06: historical scoped Done retained.
 * F03: Done — final QA Approved with Notes (2026-09-21); Visual Scope none covered behaviour/accessibility only; visual surface pending the Design Adoption Route.
-* F00: Rework — cross-cutting Design Foundation track, Visual Scope design-system; Foundation Selected (Direction C, 2026-09-21); QA-01/02/03 fixed and independently confirmed (F00-QA-VISUAL2, 88/100, every dimension >= 8, but QA Result corrected to Rejected — rubric's Verdict Bands are unconditional below 93); F00-FE-A11Y-REWORK2 active, narrow, for the one remaining QA-04 item.
+* F00: In QA — cross-cutting Design Foundation track, Visual Scope design-system; Foundation Selected (Direction C, 2026-09-21); QA-01/02/03/04 all fixed and independently confirmed; F00-QA-VISUAL3 active to verify the last fix and rescore honestly against the 93+ bar.
 * F05: In Progress; real strict content delivered (bundle mirrors content/journey); F03 lock released; Tech Lead delivery reconciliation then QA-STRICT queued; final verdict None.
 * F08: In Progress, queued; independent local/emulator validation pending, release task Blocked, release/final acceptance pending.
 * F07, F09–F13: Not Started. Pending follow-ons are in workflow-follow-ups.md.

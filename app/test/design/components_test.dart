@@ -741,6 +741,61 @@ void main() {
         }
       },
     );
+
+    testWidgets(
+      'F00-FE-A11Y-REWORK2 (QA-04): display/headline stay capped at 1.3x '
+      'regardless of OS text scale, so a long word never outgrows the line',
+      (tester) async {
+        for (final scale in <double>[1.3, 1.65, 2.35, 3.12]) {
+          await tester.pumpWidget(
+            MediaQuery(
+              data: MediaQueryData(
+                size: const Size(393, 852),
+                textScaler: TextScaler.linear(scale),
+              ),
+              child: const Directionality(
+                textDirection: TextDirection.ltr,
+                child: DesignGalleryScreen(),
+              ),
+            ),
+          );
+          await tester.pump();
+
+          final display = tester.widget<Text>(
+            find.byWidgetPredicate(
+              (w) => w is Text && w.data == 'Döngü\ntamamlandı.',
+            ),
+          );
+          final headlines = tester.widgetList<Text>(
+            find.byWidgetPredicate(
+              (w) =>
+                  w is Text &&
+                  w.textSpan != null &&
+                  w.textSpan!.toPlainText().contains('Sıradaki'),
+            ),
+          );
+          expect(
+            headlines,
+            isNotEmpty,
+            reason: 'expected both headline instances at scale=$scale',
+          );
+          for (final t in <Text>[display, ...headlines]) {
+            expect(
+              t.textScaler,
+              isNotNull,
+              reason: 'must pass loopCappedTextScaler explicitly',
+            );
+            expect(
+              t.textScaler!.scale(100),
+              closeTo(130, 0.5),
+              reason:
+                  'a $scale x OS scale must still resolve to the 1.3x cap '
+                  '(scale=$scale)',
+            );
+          }
+        }
+      },
+    );
   });
 
   group('font assets (F00 architecture §7.3)', () {

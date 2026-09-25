@@ -124,7 +124,11 @@ class _TypeRoles extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text('Döngü\ntamamlandı.', style: LoopText.display(s)),
+        Text(
+          'Döngü\ntamamlandı.',
+          style: LoopText.display(s),
+          textScaler: loopCappedTextScaler(context),
+        ),
         Text('Display 33 / 1.13 · 500', style: LoopText.label(s)),
         SizedBox(height: 14 * s),
         Text.rich(
@@ -139,6 +143,7 @@ class _TypeRoles extends StatelessWidget {
               const TextSpan(text: ' çöz.'),
             ],
           ),
+          textScaler: loopCappedTextScaler(context),
         ),
         Text('Headline 28 / 1.16 · 500', style: LoopText.label(s)),
         SizedBox(height: 14 * s),
@@ -314,6 +319,7 @@ class _Cards extends StatelessWidget {
                     const TextSpan(text: ' çöz.'),
                   ],
                 ),
+                textScaler: loopCappedTextScaler(context),
               ),
             ],
           ),

@@ -1,8 +1,8 @@
 # Feature Board — LOOPLET
 
-Last Updated: 2026-09-24
-Active Phase: F00 design-system accessibility rework — narrow polish rework (F00-FE-A11Y-REWORK2)
-Active Owner: Frontend/Mobile Developer
+Last Updated: 2026-09-26
+Active Phase: F00 design-system accessibility rework — final-stage re-verify (F00-QA-VISUAL3)
+Active Owner: QA
 Active Feature: F00
 Pending Product Revision: None
 Revision Affected Features: None
@@ -11,7 +11,7 @@ Revision Affected Features: None
 
 | ID | Feature | Status | Owner | QA | Priority | Notes |
 | --- | --- | --- | --- | --- | --- | --- |
-| F00 | design-foundation | Rework | Frontend/Mobile Developer | Rejected (final, visual-quality; 88/100) | P1 | Foundation Selected; F00-FE-A11Y-REWORK (QA-01/02/03) delivered, Accepted, and independently re-verified by QA in F00-QA-VISUAL2 (RESOLVED, 313/313 tests, F03 13/13). Tech Lead reconciliation 2026-09-24 corrected QA's own verdict: premium-ui-rubric.md's Verdict Bands are unconditional ("85–92: zorunlu rework"; "92 ve altı Approved with Notes ile geçirilemez") — 88/100 cannot be Approved with Notes regardless of why, so QA Result is Rejected, not Approved with Notes. Also corrected QA-04's status (2 of 3 items were already fixed in code; only the display/headline mid-word-wrap-at-extreme-scale item is genuinely open) and removed a stray app/9.png QA's commit had swept into the app tree. F00-FE-A11Y-REWORK2 active — narrow, scoped only to the one remaining QA-04 item — then F00-QA-VISUAL3 verifies it and rescores honestly. Visual Quality Gate stays Ready for QA (not Passed; needs >= 93). NO shipped-surface change. Visual Scope design-system. |
+| F00 | design-foundation | In QA | QA | None (final, visual-quality; targeted re-verify) | P1 | Foundation Selected; QA-01/02/03 fixed, Accepted, and independently re-verified (F00-QA-VISUAL2, RESOLVED). Tech Lead corrected QA's Round 2 verdict 2026-09-24 (premium-ui-rubric.md's Verdict Bands are unconditional below 93 — score was 88/100, so QA Result is Rejected, not Approved with Notes) and QA-04's status (2 of 3 items were already fixed in code). F00-FE-A11Y-REWORK2 delivered and Accepted 2026-09-26 (the one remaining QA-04 item — display/headline mid-word-wrap at extreme OS text scale — fixed via loopCappedTextScaler, real runtime evidence at 1.65x and ~3.12x, 314 tests, F03 13/13); one base-commit provenance mistake in the delivery's own note found and corrected (code diff unaffected). F00-QA-VISUAL3 active — verify the fix, rescore honestly, PASS bar 93+. Visual Quality Gate stays Ready for QA (not Passed). NO shipped-surface change. Visual Scope design-system. |
 | F01 | dictionary-service | Done | - | Approved with Notes (historical scope) | P0 | Dictionary implementation accepted historically; production corpus review and Android confirmation remain follow-ups. |
 | F02 | grid-engine | Done | - | Approved with Notes (historical scope) | P0 | Engine accepted historically; future scope/CI notes retained in workflow-follow-ups.md. |
 | F06 | puzzle-content-and-solver-tooling | Done | - | Approved with Notes (historical scope) | P0 | Done covers toolchain + smoke set only. Journey acceptance now F05; OPEN Daily content follow-on belongs to F07 (workflow-follow-ups.md). |
@@ -28,9 +28,9 @@ Revision Affected Features: None
 
 ## Current Routing
 
-* Next command: Run Frontend/Mobile Developer (task F00-FE-A11Y-REWORK2 in F00 orchestration; Current Frontend Brief — fix the one remaining QA-04 item with real runtime evidence, not a widget test alone). Then Run QA (F00-QA-VISUAL3: verify the fix, rescore honestly; QA-01/02/03 evidence stays fingerprint-valid). The F05 / F08 queue (F05 delivery reconciliation + F05-QA-STRICT, then F08 local evidence) waits behind the F00 QA slot — one QA feature at a time — and is not blocked by any open decision.
+* Next command: Run QA (task F00-QA-VISUAL3 in F00 orchestration; Current QA Brief — verify the QA-04 fix at 1.65x and ~3.12x, run the regression set, rescore all ten dimensions honestly; a total under 93 must be reported `Rejected`, not `Approved with Notes`). The verdict returns to Tech Lead. The F05 / F08 queue waits behind the F00 QA slot — one QA feature at a time — and is not blocked by any open decision.
 * F03 is Done (final QA Approved with Notes, 2026-09-21). The rework-control lock is released. Queue behind the F00 QA slot: (1) F05-QA-STRICT — needs Tech Lead delivery reconciliation of F05 (strict pack + code), then QA; F05.SHARED-RUNTIME can reuse F03's fresh runtime evidence for unchanged paths; (2) F08 local evidence (F08-LOCAL-EVIDENCE, then F08-QA-FUNCTIONAL). One QA feature at a time.
-* Design adoption: [Design Adoption Route](workflow-follow-ups.md) — Phase A done; Phase B in rework (Foundation Selected 2026-09-21; design-system layer delivered 2026-09-21; QA-01/02/03 fixed and independently confirmed 2026-09-23; overall numeric verdict still short of the 93 gate — F00-FE-A11Y-REWORK2 narrows the remaining gap); Phase C/D (conformance, incl. F03/F04/F05 surfaces and the contract amendments logged as DESIGN-ADOPTION-CONTRACT-AMENDMENTS) follow once F00 reaches Passed.
+* Design adoption: [Design Adoption Route](workflow-follow-ups.md) — Phase A done; Phase B in final-stage re-verify (Foundation Selected 2026-09-21; design-system layer delivered; QA-01/02/03/04 all fixed and independently confirmed; F00-QA-VISUAL3 will decide whether the numeric verdict now crosses 93); Phase C/D (conformance, incl. F03/F04/F05 surfaces and the contract amendments logged as DESIGN-ADOPTION-CONTRACT-AMENDMENTS) follow once F00 reaches Passed.
 * F08 release authorization gates the release stage only; no paid service, deployment, production action or store distribution is authorized. F07, F09–F13 remain Not Started.
 
 ## Open Portfolio Follow-ups

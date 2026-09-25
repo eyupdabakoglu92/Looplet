@@ -214,6 +214,33 @@ Fix: `MovesCard` and `StatCard` switched their **height** from fixed to `minHeig
 
 **Note on `melos run format:check`.** It fails at the full-workspace level on `ai-system/features/f00-design-foundation/qa/src/qa_probe_main.dart` — QA's own evidence file, added in a prior commit, outside `app/` and outside this task's scope. Not touched here (altering another role's committed evidence without being asked isn't this role's call); flagged for whoever owns that path to run `dart format` on it. `app/`-scoped formatting (this task's actual surface) is clean.
 
+## F00-FE-A11Y-REWORK2 — the last QA-04 item (2026-09-26)
+
+> Narrow follow-up. Tech Lead's reconciliation of `F00-QA-VISUAL2` (2026-09-24) found 2 of QA-04's 3 items were **already fixed** by F00-FE-A11Y-REWORK (`caption` line-height, `OutlinePill` padding) — QA's Round 2 report had carried forward stale Round-1 prose without diffing the current code. Only the third item was genuinely open: at extreme OS text scale (>= accessibility-extra-extra-extra-large, ~3.12x) the `display`/`headline` type roles mid-word-break long Turkish words with no hyphen, because a single token outgrows the line before the rest of the sentence does (QA's own E19 evidence, `qa.md` § F00-QA-VISUAL2 — "tamamlandı." rendered as "tama" / "mland" / "ı.", the trailing "ı." isolated). Source revision: this section's diff on top of commit `0ec7f46` (clean tree at start — the Tech Lead reconciliation commit that removed the stray `app/9.png`; not `9371468`, whose `app` tree still carried it; not committed by this delivery). QA-01/02/03's own fix mechanisms (`minHeight`, `excludeSemantics`, the focus ring) are untouched.
+
+### Impacted files
+
+| File | Change |
+| --- | --- |
+| `app/lib/design/typography.dart` | `display` and `headline` roles: new doc comments state the `loopCappedTextScaler` requirement and why (the mid-word-break mechanism), matching the existing precedent for `caption`/`label`. No change to the styles themselves — the cap is a caller-side `Text`/`Text.rich` property, same pattern as `MovesCard`/`StatCard`/`LoopNode`/`LoopletWordmark`. |
+| `app/lib/design/gallery/design_gallery_screen.dart` | The 3 call sites using `LoopText.display`/`LoopText.headline` (the `_TypeRoles` specimen's `Text` and `Text.rich`, and the journey `GlassCard`'s `Text.rich`) now pass `textScaler: loopCappedTextScaler(context)`. These are currently the only call sites — `display`/`headline` aren't consumed anywhere else yet (Phase D doesn't exist). |
+| `app/test/design/components_test.dart` | +1 test in the `gallery layout` group: at OS scale 1.3/1.65/2.35/3.12x, asserts the `display` `Text` and every `headline` `Text.rich` instance carry a non-null `textScaler` that resolves to exactly 1.3x regardless of the ambient scale — catches an accidental removal of the cap, though (per the QA-01 lesson below) it is not relied on alone. |
+
+### Why a scale cap, not a wrap-safe layout trick
+
+Flutter's line breaker has no built-in "never split a word, just overflow instead" mode that renders cleanly — the alternatives are clipping or an ellipsis, both worse than the mid-word break itself. A scale cap is the same fix class already applied to `MovesCard`/`StatCard`/`LoopNode`/`LoopletWordmark` in the previous rework, and it directly removes the cause: once a word's rendered width can't exceed what it is at 1.3x, and the reference layout already fits comfortably at 1x, no realistic Turkish word in this specimen outgrows the line. The trade-off, stated plainly: `display`/`headline` text stops growing past 1.3x even at the largest OS accessibility sizes — a real cost for a low-vision reader who wants the text bigger still, accepted here because the base sizes (33 pt / 28 pt) are already large relative to body text, and the alternative (an isolated single glyph on its own line) is worse, not better, for a low-vision reader specifically.
+
+### Evidence
+
+| Evidence ID | Kind | Scenario | Command / Target | Result | Provenance |
+| --- | --- | --- | --- | --- | --- |
+| RW2-1 | automated functional | Analyzer, format, full test suite | `melos run analyze`; `dart format --output=none --set-exit-if-changed app`; `melos run test` (workspace) | `looplet_app`/all packages except the pre-existing unrelated `looplet_solver` info-lint: 0 issues; app-scoped format exit 0 (110 files, 0 changed); tests exit 0 — app **314** (was 313; +1, the new gallery-layout test) | this session, final code |
+| RW2-2 | runtime | The defect, fixed, at the platform floor | `flutter build ios --simulator --debug -t lib/main_gallery.dart`; `xcrun simctl ui <udid> content_size accessibility-medium` (1.65x); gallery capture at the `_TypeRoles` specimen | "Döngü / tamamlandı." and "Sıradaki döngüyü / çöz." both render on clean word-boundary lines, no mid-word break (was already clean at this floor before the fix too — the bug only showed at more extreme scale) | iPhone 16, iOS 18.6 simulator |
+| RW2-3 | runtime | The defect, fixed, at the scale it actually reproduced at | Same build; `content_size accessibility-extra-extra-extra-large` (~3.12x); both specimen instances captured (`_TypeRoles` and the journey `GlassCard`) | Identical two-line rendering to the 1.65x capture at both instances — no mid-word break, no isolated glyph, `StatCard`/`LoopNode` in the same frame still hold (QA-01 unaffected) | iPhone 16, iOS 18.6 simulator |
+| RW2-4 | runtime | F03 device suite unaffected | `flutter test integration_test -d <iPhone 16>` | `+13 All tests passed`, exit 0 | iPhone 16 |
+
+**Limits, stated plainly:** the same limits as F00-FE-A11Y-REWORK apply unchanged (simulator not physical device, no VoiceOver speech pass, no real hardware keyboard, no consuming screen for full composition). This task did not touch QA-01/02/03's own mechanisms or re-verify them; their evidence stays fingerprint-valid. The cap trade-off above (display/headline text has a lower growth ceiling than before this task) is a deliberate, documented choice, not a silent regression — if a future Phase D screen finds 1.3x too restrictive for a specific real headline, that's a fresh call for whoever builds that screen, not implied by this task.
+
 ## Sonraki Komut
 
 ```text
