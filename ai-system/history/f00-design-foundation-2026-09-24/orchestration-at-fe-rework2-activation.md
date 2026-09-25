@@ -89,11 +89,49 @@ allowed
 
 ## Pending Evidence
 
-- Evidence ID: F00.UI-FOUNDATION-EVIDENCE (consolidated; full text archived: [orchestration-at-fe-rework2-activation.md](../../history/f00-design-foundation-2026-09-24/orchestration-at-fe-rework2-activation.md))
-  * Scenario: UI Designer's four Round-1 foundation-stage records (Direction A/B renders, Direction C renders, reference parity, selected-source renders) — all PASS, all superseded by F00.FOUNDATION-SELECTION RESOLVED and the later implementation evidence below
+- Evidence ID: F00.DIRECTION-RENDERS
+  * Scenario: At least two materially different rendered directions (real image/PDF/HTML-render artefacts) of the same Play (idle + lifted row + locked/frozen), Won moment + F04 panel (Perfect, 2★), Journey home (in-progress ring) and tutorial states, plus a Turkish glyph / tabular-figure specimen, recorded as direction-render records in a Visual Evidence Manifest
+  * Required Class: manual
+  * Target / Environment: iPhone 16 393×852 reference frame (platform.md §14); 16e and 16 Pro Max variants for the critical states
   * Owner Role: UI Designer
+  * Prerequisite / External Decision: None
+  * Re-evaluation Trigger: F00-UI-FOUNDATION delivery
+  * Blocks: Foundation selection; every visual implementation task
   * Result: PASS
-  * Provenance / Note: IDs were F00.DIRECTION-RENDERS, F00.DIRECTION-C-RENDERS, F00.REFERENCE-PARITY, F00.SELECTED-SOURCE (2026-09-21). Kept here as a pointer only — the Foundation is Selected, implementation evidence (F00.DS-AUTOMATED/DS-PARITY/DS-A11Y-REWORK/VISUAL-QA2 below) is what current work relies on.
+  * Provenance / Note: 2026-09-21 UI Designer, HEAD 1d1ae14 + uncommitted working tree: 2 directions x 10 frames at 393x852 (Play idle, lifted row, locked+frozen, Won Perfect, Won 2-star, Journey home, tutorial, and three won-moment stills), 16e and Pro Max variants of Play idle and Won Perfect, a type/glyph/contrast specimen per direction, composites — 40 files in features/f00-design-foundation/design/ (generator in src/, HTML/CSS rendered with headless Chrome at DPR 2). Generated design artefacts, not app runtime captures; no motion prototype or video, no OS text-scale render, no Android frame; renders use Blink not Flutter, so implementation fidelity is unproven. Independent QA scoring pending selection and implementation.
+
+- Evidence ID: F00.DIRECTION-C-RENDERS
+  * Scenario: Direction C rendered from the user's reference language on the same states as A/B (Play idle, lifted row, locked+frozen, Won Perfect and 2-star, Journey home, column tutorial, won-moment stills) at 393x852, with 16e and Pro Max variants, Turkish glyph / tabular / contrast specimen, recorded as direction-render records in the Foundation manifest
+  * Required Class: manual
+  * Target / Environment: iPhone 16 393x852 reference frame (platform.md §14); 16e and 16 Pro Max variants for the critical states
+  * Owner Role: UI Designer
+  * Prerequisite / External Decision: None
+  * Re-evaluation Trigger: F00-UI-DIRECTION-C delivery
+  * Blocks: Foundation selection; every visual implementation task
+  * Result: PASS
+  * Provenance / Note: 2026-09-21 UI Designer, HEAD 8b1a3d5 + uncommitted working tree: Direction C x 14 frames at 393x852 (Play idle, row lifted resolved + reference-literal, locked+frozen, Won Perfect + 2-star as a bottom-anchored sheet, full-screen completion and reference-semantics alternatives, Home with the reference composition and shipped-scope only, column tutorial, three won-moment stills), 16e and Pro Max variants, a specimen with computed and measured contrast, composites — in features/f00-design-foundation/design/ (generator src/gen-c.mjs; HTML/CSS rendered with headless Chrome at DPR 2). Generated design artefacts, not app runtime captures; no motion prototype or video, no OS text-scale render, no Android frame; Blink not Flutter. Folder now holds ~27 MB of PNGs (65 files) — prune or compress if repo size matters.
+
+- Evidence ID: F00.REFERENCE-PARITY
+  * Scenario: Side-by-side parity between each user reference screen (Home, Play, Completion) and the corresponding Direction C render on the reference frame, with every deviation (contrast fixes, contract conflicts, shipped-content substitutions) listed and justified
+  * Required Class: manual
+  * Target / Environment: reference frame 716x1434 (2x of 358x717) and the 393x852 canonical frame
+  * Owner Role: UI Designer
+  * Prerequisite / External Decision: None
+  * Re-evaluation Trigger: F00-UI-DIRECTION-C delivery
+  * Blocks: Foundation selection
+  * Result: PASS
+  * Provenance / Note: 2026-09-21 UI Designer: parity-1-home.png, parity-2-play.png, parity-3-completion.png (user reference | Direction C render on the same 358x717 @2x frame; renders C-P1/P2/P3). Deviations D1-D11 listed in design-foundation.md §17.8 (Turkish casing fixes, earned stars filled, node overlap and text wrap fixed, status chrome, active-row accent resolved with a literal variant, contract-conforming completion with a reference variant). Palette and small-label colours MEASURED from the reference pixels (§17.4); the brief's assumption that the reference's small caps were a contrast weakness was disproved by measurement (5.6-9.6:1).
+
+- Evidence ID: F00.SELECTED-SOURCE
+  * Scenario: Selected-source renders reflecting the final decision set (§18): Play idle / lifted row / locked+frozen, full-screen solved result (Perfect and 2-star) with the board-to-result transition and a proposed visible exit, Home with future-scope items and the `Looplet` wordmark, column tutorial — recorded as `selected-source` in a Visual Evidence Manifest inside the F00 ui-design.md handoff
+  * Required Class: manual
+  * Target / Environment: iPhone 16 393x852 reference frame (platform.md §14); 16e and Pro Max variants for the critical states
+  * Owner Role: UI Designer
+  * Prerequisite / External Decision: None (F00.FOUNDATION-SELECTION RESOLVED)
+  * Re-evaluation Trigger: F00-UI-FINALIZE delivery
+  * Blocks: Visual Quality Gate = Ready for Implementation; every visual implementation task
+  * Result: PASS
+  * Provenance / Note: 2026-09-21 UI Designer, HEAD cc7fe3f + uncommitted working tree: 24 selected-source PNGs (S-01 … S-16, S-v-*, S-91) plus contact sheets in features/f00-design-foundation/design/, the executable prototype design/src/S-transition-prototype.html (frames S-08…S-16 are captured from it), and ui-design.md with a Visual Evidence Manifest (3 direction-render, 3 canonical-reference, parity-comparison, selected-source and motion-prototype records). Generated HTML/CSS renders (Blink), not Flutter or simulator captures; no OS-text-scale, loading/error/recovery or Android renders; the motion prototype is not a Flutter prototype. Independent QA scoring pending implementation.
 
 - Evidence ID: F00.DS-AUTOMATED
   * Scenario: Token values, Turkish uppercasing cases, component state tests, analyzer, format, full melos test suite and the F03 device suite stay green with no shipped-surface change
@@ -176,7 +214,7 @@ Earlier decisions of this track, full text archived: [Direction A/B rejection th
 
 2026-09-23 (F00-FE-A11Y-REWORK reconciliation, full text archived: [orchestration-at-qa-visual2-verdict.md](../../history/f00-design-foundation-2026-09-23/orchestration-at-qa-visual2-verdict.md)) — Tech Lead reconciled the rework delivery: all four findings addressed and independently code-verified (QA-01/02/03 fix mechanisms confirmed in `buttons.dart`/`info.dart`/`surfaces.dart`), contract compliance confirmed (7 files, only under `app/lib/design`/`app/test/design`), evidence re-run independently (analyze/format/test/F03 all exit 0), one mis-cropped "before" evidence JPEG found and corrected (report correction, not rework). Delivery Review = Accepted; F00-QA-VISUAL2 activated with a targeted re-verify brief.
 
-2026-09-23 (F00-QA-VISUAL2 verdict, full text archived: [orchestration-at-fe-rework2-activation.md](../../history/f00-design-foundation-2026-09-24/orchestration-at-fe-rework2-activation.md)) — QA delivered Approved with Notes, 88/100 (was 80), on the claim that the shortfall was entirely a non-blocking, out-of-scope gap; see the next entry for why Tech Lead corrected this.
+2026-09-23 (F00-QA-VISUAL2 verdict) — QA delivered Approved with Notes, 88/100 (was 80); QA-01/02/03 independently RESOLVED with fresh runtime evidence (own gallery captures at 1.65x and 3.12x, a rebuilt semantics probe, a new independent focus-ring widget test), zero regression (313 tests, F03 13/13, fresh cold launch); QA-04 stays open/non-blocking; the 5-point gap under the generic >= 93 gate is entirely QA-04 (already non-blocking) and Motion's pre-existing Phase-D-absence cap, flagged to Tech Lead rather than resolved unilaterally. Full text: qa.md § F00-QA-VISUAL2 and [orchestration-at-qa-visual2-verdict.md](../../history/f00-design-foundation-2026-09-23/orchestration-at-qa-visual2-verdict.md).
 
 2026-09-24 (F00-QA-VISUAL2 reconciliation) — Tech Lead reconciled. Credited and accepted at face value: QA-01/02/03 are genuinely RESOLVED — independently re-ran analyzer/format/`flutter test` (313/313) myself on the committed tree (commit `9371468`) and they pass; the runtime-capture and probe/widget-test methodology QA describes is sound and consistent with the already-verified code. Corrected two things QA got wrong, neither of which reopens QA-01/02/03: (1) **QA Result.** `premium-ui-rubric.md` § Verdict Bands is unconditional — "85–92: hedef bandın altında; zorunlu rework" and "92 ve altı `Approved with Notes` ile geçirilemez," with no carve-out for a shortfall already labelled non-blocking elsewhere (`visual-quality-gate.md` §Independent QA Gate: "93 altını mandatory rework yapar," same unconditional framing). An 88 cannot be `Approved with Notes` regardless of *why* it's 88; QA conflated "QA-04 doesn't have to be fixed in the a11y-rework task" (true, Round 1's ruling) with "QA-04 no longer counts toward the numeric gate" (not true — corrected `QA Result: Rejected`). (2) **QA-04 status.** Read the current code directly: `app/lib/design/typography.dart:106` (`caption` role, height 1.3) and `app/lib/design/components/buttons.dart:195-199` (`OutlinePill`, horizontal padding added) show 2 of QA-04's 3 items are *already fixed* — QA's Round 2 Findings carried forward Round 1's "QA-04 unchanged" prose without diffing it against the current tree. Only the third item (long Turkish words mid-word-wrapping at extreme OS text scale, isolating a trailing glyph — real, confirmed by QA's own `xxxl` captures) is genuinely open. Also removed a stray `app/9.png` (a screenshot accidentally committed into the app tree by QA's own commit, contaminating the `app` fingerprint QA itself cites — not referenced anywhere, no history before this commit). Routing: F00-FE-A11Y-REWORK2 activated, narrowly scoped to the one real remaining item; then F00-QA-VISUAL3 to verify it and rescore honestly — QA is invited to re-examine whether its own conservative "yalnız galeri" ceiling applies to every dimension, or, per the rubric's own dimension-7 text, only clearly to Motion (the only dimension whose text explicitly withholds an automatic 10 absent a real motion surface); this is a question for QA's own evidence-based judgment, not a score Tech Lead is assigning. Full text: [orchestration-at-fe-rework2-activation.md](../../history/f00-design-foundation-2026-09-24/orchestration-at-fe-rework2-activation.md).
 
@@ -195,7 +233,7 @@ Why now: the ai-system upgrade (cfd6b59) made an independent visual gate (>= 93 
 * [Scope contract](architecture.md); [Design Adoption Route](../../workflow-follow-ups.md); [platform.md §14](../../project-authority/platform.md).
 * Shipped identity for reference: `app/lib/play/play_theme.dart`; surfaces documented in F03 ui-design.md (§5–§8, §16), F04 ui-design.md, F05 ui-design.md.
 * Canonical execution: role-execution-contract.md.
-* [Frontend delivery](frontend.md) · [QA verdict](qa.md) · [carrier PRD statement](prd.md) · archived working orchestrations: [at the first Frontend delivery](../../history/f00-design-foundation-2026-09-21/orchestration-at-frontend-delivery.md) · [at the accessibility-rework reconciliation](../../history/f00-design-foundation-2026-09-23/orchestration-at-a11y-reconciliation.md) · [at the F00-QA-VISUAL2 verdict](../../history/f00-design-foundation-2026-09-23/orchestration-at-qa-visual2-verdict.md) · [at the F00-FE-A11Y-REWORK2 activation](../../history/f00-design-foundation-2026-09-24/orchestration-at-fe-rework2-activation.md).
+* [Frontend delivery](frontend.md) · [QA verdict](qa.md) · [carrier PRD statement](prd.md) · archived working orchestrations: [at the first Frontend delivery](../../history/f00-design-foundation-2026-09-21/orchestration-at-frontend-delivery.md) · [at the accessibility-rework reconciliation](../../history/f00-design-foundation-2026-09-23/orchestration-at-a11y-reconciliation.md) · [at the F00-QA-VISUAL2 verdict](../../history/f00-design-foundation-2026-09-23/orchestration-at-qa-visual2-verdict.md).
 
 ## Change Log
 

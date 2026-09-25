@@ -1,0 +1,3 @@
+# F00 working record — 2026-09-24 (F00-FE-A11Y-REWORK2 activation checkpoint)
+
+`orchestration-at-fe-rework2-activation.md` is the byte-for-byte working orchestration of F00 right after the Tech Lead reconciled the F00-QA-VISUAL2 verdict (QA-01/02/03 credited as RESOLVED; QA Result corrected from `Approved with Notes` to `Rejected` because `premium-ui-rubric.md`'s Verdict Bands are unconditional at 88/100; QA-04's status corrected — 2 of 3 items were already fixed in code) and activated F00-FE-A11Y-REWORK2 for the Frontend/Mobile Developer. The live `features/f00-design-foundation/orchestration.md` keeps a short summary of this reconciliation plus the current state so it stays within the snapshot byte budget.
