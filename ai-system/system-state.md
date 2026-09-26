@@ -1,6 +1,6 @@
 # System State — LOOPLET
 
-Last Updated: 2026-09-26
+Last Updated: 2026-09-27
 
 ## Platform Initialized
 
@@ -40,47 +40,42 @@ features/f05-journey-progression/orchestration.md
 
 ## Current Phase
 
-F05 journey-progression — rework (F05-FE3-GATE + F05-FE3-HOME) after F05-QA-STRICT Rejected
+F05 journey-progression — final-stage re-QA (F05-QA-STRICT2) after the F05-FE3 rework
 
 ## Current Role
 
-Frontend/Mobile Developer
+QA
 
 ## Current Reason
 
-F05-QA-STRICT (2026-09-26) rejected F05's final QA. The Tech Lead re-verified all three findings with its own commands.
+F05-QA-STRICT (2026-09-26) rejected F05's final QA on three defects:
+* the strict gate enforced no band rule;
+* `content:check` had a `levels`-key bypass;
+* the home read-model was stale within a session (AC7 on the replay path).
 
-**What passes:** the real 30-level strict pack is clean; the full campaign 1→30 → terminal works against the real bundle; AC7 resume across a real process kill works on iPhone 16; the full regression is green.
+The F05-FE3 rework (2026-09-27) fixed all three.
 
-**What is broken:**
-* The strict build gate enforces none of the structural band rules. The earlier "4/4 including the band-rule case" was an empty test that the Tech Lead's pre-QA reconciliation accepted without reading it; that claim is now corrected.
-* `content:check` can be bypassed with a stray `levels` key.
-* The home read-model never re-reads the active-session snapshot within a session, so the in-progress state is missing after going back, and mid-replay CONTINUE targets a different level than after a relaunch (AC7).
+**Tech Lead reconciliation (2026-09-27):** the Tech Lead did not rely on the green suite. It read every gate check and ran its own negative cases on real content, using rule/level pairs not used before; the one-byte bundle drift test failed as expected; the new home tests fail against the old provider. `flutter analyze` is clean and the app suite is 336/336.
 
-**Contract:** the root cause of the last defect was the contract itself — architecture §6 specified a one-shot snapshot read. §5.4/§6/§10/§15 have been amended accordingly.
+**Evidence:** the QA evidence records are re-opened as PENDING. F05.SHARED-RUNTIME is re-opened too, because `ActiveSessionRepo` — the resume read path — changed.
 
 ## Last Completed Action
 
-Tech Lead triaged the incident of 2026-09-26: "the app still shows the old design — why wasn't the redesign integrated?"
-* **Classification:** Cross-Feature Integration Issue; no code defect.
-* **Why the app looks old:** F00 was scoped to the design-system layer and gallery only. Verified: no shipped screen imports `app/lib/design/`, and `main.dart` still uses the old `play_theme.dart`.
-* **Gap:** after F00 closed, the screen integration (Design Adoption Phase C/D) had no scheduled slot.
-* **Decision:** continue the F05 rework; start design adoption right after F05 closes; F08 local evidence moves behind it.
-
-Before that, Tech Lead reconciled F05-QA-STRICT on 2026-09-26:
-* re-verified and accepted the Rejected verdict;
-* marked its own F06.CONTENT-PROMOTE-RECONCILE record FAIL with a correction note;
-* added the F05.HOME-LIVE-STATE evidence record;
-* amended the contract (§5.4, §6, §10, §15) and resynced the derived prd.md AC3 to the product PRD;
-* activated F05-FE3-GATE and F05-FE3-HOME for the Frontend/Mobile Developer.
+Tech Lead reconciled F05-FE3 on 2026-09-27:
+* Delivery Review = Accepted;
+* F06.CONTENT-PROMOTE-RECONCILE = PASS;
+* F05.STRICT-CONTENT, F05.HOME-LIVE-STATE and F05.SHARED-RUNTIME set to PENDING for re-verification;
+* QA plan locked — final, client-only, core + client-ui + stateful-flow, full, allowed. The `content` module was dropped: qa-preflight failed it because there is no `content-design.md`. The validator positive/negative-fixture check is required in the brief instead. Preflight PASS;
+* F05-QA-STRICT2 activated.
 
 ## Next Expected Action
 
-Run Frontend/Mobile Developer on F05-FE3-GATE and F05-FE3-HOME (Current Rework Brief in the F05 orchestration):
-* **F05-FE3-GATE:** F05's gate enforces R1–R6 plus the manifest-label check on the shipped bundle, each rule with its own rejecting negative case; the bundle must equal the `content/` mirror; `content:check` recognizes a Journey manifest by path and shape.
-* **F05-FE3-HOME:** the read-model is live on both sources, with warm-path widget tests.
+Run QA on F05-QA-STRICT2 (Current QA Brief in the F05 orchestration):
+* independently verify the three closures — the gate rule → check → negative mapping, the mirror, the `content:check` recognition, and the home warm == cold at runtime including the replay path;
+* re-verify the shared runtime (F03 device suite + AC7 kill/relaunch);
+* run full regression.
 
-After delivery, the Tech Lead reconciles by reading every check and running its negative case, then activates the F05 re-QA.
+The verdict returns to the Tech Lead.
 
 After F05 closes, the Design Adoption Route takes the next slot:
 1. Phase C — UI Designer + Tech Lead audit of the F03/F04/F05 screens against the selected renders.
@@ -93,7 +88,7 @@ F08 local evidence follows the design adoption (incident 2026-09-26).
 * F01, F02, F04, F06: historical scoped Done retained.
 * F03: Done — final QA Approved with Notes (2026-09-21); Visual Scope none covered behaviour/accessibility only; visual surface pending the Design Adoption Route.
 * F00: Done (2026-09-26) — cross-cutting Design Foundation track, Visual Scope design-system; Foundation Selected (Direction C, 2026-09-21); QA-01/02/03/04 all fixed and independently confirmed, 90/100; Visual Quality Gate Passed via a user-resolved scoped one-time exception (F00.VISUAL-93-THRESHOLD option C, not a rubric change). No shipped screen uses the new design yet (by scope). Design Adoption Route Phase C is scheduled for right after F05 closes (incident 2026-09-26).
-* F05: Rework — the active feature. F05-QA-STRICT was Rejected on 2026-09-26: the content is clean, but the gate and the home read-model are defective (F05-QA-STRICT-1/-2/-3). F05-FE3-GATE and F05-FE3-HOME are open for the Frontend/Mobile Developer, followed by a re-QA.
+* F05: In QA — the active feature. F05-QA-STRICT was Rejected on 2026-09-26. The F05-FE3 rework was delivered and Tech Lead-reconciled on 2026-09-27, and the final re-QA F05-QA-STRICT2 is now active.
 * F08: In Progress, queued; independent local/emulator validation pending, release task Blocked, release/final acceptance pending.
 * F07, F09–F13: Not Started. Pending follow-ons are in workflow-follow-ups.md.
 
