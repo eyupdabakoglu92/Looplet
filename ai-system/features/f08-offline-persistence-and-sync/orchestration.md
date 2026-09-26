@@ -143,7 +143,15 @@ None
 
 ## Next Action
 
-F03 is Done (2026-09-21): the rework-control lock is released. Queued behind the current single-owner turn (F00 Phase B, then F05 delivery reconciliation + F05-QA-STRICT); F08-LOCAL-EVIDENCE and F08-QA-FUNCTIONAL stay Queued and none waits for paid deployment. Tech Lead reviews the F03 final QA provenance (qa.md E4-E15, R1-R7: real kill/relaunch resume, resume after interruption, idle/paused lifecycle on the real store) before deciding what F08.LOCAL-RESUME / F08.LIFECYCLE can reuse for the identical scope; F08's own scenarios (storage-full, offline Journey, emulator) remain open. The release task remains Blocked and no deployment/billing action is authorized.
+**Queued, reordered by incident 2026-09-26.** F08 waits behind the F05 rework and its re-QA, and then behind the Design Adoption Route (Phase C audit, Phase D screen conversions).
+
+* **Why:** F08 cannot reach Done while F08.DEPLOY-AUTHORIZATION is OPEN. Its offline-Journey and resume runtime proof also runs through the F03/F05 screens that Phase D will change, so gathering it after the redesign avoids doing it twice.
+* **Tasks:** F08-LOCAL-EVIDENCE and F08-QA-FUNCTIONAL stay Queued; none waits for paid deployment.
+* **At activation:** Tech Lead reviews the reusable provenance before deciding what F08.LOCAL-RESUME and F08.LIFECYCLE can reuse for the identical scope:
+  * F03 final QA qa.md E4-E15 and R1-R7 — real kill/relaunch resume, resume after interruption, idle/paused lifecycle on the real store;
+  * F05-QA-STRICT QS-10/QS-11 — exact Journey resume across a real process kill (grid, moves, undo; restart and thaw not covered).
+* **Still open:** F08's own scenarios (storage-full, offline Journey, emulator).
+* **Release:** the release task remains Blocked, and no deployment or billing action is authorized.
 
 ## Last Decision
 
@@ -152,8 +160,8 @@ F03 is Done (2026-09-21): the rework-control lock is released. Queued behind the
 ## Last Update
 
 * Updated By: Tech Lead
-* Timestamp: 2026-09-20
-* Summary: Routing note only (queued behind F03 QA); ledger, evidence and release gate unchanged.
+* Timestamp: 2026-09-26
+* Summary: Routing note only (incident 2026-09-26) — queued behind the F05 rework and the Design Adoption Route (Phase C/D). The ledger, evidence and release gate are unchanged.
 
 ## Context & Follow-ups
 
@@ -169,6 +177,7 @@ F08 implementation/runbook and the F08-FE12 fix are retained. Exact old tasks an
 ## Change Log
 
 * 2026-09-18 — migrated state; see the immutable pre-migration snapshot for all earlier tasks, decisions and evidence.
+* 2026-09-26 — Tech Lead: queue reordered (incident "the app still shows the old design"): F05 → design adoption → F08 local evidence. No scope, evidence or release change.
 
 ## Release Constraints
 

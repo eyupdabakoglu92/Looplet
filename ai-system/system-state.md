@@ -61,7 +61,13 @@ F05-QA-STRICT (2026-09-26) rejected F05's final QA. The Tech Lead re-verified al
 
 ## Last Completed Action
 
-Tech Lead reconciled F05-QA-STRICT on 2026-09-26:
+Tech Lead triaged the incident of 2026-09-26: "the app still shows the old design — why wasn't the redesign integrated?"
+* **Classification:** Cross-Feature Integration Issue; no code defect.
+* **Why the app looks old:** F00 was scoped to the design-system layer and gallery only. Verified: no shipped screen imports `app/lib/design/`, and `main.dart` still uses the old `play_theme.dart`.
+* **Gap:** after F00 closed, the screen integration (Design Adoption Phase C/D) had no scheduled slot.
+* **Decision:** continue the F05 rework; start design adoption right after F05 closes; F08 local evidence moves behind it.
+
+Before that, Tech Lead reconciled F05-QA-STRICT on 2026-09-26:
 * re-verified and accepted the Rejected verdict;
 * marked its own F06.CONTENT-PROMOTE-RECONCILE record FAIL with a correction note;
 * added the F05.HOME-LIVE-STATE evidence record;
@@ -74,13 +80,19 @@ Run Frontend/Mobile Developer on F05-FE3-GATE and F05-FE3-HOME (Current Rework B
 * **F05-FE3-GATE:** F05's gate enforces R1–R6 plus the manifest-label check on the shipped bundle, each rule with its own rejecting negative case; the bundle must equal the `content/` mirror; `content:check` recognizes a Journey manifest by path and shape.
 * **F05-FE3-HOME:** the read-model is live on both sources, with warm-path widget tests.
 
-After delivery, the Tech Lead reconciles by reading every check and running its negative case, then activates the F05 re-QA. F08 stays queued until F05 closes.
+After delivery, the Tech Lead reconciles by reading every check and running its negative case, then activates the F05 re-QA.
+
+After F05 closes, the Design Adoption Route takes the next slot:
+1. Phase C — UI Designer + Tech Lead audit of the F03/F04/F05 screens against the selected renders.
+2. Phase D — the screens are redesigned one at a time, each through independent visual QA.
+
+F08 local evidence follows the design adoption (incident 2026-09-26).
 
 ## Portfolio Summary
 
 * F01, F02, F04, F06: historical scoped Done retained.
 * F03: Done — final QA Approved with Notes (2026-09-21); Visual Scope none covered behaviour/accessibility only; visual surface pending the Design Adoption Route.
-* F00: Done (2026-09-26) — cross-cutting Design Foundation track, Visual Scope design-system; Foundation Selected (Direction C, 2026-09-21); QA-01/02/03/04 all fixed and independently confirmed, 90/100; Visual Quality Gate Passed via a user-resolved scoped one-time exception (F00.VISUAL-93-THRESHOLD option C, not a rubric change). Design Adoption Route Phase C now unblocked, not yet activated.
+* F00: Done (2026-09-26) — cross-cutting Design Foundation track, Visual Scope design-system; Foundation Selected (Direction C, 2026-09-21); QA-01/02/03/04 all fixed and independently confirmed, 90/100; Visual Quality Gate Passed via a user-resolved scoped one-time exception (F00.VISUAL-93-THRESHOLD option C, not a rubric change). No shipped screen uses the new design yet (by scope). Design Adoption Route Phase C is scheduled for right after F05 closes (incident 2026-09-26).
 * F05: Rework — the active feature. F05-QA-STRICT was Rejected on 2026-09-26: the content is clean, but the gate and the home read-model are defective (F05-QA-STRICT-1/-2/-3). F05-FE3-GATE and F05-FE3-HOME are open for the Frontend/Mobile Developer, followed by a re-QA.
 * F08: In Progress, queued; independent local/emulator validation pending, release task Blocked, release/final acceptance pending.
 * F07, F09–F13: Not Started. Pending follow-ons are in workflow-follow-ups.md.

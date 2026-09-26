@@ -167,6 +167,7 @@ Earlier decisions (2026-09-20 QA sequencing; the 2026-09-26 pre-QA reconciliatio
 * **Tracked elsewhere:**
   * Offline and storage-failure device branches: workflow-follow-ups.md SHARED-PERSISTENCE-PROOF and F08.
   * First-app-distribution: workflow-follow-ups.md; not an F05 gate.
+* **Incident 2026-09-26 ("the app still shows the old design"):** the Design Adoption Route (Phase C audit, then Phase D screen by screen) takes the next slot after F05 closes, ahead of F08. F05's home and tutorial are Phase D surfaces, so this rework stays strictly non-visual (see the non-goals in the brief).
 
 ## History & Evidence References
 
@@ -185,6 +186,7 @@ Earlier decisions (2026-09-20 QA sequencing; the 2026-09-26 pre-QA reconciliatio
 * 2026-09-26 — Tech Lead: F06-CONTENT-PROMOTE reconciled (content promotion, toolchain fix and strict gate independently re-verified); Delivery Review = Accepted; QA plan locked (final, client-only, core+client-ui+stateful-flow, full, allowed); F05-QA-STRICT activated.
 * 2026-09-26 — QA: F05-QA-STRICT Rejected (F05-QA-STRICT-1/-2/-3); F05.STRICT-CONTENT FAIL, F05.SHARED-RUNTIME PASS; owner -> Tech Lead.
 * 2026-09-26 — Tech Lead: F05-QA-STRICT reconciled (findings re-verified; own pre-QA band-rule claim corrected); contract §5.4/§6/§10/§15 amended; prd.md AC3 resynced; F05-FE3-GATE + F05-FE3-HOME activated; status Rework.
+* 2026-09-26 — Tech Lead: incident triage ("the app still shows the old design") — Continue Current Flow; design adoption is scheduled right after F05 closes, ahead of F08.
 
 ## Consumed Signals
 
