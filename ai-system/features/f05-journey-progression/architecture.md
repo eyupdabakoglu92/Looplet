@@ -1,6 +1,11 @@
 # F05 — journey-progression: Architecture (Contract)
 
-> Status: **LOCKED (2026-09-07, Tech Lead — DURUM 3).** `analysis.md` decisions D1–D8 consumed. `[PENDING — UI]` **resolved** by `ui-design.md` (F05-UI, 2026-09-08). **Amended 2026-09-09 (Tech Lead — F05-QA `Rejected` reconcile, DURUM 5):** §5.4 (interim-turn `strict`-branch unit coverage required now), §12 + §15 (AC2 satisfied by construction — test-asserted, no hot-path guard; the explicit locked affordance → `[DEFERRED — F10]`), §15 (`Next Level` needs a trigger→outcome nav test, not just the routing fn), §17 (`[DEFERRED — F10]` level-select surface + affordance + guard). **Amended 2026-09-13 (Tech Lead, on the user's decision — `F06-CONTENT-PROMOTE`):** §5.4 — corrected the levels 1–3 `optimalMoves` claim (`{3,4}` was unachievable for a rows-only 5-letter 5×5 and was never actually gate-enforced; locked to `optimalMoves == 2`, matching the accepted `F06-CONTENT-DRAFT` pack). D1–D8 **unchanged**. `[PENDING — F06-CONTENT]` **resolving this turn** — the user accepted the AI-drafted 30 levels as-is; promotion to `content/journey/tr/` routed to Frontend/Mobile Developer (`F06-CONTENT-PROMOTE`). `[PENDING — F09]` still open. Contract authority for F05. Execution state is in `orchestration.md`.
+> Status: **LOCKED (2026-09-07, Tech Lead — DURUM 3).** `analysis.md` decisions D1–D8 consumed. `[PENDING — UI]` **resolved** by `ui-design.md` (F05-UI, 2026-09-08). **Amended 2026-09-09 (Tech Lead — F05-QA `Rejected` reconcile, DURUM 5):** §5.4 (interim-turn `strict`-branch unit coverage required now), §12 + §15 (AC2 satisfied by construction — test-asserted, no hot-path guard; the explicit locked affordance → `[DEFERRED — F10]`), §15 (`Next Level` needs a trigger→outcome nav test, not just the routing fn), §17 (`[DEFERRED — F10]` level-select surface + affordance + guard). **Amended 2026-09-13 (Tech Lead, on the user's decision — `F06-CONTENT-PROMOTE`):** §5.4 — corrected the levels 1–3 `optimalMoves` claim (`{3,4}` was unachievable for a rows-only 5-letter 5×5 and was never actually gate-enforced; locked to `optimalMoves == 2`, matching the accepted `F06-CONTENT-DRAFT` pack). D1–D8 **unchanged**. `[PENDING — F06-CONTENT]` **resolving this turn** — the user accepted the AI-drafted 30 levels as-is; promotion to `content/journey/tr/` routed to Frontend/Mobile Developer (`F06-CONTENT-PROMOTE`). `[PENDING — F09]` still open. **Amended 2026-09-26 (Tech Lead — F05-QA-STRICT `Rejected` reconcile):**
+* §5.4: band-rule enforcement ownership on the shipped bundle, with one rejecting negative case per rule; shipped bundle == `content/` mirror; `content:check` Journey-manifest recognition.
+* §6 + §10: the read-model is live on both sources. The one-shot snapshot read was the root cause of F05-QA-STRICT-3. The replay-in-progress semantics are clarified and unchanged.
+* §15: QA focus now covers the warm path and the negative cases.
+
+Contract authority for F05. Execution state is in `orchestration.md`.
 
 ---
 
@@ -104,6 +109,20 @@ A new check — **`melos run content:check` extended** (F06's `check` / a `flutt
 * **`mode == "smoke"`** (interim): the gate asserts consistency of whatever levels are present + logs the shortfall to `< 30`; **does not fail CI**.
 * **`mode == "strict"`** (when `F06-CONTENT` lands): `levels.length == 30` **required**; any violation **fails CI**. Flipping the mode is a one-field manifest edit + the gate reads it.
 * **Interim-turn coverage [amended 2026-09-09, F05-QA reconcile]:** even while the shipped manifest is `mode == "smoke"`, the gate's **`strict` branch itself is a Mode/Configuration variant that MUST carry executed coverage now** — a unit test feeding a synthetic `mode: "strict"` manifest with `< 30` levels (and one with an unresolvable `asset`) and asserting the gate **rejects** it. Only the *structural band rules* legitimately wait for `F06-CONTENT` (they need the real 30 authored levels); the bare `levels.length == 30` + asset-resolution checks do not.
+* **Band-rule enforcement ownership [amended 2026-09-26, F05-QA-STRICT reconcile].** `F06-CONTENT` has been delivered, so the band rules are now due.
+  * **Authority:** F05's own build gate (`runJourneyManifestGate`, run by `journey_manifest_gate_test.dart` inside `melos run test` / `content:journey`) is the authority for all six band rules, applied to the **shipped bundle** (`app/assets/journey/<lang>/`).
+  * **The six rules:** R1–R5 are the structural rules above. R6 is `difficultyLabel` inside the level's band, using the same bands as `_expectedBands`.
+  * **Label consistency:** the manifest entry's `difficultyLabel` must equal the asset's `difficultyLabel`.
+  * **Modes:** in `mode:"strict"` every violation is a named gate violation and fails CI. In `mode:"smoke"` violations are logged as advisory.
+  * **Evidence per rule:** each rule needs (a) an executable assertion and (b) a synthetic negative case asserting the gate rejects that specific violation (rule → check → negative example). A test body that asserts nothing is not coverage.
+  * **`content:check`:** keeps its existing R1/R6 checks and solver re-verification on `content/` as defence in depth; it is not the band-rule authority.
+  * **Out of scope:** levels 1–3 `optimalMoves == 2` remains a documented content decision, not a gate rule (unchanged).
+* **Shipped bundle == verified source [amended 2026-09-26].** CI fails if `app/assets/journey/<lang>/` is not byte-identical to `content/journey/<lang>/` (the `content:sync` mirror). This makes `content:check`'s solver re-verification, which runs on `content/`, cover what actually ships. Placement is the implementer's choice (`content:check --repo-root` or an app test); a negative case is required.
+* **Journey-manifest recognition in `content:check` [amended 2026-09-26].** A file is skipped as a Journey manifest only if **both** hold:
+  * it is `content/journey/<lang>/journey_manifest_<lang>.json`;
+  * it has the manifest shape (`schemaVersion`, `mode`, `lang`, and a `levels` list).
+
+  Any other JSON carrying a `levels` key is validated as a `Puzzle` artifact and fails if it is not one. A malformed manifest also fails. Negative cases are required. (This closes F05-QA-STRICT-2: a stray `"levels": []` used to skip all puzzle validation.)
 
 ### 5.5 Interim content [D7]
 
@@ -123,16 +142,25 @@ The 5 interim artifacts are **copies of the smoke JSON re-`id`'d to `journey-tr-
 
 ## 6. Progression Read-Model [LOCKED]
 
-Derived from `journey_progress` + a one-shot active-session snapshot read. No new storage.
+Derived from `journey_progress` + the persisted active-session snapshot, **both observed live**. No new storage.
+
+*Amended 2026-09-26 (F05-QA-STRICT reconcile):* this was a one-shot snapshot read. Because the home stays mounted under the pushed `/play` route, the one-shot read left the in-progress state and the CONTINUE target stale for the rest of the app session.
 
 * `LevelState(n)` for `n ∈ 1..30`:
   * `locked` ⇔ `n > highestUnlockedLevel`;
   * `completed` ⇔ `n ∈ completedLevels`;
   * `unlockedIncomplete` ⇔ `n <= highestUnlockedLevel && n ∉ completedLevels`;
   * `inProgress` ⇔ an F08 snapshot exists with `puzzleSource == journey && status == inProgress && parseJourneyLevel(puzzleId) == n` (at most one).
+    * This **includes a replay of an already-completed level**: for that level the in-progress state takes precedence over `completed`, and `progressCount` is unaffected.
+    * CONTINUE therefore resumes the replay (product AC7: "Given an in-progress level … that level resumes").
+    * These semantics are unchanged; clarified 2026-09-26.
 * `currentLevel` (for CONTINUE) = the `inProgress` level if any, else `min({n : unlockedIncomplete})`, else `null` (all 30 done → terminal).
 * `progressCount` = `|completedLevels ∩ {1..30}|` (clamp — ignore strays).
-* Exposed as a Riverpod provider bound to `JourneyProgressRepo.watch(guestId)` (live) + a read of `activeSessionRepoProvider.read()`.
+* Exposed as a Riverpod provider that **re-derives whenever either source changes** [amended 2026-09-26]:
+  * `JourneyProgressRepo.watch(guestId)` — win commits;
+  * the active-session snapshot — session start, move, completion and clear; for example a Drift watch over its stored row.
+* The same persisted state must yield the same model whether the app was just relaunched (cold) or the home stayed mounted (warm).
+* No new package dependency.
 
 **Consumers must handle all four `LevelState` values** (home tiles, the `Next Level` gate, CONTINUE).
 
@@ -171,7 +199,7 @@ Derived from `journey_progress` + a one-shot active-session snapshot read. No ne
 ## 10. Home Surface [LOCKED contract; `[PENDING — UI]` visual]
 
 * Replaces `app/lib/home_screen.dart` (currently a debug `Wrap` of `smoke-tr-*` buttons). The debug buttons move behind `kDebugMode` or are removed (`[IMPL — Frontend]`).
-* **Content (AC10):** LOOPLET wordmark; **CONTINUE** (primary CTA — §8); a **journey-progress indicator** ("`progressCount` / 30" + a completed/unlocked visual), bound to `JourneyProgressRepo.watch` (live-updates when a win commits, even after the player pops back to `/`).
+* **Content (AC10):** LOOPLET wordmark; **CONTINUE** (primary CTA — §8); a **journey-progress indicator** ("`progressCount` / 30" + a completed/unlocked visual), bound to `JourneyProgressRepo.watch` (live-updates when a win commits, even after the player pops back to `/`) **and** to the active-session snapshot (§6). The in-progress state and the CONTINUE target update as soon as the player pops back to `/` [amended 2026-09-26].
 * **Terminal variant ("all 30 complete"):** a distinct home state — a completion message; CONTINUE hidden or repurposed ("Replay a level" — **UI Designer's call**, Open item). No crash, no dead button.
 * **Chrome:** `/` is the app root — **no back affordance**. Not the F10 menu (no DAILY, no Settings icon, no level-select map — F10 re-homes this surface).
 * **Strings:** F05 UI strings follow F03's interim per-language table pattern (`PlayStrings`-style). `gen_l10n` stays `[DEFERRED — F10-or-earlier]` (F03's clarification).
@@ -222,10 +250,19 @@ F05-FE adds `journey_col_tutorial_ack` here; any future `kv` key is added to thi
 
 * **Progression (`automated functional`):** unlock N→N+1 at 1★ **and** 3★ (AC1/AC13 — the unlock write is star-agnostic, so an end-to-end 1★ solve is a *bonus*, not a gate; the required evidence is that `_resolveJourneyUnlock` fires irrespective of the star result and the CTA weighting enables `Next Level` at 1–2★); **AC2 — no F05 navigation path resolves to a `locked` level** (asserted across new / mid / in-progress / terminal + the last-available boundary; see §12 — the explicit locked *affordance* is `[DEFERRED — F10]`, no direct-entry guard on the hot path); replay a completed level → no re-lock / no progress change; `markCompleted` idempotency against the **real F08 `JourneyProgressRepo`** + an in-memory DB.
 * **CONTINUE / resume:** in-progress → resumes at the exact saved state (kill/relaunch — via the F08 restore path; an ad-hoc device pass folds into the eventual first-app-distribution smoke) (AC7); no in-progress → lowest unlocked incomplete (AC8); all 30 → terminal, no crash (AC9).
+* **Warm path (`automated functional`) [amended 2026-09-26, F05-QA-STRICT-3].** With the home mounted, `/play` may write, change or clear the active-session snapshot. Cases:
+  * a frontier level is started;
+  * a completed level is replayed;
+  * a level is won.
+
+  On return to `/`, the home must show the same in-progress caption, `Semantics` and CONTINUE target as the cold (relaunch) derivation. Widget-test at least the frontier and replay variants, and the win clearing the in-progress state.
 * **`Next Level` (`automated functional`) [emphasised 2026-09-09, F05-QA reconcile]:** the evidence MUST be a **trigger → outcome** test — tapping the rendered `SONRAKİ` CTA on a real `/play` `CompletionPanel` and observing navigation: panel of N (N<30, `n+1` present) → level N+1's `/play` via `pushReplacement` (the back stack does **not** grow); panel of the last available level / level 30 → `context.go('/')` → the terminal home. Unit coverage of the pure `nextJourneyLevel(n, manifestLevelCount)` routing fn alone does **not** satisfy AC12 (this was the F05-QA-1 blocking gap).
 * **Micro-tutorial (`automated functional`):** shows on first 4–6 entry (AC4); re-shows after a simulated force-quit (ack flag still false) until the gated action (AC11); not again after ack; not shown for 1–3 or 7+.
 * **Content resolver (`automated functional`):** resolve by number → the right `Puzzle`; corrupt/missing asset or manifest entry → the F03 load-error state, the rest of the Journey playable; offline (no network) → loads from the bundle (AC14).
 * **Build gate:** a manifest with `mode:"strict"` + `< 30` / a missing asset / a band-rule violation → the gate **fails CI**; `mode:"smoke"` → logs + passes.
+  * *Amended 2026-09-26:* each of R1–R6 and the manifest-label check needs its own rejecting negative case (§5.4).
+  * A shipped bundle that differs from `content/` fails.
+  * `content:check` rejects a `Puzzle` artifact carrying a stray `levels` key instead of skipping it.
 * **`ui-design.md` alignment:** the home CONTINUE/progress/terminal surface + the 4–6 micro-tutorial overlay vs `ui-design.md`; chrome parity with F03 Direction A; `premium-ui-rubric.md` fail conditions absent (≥ 90).
 * **Regression:** the F03 play + F04 completion suites stay green; F04's `CompletionPanel` now-enabled `onNextLevel` path does not break its disabled-state tests; F04's per-outcome CTA-weighting tweak (§16) behaves.
 * **Evidence class:** `automated functional` **mandatory**. `runtime` (device) is **not** an F05 gate — it folds into the deferred first-app-distribution smoke; an optional ad-hoc iPhone pass may be recorded.

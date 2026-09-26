@@ -27,7 +27,7 @@ F05 does **not** own: the play mechanic (F03), the star rating / completion pane
 
 * **AC1** — Given level N is completed with **any** star count, When the completion panel closes (via `Next Level` or `Close`), Then level N+1 is unlocked.
 * **AC2** — Given level N is not completed, When the player attempts to open level N+1, Then it is unavailable (no navigation, a clear locked affordance).
-* **AC3** — Given levels **1–3**, When played, Then column moves are disabled and only row shifts are available; optimal is 3–4 moves.
+* **AC3** — Given levels **1–3**, When played, Then column moves are disabled and only row shifts are available; optimal is 2 moves. *(Resynced 2026-09-26 by the Tech Lead to the authoritative `product-prd.md` AC, which was corrected 2026-09-13 on the user's decision — `3–4` is unachievable for a rows-only 5×5 with a 5-letter target; see §6 below and `architecture.md §5.4`. Derived-copy sync only; no semantic change.)*
 * **AC4** — Given the player **first** enters the **4–6** band, When the level loads, Then a short column-shift micro-tutorial is shown and column shifts become available.
 * **AC5** — Given levels **7–10**, When played, Then rows and columns are both available with optimal 4–6.
 * **AC6** — Given levels **11–15 / 16–20 / 21–25 / 26–30**, When played, Then respectively: heavier temporary-displacement / locked tiles / frozen tiles / locked+frozen combos, matching the difficulty curve.

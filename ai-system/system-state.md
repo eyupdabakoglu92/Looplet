@@ -40,30 +40,48 @@ features/f05-journey-progression/orchestration.md
 
 ## Current Phase
 
-F05 journey-progression — final-stage QA (F05-QA-STRICT)
+F05 journey-progression — rework (F05-FE3-GATE + F05-FE3-HOME) after F05-QA-STRICT Rejected
 
 ## Current Role
 
-QA
+Frontend/Mobile Developer
 
 ## Current Reason
 
-F05's code-logic layer was already QA-approved (qa.md, Approved with Notes) against interim smoke content. F06-CONTENT-PROMOTE (2026-09-13) then promoted the real 30-level Journey pack into `content/journey/tr/` (mirrored to `app/assets/journey/tr/`) and fixed a genuine toolchain bug in `content_check.dart` that had never been exercised before. Tech Lead reconciled this 2026-09-26: independently re-verified every claim with its own commands (byte-identical content mirror, the toolchain fix present and regression-tested, `content:check` OK, F05's own strict gate 4/4 including the structural band-rule case for the first time against real content, full `flutter test` 314/314, `looplet_authoring` 20/20) rather than accepting the delivery report's word. Delivery Review = Accepted; F05-QA-STRICT activated — the one remaining gate before F05 can reach Done.
+F05-QA-STRICT (2026-09-26) rejected F05's final QA. The Tech Lead re-verified all three findings with its own commands.
+
+**What passes:** the real 30-level strict pack is clean; the full campaign 1→30 → terminal works against the real bundle; AC7 resume across a real process kill works on iPhone 16; the full regression is green.
+
+**What is broken:**
+* The strict build gate enforces none of the structural band rules. The earlier "4/4 including the band-rule case" was an empty test that the Tech Lead's pre-QA reconciliation accepted without reading it; that claim is now corrected.
+* `content:check` can be bypassed with a stray `levels` key.
+* The home read-model never re-reads the active-session snapshot within a session, so the in-progress state is missing after going back, and mid-replay CONTINUE targets a different level than after a relaunch (AC7).
+
+**Contract:** the root cause of the last defect was the contract itself — architecture §6 specified a one-shot snapshot read. §5.4/§6/§10/§15 have been amended accordingly.
 
 ## Last Completed Action
 
-Tech Lead reconciled F06-CONTENT-PROMOTE 2026-09-26: verified the content promotion, the toolchain fix and the strict gate independently; set Delivery Review = Accepted; locked the QA plan (final, client-only, core+client-ui+stateful-flow, full, allowed) and activated F05-QA-STRICT with a targeted brief.
+Tech Lead reconciled F05-QA-STRICT on 2026-09-26:
+* re-verified and accepted the Rejected verdict;
+* marked its own F06.CONTENT-PROMOTE-RECONCILE record FAIL with a correction note;
+* added the F05.HOME-LIVE-STATE evidence record;
+* amended the contract (§5.4, §6, §10, §15) and resynced the derived prd.md AC3 to the product PRD;
+* activated F05-FE3-GATE and F05-FE3-HOME for the Frontend/Mobile Developer.
 
 ## Next Expected Action
 
-Run QA on F05-QA-STRICT: verify the strict-mode gate and structural band rules against the real 30-level bundle with QA's own commands, confirm the prior round's interim-content edge case (N1) is now moot, re-verify all-30-complete/terminal navigation against the real manifest, run full regression, and review the still-open F05.SHARED-RUNTIME (F03/F08 inherited evidence). Tech Lead reconciles the verdict next; only then does F05 close and F08 become the next queued QA feature.
+Run Frontend/Mobile Developer on F05-FE3-GATE and F05-FE3-HOME (Current Rework Brief in the F05 orchestration):
+* **F05-FE3-GATE:** F05's gate enforces R1–R6 plus the manifest-label check on the shipped bundle, each rule with its own rejecting negative case; the bundle must equal the `content/` mirror; `content:check` recognizes a Journey manifest by path and shape.
+* **F05-FE3-HOME:** the read-model is live on both sources, with warm-path widget tests.
+
+After delivery, the Tech Lead reconciles by reading every check and running its negative case, then activates the F05 re-QA. F08 stays queued until F05 closes.
 
 ## Portfolio Summary
 
 * F01, F02, F04, F06: historical scoped Done retained.
 * F03: Done — final QA Approved with Notes (2026-09-21); Visual Scope none covered behaviour/accessibility only; visual surface pending the Design Adoption Route.
 * F00: Done (2026-09-26) — cross-cutting Design Foundation track, Visual Scope design-system; Foundation Selected (Direction C, 2026-09-21); QA-01/02/03/04 all fixed and independently confirmed, 90/100; Visual Quality Gate Passed via a user-resolved scoped one-time exception (F00.VISUAL-93-THRESHOLD option C, not a rubric change). Design Adoption Route Phase C now unblocked, not yet activated.
-* F05: In QA — the active feature; F05-FE2 code-logic layer already Approved with Notes; real strict content promoted and independently re-verified by Tech Lead 2026-09-26; F05-QA-STRICT active, final verdict None.
+* F05: Rework — the active feature. F05-QA-STRICT was Rejected on 2026-09-26: the content is clean, but the gate and the home read-model are defective (F05-QA-STRICT-1/-2/-3). F05-FE3-GATE and F05-FE3-HOME are open for the Frontend/Mobile Developer, followed by a re-QA.
 * F08: In Progress, queued; independent local/emulator validation pending, release task Blocked, release/final acceptance pending.
 * F07, F09–F13: Not Started. Pending follow-ons are in workflow-follow-ups.md.
 
@@ -77,6 +95,7 @@ F08.DEPLOY-AUTHORIZATION is OPEN with Blocking Scope = release. The old deferral
 * The Design Foundation is Selected and its design-system layer passed independent visual QA 2026-09-26 (90/100, every dimension >= 8, no fail condition) via a user-resolved scoped one-time exception — not a change to the >= 93 generic bar, which still applies to future visual work (F03/F04/F05 conformance in Phase C, and any other feature/rework) unless that feature's own decision gate says otherwise. Shipped visuals (default font, Material icons, text-only legacy ui-designs, self-scores only) still have not passed the independent Visual Quality Gate. See Design Adoption Route.
 * Rotation, AC9 highlight, back/exit and won-moment regular motion passed runtime QA (rev c0cba44); live lifecycle and reduced-motion runtime remain FAIL/pending until the fixes land. Info.plist still allows landscape; the portrait lock rests on runtime behaviour (rotation PASS).
 * Required device/manual evidence is not established by a widget test, build or a planned CI job.
+* A green suite does not prove that a rule is enforced. F05's "band-rule case" was an empty test, and it passed a Tech Lead reconciliation because the check itself was never read (2026-09-26). Every gate claim needs its check read and its negative case run.
 * Startup/resume/persistence proof is shared by consuming features; reconcile the actual scope before clearing a downstream gate.
 * F08 cold-boot fix evidence exists in prior delivery/Tech Lead reports; QA must review applicable provenance, not invent an approval.
 * Daily content, first distribution, Android CI and other unresolved follow-ons remain OPEN in workflow-follow-ups.md.

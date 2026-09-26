@@ -1,0 +1,3 @@
+# F05 working record — 2026-09-26 (F05-QA-STRICT verdict checkpoint)
+
+`orchestration-at-qa-strict-verdict.md` is the byte-for-byte working orchestration of F05 right after QA delivered the F05-QA-STRICT verdict (Rejected — qa.md § F05-QA-STRICT) and before the Tech Lead reconciled it. It keeps the full Current QA Brief (activated 2026-09-26), the Tech Lead's pre-QA `F06.CONTENT-PROMOTE-RECONCILE` provenance exactly as written (including the later-disproven claim that F05's strict gate passed "including the structural band-rule case") and QA's own evidence records. The live `features/f05-journey-progression/orchestration.md` replaces the QA brief with the rework brief and corrects the disproven claim, so this snapshot is the unedited reference.
