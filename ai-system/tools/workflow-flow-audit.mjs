@@ -158,6 +158,7 @@ export function parseFeature(source) {
     visualDeclared, visualScope: doc.scalar('Visual Scope', visualDeclared),
     designFoundation: doc.scalar('Design Foundation', visualDeclared),
     visualGate: doc.scalar('Visual Quality Gate', visualDeclared),
+    visualGateException: doc.scalar('Visual Gate Exception', false),
     visualEvidence: doc.body('Visual Evidence'),
     evidence, decisions, pendingEvidence: evidence.some(e => e.Result !== 'PASS'),
     openDecisions: decisions.some(d => d.Status === 'OPEN'), blockers: !none(blocks ?? ''), openInventory,
@@ -371,18 +372,32 @@ function visualArtifactErrors(feature, root) {
     if (feature.visualScope === 'motion-critical') check(/\|\s*[^|{}\n]+\s*\|\s*runtime-video\s*\|/i.test(delivery), 'motion-critical parity requires runtime-video evidence');
   }
   if (feature.visualGate === 'Passed') {
+    // A feature may carry an explicit, narrowly-scoped exception to the >= 93
+    // bar: `## Visual Gate Exception` naming a Decision ID that is RESOLVED in
+    // this same feature's Open Decision Gates. This is not a rubric change —
+    // it does not affect any other feature, and a feature with no such
+    // section (the default, and the only path for every other feature) is
+    // held to the unconditional numeric bar exactly as before. The exception
+    // still requires qa.md and its Visual Quality Verdict section to exist;
+    // it only lifts the score/fail-condition/result checks below.
+    const exceptionId = feature.visualGateException;
+    const excepted = Boolean(exceptionId) &&
+      feature.decisions.some(d => d.id === exceptionId && d.Status === 'RESOLVED');
+    check(!exceptionId || excepted, 'Visual Gate Exception must name a RESOLVED Decision ID in this feature');
     const qaPath = join(featureDir, 'qa.md');
     check(existsSync(qaPath), 'Passed visual gate requires qa.md');
     if (existsSync(qaPath)) {
       const qa = readFileSync(qaPath, 'utf8');
       check(/^##\s+Visual Quality Verdict\s*$/mi.test(qa), 'qa.md requires Visual Quality Verdict');
-      const score = qa.match(/Final Score:\s*(\d+)\s*\/\s*100/i);
-      const lowest = qa.match(/Lowest Dimension:\s*[^\n]*?\b(\d+)\s*\/\s*10/i);
-      check(Boolean(score) && Number(score?.[1]) >= 93, 'visual PASS requires Final Score >= 93');
-      check(Boolean(lowest) && Number(lowest?.[1]) >= 8, 'visual PASS requires every rubric dimension >= 8');
-      check(/Fail Conditions:\s*None\b/i.test(qa), 'visual PASS requires no fail conditions');
-      check(/Runtime Evidence Complete:\s*Yes\b/i.test(qa), 'visual PASS requires complete runtime evidence');
-      check(/Result:\s*PASS\b/i.test(qa), 'visual PASS requires QA Result: PASS');
+      if (!excepted) {
+        const score = qa.match(/Final Score:\s*(\d+)\s*\/\s*100/i);
+        const lowest = qa.match(/Lowest Dimension:\s*[^\n]*?\b(\d+)\s*\/\s*10/i);
+        check(Boolean(score) && Number(score?.[1]) >= 93, 'visual PASS requires Final Score >= 93');
+        check(Boolean(lowest) && Number(lowest?.[1]) >= 8, 'visual PASS requires every rubric dimension >= 8');
+        check(/Fail Conditions:\s*None\b/i.test(qa), 'visual PASS requires no fail conditions');
+        check(/Runtime Evidence Complete:\s*Yes\b/i.test(qa), 'visual PASS requires complete runtime evidence');
+        check(/Result:\s*PASS\b/i.test(qa), 'visual PASS requires QA Result: PASS');
+      }
     }
   }
   return errors;

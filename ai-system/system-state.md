@@ -32,15 +32,15 @@ feature-board.md for portfolio; features/*/orchestration.md for execution; role-
 
 ## Active Feature
 
-F00
+F05
 
 ## Active Orchestration Path
 
-features/f00-design-foundation/orchestration.md
+features/f05-journey-progression/orchestration.md
 
 ## Current Phase
 
-F00 design-system accessibility rework — final-stage re-verify (Visual Quality Gate: Ready for QA; QA Result: None)
+F05 journey-progression — final-stage QA (F05-QA-STRICT)
 
 ## Current Role
 
@@ -48,22 +48,22 @@ QA
 
 ## Current Reason
 
-QA-01/02/03/04 are all now fixed and independently confirmed. F00-FE-A11Y-REWORK2 closed the one item Round 2 left open (display/headline mid-word-wrap at extreme OS text scale, via a documented `loopCappedTextScaler` cap) with real runtime evidence at 1.65x and ~3.12x, zero regression (314 tests). This Tech Lead independently re-verified task coverage, contract compliance (3 files, no shipped surface) and evidence (re-ran analyze/format/test myself, personally reviewed the runtime captures) — one provenance-only mistake found and corrected (the delivery's note cited a base commit that still carried a stray `app/9.png`; corrected, code diff unaffected). Delivery Review = Accepted. F00-QA-VISUAL3 is now active: verify the fix and rescore all ten rubric dimensions — QA-01/02/03 evidence is reused by fingerprint, not re-verified. The brief explicitly reminds QA not to repeat Round 2's mistake (a total under 93 must be `Rejected`, per `premium-ui-rubric.md`'s unconditional Verdict Bands — no exception for an already-non-blocking cause).
+F05's code-logic layer was already QA-approved (qa.md, Approved with Notes) against interim smoke content. F06-CONTENT-PROMOTE (2026-09-13) then promoted the real 30-level Journey pack into `content/journey/tr/` (mirrored to `app/assets/journey/tr/`) and fixed a genuine toolchain bug in `content_check.dart` that had never been exercised before. Tech Lead reconciled this 2026-09-26: independently re-verified every claim with its own commands (byte-identical content mirror, the toolchain fix present and regression-tested, `content:check` OK, F05's own strict gate 4/4 including the structural band-rule case for the first time against real content, full `flutter test` 314/314, `looplet_authoring` 20/20) rather than accepting the delivery report's word. Delivery Review = Accepted; F05-QA-STRICT activated — the one remaining gate before F05 can reach Done.
 
 ## Last Completed Action
 
-Tech Lead reconciliation 2026-09-26: independently re-ran analyzer, app-scoped format and the full `flutter test` suite (314/314) on the current working tree; confirmed the diff is exactly the 3 claimed files (75 insertions/1 deletion) with no shipped-surface change; personally reviewed the runtime captures Frontend produced (clean word-boundary wrapping at both 1.65x and ~3.12x, both call sites); found and corrected a base-commit citation error in the delivery's own evidence note (cited `9371468`, which still had the stray `app/9.png`; corrected to `0ec7f46`, the clean commit — the actual code diff is unaffected either way). Delivery Review = Accepted; F00-QA-VISUAL3 activated (QA Result reset to None).
+Tech Lead reconciled F06-CONTENT-PROMOTE 2026-09-26: verified the content promotion, the toolchain fix and the strict gate independently; set Delivery Review = Accepted; locked the QA plan (final, client-only, core+client-ui+stateful-flow, full, allowed) and activated F05-QA-STRICT with a targeted brief.
 
 ## Next Expected Action
 
-Run QA on F00-QA-VISUAL3: verify the QA-04 fix at accessibility-medium and ~3.12x, run the regression set (analyze/format/test/F03 device suite), and rescore all ten rubric dimensions honestly against the rubric's literal per-dimension text — QA-01/02/03 evidence stays fingerprint-valid. A total under 93 must be reported `Rejected`, not `Approved with Notes` (Round 2's mistake). Tech Lead reconciles; only a genuine >= 93 (every dimension >= 8, no fail condition) moves Visual Quality Gate to Passed and opens Phase C. F05-QA-STRICT and F08 local evidence stay queued behind the F00 QA slot.
+Run QA on F05-QA-STRICT: verify the strict-mode gate and structural band rules against the real 30-level bundle with QA's own commands, confirm the prior round's interim-content edge case (N1) is now moot, re-verify all-30-complete/terminal navigation against the real manifest, run full regression, and review the still-open F05.SHARED-RUNTIME (F03/F08 inherited evidence). Tech Lead reconciles the verdict next; only then does F05 close and F08 become the next queued QA feature.
 
 ## Portfolio Summary
 
 * F01, F02, F04, F06: historical scoped Done retained.
 * F03: Done — final QA Approved with Notes (2026-09-21); Visual Scope none covered behaviour/accessibility only; visual surface pending the Design Adoption Route.
-* F00: In QA — cross-cutting Design Foundation track, Visual Scope design-system; Foundation Selected (Direction C, 2026-09-21); QA-01/02/03/04 all fixed and independently confirmed; F00-QA-VISUAL3 active to verify the last fix and rescore honestly against the 93+ bar.
-* F05: In Progress; real strict content delivered (bundle mirrors content/journey); F03 lock released; Tech Lead delivery reconciliation then QA-STRICT queued; final verdict None.
+* F00: Done (2026-09-26) — cross-cutting Design Foundation track, Visual Scope design-system; Foundation Selected (Direction C, 2026-09-21); QA-01/02/03/04 all fixed and independently confirmed, 90/100; Visual Quality Gate Passed via a user-resolved scoped one-time exception (F00.VISUAL-93-THRESHOLD option C, not a rubric change). Design Adoption Route Phase C now unblocked, not yet activated.
+* F05: In QA — the active feature; F05-FE2 code-logic layer already Approved with Notes; real strict content promoted and independently re-verified by Tech Lead 2026-09-26; F05-QA-STRICT active, final verdict None.
 * F08: In Progress, queued; independent local/emulator validation pending, release task Blocked, release/final acceptance pending.
 * F07, F09–F13: Not Started. Pending follow-ons are in workflow-follow-ups.md.
 
@@ -74,7 +74,7 @@ F08.DEPLOY-AUTHORIZATION is OPEN with Blocking Scope = release. The old deferral
 ## Global Risks
 
 * F03-QA-03 / F03-QA-04 are fixed and verified on the real target (F03 final QA); not verified: physical finger, Android, terminal 30/30 bloom under Reduce Motion at runtime.
-* The Design Foundation is Selected and its design-system layer exists (unused by any surface), but its own independent visual QA returned Rejected (accessibility: Dynamic Type overflow/clip, duplicate VoiceOver semantics, missing focus ring) — rework is in progress. Shipped visuals (default font, Material icons, text-only legacy ui-designs, self-scores only) have not passed the independent Visual Quality Gate either. Any surface reopened as visual work will be gated (>= 93 total, every dimension >= 8). See Design Adoption Route.
+* The Design Foundation is Selected and its design-system layer passed independent visual QA 2026-09-26 (90/100, every dimension >= 8, no fail condition) via a user-resolved scoped one-time exception — not a change to the >= 93 generic bar, which still applies to future visual work (F03/F04/F05 conformance in Phase C, and any other feature/rework) unless that feature's own decision gate says otherwise. Shipped visuals (default font, Material icons, text-only legacy ui-designs, self-scores only) still have not passed the independent Visual Quality Gate. See Design Adoption Route.
 * Rotation, AC9 highlight, back/exit and won-moment regular motion passed runtime QA (rev c0cba44); live lifecycle and reduced-motion runtime remain FAIL/pending until the fixes land. Info.plist still allows landscape; the portrait lock rests on runtime behaviour (rotation PASS).
 * Required device/manual evidence is not established by a widget test, build or a planned CI job.
 * Startup/resume/persistence proof is shared by consuming features; reconcile the actual scope before clearing a downstream gate.

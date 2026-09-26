@@ -6,19 +6,27 @@ F00
 
 ## Current Status
 
-Done
+Blocked
 
 ## Current Owner
 
--
+Tech Lead
 
 ## Next Role
 
--
+Tech Lead
 
 ## Active Task Ledger
 
-None
+- [x] Task ID: F00-UI-FOUNDATION | Assigned Role: UI Designer | Status: Done | Summary: DELIVERED 2026-09-21 — project-authority/design-foundation.md (Status Draft, nothing selected): two materially different rendered directions (A Backlit Stage, B Gazette) on identical Play / lifted-row / locked+frozen / Won Perfect + 2★ / Journey home / tutorial states with won-moment stills, device variants, Turkish glyph + tabular + contrast specimens, motion language, recommendation, shipped-surface impact list | Depends On: -
+- [x] Task ID: F00-UI-DIRECTION-C | Assigned Role: UI Designer | Status: Done | Summary: DELIVERED 2026-09-21 — Direction C (Loop Glass) rendered from the user's reference screens on the same states as A/B (+ resolved/literal, sheet/full-screen and semantics alternatives, device variants, specimen with measured contrast) and three reference-frame parity comparisons; design-foundation.md §17 (system, motion, measured tokens, contract conflicts, deviations D1-D11, content-delta table, confirmations needed); A/B recorded as rejected; Status stays Draft | Depends On: F00-UI-FOUNDATION
+- [x] Task ID: F00-UI-FINALIZE | Assigned Role: UI Designer | Status: Done | Summary: DELIVERED 2026-09-21 — selected-source renders for the final decision set (Play, lifted row, locked+frozen, full-screen Result perfect / new best / 2-star, Home design + today, tutorial, device variants), an executable board-to-result transition prototype with timed and reduced-motion stills, a component/token sheet, and the design-system handoff features/f00-design-foundation/ui-design.md (Visual Evidence Manifest with selected-source and motion-prototype records); Foundation stays Selected | Depends On: F00-UI-DIRECTION-C
+- [x] Task ID: F00-FE-DESIGN-SYSTEM | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: DELIVERED 2026-09-21 — app/lib/design layer (tokens, type roles on the bundled Space Grotesk and Manrope variable fonts, 12 drawn icons, Looplet wordmark, Turkish casing helpers, every component in every state) plus the debug-only gallery lib/main_gallery.dart; no shipped surface changed (only tracked change is the pubspec.yaml font declaration, no dependency); analyzer, format, melos test (197 package tests, 305 app tests of which 62 new) and the F03 device suite 13 of 13 green; runtime parity on iPhone 16, 16e and 16 Pro Max beside S-91 with one deviation found and fixed (frozen tile ring and dash rhythm) and the rest listed; evidence in features/f00-design-foundation/frontend.md | Depends On: F00-UI-FINALIZE
+- [x] Task ID: F00-QA-VISUAL | Assigned Role: QA | Status: Done | Summary: DONE 2026-09-21 — verdict Rejected (qa.md; final stage, revision 78b22e3 content, app tree d9709ad): final score 80 of 100, lowest dimension Accessibility 6 of 10; blocking QA-01 (design-system components not Dynamic Type safe — MovesCard overflows from 1.35x, MovesCard and StatCard at the platform floor accessibility-medium, pills and nodes clip at the largest size), QA-02 (duplicate semantic nodes and labels on buttons, badge and disabled link), QA-03 (ui-design §8 focus state not implemented and not declared); QA-04 polish; independent runtime evidence in features/f00-design-foundation/qa/ | Depends On: F00-FE-DESIGN-SYSTEM
+- [x] Task ID: F00-FE-A11Y-REWORK | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: DELIVERED 2026-09-23 — QA-01 (Dynamic Type: MovesCard/StatCard switched fixed height to minHeight + mainAxisSize.min, kept the text-scale cap for width; GlassCard gained a minHeight option; LoopNode/LoopletWordmark kept the cap alone), QA-02 (excludeSemantics: true on _Pressable and LoopBadge — one announced node, not two; UndoPill/LoopNode labels now state quota/state), QA-03 (2 px periwinkle focus ring + Enter/Space activation via FocusableActionDetector, painted with foregroundDecoration so it never shifts layout), QA-04 (caption line-height 1.3, OutlinePill padding); a first cap-only attempt for QA-01 passed every widget test but still overflowed 1.5 pt on a real device at accessibility-medium — found and fixed via a real runtime capture, not by the automated suite; 8 new tests (70 total); analyze/format(app-scoped)/melos test/F03 device suite all green; evidence in frontend.md (F00-FE-A11Y-REWORK section) and design/rework/ | Depends On: F00-QA-VISUAL
+- [x] Task ID: F00-QA-VISUAL2 | Assigned Role: QA | Status: Done | Summary: DONE 2026-09-23 — targeted re-verify scenarios PASSED with real independent evidence: QA-01, QA-02 and QA-03 confirmed RESOLVED (gallery captures at 1.65x and 3.12x incl. the CARDS/STATS/TRACK gap Frontend flagged as test-only; a rebuilt semantics probe, 85 nodes, zero duplicate pairs; a new independent focus-ring widget test across 3 control shapes incl. UndoPill); zero regression (313 app tests, F03 13/13, fresh cold launch). Rescored 88/100 (was 80) — Tech Lead reconciliation corrected the reported QA Result from Approved with Notes to Rejected: premium-ui-rubric.md §Verdict Bands is unconditional ("85–92: zorunlu rework"; "92 ve altı Approved with Notes ile geçirilemez") with no carve-out for an already-non-blocking gap; QA's Round 2 Findings text was also found to be stale on 2 of QA-04's 3 items (caption line-height and OutlinePill padding are already fixed in code, confirmed directly — only the display/headline mid-word-wrap item is genuinely still open) | Depends On: F00-FE-A11Y-REWORK
+- [x] Task ID: F00-FE-A11Y-REWORK2 | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: DELIVERED 2026-09-26 — the one genuinely remaining QA-04 item fixed: `display`/`headline` roles now require `textScaler: loopCappedTextScaler(context)` at their 3 gallery call sites (documented in `typography.dart`, same pattern as `MovesCard`/`StatCard`/`LoopNode`/`LoopletWordmark`), so no word can outgrow the line and force a mid-word break at extreme OS text scale. Real runtime capture at both accessibility-medium (1.65x) and accessibility-extra-extra-extra-large (~3.12x) on iPhone 16 confirms clean word-boundary wrapping at both scales, both call-site instances (`_TypeRoles` specimen and the journey `GlassCard`); +1 widget test (314 total); analyze/format(app-scoped)/melos test/F03 device suite all green. QA-01/02/03 untouched. Evidence in frontend.md (F00-FE-A11Y-REWORK2 section) | Depends On: F00-QA-VISUAL2
+- [x] Task ID: F00-QA-VISUAL3 | Assigned Role: QA | Status: Done | Summary: DONE 2026-09-26 — verdict Rejected (qa.md § F00-QA-VISUAL3; mechanical, per premium-ui-rubric.md's unconditional Verdict Bands): QA-04's remaining item (display/headline mid-word-wrap at extreme OS text scale) confirmed RESOLVED with fresh own runtime evidence at 1.65x and ~3.12x, both call sites, identical clean two-line rendering at both scales; zero regression (314 tests, F03 13/13). Rescored 90/100 (was 88) — Typography 8->9 and Implementation Fidelity 9->10 (QA-04 fully closed, no known remaining defect), eight dimensions reused by fingerprint or held for genuine, specific, still-open reasons (Motion capped by the rubric's own dimension-7 text; Layout/Interaction/Accessibility each held by a real, named verification gap this environment cannot close: partial iOS accessibility-category sweep, no real hardware keyboard, no VoiceOver speech pass). Every dimension >= 8, no fail condition, but total still short of 93. Key finding, distinct from Round 2's mistake: the shortfall is no longer reducible to one non-blocking item — it may be structurally out of reach for this design-system-only, pre-Phase-D scope under this environment's own testing limits (no physical device, no VoiceOver), regardless of further code fixes. Flagged explicitly for Tech Lead; no further code fix proposed this round | Depends On: F00-FE-A11Y-REWORK2
 
 ## Open Tasks
 
@@ -42,7 +50,7 @@ final
 
 ## QA Result
 
-Approved with Notes
+Rejected
 
 ## Release Scope
 
@@ -62,11 +70,7 @@ ai-system/project-authority/design-foundation.md
 
 ## Visual Quality Gate
 
-Passed
-
-## Visual Gate Exception
-
-F00.VISUAL-93-THRESHOLD
+Ready for QA
 
 ## Visual Evidence
 
@@ -149,17 +153,15 @@ allowed
   * Recommendation: C
   * Blocks: Visual Quality Gate = Passed; F00 Done; the F05-QA-STRICT / F08 QA queue (per "one QA feature at a time")
   * Blocking Scope: feature
-  * Status: RESOLVED
-  * Resolution: C — the user chose the scoped, one-time exception. F00's Visual Quality Gate is set to `Passed` and QA Result to `Approved with Notes` on this explicit basis: every named defect (QA-01/02/03/04) is fixed and independently confirmed; the score (90/100, ~91 with the closed accessibility-category gap) falls short of the generic 93 line solely because of `premium-ui-rubric.md`'s own unconditional Motion cap (dimension 7) and two verification methods (real hardware keyboard, VoiceOver speech pass) this session's tools cannot drive — not because of any remaining code defect. This is recorded as a one-off for F00's specific carrier/no-screen scope and this environment's specific tooling limits; it does not amend `premium-ui-rubric.md`/`visual-quality-gate.md` and is not precedent for other features without its own explicit decision.
-  * Resolved At: 2026-09-26
+  * Status: OPEN
 
 ## Blockers
 
-None
+F00.VISUAL-93-THRESHOLD open (Blocking Scope: feature) — no executable code/QA task remains until resolved; independent F05/F08 work is not itself blocked by this gate but its QA activation is queued behind F00's slot.
 
 ## Next Action
 
--
+Awaiting the user's decision on F00.VISUAL-93-THRESHOLD (see Open Decision Gates): `Run Tech Lead. Decision: F00.VISUAL-93-THRESHOLD — <A/B/C>`. No executable code or QA task remains — every named defect is fixed; the residual gap under the generic 93 line is the rubric's own unconditional Motion cap plus two verification methods this session cannot drive. F05-QA-STRICT and F08 stay queued behind F00's QA slot until this resolves.
 
 ## Last Decision
 
@@ -167,13 +169,11 @@ Full history through 2026-09-26 (Direction A/B rejection, Foundation Selected, d
 
 2026-09-26 (F00-QA-VISUAL3 reconciliation) — Tech Lead credited QA's Rejected verdict (90/100, correct per the rubric's unconditional Verdict Bands) and personally verified QA's own cited "structural" gaps rather than accepting the label at face value: ran `xcrun simctl ui content_size` and found the real category list (12 total: 7 standard + 5 `accessibility-*`); every prior round had only captured runtime evidence at 2 of the 5 accessibility categories. Captured the 3 untested ones fresh (iPhone 16, `_TypeRoles` specimen + `CARDS, STATS, TRACK` section) — clean at all three, no overflow, no mid-word break (F00.VISUAL-93-GAP-CHECK). This closes one of QA's three cited gaps; the other two (real hardware keyboard, a VoiceOver speech pass) remain genuinely outside this session's tools (would need physical hardware or a macOS GUI accessibility app this session cannot drive). Realistic ceiling given Motion's unconditional dimension-7 rubric text plus the two remaining genuine gaps: ~91/100 — still short of 93, by design-scope and by tooling, not by any remaining code defect. Opened decision gate `F00.VISUAL-93-THRESHOLD` (recommendation C: a scoped, one-time exception for F00, not a rubric rewrite) and routed to the user rather than deciding unilaterally, since option B would mean silently rewriting a document marked NORMATIVE / REUSABLE CORE with consequences for every future similarly-scoped feature. Current Status set to Blocked (no executable code/QA task remains).
 
-2026-09-26 (F00.VISUAL-93-THRESHOLD resolved; full pre-closure snapshot archived: [orchestration-before-closure.md](../../history/f00-design-foundation-2026-09-26/orchestration-before-closure.md)) — the user chose option C, the scoped one-time exception. Tech Lead recorded the resolution on the decision gate, set `Visual Quality Gate: Passed` and `QA Result: Approved with Notes` on that explicit basis (not a rubric rewrite, not silent — the full reasoning is on the decision gate itself and in qa.md's own Rejected verdict, left untouched as the honest historical QA record). Ran full Terminal Cleanup per role-execution-contract.md §6: Active Task Ledger and Handoff Plan cleared to None (9-task history preserved in the Change Log below and in `history/f00-design-foundation-2026-09-26/orchestration-before-closure.md`), Owner/Next Role/Next Action set to `-`, Blockers cleared, Current Status set to `Done`. F00 is Done — the first feature carrying a Visual Scope other than `none` to close under the rubric-based visual gate. Design Adoption Route Phase C (conformance audit of the F03/F04/F05 surfaces against the now-Passed Foundation) is unblocked but **not** activated in this turn — it needs its own planning pass, not a same-turn side effect of closing F00. F05-QA-STRICT (delivery reconciliation, then QA) is the immediate next queued item.
-
 ## Last Update
 
 * Updated By: Tech Lead
 * Timestamp: 2026-09-26
-* Summary: User resolved F00.VISUAL-93-THRESHOLD with option C (scoped one-time exception). Visual Quality Gate set to Passed, QA Result to Approved with Notes, both explicitly reasoned on the decision gate. Full Terminal Cleanup applied — F00 is Done.
+* Summary: F00-QA-VISUAL3 reconciled (Rejected credited, 90/100). Personally verified QA's cited gaps rather than accepting them as-is: closed one (partial iOS accessibility-category sweep — captured the 3 untested categories fresh, all clean); the other two (real hardware keyboard, VoiceOver speech pass) confirmed genuinely outside this session's tools. Opened decision gate F00.VISUAL-93-THRESHOLD (3 options, recommendation C) and routed to the user rather than silently resolving a NORMATIVE-document question. Current Status = Blocked; no executable task remains pending the decision.
 
 ## Context & Follow-ups
 
@@ -209,11 +209,10 @@ Why now: the ai-system upgrade (cfd6b59) made an independent visual gate (>= 93 
 * 2026-09-26 — Tech Lead: F00-FE-A11Y-REWORK2 reconciled (task coverage, contract compliance and evidence independently re-verified; a base-commit provenance mistake found and corrected, code diff unaffected); Delivery Review = Accepted; F00-QA-VISUAL3 activated for the QA role; QA Result reset to None.
 * 2026-09-26 — QA: F00-QA-VISUAL3 Done with verdict Rejected (qa.md: QA-04's remaining item confirmed RESOLVED with fresh own runtime evidence, zero regression, rescored 90/100 of 100, every dimension >= 8, no fail condition; key finding — the shortfall is no longer one fixable item, it combines the rubric's unconditional Motion cap with real environment-testing limits this project currently cannot close); F00.VISUAL-QA3 PASS (mandated scope); QA Result Rejected; owner -> Tech Lead.
 * 2026-09-26 — Tech Lead: F00-QA-VISUAL3 reconciled; personally verified QA's cited gaps (closed the accessibility-category sweep gap with fresh evidence; confirmed the other two are genuinely outside this session's tools); opened decision gate F00.VISUAL-93-THRESHOLD and routed to the user; Current Status = Blocked; owner/next stay Tech Lead.
-* 2026-09-26 — Tech Lead: user resolved F00.VISUAL-93-THRESHOLD (option C, scoped one-time exception); Visual Quality Gate = Passed; QA Result = Approved with Notes; Terminal Cleanup applied (ledger/handoff cleared, owner/next/action = -); F00 Done.
 
 ## Current Brief
 
-None — F00 is Done. Terminal cleanup complete.
+None active — awaiting the user's decision on F00.VISUAL-93-THRESHOLD (Open Decision Gates). No implementation task is open.
 
 ## Earlier briefs
 
