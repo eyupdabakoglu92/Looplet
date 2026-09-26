@@ -278,3 +278,174 @@ Run Tech Lead
 * **F05 is code-complete + QA-passed against the interim `mode:"smoke"` content.** It is **not yet `Done`** — `architecture.md §5.5` / §17 gate `Done` on `F06-CONTENT` (the 30 authored levels + a `mode:"strict"` `journey_manifest_tr.json`) delivered + the strict gate green. This is the F08 shape (code-complete, parked on an external deliverable). Recommend: F05 → `In Progress` (or a "code-complete, awaiting content" state) with the `F06-CONTENT` decision surfaced to the user as it was at F05.CONTRACT-TL; do **not** activate the next feature until F05 closes (Retro Bug / Rework Control — the rework is done, but F05 is still the active feature).
 * **Non-blocking notes for the change log:** N1 (interim `continueTarget = 6` edge — a `F06-CONTENT` content gap, not a code defect; optional cheap clamp available); N2 (pulse is a one-directional swell vs symmetric ±6 % — cosmetic); N3 (`routeLog` exact-match in `journey_next_level_test.dart` — relax if CI-flaky; `canPop()` is the primary proof); N4 (device feel of the new ring motion → deferred first-app-distribution smoke). None need a rework turn.
 * `orchestration.md` updated: F05-QA re-verify closed `Approved with Notes`; Blockers aligned (the F05-QA blocker removed; `F06-CONTENT` + the strict gate remain the `Done` prerequisites). Global `feature-board.md` / `system-state.md` sync is Tech Lead's.
+
+---
+
+# F05 — journey-progression: QA Raporu (F05-QA-STRICT, 2026-09-26)
+
+> Final-stage, client-only. Aday: HEAD `6fb2d23`, temiz çalışma ağacı. QA plan alanları Tech Lead'in kilitlediği gibi kullanıldı. Yukarıdaki bölümler (F05-FE2 turu, 2026-09-09) tarihsel kayıttır; bu bölüm onların üzerine eklenir. QA probe'ları repo dışında (session scratchpad `qa-f05/`) tutuldu; repoya dosya eklenmedi.
+
+## 0. QA Execution Plan
+
+* **Stage / Scope:** `final` / `client-only`.
+* **Modules + trigger:** `core, client-ui, stateful-flow`. Tetikleyiciler: gerçek strict içerik ve `content_check.dart` düzeltmesi (content gate), home/CONTINUE/terminal yüzeyi (client-ui), ilerleme, aktif oturum ve süreç ölümü/yeniden açılış (stateful-flow).
+* **Regression Depth:** `full`. İçerik ve araç değişikliğine ek olarak F05'in kendi dosyaları (`home_screen.dart`, `column_tutorial_overlay.dart`) ve 6 paylaşılan play/rating dosyası önceki F05 QA commit'inden (`345147e`) beri değişti.
+* **Evidence Reuse:** `allowed`, parmak izi kontrollü. Brief'teki "F05-FE2 kanıtı fingerprint-valid" iddiası doğru değil: yukarıdaki 8 dosya değişti, bu yüzden etkilenen suite'ler bu turda yeniden koşuldu (QS-06). F03 final QA runtime kanıtı (`51497dd`) paylaşılan play yolu için geçerli. Son `app/lib/play` değişikliği olan `cf747f8`, `51497dd`'nin atası. `51497dd..HEAD` aralığında `lib/play`, `lib/rating`, `lib/persistence`, bootstrap, main ve router değişmedi.
+* **Canonical target / runtime class:** architecture §15 gereği `automated functional` zorunlu; cihaz runtime'ı F05 kapısı değil. İsteğe bağlı ad-hoc runtime yine de kaydedildi: iPhone 16 simülatörü `D0011CE7…`, content size `large`, `flutter build ios --simulator --debug -t lib/main.dart` ve temiz kurulum.
+* **Fail-fast checkpoint:** Build, analyze ve testler yeşil olduğu için fail-fast tetiklenmedi. Gate kapsam açığı bir finding olarak kaydedildi; verdict eksiksiz olsun diye kapsamın tamamı koşuldu.
+
+## 1. Evidence Ledger
+
+| Evidence ID | Claim / Scenario | Class | Command / Action | Target | Result / Counts | Provenance / Fingerprint | Isolation |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| QS-01 | Her seviye için §5.4 R1–R6, 2026-09-13 kullanıcı kararı (1–3 `optimalMoves == 2`), id/numara/tip, sha256 ve manifest etiketi | automated functional (bağımsız probe) | `python3 band_probe.py <ağaç>` | `content/journey/tr` ve `app/assets/journey/tr` | 30/30, **0 ihlal** (iki ağaçta da) | EXECUTED THIS RUN · `HEAD:content/journey` = `HEAD:app/assets/journey` = git tree `057f242b` | scratch, repo dışı |
+| QS-02 | `content:check` hangi bant kuralını gerçekten reddediyor? | automated functional (negatif) | gerçek CLI: `dart run bin/looplet_authoring.dart check <content kopyası> --repo-root <repo>`; 1 kontrol + 8 tek-dosya mutasyonu | `content/` kopyası | kontrol: exit 0 · R1 L02: exit 1 (açık kural) · R2 L07: exit 1 (**tesadüfi**, `unsolvable`) · R3 L17: exit 1 (**tesadüfi**, `budgetExceeded`) · **R4 L22: exit 0** · **R5 L28: exit 0** · R6 L28: exit 1 (açık kural) · L17 `optimalMoves 9` (gerçek 4): exit 1 · **aynı dosya + `"levels": []`: exit 0** | EXECUTED THIS RUN · `tools/looplet_authoring` tree `4d301d0c` | geçici kopya, sonra silindi |
+| QS-03 | F05 gate'i (`runJourneyManifestGate`) bant ihlalini reddediyor mu? | automated functional (negatif) | `flutter test …/f05_gate_negative_test.dart`: gerçek gate çalışıyor, mutasyonlu asset'lerin checksum'ları yeniden hesaplanıyor | gerçek strict manifest + tek mutasyon | kontrol PASS · R1, R4, R5 ve R6 ihlallerinin hepsi `JourneyGateReport(passed: true, violations: [])` döndü | EXECUTED THIS RUN · `app/test/journey` tree `7b5b2787` | bellek içi |
+| QS-04 | Gate ve CI kaynak eşlemesi | source review (yardımcı) | okuma | HEAD `6fb2d23` | `journey_manifest_gate_test.dart:75-80`: bant testinin gövdesi boş (`if (!manifest.isStrict) return;`) · `journey_gate_support.dart:37-39`: "not enforced here", bant alanlarına 0 referans · `content_check.dart:45`: `levels` anahtarı görülünce `continue` · `ci.yml:54-57`: `Content check` adımı engelleyici | — | — |
+| QS-05 | Statik kapılar | automated | `flutter analyze` (app) · `dart format --output=none --set-exit-if-changed app` | app | analyze: No issues found · format: 110 dosya, 0 değişiklik, exit 0 | EXECUTED THIS RUN | — |
+| QS-06 | Uygulama regresyonu | automated functional | `flutter test test/journey test/rating` · `flutter test` | app | **73/73** · **314/314** | EXECUTED THIS RUN (geçersizleşen F05-FE2 parmak izinin yerine) | Drift bellek içi |
+| QS-07 | Paket regresyonu | automated | `melos exec --no-flutter -- dart test` · `tools/looplet_authoring`: `dart test` | 6 paket | core 22 · dictionary 32 · engine 83 · content 17 · solver 23 · authoring 20 = **197/197** · authoring tekrar koşusu 20/20 | EXECUTED THIS RUN | — |
+| QS-08 | Paylaşılan play yolu, cihaz suite'i | runtime | `flutter test integration_test -d D0011CE7…` | iPhone 16 sim | **13/13** | EXECUTED THIS RUN | simülatör |
+| QS-09 | Gerçek paketle 30 seviyelik kampanya, 30 → terminal ve terminalin yeniden kullanımı; STRICT-3'ün otomatik yeniden üretimi | automated functional | `flutter test …/f05_real_campaign_probe_test.dart`: gerçek derlenmiş paket baytları `rootBundle` ile okunuyor; gerçek `JourneyContentRepo`, `JourneyProgressRepo`, `PlaySessionScreen`, `HomeScreen` ve GoRouter kullanılıyor | gerçek paket | **7/7.** A1: strict, 30 ardışık seviye · A2: 30/30 seviye `loadLevel` ile yüklendi · A3: `nextJourneyLevel` 1..29 için n+1, 30 için null · B: 1..30 ilerleme, CONTINUE hedefi hiçbir zaman `locked` değil, 30'da `allComplete`, tekrar oynama idempotent · C: L30 gerçek içerikle 4 hamle geri yüklendi (çözücü yolu `R4 U1 U2 U2`), son hamle `D3` gerçek sürüklemeyle yapıldı, seviye kazanıldı; `SONRAKİ` → `TAMAMLANDI` + `TEKRAR OYNA`; L31 rotası yok; 30/30 kalıcı; aktif oturum temizlendi; `TEKRAR OYNA` → L1, ilerleme korundu · D1/D2: aşağıda QS-12 | EXECUTED THIS RUN · L30 çözüm yolu `looplet_authoring solve drafts/journey/_defs/journey-tr-30.def.json` ile alındı (def ile yayımlanan asset'in grid, locked ve frozen alanları aynı) | Drift bellek içi |
+| QS-10 | Ad-hoc cihaz yolculuğu: gerçek içerik, kazanma, ilerleme, geri, kalıcılık | runtime (isteğe bağlı, §15) | temiz kurulum → home 0/30 "Seviye 1" → L1 2 hamlede çözüldü (ASLAN) → panel 3★, `SONRAKİ` birincil → L2 → geri → doğrudan home (pushReplacement) → `simctl terminate` + launch → 1/30 kalıcı | iPhone 16 sim | PASS | EXECUTED THIS RUN · ekran görüntüleri rt01–rt07 | simülatör, temiz uygulama verisi |
+| QS-11 | AC7: süreç ölümünden sonra kalınan yerden devam | runtime | L2'de 1 hamle (4. satır `MBADE`) → terminate (PID 27337 sonlandı) → launch (PID 27839) → home "Seviye 2 · sürüyor" + camgöbeği düğüm → `DEVAM ET` → L2: `MBADE`, **1 HAMLE**, geri al etkin → 1 hamle daha → çözüldü, "2 SEN = 2 OPTİMAL" | iPhone 16 sim | PASS: grid, hamle sayısı ve geri al geçmişi korundu | EXECUTED THIS RUN · rt08–rt11 | simülatör |
+| QS-12 | Aynı kalıcı durum oturum içinde ve yeniden açılıştan sonra farklı home/CONTINUE gösteriyor | runtime + automated | **Runtime:** L2 çözüldü → `Yeniden` → 1 hamle → geri → home **"Seviye 3"** (rt14) → CONTINUE'ya dokunmadan terminate/launch (PID 28957) → **"Seviye 2 · sürüyor"** + devam düğümü (rt15). Ön-sınır örneği: rt06 "Seviye 2" ↔ rt07 "Seviye 2 · sürüyor". **Automated:** QS-09 D1'de sıcak `[Seviye 2]` ↔ soğuk `[Seviye 2 · sürüyor]`; D2'de sıcak `[Seviye 3]` ↔ soğuk `[Seviye 2 · sürüyor]` | iPhone 16 sim + widget | **FAIL** (§6) | EXECUTED THIS RUN | simülatör / bellek içi |
+| QS-13 | QS-12'nin kök nedeni | source review (yardımcı) | okuma | HEAD `6fb2d23` | `journey_progress.dart:83-94`: provider yalnız `journey_progress` tick'inde yayın yapıyor, snapshot'ı tick başına bir kez okuyor · `home_screen.dart:451-469`: CONTINUE bayat `continueTarget` değerini kullanıyor · `play_session_controller.dart:107-109`: yeni oturum açılır açılmaz tek slotlu snapshot'ı yazıyor · `:562`: geri yükleme yalnız `puzzleId` eşleşirse yapılıyor | — | — |
+| REUSED | F03: rotasyon, geri, görsel, yaşam döngüsü (paylaşılan play yolu) | runtime | F03 final QA (Approved with Notes) | — | PASS | REUSED · `51497dd` (2026-09-21); parmak izi geçerli (§0) | — |
+| INVALIDATED | F05-FE2 kanıtı: `home_screen.dart`, `column_tutorial_overlay.dart` + 6 paylaşılan play/rating dosyası | — | `git diff --name-only 345147e HEAD` | — | yerini QS-06 aldı | — | — |
+| INVALIDATED | F06-CONTENT-PROMOTE ve `F06.CONTENT-PROMOTE-RECONCILE`: "strict gate 4/4, structural band-rule case dahil" | — | QS-03, QS-04 | — | Bant testinin gövdesi boş, dolayısıyla bant kuralları için **PASS sayılamaz** (yanlış atıf: `frontend.md:302`, `:320`, `:340`) | — | — |
+
+## 2. Acceptance & Critical Journey Coverage
+
+| AC / Journey | Expected | Evidence IDs | Result |
+| --- | --- | --- | --- |
+| AC1 | N, yıldız sayısından bağımsız tamamlanınca N+1 açılır | QS-06, QS-09 B/C, QS-10 | PASS |
+| AC2 | Kilitli seviyeye gezinme yok | QS-06 (no-nav-to-locked), QS-09 B | PASS (yapısal; kilit göstergesi `[DEFERRED — F10]`) |
+| AC3 | 1–3: yalnız satır hamlesi; optimal = 2 (2026-09-13 kullanıcı kararı) | QS-01, QS-10 (L1 ve L2 yalnız satırla, 2'şer hamlede) | PASS (içerik). CI koruması: R1 `content:check` ile sağlanıyor (QS-02) |
+| AC4 | 4–6: sütun hamlesi + mikro-öğretici | QS-06 (`column_tutorial_test`), QS-01 (R2) | PASS (içerik + davranış). R2 için regresyon koruması güvenilir değil → STRICT-1 |
+| AC5 | 7–10: satır + sütun, optimal 4–6 | QS-01 (sütun açık; `optimalMoves` her seviyede 4) | PASS |
+| AC6 | 11–15 / 16–20 / 21–25 / 26–30 mekanikleri | QS-01 (R3–R5 sağlanıyor) | PASS (içerik; 11–15 notu için §6'ya bakın). R3–R5 için koruma yok → STRICT-1 |
+| AC7 | Devam eden seviye, CONTINUE ile kaydedilen durumdan sürer | QS-11 ve QS-09 C (soğuk/yeniden açılış yolu PASS); QS-12 (oturum içi tekrar oynama yolu FAIL) | **FAIL (kısmi)** → STRICT-3 |
+| AC8 | Devam eden seviye yoksa en düşük açık ve tamamlanmamış seviye | QS-06, QS-09 B, QS-10 | PASS |
+| AC9 | 30 seviyenin tamamı bitince terminal, çökme yok | QS-09 C (gerçek paket), QS-06 | PASS |
+| AC10 | İlerleme göstergesi görünür ve doğru | QS-10 (1/30, 2/30), QS-09 C (terminal) | PASS (sayım). Oturum içinde devam durumu gösterilmiyor → STRICT-3 |
+| AC11 | Force-quit sonrası öğretici yeniden gösterilir | QS-06 (`column_tutorial_test` AC11 zinciri) | PASS |
+| AC12 | N<30 → N+1; N==30 → terminal | QS-09 A3/C (gerçek manifest), QS-10 (runtime L1→L2; geri tuşu doğrudan home'a) | PASS |
+| AC13 | 1★'da da `Next Level` görünür | QS-06 (`completion_cta_weighting_test`) | PASS |
+| AC14 | Ağsız: paketlenmiş içerik + yerel kayıt | QS-09 A2; kaynak: Journey ve play yolunda ağ çağrısı yok, `bootstrap.dart` önce yereli hazırlıyor, Firebase hataları yakalanıyor | PASS (automated functional + yapısal). Ağsız cihaz koşusu burada yapılamadı; F08'in kendi kaydı `F08.OFFLINE-JOURNEY`'de (PENDING) izleniyor. §15'e göre F05 kapısı değil |
+| N1 (önceki turun notu) | Ara içerikteki uç durum | QS-01, QS-09 A3/B | **Moot, kapatıldı.** Manifest 1..30 ardışık olduğu için `continueTarget` artık paketin ötesini gösteremez |
+| Negatif: bant ihlalli strict paket | CI'da reddedilmeli (§15) | QS-02, QS-03 | **FAIL** → STRICT-1 |
+| Negatif: `levels` anahtarı taşıyan puzzle dosyası | yine doğrulanmalı | QS-02 | **FAIL** → STRICT-2 |
+| Misuse: tamamlanmış seviyeyi tekrar oynama | ilerleme şişmez, yeniden kilitlenmez | QS-09 B, QS-12 (2/30 sabit kaldı) | PASS |
+
+## Client & UI Compliance
+
+| Kontrol | Beklenen | Evidence | Sonuç |
+| --- | --- | --- | --- |
+| Home: yeni / orta / terminal | Sayaç, CONTINUE hedefi, `TAMAMLANDI` ve `TEKRAR OYNA` | QS-10 (rt01, rt06), QS-09 C | PASS |
+| Home: devam eden, soğuk açılış | "Seviye N · sürüyor" + camgöbeği düğüm | QS-11 (rt09), QS-12 (rt15), QS-09 C | PASS |
+| Home: devam eden, oturum içi | Soğuk açılışla aynı görünüm (§6, ui-design) | QS-12 (rt06, rt14), QS-09 D1/D2 | **FAIL** → STRICT-3 |
+| CompletionPanel CTA ağırlığı | 3★ → amber `SONRAKİ`; hayalet `Yeniden`; `Kapat` | QS-10 (rt04), QS-11 (rt11), QS-06 | PASS |
+| Next Level geçişi | `pushReplacement`; geri tuşu doğrudan home'a | QS-10, QS-06 | PASS |
+| Debug kısayolları | Yalnız debug build'de | `home_screen.dart:65` (`kDebugMode`) | PASS |
+
+Visual Scope tanımlı değil. Premium puanlama yapılmadı; F05 yüzeyinin Foundation'a uyumu Design Adoption Route Phase C'de değerlendirilecek.
+
+## Stateful Flow & Integration
+
+| Boundary / Transition | Actor / Start State | Expected | Evidence IDs | Result |
+| --- | --- | --- | --- | --- |
+| Soğuk açılış, boş durum | Yeni kurulum | 0/30, CONTINUE → L1 | QS-10 | PASS |
+| Soğuk açılış, kalıcı ilerleme | 1/30 → kill/relaunch | 1/30, "Seviye 2" | QS-10 | PASS |
+| Seviye ortasında süreç ölümü → devam | L2, 1 hamle | Grid, hamle ve geri al aynen döner | QS-11 | PASS |
+| Kazanma commit'i → altta mounted home | L30 kazanıldı | Home terminal durumuna geçer | QS-09 C | PASS |
+| Kazanma anı: snapshot `completed` → `markCompleted` | Kazanma | Tick anında devam eden seviye kalmaz | QS-10 ("Seviye 2", "sürüyor" yok), QS-09 C (aktif oturum `null`) | PASS (`completed` durumu `markCompleted`'dan önce kuyruğa alınıyor) |
+| Oyun oturumunun snapshot yazması → mounted home | Ön-sınır L2 başlatıldı / tamamlanmış L2 tekrar oynanıyor | Home devam durumunu ve CONTINUE hedefini yansıtır (§6) | QS-12, QS-09 D1/D2 | **FAIL** → STRICT-3 |
+| Tek slotlu snapshot'ın üzerine yazma | Tekrar oynama sürerken oturum içi CONTINUE (L3) | Tekrar oynamanın kaydı korunur ya da hedef tekrar oynanan seviye olur | QS-12 (hedef "Seviye 3") + `play_session_controller.dart:107-109` | FAIL (kaynaktan çıkarım; rt15 kanıtını korumak için cihazda L3'e dokunulmadı) |
+| Tam döngü + terminal yeniden kullanımı | 1..30 | 30'da terminal; `TEKRAR OYNA` → L1; ilerleme korunur | QS-09 B/C | PASS |
+| Idempotency | Tamamlanmış seviyeyi yeniden kazanma | İlerleme değişmez | QS-09 B, QS-06 (`journey_unlock_flow_test`) | PASS |
+
+## 3. Findings
+
+**F05-QA-STRICT-1: Strict build gate'i yapısal bant kurallarını uygulamıyor; teslimat kanıtı yanlış atıflı**
+* Severity / Type: High / validation defect (sözleşme ihlali). **Blocking.**
+* İlgili: architecture §5.4 (satır 102 ve 106), §15 "Build gate" (satır 228); AC3–AC6'nın regresyon koruması; F06-CONTENT-PROMOTE; brief madde 1.
+* Expected: `mode:"strict"` bir pakette bant ihlali varsa gate CI'ı düşürür. F05 gate testi strict modda R1–R5 (ve R6) için gerçek assertion taşır.
+* Actual: `journey_manifest_gate_test.dart:75-80`'in gövdesi boş; strict modda hiçbir şey assert edilmiyor. `runJourneyManifestGate` bant alanlarını hiç okumuyor. Gerçek kapsam (QS-02, QS-03):
+  * R1 ve R6 yalnız `content:check` ile korunuyor (CI'da engelleyici).
+  * R2 ve R3 yalnız tesadüfen reddediliyor (`unsolvable` / `budgetExceeded`); çözülebilir kalan bir ihlal geçer.
+  * **R4 ve R5 hiçbir kapıda reddedilmiyor.**
+* Yanlış atıf: `frontend.md:302` ("`difficultyLabel` in the strict-mode band rule … 4/4 pass"), `:320` ve `:340`. Aynı iddia `F06.CONTENT-PROMOTE-RECONCILE`, `system-state.md` ve `feature-board.md` içinde de tekrarlanıyor.
+* Mevcut içeriğe etkisi yok: 30 seviyenin hepsi kurallara uyuyor (QS-01). Risk, ileride yapılacak bir içerik düzenlemesinin R2–R5'i fark edilmeden bozması.
+* Tekrarlama: QS-02 (L22 veya L28 frozen hücresi silinince `content:check` exit 0) ve QS-03 (R1/R4/R5/R6 ihlali F05 gate'inden `passed: true` ile geçiyor).
+* Öneri (root-cause: Frontend/Mobile Developer + content toolchain; karar Tech Lead'in): R1–R6 için tek bir kural kaynağı (ör. `runJourneyManifestGate` içinde), strict testte gerçek assertion ve her kural için reddedilmesi beklenen sentetik negatif test. `content:check`'e R2–R5 eklenip eklenmeyeceğine ya da F05 gate'inin tek otorite olarak belgelenmesine Tech Lead karar verir. Teslimat artifact'ındaki yanlış atıf düzeltilmeli.
+
+**F05-QA-STRICT-2: `content:check`'teki `levels` anahtarı ayırt edicisi puzzle doğrulamasını atlatılabilir kılıyor**
+* Severity / Type: Medium / validation defect. STRICT-1 ile aynı rework paketinde düzeltilmeli.
+* İlgili: F06-CONTENT-PROMOTE araç düzeltmesi (`content_check.dart:45`); evidence standardındaki "ayırt edici ve bypass dalları negatif örnekle test edilmeli" kuralı.
+* Expected: Yalnız gerçek Journey manifesti atlanır. Puzzle artifact'ları her zaman çözücüyle yeniden doğrulanır.
+* Actual: Herhangi bir JSON'a `"levels": []` eklenince çözücü, eligibility, R1/R6 ve dedup kontrollerinin hepsi atlanıyor. L17'de `optimalMoves 9` (gerçek değer 4) anahtarsız exit 1 veriyor, anahtarla **exit 0** veriyor (QS-02). Eklenen regresyon testi yalnız pozitif durumu kapsıyor; negatif dal test edilmemiş.
+* Öneri: Ayırt ediciyi sıkılaştırın (ör. manifest şeklinin tamamı — `schemaVersion`, `mode`, `lang`, `levels` — ve/veya dosya adı `journey_manifest_<lang>.json`). Şekli bozuk manifest hata üretsin. Negatif test ekleyin.
+
+**F05-QA-STRICT-3: Home read-model oturum içinde aktif oturum snapshot'ını yeniden okumuyor; devam durumu görünmüyor ve tekrar oynamada CONTINUE hedefi sapıyor**
+* Severity / Type: Medium / implementation defect (§6 sözleşmesi + AC7'de kısmi ihlal). **Blocking:** AC7 ihlali var; bu rework'te düzeltilmeli ya da Tech Lead açık gerekçeyle karar vermeli.
+* İlgili: AC7, AC10; architecture §6 (satır 132–135); ui-design'daki devam durumu (camgöbeği düğüm, nabız, "· sürüyor"); stateful-flow modülündeki "stale state" kontrolü.
+* Expected: §6'ya göre `inProgress`, `inProgress` durumundaki bir journey snapshot'ıdır; tamamlanmış seviye için istisna yoktur. CONTINUE hedefi devam eden seviyedir. Aynı kalıcı durum, süreç ne kadar süredir çalışıyor olursa olsun aynı home'u üretmelidir.
+* Actual: `journeyProgressModelProvider` yalnız `journey_progress` tick'inde yayın yapıyor (`journey_progress.dart:83-94`). Home, push edilen `/play` rotasının altında mounted kaldığı için oyun oturumunun snapshot yazımları home'a hiç yansımıyor.
+  * (a) **Ön-sınır yolu (en yaygın akış):** Seviyeye başlayıp geri dönünce home'da "· sürüyor" yazısı, camgöbeği düğüm ve nabız görünmüyor; yeniden açılışta görünüyor (rt06 ↔ rt07; QS-09 D1). CONTINUE yine doğru seviyeye gidiyor ve `puzzleId` eşleştiği için durum geri yükleniyor. İşlevsel etki yok, ama durum gösterimi yanlış.
+  * (b) **Tekrar oynama yolu:** Tamamlanmış L2 → `Yeniden` → 1 hamle → geri. Oturum içi CONTINUE hedefi **L3** ("Seviye 3"); aynı durum yeniden açılıştan sonra **"Seviye 2 · sürüyor"** gösteriyor (rt14 ↔ rt15; QS-09 D2). Oturum içi CONTINUE'ya basılırsa L3'ün yeni oturumu tek slotlu snapshot'ın üzerine yazar (`play_session_controller.dart:107-109`) ve tekrar oynamanın ilerlemesi sessizce kaybolur (kaynaktan çıkarım). 1–2★ sonucunda birincil CTA `Yeniden` olduğu için bu akış gerçekçi.
+* Test açığı: `journey_home_test.dart`'taki devam eden varyantı snapshot'ı home kurulmadan önce yazıyor; yani yalnız soğuk yolu test ediyor. Önceki turun AC7 ve N1 PASS'leri bu yolu kapsamıyordu.
+* Öneri (root-cause: Frontend/Mobile Developer; sözleşme netleştirmesi Tech Lead'in): §6'daki "a read of `activeSessionRepoProvider.read()`" ifadesi, canlı olmayan tek seferlik bir okumaya izin veriyor. Model aktif oturum değiştiğinde de yeniden türetilmeli (ör. `active_session` için Drift `watch` + `journey_progress` birleşimi, ya da `/`'e dönüşte yenileme). Sıcak yol (snapshot home mounted iken yazılıyor) ve tekrar oynama varyantı için widget testleri eklenmeli.
+
+## 4. Pending Evidence
+
+* F05'e yeni PENDING kayıt eklenmedi.
+* **Ağsız cihaz koşusu** F08'in kendi kaydı `F08.OFFLINE-JOURNEY`'de (Owner QA, PENDING) izleniyor.
+  * Required class: runtime.
+  * Hedef: ağdan izole bir cihaz (uçak modu) ya da ağdan izole bir simülatör hostu. Bu ortamda simülatör host'un ağını paylaşıyor ve host ağını değiştirmek kapsam dışı.
+  * Yeniden değerlendirme: F08-LOCAL-EVIDENCE koşusu ya da ilk dağıtım smoke testi.
+* §15'e göre bu koşu F05 kapısı değil. F05'e PENDING kayıt olarak eklenseydi audit'in "terminal feature contains PENDING" kuralı F05'i sözleşmeye aykırı biçimde kilitlerdi.
+
+## 5. Regression & Evidence Reuse
+
+* **Etkilenen yüzey:** gerçek 30 seviyelik içerik, `content_check.dart`, F05 home ve tutorial (F03-QA-04 değişikliği), paylaşılan play/rating. Full depth koşuldu: QS-05..QS-08 yeşil, regresyon yok.
+* **Reused:** F03 final QA runtime kanıtı (`51497dd`); parmak izinin geçerliliği §0'da gerekçelendirildi.
+* **Invalidated:** 8 dosya değiştiği için F05-FE2'nin parmak izi geçersiz; yerini QS-06 aldı. F06-CONTENT-PROMOTE'un "band-rule case 4/4" iddiası da geçersiz: test gövdesi boş olduğu için bant kuralı kanıtı sayılamaz.
+* **Bağımsız QA probe'ları:** QS-01 (bağımsız Python kural denetçisi), QS-02/QS-03 (gerçek CLI ve gerçek gate'e negatif örnekler), QS-09 (gerçek paketle uçtan uca), QS-10..QS-12 (cihaz).
+
+## 6. Final Verdict
+
+* `QA Result: Rejected`
+* Blocking Issues: F05-QA-STRICT-1, F05-QA-STRICT-3 (F05-QA-STRICT-2 aynı rework paketinde)
+* Required Fixes (sırayla):
+  1. Strict gate'te R1–R6 için gerçek assertion ve her kural için reddedilmesi beklenen negatif test (STRICT-1).
+  2. `levels` ayırt edicisini sıkılaştır ve negatif test ekle (STRICT-2).
+  3. Home read-model'ini aktif oturum değişimlerine bağla; sıcak yol ve tekrar oynama widget testlerini ekle (STRICT-3).
+  4. `frontend.md` F06-CONTENT-PROMOTE bölümündeki yanlış atıfı düzelt.
+* Non-blocking Notes:
+  * 11–15 bandında `tdDegree = 0`: AC6'nın "heavier temporary-displacement" ifadesi yapısal olarak karşılanmıyor. §5.4'e göre bu sert bir kural değil ve kullanıcı 30 seviyeyi 2026-09-13'te olduğu gibi kabul etti. Defect değil; PO'nun görmesi için not.
+  * `content/` ↔ `app/assets/` ayna eşitliği ve manifest `difficultyLabel` ↔ asset etiketi hiçbir kapıda kontrol edilmiyor. Bugün tutarlılar (QS-01).
+  * Çözücüyle yeniden doğrulama yalnız `content/` üzerinde koşuyor, paketlenen kopyada koşmuyor.
+  * `highestUnlockedLevel` 30'dan sonra 31 oluyor. Bu §33'teki `max(existing, N+1)` kuralıyla uyumlu ve zararsız.
+  * Ağsız cihaz koşusu → `F08.OFFLINE-JOURNEY` (F08'in kaydı).
+
+## 7. Tech Lead Note
+
+* **Root-cause:**
+  * STRICT-1/2 → Frontend/Mobile Developer (F05 gate testi) + content toolchain (`content_check.dart`).
+  * STRICT-3 → Frontend/Mobile Developer (read-model) + §6 netleştirmesi (Tech Lead).
+* **QA'nın yetki alanı dışında olduğu için düzeltilmesi gereken kayıtlar:**
+  * `F06.CONTENT-PROMOTE-RECONCILE` provenance'ı, `system-state.md` Current Reason ve `feature-board.md` F05 satırı: "4/4 … structural band-rule case dahil" iddiası QS-03/QS-04 ile çürütüldü.
+  * Brief'teki "F05-FE2 fingerprint-valid" ifadesi: 8 dosya değişti, QA suite'leri yeniden koştu.
+  * Consumed Signals'taki "Tech-Lead-reconciled on 2026-09-13" tarihi: reconciliation 2026-09-26'da yapıldı.
+  * `prd.md:30`'daki AC3 hâlâ "optimal is 3–4 moves" diyor. Aynı dosyanın 73. satırı ve `product-prd.md:328` düzeltmeyi (== 2) içeriyor; AC satırı güncellenmemiş, bu bir doküman kayması.
+* **Routing:** Rework (STRICT-1/2/3) sonrası yeniden QA. Yeniden QA dar kapsamlı olabilir: strict gate negatif testleri, `content:check` negatifleri, sıcak/soğuk home ve tekrar oynama. İçerik ve ilgili kod değişmezse QS-01, QS-09 A–C, QS-10, QS-11 ve F03 kanıtı yeniden kullanılabilir.
+* **Karar notu:** §6 bugün tekrar oynanan tamamlanmış bir seviyeyi "devam eden" sayıyor ve CONTINUE onu hedefliyor. Ürün açısından istenen davranış buysa korunmalı; değilse Tech Lead/PO kararı gerekir. Hangisi seçilirse seçilsin oturum içi ve soğuk yol aynı sonucu vermeli. Release veya paid deploy ile ilgisi yok.
+* **F08 için girdi:** Bu turun kill/relaunch kanıtı (QS-10, QS-11), F08 QA koşusunda parmak izi eşleşirse `F08.LOCAL-RESUME` için kısmi girdi olarak kullanılabilir. Restart, thaw ve güvenilmeyen önbellekteki thaw'ın yeniden türetilmesi alt senaryoları kapsanmadı. F08 kayıtları bu turda değiştirilmedi.
+* **Ortam:** iPhone 16 simülatöründe QA test verisi kaldı (2/30 ilerleme, L2 tekrar oynaması sürüyor); content size `large`.
+
+## Sonraki Komut
+
+```text
+Run Tech Lead
+```
