@@ -6,6 +6,7 @@
 // `melos run test` / `melos run content:journey`.
 
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_test/flutter_test.dart';
@@ -72,10 +73,37 @@ Future<void> main() async {
     }
   });
 
-  test('band rules (strict-only hard check; smoke-mode advisory)', () {
-    // Deferred: the strict-mode structural band assertions land with
-    // F06-CONTENT — they need the real 30 authored levels (`architecture.md
-    // §5.4`). In smoke mode the interim pack knowingly re-ids the F06 smoke set.
-    if (!manifest.isStrict) return;
+  test('band rules R1–R6 + manifest label hold for every shipped level '
+      '(§5.4, F05-QA-STRICT-1)', () async {
+    // F06-CONTENT has landed: the shipped pack must be the strict one (§5.5).
+    expect(manifest.isStrict, isTrue, reason: 'shipped manifest is not strict');
+
+    final report = await runJourneyManifestGate(
+      manifest,
+      readAsset: readAsset,
+      lang: lang,
+    );
+
+    expect(report.violations, isEmpty, reason: report.toString());
+    expect(report.advisories, isEmpty, reason: report.toString());
+    // Non-vacuity: every band rule actually ran against every level —
+    // R1 ×3 + R2 ×7 + R3 ×5 + R4 ×5 + R5 ×5 + R6 ×30 + LABEL ×30 = 85.
+    expect(report.bandChecks, 85, reason: report.toString());
+  });
+
+  test('the shipped bundle mirrors content/journey byte-for-byte (§5.4)', () {
+    // `flutter test` runs with the package root (`app/`) as the cwd.
+    final diffs = compareJourneyMirror(
+      source: Directory('../content/journey'),
+      bundle: Directory('assets/journey'),
+    );
+
+    expect(
+      diffs,
+      isEmpty,
+      reason:
+          'app/assets/journey drifted from content/journey — run '
+          '`melos run content:sync`:\n${diffs.join('\n')}',
+    );
   });
 }

@@ -179,4 +179,121 @@ void main() {
       );
     },
   );
+
+  group('Journey-manifest recognition is path + shape (F05-QA-STRICT-2)', () {
+    late Directory journeyDir;
+    late Map<String, Object?> good;
+
+    setUp(() async {
+      good = await goodArtifact(tmp);
+      journeyDir = Directory('${tmp.path}/content/journey/tr')
+        ..createSync(recursive: true);
+    });
+
+    Map<String, Object?> manifest(
+            {String mode = 'strict', String lang = 'tr'}) =>
+        <String, Object?>{
+          'schemaVersion': 1,
+          'contentVersion': '2026.09-v1',
+          'lang': lang,
+          'mode': mode,
+          'levels': <Map<String, Object?>>[
+            <String, Object?>{
+              'n': 1,
+              'id': good['id'],
+              'asset': 'tr/journey-tr-01.json',
+              'difficultyLabel': good['difficultyLabel'],
+            },
+          ],
+        };
+
+    Future<List<String>> check() => runContentCheck(
+          root: '${tmp.path}/content',
+          repoRoot: _repoRoot,
+        );
+
+    test(
+        'a Puzzle with a stray "levels" key is still fully validated '
+        '(a wrong optimalMoves is caught)', () async {
+      write(journeyDir, 'journey-tr-02.json', <String, Object?>{
+        ...good,
+        'optimalMoves': 9,
+        'levels': <Object?>[],
+      });
+
+      final failures = await check();
+      expect(
+        failures.where(
+          (f) =>
+              f.contains('journey-tr-02.json') && f.contains('!= fresh solve'),
+        ),
+        hasLength(1),
+        reason: failures.join('\n'),
+      );
+    });
+
+    test(
+        'a manifest-shaped file outside journey/<lang>/journey_manifest_<lang>'
+        '.json is not skipped', () async {
+      write(journeyDir, 'manifest_copy.json', manifest());
+
+      final failures = await check();
+      expect(
+        failures.where((f) => f.contains('manifest_copy.json')),
+        isNotEmpty,
+        reason: failures.join('\n'),
+      );
+    });
+
+    test('a manifest with an unknown mode at the manifest path fails',
+        () async {
+      write(journeyDir, 'journey_manifest_tr.json', manifest(mode: 'loose'));
+
+      final failures = await check();
+      expect(
+        failures,
+        contains(
+          allOf(
+            contains('journey_manifest_tr.json'),
+            contains('malformed Journey manifest'),
+            contains('"mode"'),
+          ),
+        ),
+      );
+    });
+
+    test('a manifest whose lang disagrees with its directory fails', () async {
+      write(journeyDir, 'journey_manifest_tr.json', manifest(lang: 'en'));
+
+      final failures = await check();
+      expect(
+        failures,
+        contains(
+          allOf(
+            contains('journey_manifest_tr.json'),
+            contains('"lang" must be "tr"'),
+          ),
+        ),
+      );
+    });
+
+    test('a manifest without levels at the manifest path fails', () async {
+      write(
+        journeyDir,
+        'journey_manifest_tr.json',
+        manifest()..remove('levels'),
+      );
+
+      final failures = await check();
+      expect(
+        failures,
+        contains(
+          allOf(
+            contains('journey_manifest_tr.json'),
+            contains('"levels" must be a non-empty array'),
+          ),
+        ),
+      );
+    });
+  });
 }

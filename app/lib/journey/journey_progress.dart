@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../persistence/active_session_snapshot.dart';
@@ -77,9 +79,15 @@ JourneyProgressModel buildJourneyProgressModel({
   );
 }
 
-/// Live Journey progress for the home surface — re-emits when a win commits
-/// (`JourneyProgressRepo.markCompleted` → the Drift `watchSingle` stream),
-/// re-reading the active-session snapshot on each tick.
+/// Live Journey progress for the home surface (`architecture.md §6`, amended
+/// 2026-09-26). Re-derives whenever EITHER source changes:
+/// * a win commits (`JourneyProgressRepo.watch`);
+/// * the active-session snapshot changes (`ActiveSessionRepo.watch` — session
+///   start, move, completion, clear).
+///
+/// The home stays mounted under the pushed `/play` route, so a one-shot
+/// snapshot read would leave it stale for the rest of the app session: the
+/// same persisted state must yield the same model warm or cold.
 final journeyProgressModelProvider = StreamProvider<JourneyProgressModel>((
   ref,
 ) async* {
@@ -87,8 +95,68 @@ final journeyProgressModelProvider = StreamProvider<JourneyProgressModel>((
   final repo = ref.watch(journeyProgressRepoProvider);
   final activeRepo = ref.watch(activeSessionRepoProvider);
 
-  await for (final row in repo.watch(guestId)) {
-    final snap = await activeRepo.read();
-    yield buildJourneyProgressModel(row: row, activeSnapshot: snap);
-  }
+  yield* _combineLatest(repo.watch(guestId), activeRepo.watch());
 });
+
+/// Emits a [JourneyProgressModel] from the latest value of each source once
+/// both have emitted, then again whenever either emits. Closes when both
+/// sources are done.
+Stream<JourneyProgressModel> _combineLatest(
+  Stream<JourneyProgressRow> rows,
+  Stream<ActiveSessionSnapshot?> snapshots,
+) {
+  late final StreamController<JourneyProgressModel> controller;
+  StreamSubscription<JourneyProgressRow>? rowSub;
+  StreamSubscription<ActiveSessionSnapshot?>? snapshotSub;
+  JourneyProgressRow? row;
+  ActiveSessionSnapshot? snapshot;
+  var hasSnapshot = false;
+  var doneCount = 0;
+
+  void emit() {
+    final current = row;
+    if (current == null || !hasSnapshot) return;
+    controller.add(
+      buildJourneyProgressModel(row: current, activeSnapshot: snapshot),
+    );
+  }
+
+  void done() {
+    if (++doneCount == 2) controller.close();
+  }
+
+  controller = StreamController<JourneyProgressModel>(
+    onListen: () {
+      rowSub = rows.listen(
+        (value) {
+          row = value;
+          emit();
+        },
+        onError: controller.addError,
+        onDone: done,
+      );
+      snapshotSub = snapshots.listen(
+        (value) {
+          snapshot = value;
+          hasSnapshot = true;
+          emit();
+        },
+        onError: controller.addError,
+        onDone: done,
+      );
+    },
+    onPause: () {
+      rowSub?.pause();
+      snapshotSub?.pause();
+    },
+    onResume: () {
+      rowSub?.resume();
+      snapshotSub?.resume();
+    },
+    onCancel: () async {
+      await rowSub?.cancel();
+      await snapshotSub?.cancel();
+    },
+  );
+  return controller.stream;
+}

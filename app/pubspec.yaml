@@ -56,10 +56,10 @@ flutter:
   # Dictionary assets are declared by the looplet_dictionary package itself and
   # reach the bundle as packages/looplet_dictionary/assets/<lang>/dictionary.json.
   #
-  # F05 Journey content pack: the per-language manifest + level artifacts.
-  # Interim — the 5 files under assets/journey/tr/ re-id the F06 smoke set
-  # (f05 architecture.md §5.5); F06-CONTENT delivers the real 30 (source of
-  # truth `content/journey/<lang>/`, mirrored here by `melos run content:sync`).
+  # F05 Journey content pack: the per-language strict manifest + the 30 level
+  # artifacts. Source of truth is `content/journey/<lang>/`, mirrored here by
+  # `melos run content:sync`; the F05 build gate fails on any drift between the
+  # two (f05 architecture.md §5.4).
   assets:
     - assets/journey/tr/
 

@@ -1,6 +1,8 @@
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:looplet_app/persistence/active_session_snapshot.dart';
 import 'package:looplet_app/persistence/app_database.dart';
+import 'package:looplet_app/persistence/repositories/active_session_repo.dart';
 import 'package:looplet_app/persistence/repositories/daily_puzzle_cache.dart';
 import 'package:looplet_app/persistence/repositories/daily_repo.dart';
 import 'package:looplet_app/persistence/repositories/daily_streak_repo.dart';
@@ -18,6 +20,82 @@ void main() {
     guestId = await PlayerRepo(db).currentGuestId();
   });
   tearDown(() => db.close());
+
+  group('ActiveSessionRepo.watch (F05-FE3-HOME)', () {
+    ActiveSessionSnapshot snapshot(String puzzleId) => ActiveSessionSnapshot(
+      puzzleId: puzzleId,
+      puzzleSource: PuzzleSource.journey,
+      lang: 'tr',
+      appliedMoves: const <String>['R1'],
+      undosRemaining: 3,
+      restartCount: 0,
+      elapsedMsAccumulated: 4200,
+      thawedFrozenCells: const <String>[],
+      status: ActiveSessionStatus.inProgress,
+      startedAtUtcMs: 1757145000000,
+      lastPersistedAtUtcMs: 1757145004200,
+    );
+
+    /// Consecutive duplicates collapsed — Drift may re-emit an unchanged row
+    /// when another `kv` key is written; only real transitions matter here.
+    List<String?> transitions(List<String?> seen) => <String?>[
+      for (var i = 0; i < seen.length; i++)
+        if (i == 0 || seen[i] != seen[i - 1]) seen[i],
+    ];
+
+    test('emits the current value, then every save and clear', () async {
+      final repo = ActiveSessionRepo(db);
+      final seen = <String?>[];
+      final sub = repo.watch().listen((s) => seen.add(s?.puzzleId));
+      await pumpEventQueue();
+
+      await repo.save(snapshot('journey-tr-02'));
+      await pumpEventQueue();
+      await repo.save(snapshot('journey-tr-03'));
+      await pumpEventQueue();
+      await repo.clear();
+      await pumpEventQueue();
+      await sub.cancel();
+
+      expect(transitions(seen), <String?>[
+        null,
+        'journey-tr-02',
+        'journey-tr-03',
+        null,
+      ]);
+    });
+
+    test(
+      'a corrupt row is discarded and emits null, without looping',
+      () async {
+        await db
+            .into(db.kvRows)
+            .insertOnConflictUpdate(
+              KvRowsCompanion.insert(
+                key: ActiveSessionSnapshot.kvKey,
+                valueJson: '{not json',
+                schemaVersion: ActiveSessionSnapshot.currentSnapshotVersion,
+              ),
+            );
+        final seen = <String?>[];
+        final sub = ActiveSessionRepo(
+          db,
+        ).watch().listen((s) => seen.add(s?.puzzleId));
+        await pumpEventQueue();
+        await sub.cancel();
+
+        expect(seen, isNotEmpty);
+        expect(seen, everyElement(isNull));
+        // The corrupt emission + the delete's re-emission — then it settles.
+        expect(seen.length, lessThanOrEqualTo(3));
+        final row =
+            await (db.select(db.kvRows)
+                  ..where((t) => t.key.equals(ActiveSessionSnapshot.kvKey)))
+                .getSingleOrNull();
+        expect(row, isNull);
+      },
+    );
+  });
 
   group('PlayerRepo', () {
     test('setFirebaseUid writes through, idempotently', () async {

@@ -10,18 +10,18 @@ Rework
 
 ## Current Owner
 
-Frontend/Mobile Developer
+Tech Lead
 
 ## Next Role
 
-Frontend/Mobile Developer
+Tech Lead
 
 ## Active Task Ledger
 
 - [x] Task ID: F06-CONTENT-PROMOTE | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: DELIVERED 2026-09-13 — promoted the 30 accepted Journey levels from `tools/looplet_authoring/drafts/journey/tr/` to `content/journey/tr/` (real `Puzzle` artifacts, `contentVersion` "2026.09-v1", untouched grid/target/locked/frozen/optimalMoves data) plus a real `mode:"strict"` manifest (30 contiguous entries, sha256 checksums); `content:sync`'s existing rsync mirrored it into `app/assets/journey/tr/`, replacing the 5 interim smoke files. Found and fixed a real toolchain bug in `tools/looplet_authoring/lib/src/content_check.dart` (a Journey manifest, `{levels: [...]}` shape, was force-parsed as a `Puzzle` and rejected — had never been exercised before since no Journey manifest previously lived under `content/`); added a `levels`-key skip branch + a regression test. `flutter test` 181/181 (unchanged — no test needed a content-specific change), `looplet_authoring` `dart test` 20/20 (+1 regression test), `content:check` → OK, F05's own strict manifest gate 4/4 green for the first time against real content, `flutter build ios --release --no-codesign` green (54.7 MB, unchanged size). [CORRECTED 2026-09-26, Tech Lead: the "4/4" contains no band-rule assertion (empty test body) and the `levels`-key skip is bypassable — F05-QA-STRICT-1/-2; the content promotion itself stands] | Depends On: -
 - [x] Task ID: F05-QA-STRICT | Assigned Role: QA | Status: Done | Summary: DONE 2026-09-26 — verdict Rejected (qa.md § F05-QA-STRICT; final, client-only, HEAD 6fb2d23). The real pack itself is clean: independent probe 30/30 levels, 0 violations of §5.4 R1–R6 + the 2026-09-13 decision, content/ and app/assets/ identical (git tree 057f242b); full campaign 1..30 → terminal → replay L1 proven against the real bundle (real level 30 won by a real drag → SONRAKİ → TAMAMLANDI); AC7 resume across a real process kill PASS on iPhone 16; N1 moot; regression green (analyze, format, app 314/314, F05 73/73, packages 197/197, F03 device 13/13). Blocking: F05-QA-STRICT-1 (High) — the strict build gate enforces no structural band rule: F05's band test has an empty body and the gate never reads band fields (R1/R4/R5/R6 violations → passed: true); content:check rejects R1/R6 explicitly, R2/R3 only incidentally, R4/R5 not at all — the "4/4 incl. the structural band-rule case" delivery and reconcile claim is misattributed. F05-QA-STRICT-3 (Medium, AC7) — the home read-model never re-reads the active-session snapshot in-session: no in-progress state after backing out of a level, and mid-replay of a completed level makes in-session CONTINUE target the frontier (Seviye 3) while the same persisted state after relaunch targets the replay (Seviye 2 · sürüyor); reproduced at runtime and in a widget probe. Same rework: F05-QA-STRICT-2 (Medium) — a stray "levels" key makes content:check skip all puzzle validation (a wrong optimalMoves passes). Also: the brief's "F05-FE2 fingerprint-valid" was inaccurate (8 files changed since 345147e) — QA re-ran the affected suites | Depends On: F06-CONTENT-PROMOTE
-- [ ] Task ID: F05-FE3-GATE | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: ACTIVATED 2026-09-26 (F05-QA-STRICT reconcile) — close F05-QA-STRICT-1 and -2 per architecture.md §5.4/§15 (amended 2026-09-26): F05's strict build gate enforces R1–R6 + the manifest-label check on the shipped bundle, each rule with its own rejecting negative test; CI fails when app/assets/journey/<lang>/ differs from content/journey/<lang>/; content:check recognizes only a real Journey manifest (path + shape) and validates everything else; frontend.md erratum for the misattributed F06-CONTENT-PROMOTE claims; stale interim comments on touch. See Current Rework Brief | Depends On: F05-QA-STRICT
-- [ ] Task ID: F05-FE3-HOME | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: ACTIVATED 2026-09-26 (F05-QA-STRICT reconcile) — close F05-QA-STRICT-3 per architecture.md §6/§10/§15 (amended 2026-09-26): the home read-model re-derives on active-session snapshot changes as well as journey_progress changes, so the mounted home shows the in-progress state and the §6 CONTINUE target (incl. a completed-level replay) right after returning from /play — warm == cold for the same persisted state; warm-path widget tests. See Current Rework Brief | Depends On: F05-QA-STRICT
+- [x] Task ID: F05-FE3-GATE | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: DELIVERED 2026-09-27 (frontend.md § F05-FE3) — runJourneyManifestGate enforces §5.4 R1–R6 + manifest↔asset LABEL (strict → named violations, smoke → advisories, bandChecks non-vacuity counter); the real-bundle band test asserts strict, 0 violations, 85 checks; one rejecting synthetic case per rule (R1 L2, R2 L7, R3 L17, R4 L22, R5 L28/L27, R6 L28, LABEL L20) each asserting exactly that violation; QA's real-content probe now rejects R4 L22 / R5 L28 / R1 L02 / R6 L28 (was passed: true); byte-mirror check content/journey ↔ app/assets/journey as an app test (in melos run test/CI) with negatives; content:check recognizes a Journey manifest only by path + shape — the L05 optimalMoves-7 + "levels": [] bypass now exits 1, real content check: OK; frontend.md erratum for the F06-CONTENT-PROMOTE claims; stale interim comments fixed. looplet_authoring 25/25 | Depends On: F05-QA-STRICT
+- [x] Task ID: F05-FE3-HOME | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: DELIVERED 2026-09-27 (frontend.md § F05-FE3) — ActiveSessionRepo.watch() (shares read()'s corrupt-row discard, no loop) + journeyProgressModelProvider combines journey_progress and the active-session row live (no new package; subscriptions cancelled on dispose; §6 semantics unchanged). 5 warm-path widget tests (frontier, replay, win clears, warm == cold, corrupt) — 3 of them fail against the old provider, proving they catch F05-QA-STRICT-3; 2 repo watch tests. Widget tests mounting HomeScreen use a sync-closing Drift test DB (drift's documented option; production unaffected). Runtime on iPhone 16 sim: warm frontier and warm replay show "Seviye 1 · sürüyor", CONTINUE resumes the replay exactly, identical after kill/relaunch. Regression: flutter analyze clean, flutter test 336/336, packages 202/202, format clean, F03 device suite 13/13 | Depends On: F05-QA-STRICT
 
 ## Open Tasks
 
@@ -33,7 +33,7 @@ None
 
 ## Delivery Review
 
-Accepted
+Pending
 
 ## QA Scope
 
@@ -123,7 +123,7 @@ None
 
 ## Next Action
 
-Run Frontend/Mobile Developer on F05-FE3-GATE and F05-FE3-HOME (Current Rework Brief below; architecture.md §5.4/§6/§10/§15 amended 2026-09-26). Deliver both; record the rule → check → negative-case mapping and the warm-path test evidence in frontend.md (new F05-FE3 section, including the F06-CONTENT-PROMOTE erratum); set Delivery Review = Pending and hand back to Tech Lead for reconciliation, then the F05 re-QA.
+Run Tech Lead to reconcile F05-FE3-GATE and F05-FE3-HOME (frontend.md § F05-FE3, Delivery Review = Pending). Per workflow-follow-ups "Required Migration Follow-through", read each gate check and run its negative case rather than relying on the green suite. Evidence map: frontend.md § 17. Then re-evaluate F06.CONTENT-PROMOTE-RECONCILE and activate the F05 re-QA.
 
 ## Last Decision
 
@@ -153,9 +153,9 @@ Earlier decisions (2026-09-20 QA sequencing; the 2026-09-26 pre-QA reconciliatio
 
 ## Last Update
 
-* Updated By: Tech Lead
-* Timestamp: 2026-09-26
-* Summary: F05-QA-STRICT reconciled — QA's three findings independently re-verified and accepted (QA Result Rejected). Contract amended (§5.4, §6, §10, §15); prd.md AC3 resynced. F05-FE3-GATE and F05-FE3-HOME activated; status Rework; owner → Frontend/Mobile Developer.
+* Updated By: Frontend/Mobile Developer
+* Timestamp: 2026-09-27
+* Summary: F05-FE3-GATE and F05-FE3-HOME delivered (frontend.md § F05-FE3) — band rules R1–R6 + LABEL enforced with per-rule negatives, bundle mirror check, content:check path + shape recognition; home read-model live on both sources (warm == cold, verified in widget tests and on the iPhone 16 simulator). Delivery Review = Pending; owner → Tech Lead.
 
 ## Context & Follow-ups
 
@@ -187,6 +187,7 @@ Earlier decisions (2026-09-20 QA sequencing; the 2026-09-26 pre-QA reconciliatio
 * 2026-09-26 — QA: F05-QA-STRICT Rejected (F05-QA-STRICT-1/-2/-3); F05.STRICT-CONTENT FAIL, F05.SHARED-RUNTIME PASS; owner -> Tech Lead.
 * 2026-09-26 — Tech Lead: F05-QA-STRICT reconciled (findings re-verified; own pre-QA band-rule claim corrected); contract §5.4/§6/§10/§15 amended; prd.md AC3 resynced; F05-FE3-GATE + F05-FE3-HOME activated; status Rework.
 * 2026-09-26 — Tech Lead: incident triage ("the app still shows the old design") — Continue Current Flow; design adoption is scheduled right after F05 closes, ahead of F08.
+* 2026-09-27 — Frontend/Mobile Developer: F05-FE3-GATE + F05-FE3-HOME delivered; Delivery Review = Pending; owner → Tech Lead.
 
 ## Consumed Signals
 

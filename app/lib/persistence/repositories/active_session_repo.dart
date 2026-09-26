@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:drift/drift.dart' show SimpleSelectStatement;
 import 'package:flutter/foundation.dart';
 
 import '../active_session_snapshot.dart';
@@ -26,12 +27,22 @@ class ActiveSessionRepo {
         ),
       );
 
+  SimpleSelectStatement<$KvRowsTable, KvRow> _query() =>
+      _db.select(_db.kvRows)
+        ..where((t) => t.key.equals(ActiveSessionSnapshot.kvKey));
+
   /// The saved session, or null if there is none or it is corrupt.
-  Future<ActiveSessionSnapshot?> read() async {
-    final row =
-        await (_db.select(_db.kvRows)
-              ..where((t) => t.key.equals(ActiveSessionSnapshot.kvKey)))
-            .getSingleOrNull();
+  Future<ActiveSessionSnapshot?> read() async =>
+      _decode(await _query().getSingleOrNull());
+
+  /// Live view of the saved session: emits the current value on listen, then
+  /// again on every [save] / [clear] — the F05 home read-model's second source
+  /// (`f05 architecture.md §6`). A corrupt row is discarded exactly as [read]
+  /// does; the resulting delete re-emits `null`, so there is no loop.
+  Stream<ActiveSessionSnapshot?> watch() =>
+      _query().watchSingleOrNull().asyncMap(_decode);
+
+  Future<ActiveSessionSnapshot?> _decode(KvRow? row) async {
     if (row == null) return null;
     try {
       final decoded = jsonDecode(row.valueJson);

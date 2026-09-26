@@ -44,8 +44,8 @@ scripts:
     description: >-
       Mirror the authored Journey content (content/journey/**) into the app
       bundle (app/assets/journey/**) so `flutter build` picks it up (F05
-      architecture.md §5.1). A no-op until F06-CONTENT populates content/journey/;
-      the interim 5-level pack is hand-maintained directly under app/assets/journey/.
+      architecture.md §5.1). content/journey/ is the source of truth (the real
+      30-level pack since F06-CONTENT); the F05 build gate fails on any drift.
     run: >-
       bash -c 'set -e; if [ -d content/journey ]; then mkdir -p app/assets/journey;
       rsync -a --delete content/journey/ app/assets/journey/;

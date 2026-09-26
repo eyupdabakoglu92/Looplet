@@ -152,11 +152,9 @@ abstract class JourneyAssetSource {
 }
 
 /// [JourneyAssetSource] over the Flutter asset bundle. Assets are declared under
-/// `flutter/assets: assets/journey/` in `app/pubspec.yaml`. (Interim: the
-/// manifest + the 5 level artifacts are hand-maintained under
-/// `app/assets/journey/tr/`; `F06-CONTENT` moves the source of truth to
-/// `content/journey/<lang>/` + a `melos content:sync` mirror — `architecture.md
-/// §5.1`.)
+/// `flutter/assets: assets/journey/` in `app/pubspec.yaml`, mirrored from the
+/// source of truth `content/journey/<lang>/` by `melos content:sync`
+/// (`architecture.md §5.1`; the build gate asserts the mirror, §5.4).
 class RootBundleJourneyAssetSource implements JourneyAssetSource {
   const RootBundleJourneyAssetSource();
   @override

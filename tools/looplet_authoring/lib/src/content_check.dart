@@ -42,11 +42,18 @@ Future<List<String>> runContentCheck({
       manifests[rel] = map;
       continue;
     }
-    if (map.containsKey('levels')) {
-      // A Journey content manifest (F05's schema — `schemaVersion`/`mode`/
-      // `lang`/`levels`). Not a Puzzle artifact and not a Daily assignments
-      // manifest; F05 owns its own structural gate for this shape
-      // (`journey_manifest_gate_test.dart`). Nothing to check here.
+    final manifestLang = _journeyManifestLangForPath(rel);
+    if (manifestLang != null) {
+      // A Journey content manifest (F05's schema). It is recognised only at
+      // `journey/<lang>/journey_manifest_<lang>.json` AND with the manifest
+      // shape (F05 architecture.md §5.4); its per-level rules are F05's own
+      // gate (`journey_manifest_gate_test.dart`). Anything else — including
+      // a Puzzle carrying a stray `levels` key — falls through and is
+      // validated as a Puzzle artifact.
+      final problem = _journeyManifestShapeProblem(map, manifestLang);
+      if (problem != null) {
+        failures.add('$rel: malformed Journey manifest — $problem');
+      }
       continue;
     }
     try {
@@ -155,6 +162,38 @@ Future<List<String>> runContentCheck({
   }
 
   return failures;
+}
+
+final RegExp _journeyManifestPath = RegExp(
+  r'(?:^|[/\\])journey[/\\]([a-z]{2})[/\\]journey_manifest_([a-z]{2})\.json$',
+);
+
+/// The language of the Journey manifest at [path] — `journey/<lang>/
+/// journey_manifest_<lang>.json`, both `<lang>`s equal — or `null` for any
+/// other path.
+String? _journeyManifestLangForPath(String path) {
+  final m = _journeyManifestPath.firstMatch(path);
+  if (m == null || m.group(1) != m.group(2)) return null;
+  return m.group(1);
+}
+
+/// Why [map] is not a well-formed Journey manifest for [lang] (F05
+/// architecture.md §5.2/§5.4: `schemaVersion`, `mode`, `lang`, a non-empty
+/// `levels` list of objects), or `null` when the shape holds.
+String? _journeyManifestShapeProblem(Map<String, Object?> map, String lang) {
+  if (map['schemaVersion'] is! int) return '"schemaVersion" must be an int';
+  final mode = map['mode'];
+  if (mode != 'smoke' && mode != 'strict') {
+    return '"mode" must be "smoke" or "strict"';
+  }
+  if (map['lang'] != lang) return '"lang" must be "$lang" (its directory)';
+  final levels = map['levels'];
+  if (levels is! List || levels.isEmpty) {
+    return '"levels" must be a non-empty array';
+  }
+  if (levels.any((e) => e is! Map))
+    return 'every "levels" entry must be an object';
+  return null;
 }
 
 EngineConfig? _toEngineConfig(Puzzle p) {

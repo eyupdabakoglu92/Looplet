@@ -3,7 +3,6 @@
 // CONTINUE CTA; CONTINUE routes to the resolved next level. Covers the
 // new / mid / in-progress / terminal variants.
 
-import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -17,12 +16,14 @@ import 'package:looplet_app/persistence/repositories/journey_progress_repo.dart'
 import 'package:looplet_app/persistence/repositories/player_repo.dart';
 import 'package:looplet_app/play/play_session_args.dart';
 
+import '../support/widget_test_database.dart';
+
 void main() {
   late AppDatabase db;
   PlaySessionArgs? lastPlayArgs;
 
   setUp(() {
-    db = AppDatabase.forTesting(NativeDatabase.memory());
+    db = widgetTestDatabase();
     lastPlayArgs = null;
   });
   tearDown(() => db.close());
