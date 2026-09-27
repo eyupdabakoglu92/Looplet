@@ -10,15 +10,15 @@ Rework
 
 ## Current Owner
 
-UI Designer
+Tech Lead
 
 ## Next Role
 
-UI Designer
+Tech Lead
 
 ## Active Task Ledger
 
-- [ ] Task ID: F03-UI-D1 | Assigned Role: UI Designer | Status: Open | Summary: Design Adoption Phase D1 — the Loop Glass Play handoff in F03 ui-design.md (architecture.md §19.7). Covers: layout per F00 ui-design §6 at 393 pt plus the 16e / Pro Max variants; component, state and interaction decisions; a motion spec with reduced paths (lift, rim, settle, inactive dim, thaw, ghost); a Screen/State/Viewport matrix; a Visual Evidence Manifest with selected-source S-01b/S-02/S-03/S-07 and new real renders for the audit's D1 missing states 1–10 (incl. AX5 Play and the tutorial HUD per §19.3); a D1 acceptance list. No code. See Current Brief | Depends On: -
+- [x] Task ID: F03-UI-D1 | Assigned Role: UI Designer | Status: Done | Summary: DELIVERED 2026-09-27 — ui-design.md §1–§14 rewritten for the Loop Glass Play surface; §16 won composition kept byte-for-byte (legacy until D2). 28 renders under design/: the audit's D1 missing states 1–10, plus idle (D1 corrections), loading, keyboard focus, 16e / Pro Max variants, the 1.3× text cap and motion stills. Executable motion prototype design/src/D1-motion-prototype.html (lift + settle, thaw, tutorial ghost; ?rm=1, ?t=). Rulings applied: C-5 (hint pill above the HUD, ≥ 4 pt clearance measured on three devices at 1.0× and 1.3×; ghost hides on touch-down), C-9 (1.3× cap), C-10 (180 ms thaw), locked/frozen treatments, copy. D1 acceptance list §11.5; manifest §12b. NTLC §14: the text cap applied to the whole of Play (deviates from the §19.3 (1) hint example), design-layer edits inside D1, and informational items. No code | Depends On: -
 - [ ] Task ID: F03-FE-D1 | Assigned Role: Frontend/Mobile Developer | Status: Queued | Summary: Implement the D1 handoff from app/lib/design (architecture.md §19.7). Covers the Play header, rail, board, HUD, special tiles, thaw and load error, plus the F05 tutorial overlay (cross-feature). Drawn icons replace the Material icons on these surfaces; tests updated and green. frontend.md Visual Parity Evidence: screenshots vs renders on iPhone 16 / 16e / Pro Max; a screen recording of row lift, column lift and thaw; an AX5 text-size sweep; Reduce Motion on and off; integration_test green | Depends On: F03-UI-D1
 - [ ] Task ID: F03-QA-D1 | Assigned Role: QA | Status: Queued | Summary: Final-stage independent visual QA of D1 (architecture.md §19.7): runtime rubric ≥ 93 with every dimension ≥ 8 and no fail condition; regression of AC1–AC11 and F05 AC4/AC11; text-scale sweep to AX5; Reduce Motion; Android stated as a limit | Depends On: F03-FE-D1
 
@@ -32,7 +32,7 @@ None
 
 ## Delivery Review
 
-None
+Pending
 
 ## QA Scope
 
@@ -74,7 +74,14 @@ Selected-source renders for this surface, all in features/f00-design-foundation/
 
 Their manifest is features/f00-design-foundation/ui-design.md § Visual Evidence Manifest.
 
-The shipped-app baseline (615e94c) is conformance-audit.md §12 in the same folder: AUD-RS-08…18, AUD-A11Y-02 and AUD-A11Y-05, and AUD-PC-03…07. The D1 handoff, parity and QA records are pending (see Pending Evidence).
+The shipped-app baseline (615e94c) is conformance-audit.md §12 in the same folder: AUD-RS-08…18, AUD-A11Y-02 and AUD-A11Y-05, and AUD-PC-03…07.
+
+D1 handoff records (2026-09-27, UI Designer) are in ui-design.md §12b Visual Evidence Manifest:
+* selected-source D1-00…D1-12 and the D1-V device variants;
+* accessibility D1-10 / D1-10b;
+* motion-prototype MP-D1 and MP-D1-S.
+
+The artefacts are in features/f03-puzzle-play-session/design/. The parity and QA records are pending (see Pending Evidence).
 
 ## QA Modules
 
@@ -98,8 +105,8 @@ allowed
   * Prerequisite / External Decision: None
   * Re-evaluation Trigger: F03-UI-D1 delivery
   * Blocks: Visual Quality Gate = Ready for Implementation; F03-FE-D1
-  * Result: PENDING
-  * Provenance / Note: -
+  * Result: PASS
+  * Provenance / Note: 2026-09-27 UI Designer, HEAD 7239492 + working tree. Contents: ui-design.md §1–§14 (§16 kept byte-for-byte, verified against HEAD); 28 PNG renders in features/f03-puzzle-play-session/design/, from design/src/gen-d1.mjs + render-d1.sh (HTML/CSS → headless Chrome @2x, same tokens and geometry as F00 gen-s.mjs); the motion prototype design/src/D1-motion-prototype(-thaw|-ghost).html. Content: real Journey grids L4, L5, L23, L26; the L23 thaw state was cross-checked with the engine rule and the provisional dictionary. Manifest in ui-design.md §12b. Generated design artefacts, not runtime; Android not rendered.
 
 - Evidence ID: F03.D1-PARITY
   * Scenario: The runtime implementation matches the D1 handoff on the canonical simulators — every §19.2 state side by side with its render; a screen recording of row lift, column lift and thaw; OS text sizes up to AX5 with no clipping or overlap (§19.3 (1)); Reduce Motion on and off; the automated suites and integration_test green
@@ -133,7 +140,11 @@ None
 
 ## Next Action
 
-Run UI Designer on F03-UI-D1: the Loop Glass Play handoff with renders for the D1 states (see Current Brief; architecture.md §19). Then return to the Tech Lead for the visual-gate checkpoint (Ready for Implementation) before Frontend starts.
+Run Tech Lead: the visual-gate checkpoint for F03-UI-D1.
+1. Verify ui-design.md (the handoff-gate items; §12b manifest; §11.5 acceptance list), the renders in design/ and the motion prototype.
+2. Rule on §14.1 (the 1.3× text cap on the whole of Play, including the hint pill) and §14.2 (design-layer edits inside D1).
+3. Set Delivery Review and Visual Quality Gate (→ Ready for Implementation).
+4. Open F03-FE-D1 for the Frontend/Mobile Developer.
 
 ## Last Decision
 
@@ -155,9 +166,9 @@ The pre-reopen terminal orchestration (Done 2026-09-21) is archived byte-for-byt
 
 ## Last Update
 
-* Updated By: Tech Lead
+* Updated By: UI Designer
 * Timestamp: 2026-09-27
-* Summary: F03 reopened as Design Adoption Phase D1 (Loop Glass Play, existing-parity); architecture.md §19 added; F03-UI-D1 activated for the UI Designer.
+* Summary: F03-UI-D1 delivered — Loop Glass Play handoff (ui-design.md), 28 renders, motion prototype; F03.D1-HANDOFF PASS; Delivery Review = Pending; owner → Tech Lead (visual-gate checkpoint).
 
 ## Context & Follow-ups
 
@@ -179,6 +190,9 @@ The pre-reopen terminal orchestration (Done 2026-09-21) is archived byte-for-byt
 * 2026-09-20 to 2026-09-21 — win-sequence rework, F03-QA-01..04, final QA; full log in the closure record.
 * 2026-09-21 — Tech Lead: closure review; status Done.
 * 2026-09-27 — Tech Lead: reopened as Design Adoption Phase D1 (visual rework, existing-parity) after the Phase C audit; architecture.md §19; F03-UI-D1 Open, F03-FE-D1 and F03-QA-D1 Queued; owner → UI Designer.
+* 2026-09-27 — UI Designer: F03-UI-D1 delivered; task Done; F03.D1-HANDOFF PASS; Delivery Review = Pending; owner → Tech Lead.
+  * **Handoff:** ui-design.md §1–§14 rewritten, §16 kept verbatim; 28 renders + motion prototype; acceptance list §11.5.
+  * **NTLC:** §14.1 text cap on the whole of Play; §14.2 design-layer edits.
 
 ## Current Brief
 
