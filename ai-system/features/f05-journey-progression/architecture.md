@@ -199,6 +199,11 @@ Derived from `journey_progress` + the persisted active-session snapshot, **both 
 * **Re-show (AC11):** quitting before the gated action leaves `ack = false` → the overlay re-shows on the next entry to any level in 4–6.
 * **Persisted flag [D2]:** a **`kv` row** — `key = 'journey_col_tutorial_ack'`, `valueJson = '{"ack": true, "atUtcMs": <int>}'`. **No F08 schema change.** A tiny `JourneyTutorialRepo` (or a generic `kv` accessor) reads/writes it. Single-guest today → a bare key; documented in the `kv` key registry (§14).
 * **Visual design** of the overlay (layout, coach-mark, gating affordance, chrome parity with F03 Direction A) is **`[PENDING — UI]`**.
+  * **[Amended 2026-09-27 — Design Adoption Phase D1]** Visual authority moves to F03 `architecture.md` §19 and the F03 D1 handoff (Loop Glass, render S-07). The overlay is re-skinned in the F03 reopen as a cross-feature item:
+    * the hint pill sits above the HUD, and undo and restart stay usable;
+    * the ghost hides while the player drags.
+  * The behaviour above is unchanged, and F05 stays Done.
+  * The home (§10) is re-composed in Phase D3, with F05 as the carrier.
 
 ---
 

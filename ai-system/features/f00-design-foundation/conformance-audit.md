@@ -7,6 +7,11 @@
 > * **Targets:** `design/S-*.png`. **Evidence:** `design/audit/`.
 >
 > **Purpose:** measure how far each shipped surface is from the Foundation, so the Tech Lead can set Visual Scope, the Phase D order and the contract amendments. No code or `app/` change, no new direction, no gate change.
+>
+> **Tech Lead reconciliation, 2026-09-27: Accepted.**
+> * **Checks:** the 49 evidence files; the captures at 1179 × 2556, crops excepted; the commit touching F00 only; and the code, PRD and contract claims.
+> * **Correction:** Android's launch background is not always white — see A-4 and §2.
+> * **Outcome:** the decisions are in the F00 `orchestration.md` Last Decision and `workflow-follow-ups.md` (Design Adoption Route). The D1 contract is F03 `architecture.md` §19.
 
 ---
 
@@ -59,7 +64,7 @@
 
      At ≈ 1.35× everything holds, so the contracted F03 ui-design §16.5 rule (text scale 1.0 and 1.3×) is met. The Foundation's own rule — no clipping up to accessibility sizes — is not.
    * **A-3 — raw bootstrap error.** The bootstrap-error screen is English and prints the raw exception to the player (`SqliteException(26) … PRAGMA user_version;`).
-   * **A-4 — white launch screen.** The native launch screen is white on iOS and Android, so every cold start flashes white before the dark app.
+   * **A-4 — white launch screen.** The native launch screen is white on iOS, so every cold start flashes white before the dark app. *Tech Lead correction, 2026-09-27:* on Android it is white only in light mode. `drawable-v21/launch_background.xml` uses the launch theme's `?android:colorBackground` — `Theme.Light` by day, `Theme.Black` under `values-night` — and `drawable/` (API < 21) is plain white.
    * **A-5 — frozen tile.** It carries only colour + border: no texture, no corner crystal marks and no thaw animation. F03 ui-design §7 asks for a "texture + border-marks cue, not colour-only" and a 180 ms thaw cross-fade.
    * **A-6 — tutorial ghost.** It keeps animating over the column the player is actually dragging.
 4. **Proposed slices** (rationale in §8):
@@ -78,7 +83,7 @@
 
 | State | Current capture | Target | Pair |
 | --- | --- | --- | --- |
-| Native launch screen | `audit/cur-shell-splash.png` — full white. iOS `LaunchScreen.storyboard` background is `#FFFFFF`; Android `launch_background.xml` is `@android:color/white`. | Foundation ground (`ui-design.md` §10) — not rendered | no target render |
+| Native launch screen | `audit/cur-shell-splash.png` — full white. iOS `LaunchScreen.storyboard` background is `#FFFFFF`. Android (Tech Lead correction): `drawable/` is `@android:color/white`, while `drawable-v21/` uses the theme's `colorBackground` — light by day, black in night mode. | Foundation ground (`ui-design.md` §10) — not rendered | no target render |
 | Flutter splash (`_SplashScreen`) | Not capturable: it lasts less than one capture interval. From code: `Scaffold(body: Center(child: Text('LOOPLET')))` on the default theme. | not rendered | no target render |
 | Bootstrap error (`StoreErrorScreen`, F08 AC9) | `audit/cur-shell-bootstrap-error.png` | Pattern only, `ui-design.md` §8: ground + glass card + Space Grotesk headline + one primary pill | no target render |
 

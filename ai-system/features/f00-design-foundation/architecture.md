@@ -73,3 +73,12 @@ Authority: `project-authority/design-foundation.md` (Selected; §18 decisions an
    * a Visual Evidence Manifest (records of kind `runtime-screenshot` and `parity-comparison`).
 4. **Exit.** The Tech Lead can decide Visual Scope, the reopen order and the first Phase D brief from the audit alone.
 5. **Non-goals.** No code or asset changes in `app/`. No change to `design-foundation.md` beyond flagging conflicts. No rewrite of the F03/F04/F05 `ui-design.md` (that is Phase D). No new feature content. No Visual Quality Gate change: the audit ships no UI, so F00's gate record stays as is.
+6. **Outcome (Tech Lead, 2026-09-27).** `conformance-audit.md` was accepted (commit `cc84440`), and Phase C is complete. The Phase D plan is set in three slices, one reopen at a time:
+
+   | Slice | Carrier | Visual Scope | Scope |
+   | --- | --- | --- | --- |
+   | D1 — Play | F03 (active now) | `existing-parity` | Play; the F05 column tutorial as a cross-feature item; the F03 load error. Contract: F03 `architecture.md` §19. |
+   | D2 — Won moment + full-screen result | F03 | `motion-critical` | The F04 amendments are made in the same reopen. |
+   | D3 — Home + app shell | F05 | `new-surface` | Native launch, the splash and the F08 bootstrap-error screen, as cross-feature items. |
+
+   Rulings on the audit's clarifications: C-2, C-5, C-8, C-9 and C-10 are decided in F03 §19. C-3, C-4, C-6, C-7 and C-11 are decided as slice inputs. C-1 (N1) waits for D3, where it needs a product decision. The full list is in `workflow-follow-ups.md` (Design Adoption Route). F00 returns to Done: it carries no Phase D work.

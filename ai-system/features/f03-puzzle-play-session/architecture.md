@@ -185,7 +185,7 @@ Coordinate orientation follows F02 (`GridCoord`, row/col conventions, L→R win 
 
 * Route: `'/play'` (go_router). Args: `PlaySessionArgs { PuzzleSource source; int? journeyLevel; /* daily needs no extra arg */ }` where `PuzzleSource` reuses F08's `{ journey, daily }`.
 * **Portrait-locked** for the whole screen lifetime.
-* Header / chrome: a minimal back affordance that pops to the caller; no mandated title bar. Exact chrome is `[PENDING — UI]` and must follow `design-doctrine.md`. If a shared header standard emerges across screens later, this section is amended.
+* Header / chrome: a minimal back affordance that pops to the caller; no mandated title bar. Exact chrome is `[PENDING — UI]` and must follow `design-doctrine.md`. If a shared header standard emerges across screens later, this section is amended. **[Amended 2026-09-27, §19]:** the back affordance becomes the drawn back chevron with the `SEVİYE NN` level label, plus the `HAMLE` card top-right; the behaviour is unchanged.
 * Back mid-puzzle keeps the resumable `inProgress` snapshot (§9). Back is confirm-less.
 * No forward navigation from F03 except the completion panel's Close/Retry and (later) F04's "Next Level".
 
@@ -230,7 +230,7 @@ Coordinate orientation follows F02 (`GridCoord`, row/col conventions, L→R win 
 ### Clarifications resolved 2026-09-06 (Tech Lead, post-QA)
 
 * **No primary CTA on the playing screen — `[LOCKED]`.** The board *is* the interaction; the only CTA is `Retry` in the completion sheet. QA must not flag the absence of a floating play/submit button as a defect. (Confirms `ui-design.md §14` #1 + this doc §8.)
-* **Locked / frozen tile *visual* treatment — F03 owns the first pass.** F02 owns the behaviour; F05/F06 author *which* tiles are locked/frozen. The `brass` ring + pin glyph (locked) and `frost` fill + crystal border + thaw cross-fade (frozen) shipped by F03-FE are the accepted first-pass visuals; there is **no separate tile-state visual feature** — a later polish revision, if wanted, is a scoped follow-on, not a blocker. (Confirms `ui-design.md §14` #2.)
+* **Locked / frozen tile *visual* treatment — F03 owns the first pass.** F02 owns the behaviour; F05/F06 author *which* tiles are locked/frozen. The `brass` ring + pin glyph (locked) and `frost` fill + crystal border + thaw cross-fade (frozen) shipped by F03-FE are the accepted first-pass visuals; there is **no separate tile-state visual feature** — a later polish revision, if wanted, is a scoped follow-on, not a blocker. (Confirms `ui-design.md §14` #2.) **[Superseded 2026-09-27 by §19.3 (3–4)]:** the Foundation treatments replace these visuals. Correction: the thaw cross-fade is *not* in the code at `615e94c` — `puzzle_board.dart` renders `BoardTile(status)` with no transition, and `BoardTile` is a plain `Container`. D1 implements it.
 * **Shared in-flow chrome ("no system header, one quiet back chevron top-left, hidden in terminal/`won` states") — locked for `/play`; cross-screen family rule deferred to F10.** F03 is the first in-flow screen, so there is no sibling to converge on yet; F10 (menu + settings) defines the shared chrome family and reconciles siblings then. (Confirms `ui-design.md §14` #3.)
 * **Localization — `PlayStrings` per-language table accepted as the seam for F03.** A proper `gen_l10n` / `.arb` localization layer is a `[DEFERRED — F10-or-earlier follow-on]` (not F03); the final Turkish strings (`HEDEF / HAMLE / ÇÖZÜLDÜ / Yeniden / Kapat / Geri`) are a PO / localization deliverable, tracked with that task. Contract requirement ("externalized") is satisfied. (Confirms `ui-design.md §14` #4.)
 * **Perf deviations from `ui-design.md` — accepted for the MVP.** (1) Board-recede during `won` is a **12 % dim only**, not dim + backdrop blur — preserves the "board recedes, winning row + sheet own focus" intent within the mid-tier frame-rate budget (`prd.md §6`); a device-tier-gated blur is a `[DEFERRED — post-MVP polish]`. (2) The optional breathing spotlight ambient is **omitted** — `ui-design.md §5/§11` marks it optional/flexible. Neither trips a `premium-ui-rubric.md` fail condition. (Resolves `frontend.md §16` #5–6.)
@@ -256,3 +256,121 @@ QA (qa.md, rev 7a907dd) reproduced that the F04 completion panel rises with no d
 * `[DEFERRED — F09]` onboarding overlay / arrow prompts layered on this screen.
 * `[DEFERRED — F11]` SFX + haptics on move / thaw / win / button.
 * `[DEFERRED — F12]` analytics events derived from F03's state changes.
+
+---
+
+## 19. Design Adoption Phase D1 — Loop Glass Play visual rework [LOCKED 2026-09-27]
+
+> **Added by:** the Tech Lead on 2026-09-27, when reconciling the Phase C conformance audit (`features/f00-design-foundation/conformance-audit.md`, accepted). It reopens F03 as visual rework under rework control.
+>
+> **Authority:**
+> * `project-authority/design-foundation.md` — Selected: Direction C "Loop Glass", the user's decisions in §18.
+> * `features/f00-design-foundation/ui-design.md` — §6 Play layout, §7 components, §8 states, §10 visual direction, §13 accessibility.
+> * The selected-source renders `design/S-01b`, `S-02`, `S-03` and `S-07` (F00), plus the device variants `S-v-*` and the component sheet `S-91`.
+> * The audit: §4 Play, §5 tutorial, §10 missing renders 1–10, and the defects A-1, A-2, A-5 and A-6.
+>
+> The Tech Lead rulings of 2026-09-21 also apply: the `HAMLE` caption ≥ 11 pt, and targets ≥ 44 pt.
+
+### 19.1 User-visible symptom
+
+The app still shows the pre-Foundation look (incident 2026-09-26). Play — the screen where players spend their time — runs on `PlayTheme` (near-black stage, amber, cyan), the system font and Material icons. Four shipped defects sit on this surface:
+* **A-1:** the column-tutorial hint is drawn over the undo pill and the restart button (`Positioned(bottom: 40)` in `column_tutorial_overlay.dart`).
+* **A-2:** at the largest OS text size, the tile and rail letters overflow their tiles.
+* **A-5:** the frozen tile carries colour + border only, and it thaws with no transition.
+* **A-6:** the tutorial ghost keeps animating over the column the player is dragging.
+
+### 19.2 Scope
+
+* **Affected journey:**
+  * **Enter:** Home CONTINUE, Result Next / Retry, or resume after a kill.
+  * **Play:** idle, row / column drag, locked / frozen / thaw, undo / restart.
+  * **Leave:** back to Home.
+
+  Entry paths (§4), route (§13) and state model (§6) are unchanged. The won moment and result are **D2**, not D1.
+* **Surfaces and states** — `/play` in every non-`won` state:
+  * the header: back chevron + level label, and the `HAMLE` card;
+  * the target rail;
+  * the board card and tiles: normal; active, for row and column drags; inactive; wrap ghost; locked; frozen; thaw;
+  * the HUD: undo pill — enabled, disabled, quota 3 / 2 / 1 / 0 — and restart;
+  * the load-error state (`_LoadErrorBody`);
+  * the F05 column-tutorial overlay (§19.5).
+* **Visual Scope `existing-parity`:** the Foundation is Selected, and S-01b / S-02 / S-03 / S-07 are its selected-source renders of this screen. The missing sub-states extend them; there is no new direction.
+
+### 19.3 Decisions (Tech Lead, from the audit's clarifications)
+
+1. **Text scale (C-9).** This applies to every Phase D surface (D1–D3). For the surfaces it reworks, it supersedes the "1.0 and 1.3×" scope of F03 ui-design §16.5 (6).
+   * **Free text** — the hint, labels outside a container, body text — follows the OS text scale up to `accessibility-extra-extra-extra-large` (AX5) with no clipping, overlap or mid-word break. The layout may reflow; for example, the hint pill may grow.
+   * **Text bound to a fixed-size container** — tile, rail and answer glyphs, card numerals and captions, pill labels, the wordmark, and the display / headline roles — uses `loopCappedTextScaler` (1.3× cap, `app/lib/design/tokens.dart`) and is sized by its container.
+   * Play never scrolls, and the board geometry does not change with text scale.
+2. **Tutorial HUD (C-5):**
+   * The hint pill sits **above** the HUD; undo and restart stay visible and usable while the tutorial is up, because the player may make row moves before the column move.
+   * The gesture ghost hides on touch-down and returns once the board is idle.
+   * Under Reduce Motion the ghost is static.
+3. **Thaw (C-10):** a 180 ms cross-fade from the frozen treatment to the normal tile, instant under Reduce Motion (F03 ui-design §7, never implemented).
+4. **Special tiles** (supersedes the §18 first-pass visuals), per the Foundation's `ui-design.md` §8:
+   * **Locked:** indigo tile + inner rim + lock icon.
+   * **Frozen:** ice tile + dashed border + snowflake icon.
+
+   Both must stay readable in greyscale.
+5. **Copy (user decision 6 — the reference wording as proposed copy):**
+   * `HEDEF` → `HEDEF DÖNGÜ`.
+   * The level label `SEVİYE NN` has two digits and is bound to the level number; the `05` in S-03 / S-07 is placeholder copy.
+   * Both ship through `PlayStrings` as interim copy. PO / localization may revise them there (F10-UI-LOCALIZATION).
+   * The tutorial sentence is unchanged.
+6. **Hybrid period (C-8) is accepted.** Home, the won moment and the result keep the legacy look until D2 / D3. There is no global font or colour swap outside the reworked surface.
+
+### 19.4 Contract amendments
+
+* **§13 chrome:** as amended in place — back chevron + `SEVİYE NN`, and the `HAMLE` card. Back still pops to the caller, keeps the snapshot, needs no confirmation and hides in `won`.
+* **§8 Restart "away from the grid":** still holds; the HUD sits below the board (S-01b).
+* **§14:** every new string goes through `PlayStrings`.
+* **§18 (2026-09-06) tile visuals:** superseded by §19.3 (3–4).
+* **F03 `ui-design.md`:** the Direction A visual sections (§2, §5–§11) are superseded for the Play surface by the D1 handoff. §16 (won composition) stays authoritative until D2.
+* **ACs unchanged:** AC1 (moves, Undo 3 and Restart shown) and AC7 hold; AC9 is met by the active-row rim + rails.
+
+### 19.5 Cross-feature item — the F05 column tutorial
+
+* The overlay (`app/lib/journey/column_tutorial_overlay.dart`) is re-skinned in this reopen per S-07 and §19.3 (2).
+* F05 behaviour is unchanged: the trigger, the action-gated dismissal and the ack / re-show (F05 §9, AC4, AC11).
+* F05 stays Done. Precedent: the 2026-09-20 F03 rework changed F04 panel code while F04 stayed Done.
+* F05 `architecture.md` §9 records that its visual authority has moved here.
+
+### 19.6 Non-goals
+
+* **Won moment and result (D2):** F03 §16 and the F04 panel keep their look and timing.
+* **Home, app shell, F08 error screen (D3).**
+* **No behaviour change:** no engine, gesture-threshold, input-lock, persistence, snapshot, route or timing change. The shift already matches the Foundation (190 ms, `cubic-bezier(.22,1,.36,1)`).
+* **No future-scope content:** the gesture-hint line "Satırı tut · kaydır · bırak" (F09), settings, the streak and the stars.
+* **No new dependency:** the fonts are bundled and the icons are drawn in `app/lib/design`.
+
+### 19.7 Evidence and exit criteria
+
+* **UI Designer (F03-UI-D1)** — the Loop Glass Play handoff in F03 `ui-design.md`, per the handoff gate in `visual-quality-gate.md`:
+  * **Layout:** per F00 ui-design §6, at 393 pt and on the 16e / Pro Max variants.
+  * **Decisions:** components, states and interaction.
+  * **Motion spec:** lift, rim fade-in, settle, inactive dim, thaw and the ghost, each with its reduced path.
+  * **Screen / State / Viewport matrix.**
+  * **Visual Evidence Manifest:** `selected-source` records for S-01b, S-02, S-03 and S-07, plus new real renders for the audit's D1 missing states 1–10 — including the AX5 Play frame and the tutorial per §19.3 (2).
+  * **A D1 acceptance list.**
+  * **Gate:** Visual Quality Gate → Ready for Implementation at the Tech Lead checkpoint.
+* **Frontend/Mobile Developer (F03-FE-D1)** — implement from `app/lib/design` tokens and components:
+  * Replace the Material icons on this surface with drawn ones — `chevron_left_rounded`, `undo_rounded`, `refresh_rounded`, `push_pin`, `error_outline_rounded`, and the tutorial's `unfold_more_rounded`.
+  * Drop `PlayTheme` from the reworked widgets; it stays for the won moment until D2.
+  * Update tests (string / icon lookups); all green.
+  * **`frontend.md` Visual Parity Evidence:**
+    * runtime screenshots on the iPhone 16, 16e and Pro Max, side by side with the renders;
+    * a screen recording of a row lift, a column lift and a thaw;
+    * an OS text-size sweep up to AX5;
+    * Reduce Motion on and off;
+    * `integration_test` still green on the simulator.
+* **QA (F03-QA-D1)** — final stage, client-only; modules core + client-ui + visual-quality + stateful-flow; regression full:
+  * an independent runtime rubric score ≥ 93, with every dimension ≥ 8 and no fail condition;
+  * regression over AC1–AC11 — gestures, no double count, resume across a kill — plus the tutorial's AC4 / AC11 re-show;
+  * the text-scale sweep and Reduce Motion;
+  * Android stated as a limit.
+* **Exit:**
+  * Visual Quality Gate Passed;
+  * final QA Approved or Approved with Notes;
+  * Delivery Review Accepted.
+
+  F03 then returns to Done, and D2 is activated.

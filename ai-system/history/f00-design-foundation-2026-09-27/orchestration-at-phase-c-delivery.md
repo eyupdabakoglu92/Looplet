@@ -6,19 +6,19 @@ F00
 
 ## Current Status
 
-Done
+In Progress
 
 ## Current Owner
 
--
+Tech Lead
 
 ## Next Role
 
--
+Tech Lead
 
 ## Active Task Ledger
 
-None
+- [x] Task ID: F00-UI-CONFORMANCE-AUDIT | Assigned Role: UI Designer | Status: Done | Summary: DELIVERED 2026-09-27 — conformance-audit.md + design/audit/ (HEAD 615e94c, iPhone 16 simulator, fresh install). Every surface/state of architecture.md §8.2 captured, including load error, bootstrap error, reduced motion and OS text scale (≈1.35× and AX5). 34 capture records, and 14 side-by-side pairs where an S-* target exists. Per-surface gap lists by the eight categories. Proposal: D1 Play + tutorial (existing-parity) → D2 won moment + full-screen result (motion-critical) → D3 Home + app shell (new-surface), with a D1 brief skeleton. Contract impacts: DESIGN-ADOPTION-CONTRACT-AMENDMENTS confirmed plus 9 new items (e.g. F05 PRD AC1 names Close; F03 §16.5 obsolete; text-scale ceiling). 26 missing renders. 6 shipped defects found (A-1…A-6). Clarifications C-1…C-11 (incl. N1). No app/ change | Depends On: -
 
 ## Open Tasks
 
@@ -30,7 +30,7 @@ None
 
 ## Delivery Review
 
-Accepted
+Pending
 
 ## QA Scope
 
@@ -170,69 +170,43 @@ None
 
 ## Next Action
 
--
+Run Tech Lead: reconcile F00-UI-CONFORMANCE-AUDIT (`conformance-audit.md`, `design/audit/`, evidence F00.CONFORMANCE-AUDIT) and set Delivery Review. Then, from the audit:
+* Visual Scope per feature — proposal §8: D1 Play + tutorial `existing-parity` → D2 won moment + full-screen result `motion-critical` → D3 Home + app shell `new-surface`.
+* The Phase D reopen order and carriers (C-2).
+* The contract amendments — §9, nine of them new.
+* Rulings on C-1…C-11, including N1 and the text-scale ceiling.
+* Routing for the shipped defects A-1…A-6 (§1).
+Finally, activate the first Phase D surface; a D1 brief skeleton is in §8.
 
 ## Last Decision
 
-2026-09-27 (Phase C reconciliation and closure) — the Tech Lead reconciled F00-UI-CONFORMANCE-AUDIT (commit cc84440) and accepted it. F00 is Done again.
+2026-09-27 (Design Adoption Phase C activation) — F05 closed Done today, so the incident decision of 2026-09-26 applies: Phase C takes the next slot, ahead of F08.
+* **Carrier:** F00 is re-activated as the carrier. Its PRD already defines it as the carrier of the Design Adoption Route, and its architecture §1 lists "Phase C conformance audit of shipped surfaces" as a later stage. A new carrier could never satisfy the terminal rules (final QA, visual gate) for a no-code audit.
+* **Gate record:** unchanged — Visual Scope design-system, Visual Quality Gate Passed via F00.VISUAL-93-THRESHOLD, QA Result Approved with Notes all refer to the shipped design-system layer. The audit ships no UI.
+* **Contract:** architecture.md §8 added (audit contract).
+* **Task:** F00-UI-CONFORMANCE-AUDIT activated for the UI Designer.
+* **Phase D:** it will reopen F03/F04/F05 one surface at a time, each under its own contract amendment and visual gate. It does not run under F00.
 
-**Task coverage.** Every surface and state of architecture.md §8.2 is covered: the F05 home ×4, the shell, F03 Play, the won moment + F04 result, and the F05 tutorial. Each has its pair (or "no target render"), gaps in the eight categories, a scope proposal, contract impacts, exclusions and missing renders. The document ends with the proposed order, a matrix and a manifest (§8.3).
+The pre-activation terminal snapshot is in history/f00-design-foundation-2026-09-27/orchestration-before-phase-c.md.
 
-**Evidence** (F00.CONFORMANCE-AUDIT, PASS) — independently checked:
-* 49 files — 35 PNG and 14 JPEG; every full capture is 1179×2556, the iPhone 16 runtime size; the two crops are derived.
-* The commit touches only `ai-system/features/f00-design-foundation/` — no `app/` file.
-* Code claims re-read:
-  * six real `Icons.*` uses (`Icons.star` only in a doc comment); no `fontFamily` outside `app/lib/design`;
-  * `PlayTheme` values: shift 190 ms, dim 0.08, radius 0.19, glyph 0.46;
-  * the tutorial hint at `Positioned(bottom: 40)` — the root cause of A-1;
-  * no thaw transition in `puzzle_board.dart` / `board_tile.dart` — A-5;
-  * the English `StoreErrorScreen` printing the raw message — A-3;
-  * the white iOS launch screen — A-4.
-* PRD claims re-read: F05 PRD AC1 and F05 architecture §8 name `Close`; product-prd only says "the completion panel closes".
+Full history through 2026-09-26 (Direction A/B rejection, Foundation Selected, design-system delivery, F00-QA-VISUAL Rejected 80/100, F00-FE-A11Y-REWORK, F00-QA-VISUAL2's Approved-with-Notes mistake corrected to Rejected 88/100, F00-FE-A11Y-REWORK2, F00-QA-VISUAL3's Rejected 90/100) is archived byte-for-byte in `history/f00-design-foundation-2026-09-{21,23,24,26}/` (each folder's README explains its checkpoint; the newest is [orchestration-at-93-threshold-decision.md](../../history/f00-design-foundation-2026-09-26/orchestration-at-93-threshold-decision.md)). Summary: every named defect across four QA rounds (QA-01 Dynamic Type, QA-02 duplicate semantics, QA-03 missing focus ring, QA-04 text-wrap at extreme scale) is now fixed and independently confirmed.
 
-**Correction:** Android's launch background is white only in light mode (`drawable-v21` uses the theme's `colorBackground`). Corrected in the audit (A-4, §2).
+2026-09-26 (F00-QA-VISUAL3 reconciliation) — Tech Lead credited QA's Rejected verdict (90/100, correct per the rubric's unconditional Verdict Bands) and personally verified QA's own cited "structural" gaps rather than accepting the label at face value: ran `xcrun simctl ui content_size` and found the real category list (12 total: 7 standard + 5 `accessibility-*`); every prior round had only captured runtime evidence at 2 of the 5 accessibility categories. Captured the 3 untested ones fresh (iPhone 16, `_TypeRoles` specimen + `CARDS, STATS, TRACK` section) — clean at all three, no overflow, no mid-word break (F00.VISUAL-93-GAP-CHECK). This closes one of QA's three cited gaps; the other two (real hardware keyboard, a VoiceOver speech pass) remain genuinely outside this session's tools (would need physical hardware or a macOS GUI accessibility app this session cannot drive). Realistic ceiling given Motion's unconditional dimension-7 rubric text plus the two remaining genuine gaps: ~91/100 — still short of 93, by design-scope and by tooling, not by any remaining code defect. Opened decision gate `F00.VISUAL-93-THRESHOLD` (recommendation C: a scoped, one-time exception for F00, not a rubric rewrite) and routed to the user rather than deciding unilaterally, since option B would mean silently rewriting a document marked NORMATIVE / REUSABLE CORE with consequences for every future similarly-scoped feature. Current Status set to Blocked (no executable code/QA task remains).
 
-**Decisions:**
-* **Phase C is complete.** Phase D runs as D1 → D2 → D3, one reopen at a time:
-
-  | Slice | Carrier | Visual Scope | Scope |
-  | --- | --- | --- | --- |
-  | D1 — Play | F03, reopened now | `existing-parity` | The F05 tutorial overlay as a cross-feature item, plus the F03 load error |
-  | D2 — Won moment + full-screen result | F03 | `motion-critical` | F04 contract amendments in the same reopen |
-  | D3 — Home + app shell | F05 | `new-surface` | Native launch, splash and the F08 `StoreErrorScreen` as cross-feature items |
-* **Rulings** (contract text: F03 architecture §19.3):
-  * C-2 — carriers, as above;
-  * C-5 — the tutorial pill sits above the HUD;
-  * C-8 — the hybrid period is accepted;
-  * C-9 — text scale: free text to AX5, container text capped at 1.3×, no scrolling on Play;
-  * C-10 — a 180 ms thaw.
-* **C-3:** no Product Owner revision is needed — the product semantics are unchanged. The F05 wording is resynced at D2, and a correction note was added to design-foundation §18.
-* **Slice inputs**, confirmed with renders at that slice:
-  * D2: C-4 (drop `3 / 3`, the delta, `İLK` and "daha iyi"; `HARİKA` takes precedence when perfect) and C-11 (special tiles turn lime at T0);
-  * D3: C-6 (Foundation pattern, Turkish copy, no raw exception) and C-7 (native launch assets).
-* **C-1 (N1) is deferred to D3.** Surfacing the replay would change the AC7/AC9 precedence, so it needs a product decision at D3 activation.
-* **Defect routing:** A-1, A-2 (board), A-5 and A-6 → D1; A-2 (result) → D2; A-2 (home), A-3 and A-4 → D3.
-
-**Closure** (role-execution-contract §6): Delivery Review Accepted; the gate record is unchanged (the audit ships no UI); the ledger and Handoff Plan are None; owner, next role and next action are `-`. The completed brief and the delivery-time orchestration are archived byte-for-byte in [orchestration-at-phase-c-delivery.md](../../history/f00-design-foundation-2026-09-27/orchestration-at-phase-c-delivery.md).
-
-**Earlier decisions:**
-* The Phase C activation (2026-09-27) is archived in the delivery-time snapshot above.
-* The pre-activation terminal state (2026-09-26) is in [orchestration-before-phase-c.md](../../history/f00-design-foundation-2026-09-27/orchestration-before-phase-c.md).
-* History through 2026-09-26 is archived byte-for-byte in `history/f00-design-foundation-2026-09-{21,23,24,26}/`: the Direction A/B rejection, Foundation Selected, the design-system delivery, the QA rounds 80 → 88 → 90 with QA-01..04 fixed, and the scoped exception F00.VISUAL-93-THRESHOLD.
+2026-09-26 (F00.VISUAL-93-THRESHOLD resolved; full pre-closure snapshot archived: [orchestration-before-closure.md](../../history/f00-design-foundation-2026-09-26/orchestration-before-closure.md)) — the user chose option C, the scoped one-time exception. Tech Lead recorded the resolution on the decision gate, set `Visual Quality Gate: Passed` and `QA Result: Approved with Notes` on that explicit basis (not a rubric rewrite, not silent — the full reasoning is on the decision gate itself and in qa.md's own Rejected verdict, left untouched as the honest historical QA record). Ran full Terminal Cleanup per role-execution-contract.md §6: Active Task Ledger and Handoff Plan cleared to None (9-task history preserved in the Change Log below and in `history/f00-design-foundation-2026-09-26/orchestration-before-closure.md`), Owner/Next Role/Next Action set to `-`, Blockers cleared, Current Status set to `Done`. F00 is Done — the first feature carrying a Visual Scope other than `none` to close under the rubric-based visual gate. Design Adoption Route Phase C (conformance audit of the F03/F04/F05 surfaces against the now-Passed Foundation) is unblocked but **not** activated in this turn — it needs its own planning pass, not a same-turn side effect of closing F00. F05-QA-STRICT (delivery reconciliation, then QA) is the immediate next queued item.
 
 ## Last Update
 
-* Updated By: Tech Lead
+* Updated By: UI Designer
 * Timestamp: 2026-09-27
-* Summary: F00-UI-CONFORMANCE-AUDIT reconciled and accepted (with one correction). The Phase D plan and rulings are recorded; F00 is Done again (terminal cleanup); F03 is reopened for Phase D1.
+* Summary: F00-UI-CONFORMANCE-AUDIT delivered — conformance-audit.md + design/audit/ (34 capture records, 14 parity pairs). Delivery Review = Pending; owner → Tech Lead (visual-gate checkpoint).
 
 ## Context & Follow-ups
 
-* **Phase status:**
-  * Phases A, B and C are done: the Foundation is Selected; the design-system layer and gallery shipped and passed; the conformance audit was accepted on 2026-09-27.
-  * **Phase D is active**, carried by F03 (D1 Play, architecture §19), then D2 and D3 (workflow-follow-ups.md, Design Adoption Route).
-* **F00 carries no Phase D work.**
-* **Evidence size:** the audit added ≈ 38 MB under design/audit/ (F00-ARTEFACT-SIZE).
+* **Phase status:** Phase A and Phase B are done — the Foundation is Selected and the design-system layer plus gallery shipped and passed. No shipped screen uses the new design yet (by scope).
+* **Phase C (now):** the conformance audit.
+* **Phase D (next):** F03/F04/F05 visual rework, one surface at a time, each with its own contract amendment (DESIGN-ADOPTION-CONTRACT-AMENDMENTS) and visual gate.
+* **Input for Phase D:** F05's closure note N1 — the terminal state vs an in-progress replay.
 * **F08 local evidence** is queued behind the design adoption (incident 2026-09-26).
 
 ## History & Evidence References
@@ -240,7 +214,7 @@ None
 * [Scope contract](architecture.md); [Design Adoption Route](../../workflow-follow-ups.md); [platform.md §14](../../project-authority/platform.md).
 * Shipped identity for reference: `app/lib/play/play_theme.dart`; surfaces documented in F03 ui-design.md (§5–§8, §16), F04 ui-design.md, F05 ui-design.md.
 * Canonical execution: role-execution-contract.md.
-* [Frontend delivery](frontend.md) · [QA verdict](qa.md) · [carrier PRD statement](prd.md) · [Phase C conformance audit](conformance-audit.md) · archived working orchestrations: `history/f00-design-foundation-2026-09-{21,23,24,26,27}/` (each folder's own README explains its checkpoint, oldest to newest).
+* [Frontend delivery](frontend.md) · [QA verdict](qa.md) · [carrier PRD statement](prd.md) · archived working orchestrations: `history/f00-design-foundation-2026-09-{21,23,24,26}/` (each folder's own README explains its checkpoint, oldest to newest).
 
 ## Change Log
 
@@ -271,15 +245,56 @@ None
   * **Evidence:** conformance-audit.md, plus 34 capture records and 14 parity pairs under design/audit/, from HEAD 615e94c on the iPhone 16.
   * **Proposal:** D1 Play `existing-parity` → D2 won moment + result `motion-critical` → D3 Home + shell `new-surface`.
   * **Findings:** 9 new contract impacts, 26 missing renders, 6 shipped defects (A-1…A-6), clarifications C-1…C-11.
-* 2026-09-27 — Tech Lead: F00-UI-CONFORMANCE-AUDIT reconciled; Delivery Review Accepted (one correction: the Android launch background).
-  * **Recorded:** the Phase D plan (D1 F03 → D2 F03 → D3 F05) and the rulings on C-1…C-11.
-  * **State:** terminal cleanup; F00 Done.
-  * **Next:** F03 reopened for Phase D1 (F03 architecture §19).
 
 ## Current Brief
 
-None — F00 is Done. The completed F00-UI-CONFORMANCE-AUDIT brief is archived byte-for-byte in [orchestration-at-phase-c-delivery.md](../../history/f00-design-foundation-2026-09-27/orchestration-at-phase-c-delivery.md). The active Phase D brief lives in the F03 orchestration.
+**F00-UI-CONFORMANCE-AUDIT — Design Adoption Phase C (activated 2026-09-27; contract: architecture.md §8)**
+
+**Why:** the user sees the old design in the app. The Foundation (Direction C "Loop Glass") is Selected, and the design-system layer (`app/lib/design/`) and gallery exist. No shipped screen uses them yet — that is Phase D. This audit is the planning input that lets the Tech Lead reopen the right surfaces in the right order, with the right contract amendments.
+
+**Inputs:**
+* **Authority:**
+  * `project-authority/design-foundation.md` — Selected; §18 is the user's decision set. It includes the full-screen result without Close, the `Looplet` wordmark, the reference's Turkish copy as proposed copy, and the future-scope items.
+  * `features/f00-design-foundation/ui-design.md` — the design-system handoff and §11, the board → full-screen result motion spec.
+* **Target renders:** `design/S-*.png`:
+  * S-01 / S-01b play idle; S-02 lifted row; S-03 locked + frozen;
+  * S-04 / S-04b / S-05 result perfect / new best / 2★;
+  * S-06 / S-06b home design / today; S-07 column tutorial;
+  * S-08…S-16 transition incl. the reduced-motion frames; S-91 components;
+  * device variants S-v-*.
+* **Current app:** build `app/lib/main.dart` (debug) on the iPhone 16 simulator (`D0011CE7-6E50-4367-93FA-B323E81270BE`, 393×852 pt, `platform.md` §14):
+
+  ```bash
+  cd app && flutter build ios --simulator --debug -t lib/main.dart && xcrun simctl install booted build/ios/iphonesimulator/Runner.app
+  ```
+
+  * Use a fresh install for new-player states.
+  * The home's debug row (`L01 L02 L04 L05 L06` — the smoke set) is a shortcut to locked-tile (L04) and frozen-tile (L05) boards.
+  * Journey levels 1–2 solve with row-0 left ×2 (L1) and row-3 left ×2 (L2) — handy for the win sequence and result states.
+* **Design-system layer in code:** `cd app && flutter run -t lib/main_gallery.dart` (the component gallery), to note which Foundation components already exist in code for each gap.
+* **Legacy handoffs:** F03 / F04 / F05 `ui-design.md`, plus their `architecture.md` for contract constraints (e.g. F03 §16 won-moment timing, F04 Close/back, F05 §8/§10 home and terminal).
+* **Portfolio notes:** workflow-follow-ups DESIGN-ADOPTION-CONTRACT-AMENDMENTS and USER-REFERENCE-CONTENT-DELTAS; F05 closure note N1 — with 30/30 complete, the terminal state wins over an in-progress replay (architecture F05 §8). Say whether the redesigned home should surface such a replay.
+
+**Deliver** `features/f00-design-foundation/conformance-audit.md`, with captures and side-by-side pairs under `design/audit/`, per architecture.md §8.3:
+1. **Per surface and state:** a current capture paired with its target render; a gap list by category (layout, typography, colour/surface, iconography, components, copy/casing, motion, accessibility); a Visual Scope proposal with its reason; contract/AC impacts; future-scope exclusions; states with no target render yet.
+2. **Surfaces to cover:**
+   * F05 home — new, mid, in-progress, terminal; plus the splash and bootstrap-error shell.
+   * F03 play — idle, lifted row, column drag, locked, frozen and thaw, HUD undo states, back, target rail, load-error.
+   * F03 won moment + F04 panel — win sequence; 3★ / 2★ / 1★; first clear / new best / matched; each CTA; reduced motion.
+   * F05 column tutorial.
+3. **Proposed Phase D order and grouping,** with a rationale — player-visible impact, which `app/lib/design` components are reused, risk, and contract size.
+4. **Matrix and manifest:** a Screen / State / Viewport matrix and a Visual Evidence Manifest (`runtime-screenshot`, `parity-comparison`).
+
+**Non-goals:** no code or asset changes in `app/`; no new direction or exploration (the Foundation is Selected); no edits to `design-foundation.md` except flagging conflicts; no rewrite of F03/F04/F05 `ui-design.md`; no future-scope feature content; no Visual Quality Gate change.
+
+**Exit:** the Tech Lead can decide, from this document alone:
+* Visual Scope per feature;
+* the Phase D reopen order;
+* the contract amendments;
+* the first Phase D brief.
+
+Unresolved design questions go under Needs Tech Lead Clarification; the user is not asked directly. When done, set Delivery Review = Pending and hand back to the Tech Lead.
 
 ## Earlier briefs
 
-The Phase C brief (F00-UI-CONFORMANCE-AUDIT, archived as above). The UI Designer briefs (F00-UI-FOUNDATION, F00-UI-DIRECTION-C, F00-UI-FINALIZE), the Frontend briefs (F00-FE-DESIGN-SYSTEM, F00-FE-A11Y-REWORK, F00-FE-A11Y-REWORK2) and all three QA briefs (F00-QA-VISUAL verdict Rejected; F00-QA-VISUAL2 scenarios PASSED but overall QA Result corrected to Rejected on reconciliation; F00-QA-VISUAL3 verdict Rejected, 90/100, QA-04 confirmed resolved but the shortfall now structural — see Last Decision) are closed; their content lives in design-foundation.md (§4-§19), ui-design.md, architecture.md §7, frontend.md, qa.md and the archived working orchestrations (full brief text: [orchestration-at-qa-visual3-verdict.md](../../history/f00-design-foundation-2026-09-26/orchestration-at-qa-visual3-verdict.md)).
+The UI Designer briefs (F00-UI-FOUNDATION, F00-UI-DIRECTION-C, F00-UI-FINALIZE), the Frontend briefs (F00-FE-DESIGN-SYSTEM, F00-FE-A11Y-REWORK, F00-FE-A11Y-REWORK2) and all three QA briefs (F00-QA-VISUAL verdict Rejected; F00-QA-VISUAL2 scenarios PASSED but overall QA Result corrected to Rejected on reconciliation; F00-QA-VISUAL3 verdict Rejected, 90/100, QA-04 confirmed resolved but the shortfall now structural — see Last Decision) are closed; their content lives in design-foundation.md (§4-§19), ui-design.md, architecture.md §7, frontend.md, qa.md and the archived working orchestrations (full brief text: [orchestration-at-qa-visual3-verdict.md](../../history/f00-design-foundation-2026-09-26/orchestration-at-qa-visual3-verdict.md)).
