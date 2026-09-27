@@ -10,15 +10,15 @@ In Progress
 
 ## Current Owner
 
-UI Designer
+Tech Lead
 
 ## Next Role
 
-UI Designer
+Tech Lead
 
 ## Active Task Ledger
 
-- [ ] Task ID: F00-UI-CONFORMANCE-AUDIT | Assigned Role: UI Designer | Status: Open | Summary: ACTIVATED 2026-09-27 by the Tech Lead (Design Adoption Route Phase C, scheduled by the incident of 2026-09-26 for right after F05's closure). Conformance audit of every shipped surface against the Selected Foundation (architecture.md §8): fresh runtime captures of the current app paired with the selected-source renders; a per-state gap list; Visual Scope proposals; contract impacts; future-scope exclusions; missing renders; a proposed Phase D order. Deliverable conformance-audit.md + design/audit/. No code, no new directions. See Current Brief | Depends On: -
+- [x] Task ID: F00-UI-CONFORMANCE-AUDIT | Assigned Role: UI Designer | Status: Done | Summary: DELIVERED 2026-09-27 — conformance-audit.md + design/audit/ (HEAD 615e94c, iPhone 16 simulator, fresh install). Every surface/state of architecture.md §8.2 captured, including load error, bootstrap error, reduced motion and OS text scale (≈1.35× and AX5). 34 capture records, and 14 side-by-side pairs where an S-* target exists. Per-surface gap lists by the eight categories. Proposal: D1 Play + tutorial (existing-parity) → D2 won moment + full-screen result (motion-critical) → D3 Home + app shell (new-surface), with a D1 brief skeleton. Contract impacts: DESIGN-ADOPTION-CONTRACT-AMENDMENTS confirmed plus 9 new items (e.g. F05 PRD AC1 names Close; F03 §16.5 obsolete; text-scale ceiling). 26 missing renders. 6 shipped defects found (A-1…A-6). Clarifications C-1…C-11 (incl. N1). No app/ change | Depends On: -
 
 ## Open Tasks
 
@@ -30,7 +30,7 @@ None
 
 ## Delivery Review
 
-Accepted
+Pending
 
 ## QA Scope
 
@@ -70,7 +70,7 @@ F00.VISUAL-93-THRESHOLD
 
 ## Visual Evidence
 
-Selected-source and reference records: features/f00-design-foundation/ui-design.md § Visual Evidence Manifest (3 direction-render, canonical-reference, parity-comparison, selected-source and motion-prototype records); artefacts under features/f00-design-foundation/design/ (S-*.png, S-91-components.png, parity-*.png, sheet-S*.png, src/S-transition-prototype.html); user references in design/reference/. Runtime records (2026-09-21, Frontend/Mobile Developer): features/f00-design-foundation/frontend.md § Visual Parity Evidence (7 runtime-screenshot and 3 parity-comparison records; runtime-iphone16-*.png, runtime-iphone16e-sheet.png, runtime-iphone16promax-sheet.png, parity-runtime-1..3 under design/); the Tech Lead verified the records and the artefacts on 2026-09-21 (parity boards, runtime frames, a wrong İLK attribution corrected in frontend.md) and set the gate to Ready for QA.
+Selected-source and reference records: features/f00-design-foundation/ui-design.md § Visual Evidence Manifest (3 direction-render, canonical-reference, parity-comparison, selected-source and motion-prototype records); artefacts under features/f00-design-foundation/design/ (S-*.png, S-91-components.png, parity-*.png, sheet-S*.png, src/S-transition-prototype.html); user references in design/reference/. Runtime records (2026-09-21, Frontend/Mobile Developer): features/f00-design-foundation/frontend.md § Visual Parity Evidence (7 runtime-screenshot and 3 parity-comparison records; runtime-iphone16-*.png, runtime-iphone16e-sheet.png, runtime-iphone16promax-sheet.png, parity-runtime-1..3 under design/); the Tech Lead verified the records and the artefacts on 2026-09-21 (parity boards, runtime frames, a wrong İLK attribution corrected in frontend.md) and set the gate to Ready for QA. Phase C audit records (2026-09-27, UI Designer; shipped-app baseline, not design-system evidence): conformance-audit.md §12 Visual Evidence Manifest (28 runtime-screenshot, 6 accessibility and 14 parity-comparison records; artefacts under design/audit/).
 
 ## QA Modules
 
@@ -131,6 +131,17 @@ allowed
   * Result: PASS
   * Provenance / Note: 2026-09-26 Tech Lead. `xcrun simctl ui <udid> content_size` lists exactly 12 categories (7 standard + 5 `accessibility-*`); every round's evidence only ever named real runtime captures at 2 of the 5 accessibility categories (medium, extra-extra-extra-large) — the 3 middle ones (`accessibility-large`, `accessibility-extra-large`, `accessibility-extra-extra-large`) had never been captured. Captured all 3 fresh on iPhone 16, both the `_TypeRoles` specimen and the `CARDS, STATS, TRACK` section (`MovesCard`/`StatCard`/`LoopNode`, the journey `GlassCard`): clean at every one, no overflow, no mid-word break. This specific sub-gap is closed — it was a real but closeable testing gap, not an environment limitation. The other two (real hardware/Bluetooth keyboard, a VoiceOver speech pass with live text output) remain genuinely out of reach: both require driving separate physical hardware or a macOS GUI accessibility tool (Accessibility Inspector) that this session's tools cannot operate. Net effect on the rubric: `Layout, Rhythm and Responsiveness` could reasonably move 9->10 on this new evidence (QA's own call to make, not Tech Lead's); the realistic ceiling given the remaining two genuine gaps plus Motion's unconditional dimension-7 text is approximately 91/100 — still short of 93.
 
+- Evidence ID: F00.CONFORMANCE-AUDIT
+  * Scenario: Design Adoption Phase C conformance audit — fresh runtime captures of every shipped surface and state in architecture.md §8.2 on the canonical simulator, paired with the S-* selected-source render where one exists, plus OS text-scale and Reduce Motion captures
+  * Required Class: runtime
+  * Target / Environment: iOS Simulator 18.6, iPhone 16 (393×852 pt); debug build of app/lib/main.dart at HEAD 615e94c; fresh install
+  * Owner Role: UI Designer
+  * Prerequisite / External Decision: None
+  * Re-evaluation Trigger: F00-UI-CONFORMANCE-AUDIT delivery (2026-09-27)
+  * Blocks: Tech Lead Phase D planning (Visual Scope per feature, reopen order, contract amendments)
+  * Result: PASS
+  * Provenance / Note: 2026-09-27 UI Designer, HEAD 615e94c (tree clean apart from the untracked conformance-audit.md and design/audit/). 35 capture files in 34 records (28 runtime-screenshot, 6 accessibility) plus 14 parity-comparison composites (2× JPEG), ≈ 38 MB, manifest in conformance-audit.md §12. States reached by hand (Journey L1–L2) or seeded with the app stopped: journey_progress, settings.language=de, a corrupted then restored store. Simulator Reduce Motion and content size restored afterwards; the app on the simulator keeps seeded 30/30 test progress. Limits: no Android, no real device, no 16e / Pro Max, no video (motion from ~150 ms burst frames). No app/ file changed.
+
 ## Open Decision Gates
 
 - Decision ID: F00.FOUNDATION-SELECTION
@@ -159,7 +170,13 @@ None
 
 ## Next Action
 
-Run UI Designer on F00-UI-CONFORMANCE-AUDIT (Current Brief below; architecture.md §8). Deliver `conformance-audit.md` + `design/audit/` evidence, set Delivery Review = Pending and hand back to the Tech Lead. The Tech Lead then decides Visual Scope per feature, the Phase D reopen order and the contract amendments, and activates the first Phase D surface.
+Run Tech Lead: reconcile F00-UI-CONFORMANCE-AUDIT (`conformance-audit.md`, `design/audit/`, evidence F00.CONFORMANCE-AUDIT) and set Delivery Review. Then, from the audit:
+* Visual Scope per feature — proposal §8: D1 Play + tutorial `existing-parity` → D2 won moment + full-screen result `motion-critical` → D3 Home + app shell `new-surface`.
+* The Phase D reopen order and carriers (C-2).
+* The contract amendments — §9, nine of them new.
+* Rulings on C-1…C-11, including N1 and the text-scale ceiling.
+* Routing for the shipped defects A-1…A-6 (§1).
+Finally, activate the first Phase D surface; a D1 brief skeleton is in §8.
 
 ## Last Decision
 
@@ -180,9 +197,9 @@ Full history through 2026-09-26 (Direction A/B rejection, Foundation Selected, d
 
 ## Last Update
 
-* Updated By: Tech Lead
+* Updated By: UI Designer
 * Timestamp: 2026-09-27
-* Summary: F00 re-activated as the Design Adoption Phase C carrier (F05 closed; incident decision 2026-09-26). architecture.md §8 added; F00-UI-CONFORMANCE-AUDIT activated; owner → UI Designer.
+* Summary: F00-UI-CONFORMANCE-AUDIT delivered — conformance-audit.md + design/audit/ (34 capture records, 14 parity pairs). Delivery Review = Pending; owner → Tech Lead (visual-gate checkpoint).
 
 ## Context & Follow-ups
 
@@ -224,6 +241,10 @@ Full history through 2026-09-26 (Direction A/B rejection, Foundation Selected, d
 * 2026-09-26 — Tech Lead: F00-QA-VISUAL3 reconciled; personally verified QA's cited gaps (closed the accessibility-category sweep gap with fresh evidence; confirmed the other two are genuinely outside this session's tools); opened decision gate F00.VISUAL-93-THRESHOLD and routed to the user; Current Status = Blocked; owner/next stay Tech Lead.
 * 2026-09-26 — Tech Lead: user resolved F00.VISUAL-93-THRESHOLD (option C, scoped one-time exception); Visual Quality Gate = Passed; QA Result = Approved with Notes; Terminal Cleanup applied (ledger/handoff cleared, owner/next/action = -); F00 Done.
 * 2026-09-27 — Tech Lead: F00 re-activated as the Design Adoption Phase C carrier (F05 closed; incident decision 2026-09-26); architecture.md §8 added; F00-UI-CONFORMANCE-AUDIT activated; owner → UI Designer.
+* 2026-09-27 — UI Designer: F00-UI-CONFORMANCE-AUDIT delivered; task Done; F00.CONFORMANCE-AUDIT PASS; Delivery Review = Pending; owner → Tech Lead.
+  * **Evidence:** conformance-audit.md, plus 34 capture records and 14 parity pairs under design/audit/, from HEAD 615e94c on the iPhone 16.
+  * **Proposal:** D1 Play `existing-parity` → D2 won moment + result `motion-critical` → D3 Home + shell `new-surface`.
+  * **Findings:** 9 new contract impacts, 26 missing renders, 6 shipped defects (A-1…A-6), clarifications C-1…C-11.
 
 ## Current Brief
 
