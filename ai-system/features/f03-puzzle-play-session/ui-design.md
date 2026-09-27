@@ -182,6 +182,8 @@ The executable prototype is `design/src/D1-motion-prototype.html` (`?demo=lift|t
 | loading → loaded | skeleton → board | the skeleton cells cross-fade to the tiles, and rail / `HAMLE` / HUD fade in, all over 160 ms | instant |
 | button pressed (back, undo, restart, pill) | control | scale 0.98 over 90 ms (`_Pressable`); fill .075 → .14 and edge .07 → .18 while pressed | fill only |
 
+*Tech Lead checkpoint correction (2026-09-28):* the "existing 120 ms grid swap" in the undo / restart row does not exist in the shipped code — the grid swaps instantly, and D1 keeps it that way (architecture §19.9 (5)). Only the spent-dot dim is new.
+
 * **Interruption:** input stays locked through every settle (AC5). Backgrounding mid-animation resolves to the settled state (architecture §12). A thaw that is cut short snaps to its end state.
 * **Audio / haptics:** F11 is not scheduled. The intended language is a soft tick per shift, a light haptic on settle and a short "crack" on thaw. Nothing depends on sound or haptics.
 
@@ -517,6 +519,7 @@ Advisory and provisional — the independent QA scores the runtime.
 > **Legacy — authoritative for the won moment until Phase D2.** The section below is kept byte-for-byte from F03-UI-WON (2026-09-20).
 > * During D1 the won moment keeps its shipped (Direction A) look — the accepted hybrid period (architecture §19.3 (6)).
 > * Phase D2 replaces it with the full-screen result (F00 ui-design §11; S-04, S-05, S-08…S-16).
+> * *Tech Lead checkpoint amendment (2026-09-28):* while D1 is live the docked row centres on the goal's rail tiles, which fade out beneath it. The panel keeps its 0.36 H cap, floored 16 pt under the row. The D1 header left no §16.3 free zone; architecture §19.9 (1) amends §16.3 "Dock" / "Panel cap" and §16.5 (1) accordingly.
 
 ## 16. Won composition (addendum 2026-09-20 — F03-UI-WON, post-F04)
 

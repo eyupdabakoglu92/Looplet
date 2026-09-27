@@ -341,7 +341,7 @@ The app still shows the pre-Foundation look (incident 2026-09-26). Play — the 
 
 ### 19.6 Non-goals
 
-* **Won moment and result (D2):** F03 §16 and the F04 panel keep their look and timing.
+* **Won moment and result (D2):** F03 §16 and the F04 panel keep their look and timing. *[Amended 2026-09-28, §19.9 (1)]:* the dock position moves onto the goal rail, because the D1 header left no §16.3 zone; look, timing and every other §16 rule are unchanged.
 * **Home, app shell, F08 error screen (D3).**
 * **No behaviour change:** no engine, gesture-threshold, input-lock, persistence, snapshot, route or timing change. The shift already matches the Foundation (190 ms, `cubic-bezier(.22,1,.36,1)`).
 * **No future-scope content:** the gesture-hint line "Satırı tut · kaydır · bırak" (F09), settings, the streak and the stars.
@@ -407,3 +407,51 @@ The F03-UI-D1 handoff (`ui-design.md` §1–§14, 28 renders, motion prototype; 
 8. **Informational items:**
    * D2 follows D1 with no release in between — there is no distribution anyway.
    * The frozen-row content observation is logged in `workflow-follow-ups.md` (content), outside F03.
+
+### 19.9 Frontend checkpoint rulings (Tech Lead, 2026-09-28)
+
+The F03-FE-D1 delivery (commit `b8b5f60`; `frontend.md`) is **accepted**. The Visual Quality Gate is **Ready for QA**, and F03-QA-D1 is open.
+
+**Verified independently at the checkpoint:**
+* **Scope:** the commit touches only the D1 surfaces, the F05 overlay, the allowed design-layer files, the tests and the F03 evidence. No token value, dependency, `feature-board.md`, `system-state.md`, `architecture.md` or `ui-design.md` changed. No Material `Icon` is left in `app/lib`.
+* **Suites re-run:** `melos run analyze` clean; `flutter test` 405 passed.
+* **Negative runs** — each rule broken on purpose, its test run, the file restored from git; all seven caught:
+  * N1 hint-pill clearance (A-1) — 9 tests fail;
+  * N2 tile glyph cap (A-2) — 6 fail;
+  * N3 ghost hides on touch-down (A-6) — 1 fails;
+  * N4 thaw cross-fade (A-5) — 1 fails;
+  * N5 panel floor under the docked row (ruling 1 below) — 10 fail;
+  * N6 `HAMLE` at the settle — 1 fails;
+  * N7 undo disabled at quota 0 (AC6) — 1 fails.
+* **Parity:** `design/src/measure-d1.swift` re-run on all 19 pairs reproduces `design/runtime-d1/parity-measurements.txt` number for number. Composites PC-08 and PC-06-t090 were inspected.
+
+**Rulings on the Frontend's clarifications (`frontend.md` §16):**
+1. **NTLC-1 — the won dock moves onto the goal: accepted for the D1 hybrid period.**
+   * **Why:** the accepted D1 header ends the rail tiles at ≈ 33 % of H, so §16.3's free zone is negative on every supported phone. The only in-rule alternative — flooring the panel under the rail — leaves the Perfect panel 5–13 pt short at 1.3× on 390 / 393-pt phones even after every §16.3 concession, i.e. the panel would cover the row, which §16.3 forbids. The implemented variant keeps every hard §16 invariant (T0 + 600 ms, the panel never over the row, ≤ 64 % of H, one fixed dock for all variants and rows, controls ≥ 44 pt, one glow, no blur) and restores the shipped panel geometry (regular density at 1.0×).
+   * **Amended rules** (they replace the ones cited while D1 is live):
+     * §16.3 "Dock": the docked tiles centre vertically on the goal's rail tiles, which fade out beneath the row as it arrives (and back on Retry); the row keeps its x.
+     * §16.3 "Panel cap": the panel top is `max(0.36 H, dock bottom + 16 pt)`; the row-scale fallback (≥ 0.8) applies only to frames too short for the unit.
+     * §16.5 (1): "`W.top ≥ dividerY + 12 pt`" is replaced by "the docked tiles centre on the goal tiles (± 0.5 pt) and the goal tiles are at opacity 0 at rest". The other §16.5 rules are unchanged.
+   * **Lifetime:** D2 replaces the whole moment with the full-screen result, so no UI Designer round is opened for it. `ui-design.md` §16 carries a pointer to this ruling.
+2. **NTLC-2 — three design-layer edits beyond the §19.8 (2) list: accepted in D1 scope.**
+   * The edits: `LoopBackButton`, `TileFace.iconScale`, and the `UndoPill` spent dot as an `AnimatedContainer`.
+   * **Why:** each implements an accepted handoff decision — the §7 header "in one `_Pressable`", the §5 thaw snowflake 1 → 0.6 and the §5 120 ms dot dim. None changes a token value or adds a dependency; each has component tests; the F00 suite is green. F00 stays Done.
+3. **Reconciliation items (`frontend.md` §4): accepted as implemented.**
+   * `HAMLE` swaps at the settle (§8 "may update on settle"; ui-design §5).
+   * The HUD keeps its look through a drag and a settle; the controller still drops presses while input is locked (MP-D1).
+   * The F05 re-prompt pulse is removed; the returning ghost is the re-prompt (visual authority §19.5).
+   * On the load error, the headline role is capped at 1.3× (§19.3 (1) role rule; it would break mid-word at AX5), the pill label follows the OS scale (`LimePill` reflows) and the column scrolls.
+   * The §19.8 (3) hint-pill fallback is on: the device measured 3.93 pt on the 16e at the cap, and 6.27 pt after the fallback.
+4. **Focus-ring evidence class (D1-12).** The runtime capture could not be made: this host cannot inject hardware keys into the simulator. The sub-state is accepted on the automated Tab-trigger widget test — the same evidence class F00 QA accepted for this ring (F00 `qa.md` E21), on the same `_Pressable` path. QA checks the ring at runtime if its environment can send hardware keys; otherwise it stays a stated limit, as in F00.
+5. **Informational — no F03 action:**
+   * **NTLC-3:** the `HAMLE` label sits ≈ 1.7 pt inside the card border at the 1.3× cap. That matches D1-10; there is no clipping or overlap. Logged as MOVESCARD-CAP-MARGIN in `workflow-follow-ups.md`, for the next design-layer touch.
+   * **NTLC-5:** ui-design §5's "existing 120 ms grid swap" never existed; undo / restart swap instantly, unchanged. The line is corrected in `ui-design.md` §5.
+   * **NTLC-6:** the legacy won moment / F04 panel at AX5 overflows as in the Phase C audit (A-2) — D2 scope.
+   * **NTLC-4:** CI runs the repo-wide `melos run format:check`, which fails on the F00 QA probe `ai-system/features/f00-design-foundation/qa/src/qa_probe_main.dart` (unchanged since 3647cef), so the CI format step is red independent of F03. `app/`, `packages/` and `tools/` are formatted. Logged as CI-FORMAT-GATE (owner DevOps/Release Engineer). It does not gate F03-QA-D1.
+
+**QA focus for F03-QA-D1** (the brief is in the orchestration's Current Brief):
+* the §11.5 acceptance list at runtime on the iPhone 16, 16e and Pro Max;
+* the independent rubric ≥ 93 with every dimension ≥ 8 and no fail condition — the won moment is scored only against §16 as amended by ruling 1 (hybrid period);
+* regression of AC1–AC11 and the F05 AC4 / AC11 re-show;
+* the text sweep to AX5 and Reduce Motion on and off;
+* Android stated as a limit.
