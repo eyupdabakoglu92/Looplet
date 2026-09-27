@@ -10,11 +10,11 @@ In QA
 
 ## Current Owner
 
-QA
+Tech Lead
 
 ## Next Role
 
-QA
+Tech Lead
 
 ## Active Task Ledger
 
@@ -22,7 +22,7 @@ QA
 - [x] Task ID: F05-QA-STRICT | Assigned Role: QA | Status: Done | Summary: DONE 2026-09-26 — verdict Rejected (qa.md § F05-QA-STRICT; final, client-only, HEAD 6fb2d23). The real pack itself is clean: independent probe 30/30 levels, 0 violations of §5.4 R1–R6 + the 2026-09-13 decision, content/ and app/assets/ identical (git tree 057f242b); full campaign 1..30 → terminal → replay L1 proven against the real bundle (real level 30 won by a real drag → SONRAKİ → TAMAMLANDI); AC7 resume across a real process kill PASS on iPhone 16; N1 moot; regression green (analyze, format, app 314/314, F05 73/73, packages 197/197, F03 device 13/13). Blocking: F05-QA-STRICT-1 (High) — the strict build gate enforces no structural band rule: F05's band test has an empty body and the gate never reads band fields (R1/R4/R5/R6 violations → passed: true); content:check rejects R1/R6 explicitly, R2/R3 only incidentally, R4/R5 not at all — the "4/4 incl. the structural band-rule case" delivery and reconcile claim is misattributed. F05-QA-STRICT-3 (Medium, AC7) — the home read-model never re-reads the active-session snapshot in-session: no in-progress state after backing out of a level, and mid-replay of a completed level makes in-session CONTINUE target the frontier (Seviye 3) while the same persisted state after relaunch targets the replay (Seviye 2 · sürüyor); reproduced at runtime and in a widget probe. Same rework: F05-QA-STRICT-2 (Medium) — a stray "levels" key makes content:check skip all puzzle validation (a wrong optimalMoves passes). Also: the brief's "F05-FE2 fingerprint-valid" was inaccurate (8 files changed since 345147e) — QA re-ran the affected suites | Depends On: F06-CONTENT-PROMOTE
 - [x] Task ID: F05-FE3-GATE | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: DELIVERED 2026-09-27 (frontend.md § F05-FE3) — runJourneyManifestGate enforces §5.4 R1–R6 + manifest↔asset LABEL (strict → named violations, smoke → advisories, bandChecks non-vacuity counter); the real-bundle band test asserts strict, 0 violations, 85 checks; one rejecting synthetic case per rule (R1 L2, R2 L7, R3 L17, R4 L22, R5 L28/L27, R6 L28, LABEL L20) each asserting exactly that violation; QA's real-content probe now rejects R4 L22 / R5 L28 / R1 L02 / R6 L28 (was passed: true); byte-mirror check content/journey ↔ app/assets/journey as an app test (in melos run test/CI) with negatives; content:check recognizes a Journey manifest only by path + shape — the L05 optimalMoves-7 + "levels": [] bypass now exits 1, real content check: OK; frontend.md erratum for the F06-CONTENT-PROMOTE claims; stale interim comments fixed. looplet_authoring 25/25 | Depends On: F05-QA-STRICT
 - [x] Task ID: F05-FE3-HOME | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: DELIVERED 2026-09-27 (frontend.md § F05-FE3) — ActiveSessionRepo.watch() (shares read()'s corrupt-row discard, no loop) + journeyProgressModelProvider combines journey_progress and the active-session row live (no new package; subscriptions cancelled on dispose; §6 semantics unchanged). 5 warm-path widget tests (frontier, replay, win clears, warm == cold, corrupt) — 3 of them fail against the old provider, proving they catch F05-QA-STRICT-3; 2 repo watch tests. Widget tests mounting HomeScreen use a sync-closing Drift test DB (drift's documented option; production unaffected). Runtime on iPhone 16 sim: warm frontier and warm replay show "Seviye 1 · sürüyor", CONTINUE resumes the replay exactly, identical after kill/relaunch. Regression: flutter analyze clean, flutter test 336/336, packages 202/202, format clean, F03 device suite 13/13 | Depends On: F05-QA-STRICT
-- [ ] Task ID: F05-QA-STRICT2 | Assigned Role: QA | Status: Open | Summary: ACTIVATED 2026-09-27 by the Tech Lead after reconciling F05-FE3 — final-stage re-QA of F05: independently verify the F05-QA-STRICT-1/-2/-3 closures (band-rule gate with rule → check → negative mapping, bundle mirror, content:check manifest recognition; the live home read-model warm == cold incl. the replay path) and re-verify the shared runtime touched by the ActiveSessionRepo change; full regression. See Current QA Brief | Depends On: F05-FE3-GATE, F05-FE3-HOME
+- [x] Task ID: F05-QA-STRICT2 | Assigned Role: QA | Status: Done | Summary: DONE 2026-09-27 — verdict Approved with Notes (qa.md § F05-QA-STRICT2; final, client-only, HEAD 015e50e). F05-QA-STRICT-1/-2/-3 independently closed: gate read line by line vs §5.4; own real-content probe 21/21 on band boundaries (14 violations each rejected with its one named rule, 3 positive boundaries not firing, multi-break, smoke advisory, strict-29) with pairs different from the delivery's and the Tech Lead's; the real mirror test fails on a byte drift and on a bundle-only file (dotfile ignored); 4 new content:check negatives rejected, real content check: OK, fresh content probe 30/30 with 0 violations. Home: delivered suites 27/27; own adversarial edge probe 7/7 (foreign/completed/daily snapshots ignored, level switch, far-behind replay, latest-write-wins); real-bundle campaign re-run 7/7 with warm == cold. Device: F03 suite 13/13 and a fresh-install journey on iPhone 16 — warm frontier "Seviye 1 · sürüyor", AC7 kill/relaunch resume (NASLA, 1 HAMLE → 2 = optimal), the win clears the in-progress state, warm replay "Seviye 2 · sürüyor" with CONTINUE resuming the replay (MBADE, 1 HAMLE), identical after relaunch. Regression: analyze clean, format clean, app 336/336, packages 202/202. Non-blocking: N1 — with 30/30 complete, an in-progress replay is not surfaced (TEKRAR OYNA → L1 would overwrite the replay save; AC7/AC9 overlap, pre-existing), N2 — duplicated band table, N3 — mirror test relies on the app/ cwd, N4 — carried notes | Depends On: F05-FE3-GATE, F05-FE3-HOME
 
 ## Open Tasks
 
@@ -46,7 +46,7 @@ final
 
 ## QA Result
 
-None
+Approved with Notes
 
 ## QA Modules
 
@@ -89,8 +89,8 @@ None
   * Prerequisite / External Decision: met 2026-09-27 — F05-FE3-GATE delivered and Tech Lead-reconciled (F06.CONTENT-PROMOTE-RECONCILE PASS)
   * Re-evaluation Trigger: F05-QA-STRICT2 (activated 2026-09-27)
   * Blocks: F05 final acceptance
-  * Result: PENDING
-  * Provenance / Note: Re-opened for re-verification after the fix. Last QA result: FAIL (2026-09-26, F05-QA-STRICT, qa.md QS-02/QS-03 — the gate enforced no band rule and content:check had a `levels`-key bypass). The content itself was PASS then (QS-01) and is unchanged since (content/journey tree 057f242 at HEAD 8c90e21).
+  * Result: PASS
+  * Provenance / Note: 2026-09-27 QA, HEAD 015e50e (clean), qa.md § F05-QA-STRICT2. Content: fresh probe 30/30, 0 violations in both trees (tree 057f242); `content:check` OK (Q2-04); Gate: read against §5.4 (Q2-05). Own real-content probe 21/21 on band boundaries, with pairs different from the delivery's and the Tech Lead's (Q2-06): each violation rejected with its one named rule; the positive boundaries did not fire; multi-break, smoke advisory and strict-29 all correct; Mirror: the real test fails on a byte drift and on a bundle-only file (Q2-07); `content:check`: 4 new negatives rejected (Q2-08); Full campaign → terminal against the real bundle: 7/7 (Q2-11); Previous FAIL (2026-09-26, QS-02/QS-03) is closed.
 
 - Evidence ID: F05.HOME-LIVE-STATE
   * Scenario: Warm-path home read-model (architecture.md §6/§10/§15, amended 2026-09-26). The home stays mounted while `/play` writes, changes or clears the active-session snapshot — frontier level started, completed level replayed, level won. On return to `/` the home must show the same in-progress caption, `Semantics` and CONTINUE target as the cold (relaunch) derivation for the same persisted state.
@@ -100,8 +100,8 @@ None
   * Prerequisite / External Decision: met 2026-09-27 — F05-FE3-HOME delivered and Tech Lead-reconciled
   * Re-evaluation Trigger: F05-QA-STRICT2 (activated 2026-09-27)
   * Blocks: F05 final acceptance
-  * Result: PENDING
-  * Provenance / Note: Re-opened for re-verification after the fix. Last QA result: FAIL (2026-09-26, QS-12, runtime rt14/rt15 and widget probe D1/D2). Tech Lead check 2026-09-27: `journey_home_live_test.dart` 5/5 on the new provider; 3/5 fail (frontier, replay, warm == cold) with the pre-FE3 provider swapped back in, then restored — the tests do catch the defect.
+  * Result: PASS
+  * Provenance / Note: 2026-09-27 QA, HEAD 015e50e, qa.md § F05-QA-STRICT2. Delivered home and repo suites: 27/27 (Q2-09); Own adversarial edge probe: 7/7 (Q2-10). Foreign, completed and Daily snapshots are ignored; a level switch is followed; a far-behind replay and its clear are reflected; the latest write wins; Real-bundle campaign re-run: D1/D2 warm `[Seviye 2 · sürüyor]` == cold (Q2-11); Runtime on the iPhone 16 simulator (Q2-13): warm frontier "Seviye 1 · sürüyor" (q02); the win clears the in-progress state (q07); warm replay "Seviye 2 · sürüyor" (q11); CONTINUE resumes the replay — MBADE, 1 HAMLE (q12); identical after kill/relaunch (q14); Previous FAIL (2026-09-26, QS-12) is closed; Non-blocking N1: with 30/30 complete, the terminal state does not surface an in-progress replay (see qa.md).
 
 - Evidence ID: F05.SHARED-RUNTIME
   * Scenario: Inherited play/navigation/lifecycle/resume evidence from F03 and local F08 persistence; offline Journey and failure preservation where applicable
@@ -111,8 +111,8 @@ None
   * Prerequisite / External Decision: Review/reuse proof for the actual shared path; local simulator and isolated storage are independent of paid Firebase deployment
   * Re-evaluation Trigger: F05-QA-STRICT2 — `ActiveSessionRepo` (the resume read path) changed in F05-FE3-HOME
   * Blocks: F05 final acceptance
-  * Result: PENDING
-  * Provenance / Note: Re-opened because its own validity condition no longer holds. The 2026-09-26 PASS (QA: F03 51497dd reuse + device suite 13/13 + kill/relaunch resume on iPhone 16, qa.md QS-08/QS-10/QS-11) was valid "unless the persistence or restore code changes". F05-FE3-HOME refactored `ActiveSessionRepo.read()` into a shared `_decode` and added `watch()`. The delivery's own F03 device run (13/13) is delivery evidence; QA re-verifies. The offline and storage-failure device branches stay F08's (F08.OFFLINE-JOURNEY, F08.STORAGE) and do not gate F05 (architecture §13/§15).
+  * Result: PASS
+  * Provenance / Note: 2026-09-27 QA (qa.md § F05-QA-STRICT2), re-verified on HEAD 015e50e: F03 device suite 13/13 on iPhone 16 (Q2-12); AC7 mid-level kill/relaunch on a fresh install: "NASLA", 1 HAMLE restored, and the second move scored "2 SEN = 2 OPTİMAL" (Q2-13 q03–q06); the refactored `ActiveSessionRepo.read()` also passes the corrupt-row and watch tests (Q2-09); Offline and storage-failure device branches remain F08's (not an F05 gate, §13/§15); History: re-opened on 2026-09-27 because its own validity condition no longer held. The 2026-09-26 PASS (QA: F03 51497dd reuse + device suite 13/13 + kill/relaunch resume on iPhone 16, qa.md QS-08/QS-10/QS-11) was valid "unless the persistence or restore code changes". F05-FE3-HOME refactored `ActiveSessionRepo.read()` into a shared `_decode` and added `watch()`. The delivery's own F03 device run (13/13) is delivery evidence; QA re-verifies. The offline and storage-failure device branches stay F08's (F08.OFFLINE-JOURNEY, F08.STORAGE) and do not gate F05 (architecture §13/§15).
 
 ## Open Decision Gates
 
@@ -124,12 +124,11 @@ None
 
 ## Next Action
 
-Run QA on F05-QA-STRICT2 (Current QA Brief below): final-stage re-QA. Scope:
-* independently verify the three closures;
-* re-verify the shared runtime affected by the ActiveSessionRepo change;
-* run full regression.
-
-The verdict returns to the Tech Lead.
+Run Tech Lead to reconcile F05-QA-STRICT2 (qa.md § F05-QA-STRICT2): QA Result Approved with Notes.
+* All three QA evidence records are PASS; Blockers None; no open decision gate.
+* F05 is ready for the closure review.
+* Non-blocking N1 needs a Tech Lead call: with 30/30 complete, the terminal state does not surface an in-progress replay (AC7/AC9 overlap, pre-existing).
+* N2–N4 are informational.
 
 ## Last Decision
 
@@ -158,9 +157,9 @@ Earlier decisions are in history/f05-journey-progression-2026-09-26/ and history
 
 ## Last Update
 
-* Updated By: Tech Lead
+* Updated By: QA
 * Timestamp: 2026-09-27
-* Summary: F05-FE3 reconciled (own negative runs; Delivery Review = Accepted); F06.CONTENT-PROMOTE-RECONCILE PASS; the three QA evidence records re-opened as PENDING for re-verification; QA plan locked (final, client-only, core+client-ui+stateful-flow, full, allowed; qa-preflight PASS); F05-QA-STRICT2 activated. Owner → QA.
+* Summary: F05-QA-STRICT2 done — QA Result Approved with Notes. F05.STRICT-CONTENT, F05.HOME-LIVE-STATE and F05.SHARED-RUNTIME → PASS. Non-blocking N1–N4. Owner → Tech Lead.
 
 ## Context & Follow-ups
 
@@ -194,6 +193,7 @@ Earlier decisions are in history/f05-journey-progression-2026-09-26/ and history
 * 2026-09-26 — Tech Lead: incident triage ("the app still shows the old design") — Continue Current Flow; design adoption is scheduled right after F05 closes, ahead of F08.
 * 2026-09-27 — Frontend/Mobile Developer: F05-FE3-GATE + F05-FE3-HOME delivered; Delivery Review = Pending; owner → Tech Lead.
 * 2026-09-27 — Tech Lead: F05-FE3 reconciled (own negative runs); Delivery Review = Accepted; evidence re-opened for re-verification; QA plan locked (core+client-ui+stateful-flow; the content module was rejected by qa-preflight — no content-design.md); F05-QA-STRICT2 activated; status In QA.
+* 2026-09-27 — QA: F05-QA-STRICT2 Approved with Notes (N1–N4 non-blocking); the three QA evidence records → PASS; owner → Tech Lead.
 
 ## Consumed Signals
 

@@ -449,3 +449,120 @@ Visual Scope tanımlı değil. Premium puanlama yapılmadı; F05 yüzeyinin Foun
 ```text
 Run Tech Lead
 ```
+
+---
+
+# F05 — journey-progression: QA Raporu (F05-QA-STRICT2, 2026-09-27)
+
+> Final-stage yeniden QA; F05-FE3 rework'ünden sonra. Aday: HEAD `015e50e`, temiz çalışma ağacı. Plan alanları Tech Lead'in kilitlediği gibi kullanıldı. QA probe'ları repo dışında (session scratchpad `qa2/`) tutuldu; repoya dosya eklenmedi.
+
+## 0. QA Execution Plan
+
+* **Stage / Scope:** `final` / `client-only`.
+* **Modules + trigger:** `core, client-ui, stateful-flow`.
+  * core: build gate ve validator bütünlüğü (F05-QA-STRICT-1/-2).
+  * client-ui ve stateful-flow: ana ekranın canlı durumu, sıcak ve soğuk yol, süreç ölümü (F05-QA-STRICT-3).
+  * `content` modülü qa-preflight'ta `content-design.md` olmadığı için düşürüldü. Validator'ın pozitif/negatif fixture kontrolü core altında yapıldı.
+* **Regression Depth:** `full`.
+* **Evidence Reuse:** `allowed`, parmak izi önce kontrol edildi. `content/journey` = `app/assets/journey` = git tree `057f242`, değişmemiş. Buna rağmen içerik probe'u taze koşuldu. Değişen app/persistence kodu nedeniyle QS-09 C/D, QS-10..QS-12 ve F03 runtime kanıtı yeniden çalıştırıldı.
+* **Canonical target / runtime class:** `automated functional` zorunlu (§15). Buna ek olarak iPhone 16 simülatöründe (`D0011CE7…`, content size `large`) runtime doğrulaması yapıldı. Build `flutter build ios --simulator --debug -t lib/main.dart`, temiz kurulumla.
+* **Fail-fast checkpoint:** tüm kapılar yeşil, fail-fast tetiklenmedi.
+
+## 1. Evidence Ledger
+
+| Evidence ID | Claim / Scenario | Class | Command / Action | Target | Result / Counts | Provenance / Fingerprint | Isolation |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Q2-01 | Statik kapılar | automated | `flutter analyze` (app) · `dart format --output=none --set-exit-if-changed app tools/looplet_authoring` | app + tools | No issues · 125 dosya, 0 değişiklik | EXECUTED THIS RUN · HEAD `015e50e`; ağaçlar `app/lib/journey 0e69338`, `app/lib/persistence 009256c`, `app/test/journey 698f41d`, `tools/looplet_authoring a0e4a5f` | — |
+| Q2-02 | Uygulama regresyonu | automated functional | `flutter test` | app | **336/336** | EXECUTED THIS RUN | Drift bellek içi |
+| Q2-03 | Paket regresyonu | automated | `melos exec --no-flutter -- dart test` | 6 paket | core 22 · content 17 · dictionary 32 · authoring 25 · solver 23 · engine 83 = **202/202** | EXECUTED THIS RUN | — |
+| Q2-04 | Gerçek içerik temiz; iki ağaç aynı | automated functional | `content:check` (gerçek CLI) · `band_probe.py content/journey/tr` ve `app/assets/journey/tr` | gerçek paket | `check: OK` · iki ağaçta 30/30, **0 ihlal** | EXECUTED THIS RUN · tree `057f242` (QS-01 yeniden koşuldu, reuse edilmedi) | scratch |
+| Q2-05 | Gate kuralları §5.4 ile birebir mi? | source review | `journey_gate_support.dart` okundu | HEAD | R1 1–3 sütun kapalı · R2 4–10 açık · R3 16–20 kilitli · R4 21–25 donmuş · R5 26–30 ikisi · R6 bantları {1–6: easy/medium; 7–15: +hard; 16–25: medium/hard/expert; 26–30: hard/expert} · LABEL manifest = asset · strict → violation, smoke → advisory · gerçek paket testi `isStrict` + 0 ihlal + `bandChecks == 85` + ayna | — | — |
+| Q2-06 | Gate gerçek içerikte, kendi seçtiğim sınır çiftleriyle | automated functional (negatif + pozitif) | `flutter test …/qa2_gate_probe_test.dart`: gerçek gate, gerçek 30 seviye, checksum yeniden hesaplanmış, tek mutasyon | gerçek paket | **21/21.** Tek ve adlandırılmış ihlalle reddedilenler (14): R1 L03 · R2 L04, L10 · R3 L16, L20 · R4 L21, L25 · R5 L26, L29 · R6 L06, L07, L16, L26 · LABEL L25. Kuralın bandı dışında tetiklenmedi (3): L11 sütunsuz, L15 "hard", L25 "expert". Çoklu ihlal L05 → R2 + R6 · smoke R4 L21 → yalnız advisory · 29 seviyelik strict → "must ship 30" | EXECUTED THIS RUN · seviye/kural çiftleri teslimin ve Tech Lead'inkilerden farklı | bellek içi |
+| Q2-07 | Gerçek ayna testi negatif | automated functional (negatif) | pakete geçici `zz_extra.json` eklendi, `journey-tr-19.json`'a 1 bayt eklendi → `flutter test test/journey/journey_manifest_gate_test.dart` → geri alındı · ayrıca geçici `.DS_Store` | `app/assets/journey` | exit 1: `tr/journey-tr-19.json: bytes differ` + `tr/zz_extra.json: in the bundle but not in the authored source` · `.DS_Store` ile exit 0 (yok sayıldı) · `git status` temiz | EXECUTED THIS RUN | repo geçici değişti, geri alındı |
+| Q2-08 | `content:check` tanıma kuralı, yeni negatiflerle | automated functional (negatif) | içerik kopyası + gerçek CLI | `content/` kopyası | L23 `optimalMoves 9` + `"levels": []` → exit 1 (9 ≠ 4) · gerçek yolda `lang:"en"` → exit 1 `malformed … "lang" must be "tr"` · `tr/` içinde `journey_manifest_en.json` → exit 1 (Puzzle olarak doğrulandı) · gerçek yolda `levels` nesne → exit 1 `"levels" must be a non-empty array` | EXECUTED THIS RUN | geçici kopya, silindi |
+| Q2-09 | Teslim edilen ana ekran ve repo testleri | automated functional | `flutter test test/journey/journey_home_live_test.dart test/journey/journey_home_test.dart test/widget_test.dart test/persistence/repositories_test.dart` | app | **27/27** | EXECUTED THIS RUN | Drift bellek içi (senkron kapanan) |
+| Q2-10 | Canlı ana ekran uç durumları (teslimin kapsamadığı) | automated functional (adversarial) | `flutter test …/qa2_home_edge_probe_test.dart`: gerçek `HomeScreen`, gerçek repo'lar | widget | **7/7.** E1 debug-id snapshot, E2 `completed` snapshot, E3 Daily snapshot → devam sayılmadı ("Seviye 2") · E4 ekran açıkken snapshot 04 → 02 geçti → hedef 2 · E5 ön-sınırın çok gerisinde tekrar (5 tamam) → "Seviye 2 · sürüyor", clear → "Seviye 6" · E6 aynı karede 02 → 03 → clear → 05 → en son yazım kazandı: "Seviye 5 · sürüyor" · E7 gözlem → N1 | EXECUTED THIS RUN | bellek içi |
+| Q2-11 | Gerçek paketle kampanya ve sıcak = soğuk | automated functional | QS-09 probe'u senkron kapanan DB ile yeniden koşuldu; D beklentisi `warm == cold` | gerçek paket | **7/7.** A1–A3, B ve C (L30 gerçek içerik → kazanç → `SONRAKİ` → terminal → `TEKRAR OYNA` → L1) geçti · **D1** sıcak `[Seviye 2 · sürüyor]` = soğuk `[Seviye 2 · sürüyor]` · **D2** sıcak `[Seviye 2 · sürüyor]` = soğuk (dün: `[Seviye 3]` ↔ `[Seviye 2 · sürüyor]`) | EXECUTED THIS RUN | bellek içi |
+| Q2-12 | Paylaşılan play yolu, cihazda | runtime | `flutter test integration_test -d D0011CE7…` | iPhone 16 sim | **13/13** | EXECUTED THIS RUN (`ActiveSessionRepo.read()` değiştiği için F03 51497dd reuse edilmedi) | simülatör |
+| Q2-13 | Cihazda uçtan uca yolculuk | runtime | temiz kurulum → senaryolar §2'de | iPhone 16 sim | PASS: q01–q14 | EXECUTED THIS RUN · ekran görüntüleri `qa2/q01…q14` | simülatör, temiz uygulama verisi |
+
+## 2. Acceptance & Critical Journey Coverage
+
+| AC / Journey | Expected | Evidence IDs | Result |
+| --- | --- | --- | --- |
+| **F05-QA-STRICT-1** — strict gate bant kurallarını uygular | Her kural için ihlal reddedilir; bandın dışında tetiklenmez; gerçek pakette 85 kontrol çalışır | Q2-05, Q2-06, Q2-02 | **Kapandı — PASS** |
+| **F05-QA-STRICT-2** — `content:check` ayırt edicisi | Başıboş `levels` puzzle doğrulamasını atlatamaz; bozuk ya da yanlış yerdeki manifest reddedilir; gerçek içerik geçer | Q2-08, Q2-04, Q2-03 | **Kapandı — PASS** |
+| **§5.4 ayna** — gönderilen paket = doğrulanmış kaynak | Kayma veya fazla dosya CI'ı düşürür | Q2-07 | PASS |
+| **F05-QA-STRICT-3 / AC7** — sıcak yol, tekrar oynama dahil | Ekran açıkken yazılan snapshot home'a yansır; CONTINUE devam eden seviyeyi (tekrar dahil) sürdürür; sıcak = soğuk | Q2-09, Q2-10, Q2-11, Q2-13 (q02, q11–q14) | **Kapandı — PASS** |
+| AC7 — süreç ölümünden sonra kalınan yerden devam | Grid, hamle ve geri al korunur | Q2-13 (q03–q05, q06 "2 SEN = 2 OPTİMAL") | PASS |
+| AC8 / AC10 — ilerleme sayacı ve hedef | Kazanma devam durumunu temizler; hedef bir sonraki seviyeye geçer | Q2-13 (q07: 1/30, "Seviye 2", düğüm yok), Q2-10 E5 | PASS |
+| AC9 / AC12 — 30 → terminal (gerçek paket) | `SONRAKİ` → `TAMAMLANDI`; `TEKRAR OYNA` → L1 | Q2-11 C | PASS |
+| AC1–AC6, AC11, AC13, AC14 | Önceki turdaki kapsam, yeniden koşulan suite'lerle | Q2-02, Q2-04, Q2-11 A/B | PASS |
+| Misuse/stale — journey dışı, `completed` veya Daily snapshot devam gibi görünmez; sıra dışı hızlı yazımlarda en yenisi kazanır | — | Q2-10 E1–E6 | PASS |
+
+## Client & UI Compliance
+
+| Kontrol | Beklenen | Evidence | Sonuç |
+| --- | --- | --- | --- |
+| Home: devam eden, oturum içi (sıcak) | "Seviye N · sürüyor" + camgöbeği düğüm, hemen | Q2-13 q02, q11 | PASS (dün FAIL) |
+| Home: devam eden, soğuk açılış | Sıcak yolla aynı | Q2-13 q04, q14 | PASS |
+| Home: kazanma sonrası | Devam durumu temiz, hedef bir sonraki seviye | Q2-13 q07 | PASS |
+| CompletionPanel: `Kapat`, `Yeniden`, `SONRAKİ` | `Kapat` → home; `Yeniden` → aynı seviye taze; 3★'da `SONRAKİ` amber | Q2-13 q06, q09, q10 | PASS |
+| Terminal | `TAMAMLANDI` + `TEKRAR OYNA` → L1 | Q2-11 C | PASS (N1'e bakın) |
+
+Visual Scope tanımlı değil; görsel puanlama yapılmadı (Design Adoption Phase D'de ele alınacak).
+
+## Stateful Flow & Integration
+
+| Boundary / Transition | Actor / Start State | Expected | Evidence IDs | Result |
+| --- | --- | --- | --- | --- |
+| Snapshot yazımı → mounted home | Ön-sınır seviye açıldı | Anında devam durumu | Q2-09, Q2-13 q02 | PASS |
+| Tekrar oynama snapshot'ı → mounted home | Tamamlanmış L2, `Yeniden` | CONTINUE hedefi 2; kayıt ezilmez | Q2-11 D2, Q2-13 q11–q12 | PASS |
+| Kazanma (`completed` → clear → `markCompleted`) | Devam eden L1 | Devam durumu kalkar, hedef ilerler | Q2-09, Q2-13 q07 | PASS |
+| Süreç ölümü → soğuk açılış | Sıcak durumlar | Sıcak = soğuk | Q2-11 D1/D2, Q2-13 q13 ↔ q14 | PASS |
+| Stale / sıra dışı payload | Aynı karede 4 yazım | En yenisi kazanır | Q2-10 E6 | PASS |
+| Yabancı snapshot | Debug id, `completed`, Daily | Devam sayılmaz | Q2-10 E1–E3 | PASS |
+| Bozuk snapshot | Ekran açıkken bozuk satır | Satır silinir, fallback, döngü yok | Q2-09 | PASS |
+| Abonelik yaşam döngüsü | Ekran dispose | İki Drift aboneliği iptal edilir | Q2-09 (testler senkron kapanan DB ile temiz iniyor) | PASS |
+| Paylaşılan resume yolu | `ActiveSessionRepo.read()` refactor'u | F03 davranışı korunur | Q2-12, Q2-13 q05 | PASS |
+
+## 5. Regression & Evidence Reuse
+
+* **Full depth:** Q2-01..Q2-04 ve Q2-12 yeşil, regresyon yok.
+* **Reuse:** yapılmadı. İçerik probe'u (QS-01) dahil ilgili her şey taze koşuldu.
+* **Invalidated ve yenilenen:**
+  * QS-09 C/D ve QS-10..QS-12 → Q2-11 ve Q2-13.
+  * F03 51497dd runtime → Q2-12.
+* **Bağımsızlık:**
+  * Gate negatifleri teslimin ve Tech Lead'inkilerden farklı kural/seviye çiftleriyle, bant sınırlarında ve pozitif sınırlarla koşuldu (Q2-06).
+  * Ayna negatifi farklı tipte: fazla dosya ve farklı bir seviye (Q2-07).
+  * `content:check` negatifleri yeni (Q2-08).
+  * Ana ekran uç durumları teslimde yok (Q2-10).
+
+## 6. Final Verdict
+
+* `QA Result: Approved with Notes`
+* Blocking Issues: None
+* Required Fixes: None
+* Non-blocking Notes:
+  * **N1 — terminal durum + süren tekrar oynama (Q2-10 E7).** 30/30 tamamlanmışken bir seviyenin tekrarı sürüyorsa ana ekran `TAMAMLANDI` + `TEKRAR OYNA` gösteriyor. Butona basınca L1 açılıyor ve süren tekrarın kaydı ezilecek.
+    * Model doğru: `continueTarget` = tekrar oynanan seviye (§6).
+    * `home_screen.dart`'taki terminal kararı (`allComplete`) önceliği alıyor. Bu mantık F05-FE2'den beri böyle; F05-FE3'le gelmedi.
+    * AC9 (terminal) ile AC7 (devam) bu kenarda çakışıyor; ui-design ve §8 bu durumu tanımlamıyor.
+    * Etkisi düşük: yalnızca kampanyayı bitirmiş oyuncunun kişisel rekor tekrarları etkileniyor.
+    * Karar Tech Lead'in (ve gerekirse UI'ın): terminal durumda "Seviye K · sürüyor" gösterilip sürdürülsün mü, yoksa bilinçli kabul mü?
+  * **N2 — bant tablosu iki yerde.** `journeyLabelBand` (F05 gate, otorite) ve `_expectedBands` (`content:check`). Eğri değişirse ikisi birlikte güncellenmeli (Tech Lead de not etti).
+  * **N3 — ayna testi ve cwd.** Test `../content/journey` yolunu `flutter test` çalışma dizinine (app/) göre okuyor. melos ve CI'da bu geçerli; bilgi notu.
+  * **N4 — taşınan notlar:** 11–15 `tdDegree = 0` (kabul edilmiş içerik; PO görünürlüğü); tamamlanmış seviyenin tekrarı halkada devam olarak görünüyor (§6 tasarımı); ağsız cihaz koşusu F08'in (`F08.OFFLINE-JOURNEY`; F05 kapısı değil); HomeScreen'i monte eden testler ve scratch probe'lar senkron kapanan Drift bağlantısı kullanmalı.
+
+## 7. Tech Lead Note
+
+* **Kapanış:** F05-QA-STRICT-1/-2/-3 bağımsız olarak kapandı. `F05.STRICT-CONTENT`, `F05.HOME-LIVE-STATE` ve `F05.SHARED-RUNTIME` PASS; Blockers None; açık karar kapısı yok. F05 kapanış incelemesine hazır.
+* **N1:** bloklamayan bir kenar durum kararı. Tech Lead kapanıştan önce ya da sonra karar verebilir; tasarım uyarlaması Phase D'de F05 ana ekranı zaten yeniden ele alınacak.
+* **Ortam:** iPhone 16 simülatöründe QA test verisi kaldı (2/30; L2 tekrar oynaması sürüyor, "MBADE", 1 hamle); content size `large`.
+
+## Sonraki Komut
+
+```text
+Run Tech Lead
+```
