@@ -609,7 +609,8 @@ void main() {
       for (final icon in LoopIcon.values) {
         expect(LoopIconPainter.defaultStroke(icon), inInclusiveRange(1.5, 2.0));
       }
-      expect(LoopIcon.values.length, 12);
+      expect(LoopIcon.values.length, 13);
+      expect(LoopIconPainter.defaultStroke(LoopIcon.loopBreak), 1.8);
     });
 
     testWidgets('a labelled icon is announced, an unlabelled one is not', (
@@ -796,6 +797,328 @@ void main() {
         }
       },
     );
+  });
+
+  group('D1 design-layer additions (F03 architecture §19.8 (2))', () {
+    const s390 = 390 / 358;
+
+    Widget scaled(Widget child, {double textScale = 1, Size? size}) =>
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: MediaQuery(
+            data: MediaQueryData(
+              size: size ?? const Size(390, 844),
+              textScaler: TextScaler.linear(textScale),
+            ),
+            child: LoopScale(
+              value: s390,
+              child: Center(child: child),
+            ),
+          ),
+        );
+
+    testWidgets('TileFace and RailTile glyphs are capped at 1.3× — no overflow '
+        'at AX5 (3.12) on a 390-pt width (A-2)', (tester) async {
+      await tester.pumpWidget(
+        scaled(
+          const Row(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              TileFace(letter: 'Ş', size: 52 * s390),
+              TileFace(letter: 'İ', size: 52 * s390, state: TileState.locked),
+              TileFace(letter: 'Ğ', size: 52 * s390, state: TileState.frozen),
+              RailTile(letter: 'Ü'),
+            ],
+          ),
+          textScale: 3.12,
+        ),
+      );
+      expect(tester.takeException(), isNull);
+      for (final text in tester.widgetList<Text>(find.byType(Text))) {
+        expect(text.textScaler!.scale(100), closeTo(130, 0.01));
+      }
+      for (final letter in <String>['Ş', 'İ', 'Ğ']) {
+        final glyph = tester.getRect(find.text(letter));
+        final tile = tester.getRect(
+          find.ancestor(of: find.text(letter), matching: find.byType(TileFace)),
+        );
+        expect(tile.contains(glyph.topLeft), isTrue, reason: letter);
+        expect(tile.contains(glyph.bottomRight), isTrue, reason: letter);
+      }
+    });
+
+    testWidgets('TileFace iconScale scales the corner icon about its centre', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        scaled(
+          const TileFace(
+            letter: 'A',
+            size: 57,
+            state: TileState.frozen,
+            iconScale: 0.6,
+          ),
+        ),
+      );
+      final scale = tester.widget<Transform>(
+        find
+            .ancestor(
+              of: find.byType(LoopIconView),
+              matching: find.byType(Transform),
+            )
+            .first,
+      );
+      expect(scale.transform.storage[0], closeTo(0.6, 1e-9)); // x scale
+    });
+
+    for (final (name, control) in <(String, Widget)>[
+      (
+        'GlassIconButton',
+        GlassIconButton(
+          icon: LoopIcon.restart,
+          onPressed: () {},
+          semanticLabel: 'Baştan',
+        ),
+      ),
+      (
+        'UndoPill',
+        UndoPill(quota: 2, onPressed: () {}, semanticLabel: 'Geri al'),
+      ),
+    ]) {
+      testWidgets('$name brightens fill .075 → .14 and edge .07 → .18 while '
+          'pressed — also under reduced motion (fill only)', (tester) async {
+        Color fill() =>
+            decorationOf(tester, find.byType(control.runtimeType)).color!;
+        Color edge() =>
+            (decorationOf(tester, find.byType(control.runtimeType)).border!
+                    as Border)
+                .top
+                .color;
+        for (final reduced in <bool>[false, true]) {
+          tester.platformDispatcher.accessibilityFeaturesTestValue =
+              FakeAccessibilityFeatures(reduceMotion: reduced);
+          await tester.pumpWidget(scaled(control));
+          expect(fill(), LoopColors.glassFill);
+          expect(edge(), LoopColors.glassFillEdge);
+          final g = await tester.startGesture(
+            tester.getCenter(find.byType(control.runtimeType)),
+          );
+          await tester.pump();
+          expect(fill(), const Color(0x24FFFFFF));
+          expect(edge(), LoopColors.outlineEdge);
+          expect(
+            tester.widget<AnimatedScale>(find.byType(AnimatedScale)).scale,
+            reduced ? 1.0 : 0.98,
+          );
+          await g.up();
+          await tester.pump(const Duration(milliseconds: 120));
+          expect(fill(), LoopColors.glassFill);
+        }
+        tester.platformDispatcher.clearAccessibilityFeaturesTestValue();
+      });
+    }
+
+    testWidgets(
+      'UndoPill: a spent dot dims over 120 ms; instant when reduced',
+      (tester) async {
+        final dots = find.descendant(
+          of: find.byType(UndoPill),
+          matching: find.byType(AnimatedContainer),
+        );
+        await tester.pumpWidget(
+          scaled(
+            UndoPill(quota: 3, onPressed: () {}, semanticLabel: 'Geri al'),
+          ),
+        );
+        expect(dots, findsNWidgets(3));
+        expect(
+          tester.widget<AnimatedContainer>(dots.first).duration,
+          const Duration(milliseconds: 120),
+        );
+        tester.platformDispatcher.accessibilityFeaturesTestValue =
+            const FakeAccessibilityFeatures(reduceMotion: true);
+        addTearDown(
+          tester.platformDispatcher.clearAccessibilityFeaturesTestValue,
+        );
+        await tester.pumpWidget(
+          scaled(
+            UndoPill(quota: 2, onPressed: () {}, semanticLabel: 'Geri al'),
+          ),
+        );
+        expect(
+          tester.widget<AnimatedContainer>(dots.first).duration,
+          Duration.zero,
+        );
+      },
+    );
+
+    testWidgets('LoopBackButton: chevron + capped label, one ≥ 44 pt node', (
+      tester,
+    ) async {
+      var taps = 0;
+      await tester.pumpWidget(
+        scaled(
+          LoopBackButton(
+            label: 'SEVİYE 26',
+            semanticLabel: 'Geri, Seviye 26',
+            padding: const EdgeInsets.only(left: 11, right: 8),
+            onPressed: () => taps++,
+          ),
+          textScale: 3.12,
+        ),
+      );
+      expect(tester.takeException(), isNull);
+      final size = tester.getSize(find.byType(LoopBackButton));
+      expect(size.height, greaterThanOrEqualTo(44));
+      expect(size.width, greaterThanOrEqualTo(44));
+      final icon = tester.widget<LoopIconView>(find.byType(LoopIconView));
+      expect(icon.icon, LoopIcon.back);
+      expect(icon.color, LoopColors.muted);
+      final label = tester.widget<Text>(find.text('SEVİYE 26'));
+      expect(label.textScaler!.scale(100), closeTo(130, 0.01));
+      expect(label.style!.color, LoopColors.muted);
+      final node = tester.getSemantics(find.byType(LoopBackButton));
+      expect(node.label, 'Geri, Seviye 26');
+      expect(node.childrenCount, 0);
+      await tester.tap(find.byType(LoopBackButton));
+      expect(taps, 1);
+    });
+
+    testWidgets('LineRail: a 3·s periwinkle bar with a glow, either axis', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        scaled(
+          const Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              LineRail(length: 40),
+              LineRail(length: 40, axis: Axis.horizontal),
+            ],
+          ),
+        ),
+      );
+      final rails = find.byType(LineRail);
+      expect(tester.getSize(rails.first), const Size(3 * s390, 40));
+      expect(tester.getSize(rails.last), const Size(40, 3 * s390));
+      final d = decorationOf(tester, rails.first);
+      expect(d.color, LoopColors.periwinkle);
+      expect(d.boxShadow!.single.blurRadius, 14);
+    });
+
+    testWidgets('TutorialGhost: 48·s ring + up/down chevrons, decorative', (
+      tester,
+    ) async {
+      await tester.pumpWidget(scaled(const TutorialGhost(chevronOpacity: 0.6)));
+      expect(
+        tester.getSize(find.byType(TutorialGhost)),
+        const Size(48 * s390, 90 * s390),
+      );
+      final ring = tester
+          .widgetList<Container>(
+            find.descendant(
+              of: find.byType(TutorialGhost),
+              matching: find.byType(Container),
+            ),
+          )
+          .single;
+      final d = ring.decoration! as BoxDecoration;
+      expect(d.shape, BoxShape.circle);
+      expect(d.border!.top.color, LoopColors.periwinkle);
+      expect(
+        (d.border! as Border).top.strokeAlign,
+        BorderSide.strokeAlignOutside,
+      );
+      expect(
+        tester.widget<LoopIconView>(find.byType(LoopIconView)).icon,
+        LoopIcon.upDown,
+      );
+      expect(
+        tester
+            .widget<Opacity>(
+              find.ancestor(
+                of: find.byType(LoopIconView),
+                matching: find.byType(Opacity),
+              ),
+            )
+            .opacity,
+        0.6,
+      );
+      expect(
+        find.descendant(
+          of: find.byType(TutorialGhost),
+          matching: find.byType(ExcludeSemantics),
+        ),
+        findsWidgets,
+      );
+    });
+
+    for (final scale in <double>[1.0, 1.15, 1.2, 1.3]) {
+      testWidgets('HintPill at ${scale}x: 300·s glass, sparkle only up to '
+          '1.15×, text capped', (tester) async {
+        await tester.pumpWidget(
+          scaled(
+            const HintPill(
+              text: 'Sütunları da kaydırabilirsin — yukarı ya da aşağı.',
+            ),
+            textScale: scale,
+          ),
+        );
+        expect(tester.getSize(find.byType(HintPill)).width, 300 * s390);
+        expect(
+          decorationOf(tester, find.byType(HintPill)).gradient,
+          LoopGradients.glass,
+        );
+        expect(
+          find.byType(LoopIconView),
+          scale > 1.15 ? findsNothing : findsOneWidget,
+        );
+        final text = tester.widget<Text>(find.byType(Text));
+        expect(
+          text.textScaler!.scale(100),
+          closeTo(scale.clamp(1.0, 1.3) * 100, 0.01),
+        );
+      });
+    }
+
+    testWidgets('HintPill padding: 7·s, 5·s above 1.15× with the fallback', (
+      tester,
+    ) async {
+      Future<double> padTop(double scale, {required bool compact}) async {
+        await tester.pumpWidget(
+          scaled(
+            HintPill(text: 'Sütunları da', compactAbove115: compact),
+            textScale: scale,
+          ),
+        );
+        final c = tester.widget<Container>(
+          find
+              .descendant(
+                of: find.byType(HintPill),
+                matching: find.byType(Container),
+              )
+              .first,
+        );
+        return (c.padding! as EdgeInsets).top;
+      }
+
+      expect(await padTop(1.3, compact: false), closeTo(7 * s390, 1e-9));
+      expect(await padTop(1.3, compact: true), closeTo(5 * s390, 1e-9));
+      expect(await padTop(1.0, compact: true), closeTo(7 * s390, 1e-9));
+    });
+
+    testWidgets('SkeletonCell: white 6 % with a 7 % edge at the tile radius', (
+      tester,
+    ) async {
+      await tester.pumpWidget(scaled(const SkeletonCell(size: 57)));
+      final d = decorationOf(tester, find.byType(SkeletonCell));
+      expect(d.color, const Color(0x0FFFFFFF));
+      expect(d.border!.top.color, LoopColors.glassFillEdge);
+      expect(
+        d.borderRadius,
+        BorderRadius.circular(57 * LoopRadii.tileFraction),
+      );
+    });
   });
 
   group('font assets (F00 architecture §7.3)', () {

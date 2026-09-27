@@ -9,6 +9,9 @@ import '../typography.dart';
 /// glow; locked = indigo + lock icon; frozen = ice + snowflake + dashed border.
 enum TileState { normal, active, winning, locked, frozen, inactive }
 
+/// A board tile in one [TileState]. The glyph takes [loopCappedTextScaler]: it
+/// grows with the OS text size up to 1.3× and never past what the tile can
+/// hold (F03 architecture §19.3 (1), §19.8 (2); audit defect A-2).
 class TileFace extends StatelessWidget {
   const TileFace({
     required this.letter,
@@ -16,6 +19,7 @@ class TileFace extends StatelessWidget {
     this.state = TileState.normal,
     this.height,
     this.radius,
+    this.iconScale = 1,
     super.key,
   });
 
@@ -28,6 +32,11 @@ class TileFace extends StatelessWidget {
   final double? height;
   final double? radius;
   final TileState state;
+
+  /// Scale of the corner lock / snowflake icon about its centre. The Play thaw
+  /// shrinks the snowflake 1 → 0.6 while the frozen face fades out (F03
+  /// `ui-design.md` §5).
+  final double iconScale;
 
   @override
   Widget build(BuildContext context) {
@@ -108,18 +117,24 @@ class TileFace extends StatelessWidget {
             child: Text(
               letter,
               style: LoopText.tileGlyph(size, color: glyphColor),
+              textScaler: loopCappedTextScaler(context),
             ),
           ),
           if (state == TileState.locked || state == TileState.frozen)
             Positioned(
               top: size * 0.08,
               right: size * 0.08,
-              child: LoopIconView(
-                state == TileState.locked ? LoopIcon.lock : LoopIcon.snowflake,
-                color: state == TileState.locked
-                    ? LoopColors.text
-                    : LoopColors.frozenIcon,
-                size: size * 0.27,
+              child: Transform.scale(
+                scale: iconScale,
+                child: LoopIconView(
+                  state == TileState.locked
+                      ? LoopIcon.lock
+                      : LoopIcon.snowflake,
+                  color: state == TileState.locked
+                      ? LoopColors.text
+                      : LoopColors.frozenIcon,
+                  size: size * 0.27,
+                ),
               ),
             ),
         ],
@@ -152,7 +167,8 @@ class GhostSlot extends StatelessWidget {
   );
 }
 
-/// A tile of the target-word rail (dark, 36 × 42 at the reference).
+/// A tile of the target-word rail (dark, 36 × 42 at the reference). Its glyph
+/// is capped at 1.3× like [TileFace]'s.
 class RailTile extends StatelessWidget {
   const RailTile({required this.letter, super.key});
 
@@ -180,6 +196,7 @@ class RailTile extends StatelessWidget {
       child: Text(
         letter,
         style: LoopText.node(16.5 * s, color: LoopColors.text),
+        textScaler: loopCappedTextScaler(context),
       ),
     );
   }

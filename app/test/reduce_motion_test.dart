@@ -7,6 +7,7 @@ import 'package:looplet_app/persistence/app_database.dart';
 import 'package:looplet_app/persistence/persistence_providers.dart';
 import 'package:looplet_app/persistence/repositories/active_session_repo.dart';
 import 'package:looplet_app/play/debug_puzzle_library.dart';
+import 'package:looplet_app/play/play_layout.dart';
 import 'package:looplet_app/play/play_session_args.dart';
 import 'package:looplet_app/play/play_session_controller.dart';
 import 'package:looplet_app/play/play_session_screen.dart';
@@ -69,7 +70,12 @@ void main() {
       addTearDown(c.dispose);
       await tester.pumpWidget(
         MaterialApp(
-          home: Center(child: PuzzleBoard(controller: c, boardSize: 340)),
+          home: Center(
+            child: PuzzleBoard(
+              controller: c,
+              geometry: BoardGeometry.forWidth(340),
+            ),
+          ),
         ),
       );
       c.beginDrag(startRow: 0, startCol: 0);
@@ -86,7 +92,7 @@ void main() {
         .firstWhere((p) => p.height == 3 && p.width != null)
         .width!;
 
-    const fullRow = 5 * ((340 - 2 * 10 - 4 * 8) / 5) + 4 * 8; // 320
+    final fullRow = BoardGeometry.forWidth(340).rowWidth;
 
     testWidgets('control — no OS signal: the seam is still drawing at 100 ms', (
       tester,

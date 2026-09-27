@@ -7,14 +7,17 @@ import 'dart:convert';
 
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:looplet_app/design/design.dart';
 import 'package:looplet_app/engine/engine_providers.dart';
 import 'package:looplet_app/journey/column_tutorial_overlay.dart';
 import 'package:looplet_app/journey/journey_content.dart';
 import 'package:looplet_app/journey/journey_tutorial.dart';
 import 'package:looplet_app/persistence/app_database.dart';
 import 'package:looplet_app/persistence/persistence_providers.dart';
+import 'package:looplet_app/play/play_layout.dart';
 import 'package:looplet_app/play/play_session_args.dart';
 import 'package:looplet_app/play/play_session_screen.dart';
 import 'package:looplet_app/play/widgets/puzzle_board.dart';
@@ -111,14 +114,7 @@ Widget _app(AppDatabase db, {int level = 4}) => ProviderScope(
 
 Offset _cell(WidgetTester tester, int row, int col) {
   final box = tester.getRect(find.byType(PuzzleBoard));
-  const plate = 10.0;
-  const gap = 8.0;
-  final tile = (box.width - 2 * plate - 4 * gap) / 5;
-  final stride = tile + gap;
-  return Offset(
-    box.left + plate + col * stride + tile * 0.5,
-    box.top + plate + row * stride + tile * 0.5,
-  );
+  return box.topLeft + BoardGeometry.forWidth(box.width).cellCenter(row, col);
 }
 
 void _reduceMotion(WidgetTester tester) {
@@ -272,4 +268,201 @@ void main() {
       await tester.pumpAndSettle(); // throws if the ghost still loops
     });
   }
+
+  group('D1 overlay (F03 ui-design §4–§7; A-1, A-6)', () {
+    Future<AppDatabase> bootAt(
+      WidgetTester tester,
+      Size size, {
+      double textScale = 1,
+      bool reduced = false,
+    }) async {
+      tester.view.physicalSize = size;
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+      if (textScale != 1) {
+        tester.platformDispatcher.textScaleFactorTestValue = textScale;
+        addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+      }
+      if (reduced) {
+        tester.platformDispatcher.accessibilityFeaturesTestValue =
+            const FakeAccessibilityFeatures(reduceMotion: true);
+        addTearDown(
+          tester.platformDispatcher.clearAccessibilityFeaturesTestValue,
+        );
+      }
+      final db = AppDatabase.forTesting(NativeDatabase.memory());
+      addTearDown(db.close);
+      await tester.pumpWidget(_app(db));
+      await tester.pump(const Duration(milliseconds: 600));
+      await tester.pump(const Duration(milliseconds: 600));
+      expect(find.byType(ColumnTutorialOverlay), findsOneWidget);
+      return db;
+    }
+
+    double ghostOpacity(WidgetTester tester) => tester
+        .widget<Opacity>(
+          find
+              .ancestor(
+                of: find.byType(TutorialGhost),
+                matching: find.byType(Opacity),
+              )
+              .first,
+        )
+        .opacity;
+
+    double pillOpacity(WidgetTester tester) => tester
+        .widget<Opacity>(
+          find
+              .ancestor(
+                of: find.byType(HintPill),
+                matching: find.byType(Opacity),
+              )
+              .first,
+        )
+        .opacity;
+
+    for (final (name, size) in <(String, Size)>[
+      ('390×844', const Size(390, 844)),
+      ('393×852', const Size(393, 852)),
+      ('440×956', const Size(440, 956)),
+    ]) {
+      for (final scale in <double>[1.0, 1.3, 3.12]) {
+        testWidgets('$name, OS text ${scale}x: the pill sits between the board '
+            'and the HUD with ≥ 4 pt clearance', (tester) async {
+          for (final (family, asset) in <(String, String)>[
+            ('SpaceGrotesk', 'assets/fonts/SpaceGrotesk.ttf'),
+            ('Manrope', 'assets/fonts/Manrope.ttf'),
+          ]) {
+            final loader = FontLoader(family)..addFont(rootBundle.load(asset));
+            await loader.load();
+          }
+          await bootAt(tester, size, textScale: scale, reduced: true);
+          expect(tester.takeException(), isNull);
+
+          final pill = tester.getRect(find.byType(HintPill));
+          final board = tester.getRect(find.byType(BoardCard));
+          final undo = tester.getRect(find.byType(UndoPill));
+          final restart = tester.getRect(find.byType(GlassIconButton));
+          final above = pill.top - board.bottom;
+          final below = undo.top - pill.bottom;
+          // ignore: avoid_print
+          print(
+            'hint-pill $name @${scale}x: h ${pill.height.toStringAsFixed(1)} '
+            'above ${above.toStringAsFixed(1)} below ${below.toStringAsFixed(1)}',
+          );
+          expect(above, greaterThanOrEqualTo(4), reason: 'clear of the board');
+          expect(below, greaterThanOrEqualTo(4), reason: 'clear of the HUD');
+          expect(pill.overlaps(undo), isFalse);
+          expect(pill.overlaps(restart), isFalse);
+          expect((above - below).abs(), lessThan(0.5), reason: 'centred');
+          // The sparkle is hidden above 1.15× so the sentence keeps two lines.
+          final sparkle = find.descendant(
+            of: find.byType(HintPill),
+            matching: find.byType(LoopIconView),
+          );
+          expect(sparkle, scale > 1.15 ? findsNothing : findsOneWidget);
+        });
+      }
+    }
+
+    testWidgets('undo and restart stay usable under the tutorial', (
+      tester,
+    ) async {
+      await bootAt(tester, const Size(393, 852), reduced: true);
+      await tester.dragFrom(_cell(tester, 2, 0), const Offset(140, 0));
+      await tester.pumpAndSettle();
+      expect(find.text('1'), findsOneWidget);
+      await tester.tap(find.byType(UndoPill));
+      await tester.pumpAndSettle();
+      expect(find.text('0'), findsOneWidget);
+      await tester.dragFrom(_cell(tester, 2, 0), const Offset(140, 0));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(GlassIconButton));
+      await tester.pumpAndSettle();
+      expect(find.text('0'), findsOneWidget);
+      expect(find.byType(ColumnTutorialOverlay), findsOneWidget);
+    });
+
+    testWidgets('the ghost hides on touch-down and returns after 600 ms idle '
+        '(A-6)', (tester) async {
+      await bootAt(tester, const Size(393, 852));
+      expect(ghostOpacity(tester), 1);
+
+      final g = await tester.startGesture(_cell(tester, 2, 0));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 130));
+      expect(ghostOpacity(tester), 0, reason: 'hidden under the finger');
+
+      await g.moveBy(const Offset(20, 0));
+      await g.moveBy(const Offset(120, 0));
+      await tester.pump(const Duration(milliseconds: 50));
+      expect(ghostOpacity(tester), 0, reason: 'stays hidden while dragging');
+      await g.up(); // a row move: the tutorial stays
+      // Frame by frame through the 190 ms settle, then idle.
+      for (var i = 0; i < 20; i++) {
+        await tester.pump(const Duration(milliseconds: 16));
+      }
+      expect(ghostOpacity(tester), 0, reason: 'not back right after release');
+      await tester.pump(const Duration(milliseconds: 250)); // ≈ 380 ms idle
+      expect(ghostOpacity(tester), 0, reason: 'not back before 600 ms idle');
+      await tester.pump(const Duration(milliseconds: 300)); // the timer fires
+      await tester.pump(const Duration(milliseconds: 200)); // 160 ms fade-in
+      expect(ghostOpacity(tester), closeTo(1, 1e-9));
+      expect(find.byType(ColumnTutorialOverlay), findsOneWidget);
+      await tester.pumpWidget(const SizedBox.shrink());
+    });
+
+    testWidgets('the first column move fades the pill out over 160 ms', (
+      tester,
+    ) async {
+      final db = await bootAt(tester, const Size(393, 852));
+      expect(pillOpacity(tester), 1);
+      await tester.dragFrom(_cell(tester, 2, 2), const Offset(0, 140));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 80));
+      expect(pillOpacity(tester), inExclusiveRange(0.0, 1.0));
+      expect(
+        await JourneyTutorialRepo(db).isColumnTutorialAcknowledged(),
+        isTrue,
+        reason: 'the ack is written at the gated move, not after the fade',
+      );
+      await tester.pump(const Duration(milliseconds: 120));
+      expect(find.byType(ColumnTutorialOverlay), findsNothing);
+      await tester.pumpWidget(const SizedBox.shrink());
+    });
+
+    testWidgets('the hint is announced once; the ghost is excluded', (
+      tester,
+    ) async {
+      final announced = <String>[];
+      tester.binding.defaultBinaryMessenger
+          .setMockDecodedMessageHandler<Object?>(SystemChannels.accessibility, (
+            message,
+          ) async {
+            final map = message! as Map<Object?, Object?>;
+            if (map['type'] == 'announce') {
+              announced.add(
+                (map['data']! as Map<Object?, Object?>)['message']! as String,
+              );
+            }
+            return null;
+          });
+      addTearDown(
+        () => tester.binding.defaultBinaryMessenger
+            .setMockDecodedMessageHandler<Object?>(
+              SystemChannels.accessibility,
+              null,
+            ),
+      );
+      await bootAt(tester, const Size(393, 852), reduced: true);
+      await tester.dragFrom(_cell(tester, 2, 0), const Offset(140, 0));
+      await tester.pumpAndSettle();
+      expect(announced.where((m) => m == _hint), hasLength(1));
+      final ghost = find.byType(TutorialGhost);
+      expect(
+        find.descendant(of: ghost, matching: find.byType(ExcludeSemantics)),
+        findsWidgets,
+      );
+    });
+  });
 }

@@ -5,6 +5,7 @@ library;
 
 export 'components/buttons.dart';
 export 'components/info.dart';
+export 'components/play_decor.dart';
 export 'components/surfaces.dart';
 export 'components/tile.dart';
 export 'icons.dart';

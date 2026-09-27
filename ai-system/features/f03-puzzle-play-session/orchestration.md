@@ -10,16 +10,16 @@ Rework
 
 ## Current Owner
 
-Frontend/Mobile Developer
+Tech Lead
 
 ## Next Role
 
-Frontend/Mobile Developer
+Tech Lead
 
 ## Active Task Ledger
 
 - [x] Task ID: F03-UI-D1 | Assigned Role: UI Designer | Status: Done | Summary: DELIVERED 2026-09-27 — ui-design.md §1–§14 rewritten for the Loop Glass Play surface; §16 won composition kept byte-for-byte (legacy until D2). 28 renders under design/: the audit's D1 missing states 1–10, plus idle (D1 corrections), loading, keyboard focus, 16e / Pro Max variants, the 1.3× text cap and motion stills. Executable motion prototype design/src/D1-motion-prototype.html (lift + settle, thaw, tutorial ghost; ?rm=1, ?t=). Rulings applied: C-5 (hint pill above the HUD, ≥ 4 pt clearance measured on three devices at 1.0× and 1.3×; ghost hides on touch-down), C-9 (1.3× cap), C-10 (180 ms thaw), locked/frozen treatments, copy. D1 acceptance list §11.5; manifest §12b. NTLC §14: the text cap applied to the whole of Play (deviates from the §19.3 (1) hint example), design-layer edits inside D1, and informational items. No code | Depends On: -
-- [ ] Task ID: F03-FE-D1 | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: ACTIVATED 2026-09-27 (visual-gate checkpoint passed, gate Ready for Implementation). Implement the D1 handoff (ui-design.md §1–§14, acceptance list §11.5) from app/lib/design, per architecture.md §19 and the §19.8 rulings. Scope: the Play header, rail, board, HUD, special tiles, thaw, loading and load error; the F05 tutorial overlay (cross-feature); the allowed design-layer additions. Drawn icons replace the six Material icons. Tests updated and added. frontend.md Visual Parity Evidence per §19.8 (7). The won moment stays legacy (§16) until D2. See Current Brief | Depends On: F03-UI-D1
+- [x] Task ID: F03-FE-D1 | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: DELIVERED 2026-09-28 — every non-won Play state on Loop Glass (LoopBackdrop; chevron + SEVİYE NN; MovesCard; HEDEF DÖNGÜ + RailTiles; BoardCard + TileFace; lift with rim, card-edge rails, rest at 42 %, wrap ghost 30 → 100 %; thaw 180 ms cross-fade; UndoPill + 44-pt restart; skeleton loading; error card + LimePill → /), the F05 tutorial re-skin (pill between board and HUD, ghost hides on touch-down and returns after 600 ms idle; §19.8 (3) fallback on after a 3.93-pt device measurement), the §19.8 (2) design-layer additions, drawn icons (no Material icon left), strings and semantics, reduced-motion paths. Tests: melos analyze / test green (app 405), integration_test 13/13 on the iPhone 16 simulator. frontend.md Visual Parity Evidence: runtime screenshots on the 16 / 16e / Pro Max, parity composites and measurements (≤ 0.83 pt vs the D1 renders), four videos, text sweep and Reduce Motion. NTLC-1: the won dock moved onto the goal (the D1 header left no §16.3 zone); NTLC-2: three design-layer edits beyond the §19.8 (2) list | Depends On: F03-UI-D1
 - [ ] Task ID: F03-QA-D1 | Assigned Role: QA | Status: Queued | Summary: Final-stage independent visual QA of D1 (architecture.md §19.7): runtime rubric ≥ 93 with every dimension ≥ 8 and no fail condition; regression of AC1–AC11 and F05 AC4/AC11; text-scale sweep to AX5; Reduce Motion; Android stated as a limit | Depends On: F03-FE-D1
 
 ## Open Tasks
@@ -32,7 +32,7 @@ None
 
 ## Delivery Review
 
-Accepted
+Pending
 
 ## QA Scope
 
@@ -81,7 +81,15 @@ D1 handoff records (2026-09-27, UI Designer) are in ui-design.md §12b Visual Ev
 * accessibility D1-10 / D1-10b;
 * motion-prototype MP-D1 and MP-D1-S.
 
-The artefacts are in features/f03-puzzle-play-session/design/. The Tech Lead verified them at the 2026-09-27 checkpoint (Ready for Implementation). The parity and QA records are pending (see Pending Evidence).
+The artefacts are in features/f03-puzzle-play-session/design/. The Tech Lead verified them at the 2026-09-27 checkpoint (Ready for Implementation).
+
+Runtime parity records (2026-09-28, Frontend/Mobile Developer; frontend.md § Visual Parity Evidence) are in features/f03-puzzle-play-session/design/runtime-d1/:
+* runtime-screenshot RT-* on the iPhone 16 (every §12a row), the 16e and the Pro Max (idle, tutorial, column drag);
+* parity-comparison PC-*.jpg with parity-measurements.txt;
+* runtime-video RV-* (row and column lift, thaw, tutorial ghost, Reduce Motion);
+* accessibility records for the text sweep and Reduce Motion.
+
+The tooling is in design/src/ (parity-d1.sh, measure-d1.swift, pill-clearance-d1.swift, video-d1.swift, seed-sim.sh). The QA record is pending (see Pending Evidence).
 
 ## QA Modules
 
@@ -116,8 +124,8 @@ allowed
   * Prerequisite / External Decision: F03.D1-HANDOFF accepted (gate Ready for Implementation)
   * Re-evaluation Trigger: F03-FE-D1 delivery
   * Blocks: Visual Quality Gate = Ready for QA; F03-QA-D1
-  * Result: PENDING
-  * Provenance / Note: -
+  * Result: PASS
+  * Provenance / Note: 2026-09-28 Frontend/Mobile Developer, HEAD 991584c + the F03-FE-D1 working tree, debug build on iOS Simulator 18.6 — iPhone 16 D0011CE7, 16e 6DBDFD97, Pro Max 02FDE776. Runtime screenshots cover every §12a row on the 16, plus idle / tutorial / column drag on the 16e and the Pro Max. Parity: ≤ 0.83 pt against every D1 render (19 measured pairs); token colours within ΔE2000 1.5; one gradient patch at 3.35 (F00 LoopBackdrop's circular light). Videos: row + column lift, thaw (L23), tutorial ghost, Reduce Motion ON. Text sweep default / xxxL / AX5 with every Play text at the 1.3× cap; hint-pill clearance ≥ 6.27 pt after the §19.8 (3) fallback (3.93 pt before it on the 16e). Suites: melos analyze and test green (app 405), dart format 0 changed in app / packages / tools, integration_test 13/13 on the iPhone 16. Gaps stated in frontend.md: the keyboard focus ring is covered by a widget test only (this host cannot inject Tab keys into the simulator); Android not run (ANDROID-CI-EVIDENCE). NTLC-1 (won dock onto the goal) and NTLC-2 (design-layer edits) await the checkpoint.
 
 - Evidence ID: F03.D1-VISUAL-QA
   * Scenario: An independent final-stage QA verdict on the D1 Play surface — a rubric score from real runtime (≥ 93, every dimension ≥ 8, no fail condition), full regression of AC1–AC11 and F05 AC4/AC11, a text-scale sweep and Reduce Motion
@@ -140,9 +148,11 @@ None
 
 ## Next Action
 
-Run Frontend/Mobile Developer on F03-FE-D1 (Current Brief below; architecture.md §19 and the §19.8 rulings; ui-design.md §11.5 acceptance list).
-
-Then return to the Tech Lead. That checkpoint is mandatory: the Tech Lead verifies the Visual Parity Evidence and sets Ready for QA before F03-QA-D1 starts.
+Run Tech Lead — the mandatory checkpoint on F03-FE-D1 before F03-QA-D1:
+* reconcile the delivery and verify frontend.md § Visual Parity Evidence (F03.D1-PARITY);
+* rule on NTLC-1 (the won dock moved onto the goal rail — deviation from ui-design §16.3 / §16.5 (1)) and NTLC-2 (LoopBackButton, TileFace.iconScale and the UndoPill dot animation — design-layer edits beyond the §19.8 (2) list);
+* note the informational items NTLC-3 … NTLC-6;
+* then set Delivery Review and the Visual Quality Gate (Ready for QA), and open F03-QA-D1.
 
 ## Last Decision
 
@@ -184,9 +194,9 @@ The earlier decision (the 2026-09-27 reopen) and the UI Designer brief are archi
 
 ## Last Update
 
-* Updated By: Tech Lead
-* Timestamp: 2026-09-27
-* Summary: D1 visual-gate checkpoint — F03-UI-D1 accepted; Visual Quality Gate Ready for Implementation; architecture §19.8 rulings; F03-FE-D1 activated for the Frontend/Mobile Developer.
+* Updated By: Frontend/Mobile Developer
+* Timestamp: 2026-09-28
+* Summary: F03-FE-D1 delivered — the Loop Glass Play, the F05 tutorial re-skin, the design-layer additions and the icon swap; suites and integration_test green; F03.D1-PARITY PASS with runtime evidence on three simulators; Delivery Review Pending; NTLC-1 / NTLC-2 raised; owner → Tech Lead.
 
 ## Context & Follow-ups
 
@@ -215,6 +225,11 @@ The earlier decision (the 2026-09-27 reopen) and the UI Designer brief are archi
   * **Verified:** F03-UI-D1 reconciled — HTML regenerates byte-identical, manifest paths exist, §16 identical, hint clearance measured at 4.5 / 4.0 pt.
   * **Decided:** Delivery Review Accepted; Visual Quality Gate Ready for Implementation; architecture §19.8 rulings.
   * **Next:** F03-FE-D1 Open; owner → Frontend/Mobile Developer.
+* 2026-09-28 — Frontend/Mobile Developer: F03-FE-D1 delivered; task Done; F03.D1-PARITY PASS; Delivery Review = Pending; owner → Tech Lead.
+  * **Code:** Loop Glass Play (every non-won state), F05 tutorial re-skin, §19.8 (2) design-layer additions, drawn icons, strings and semantics; the §19.8 (3) hint-pill fallback switched on after the device measurement.
+  * **Evidence:** frontend.md § Visual Parity Evidence; design/runtime-d1/; tooling in design/src/.
+  * **NTLC:** NTLC-1 won dock onto the goal; NTLC-2 design-layer edits beyond the list; NTLC-3 … NTLC-6 informational.
+  * **History:** the pre-D1 frontend.md is archived byte-for-byte as history/f03-puzzle-play-session-2026-09-27/frontend-before-phase-d1.md.
 
 ## Current Brief
 

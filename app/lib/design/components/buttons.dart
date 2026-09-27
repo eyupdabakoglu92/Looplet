@@ -15,13 +15,18 @@ import '../typography.dart';
 /// QA-03) that also activates on Enter/Space while focused.
 class _Pressable extends StatefulWidget {
   const _Pressable({
-    required this.child,
     required this.onPressed,
     required this.semanticLabel,
+    this.child,
+    this.builder,
     this.focusRadius = LoopRadii.pillFull,
-  });
+  }) : assert((child == null) != (builder == null), 'child or builder');
 
-  final Widget child;
+  final Widget? child;
+
+  /// Builds the control for its pressed state — the glass controls brighten
+  /// their fill and edge while pressed (F03 `ui-design.md` §5, §19.8 (2)).
+  final Widget Function(bool pressed)? builder;
   final VoidCallback? onPressed;
   final String? semanticLabel;
 
@@ -32,6 +37,12 @@ class _Pressable extends StatefulWidget {
   @override
   State<_Pressable> createState() => _PressableState();
 }
+
+/// Glass fill and edge while pressed: `rgba(255,255,255,.14)` / `.18`, up from
+/// the resting `.075` / `.07` (F03 `ui-design.md` §5 "button pressed", ruling
+/// §19.8 (2)). Applied with or without reduced motion ("fill only").
+const Color _glassFillPressed = Color(0x24FFFFFF);
+const Color _glassEdgePressed = LoopColors.outlineEdge;
 
 class _PressableState extends State<_Pressable> {
   bool _down = false;
@@ -83,7 +94,7 @@ class _PressableState extends State<_Pressable> {
                       ),
                     )
                   : null,
-              child: widget.child,
+              child: widget.builder?.call(_down) ?? widget.child,
             ),
           ),
         ),
@@ -279,16 +290,18 @@ class GlassIconButton extends StatelessWidget {
       onPressed: onPressed,
       semanticLabel: semanticLabel,
       focusRadius: radius * s,
-      child: Opacity(
+      builder: (pressed) => Opacity(
         opacity: onPressed == null ? 0.55 : 1,
         child: Container(
           width: edge,
           height: edge,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: LoopColors.glassFill,
+            color: pressed ? _glassFillPressed : LoopColors.glassFill,
             borderRadius: BorderRadius.circular(radius * s),
-            border: Border.all(color: LoopColors.glassFillEdge),
+            border: Border.all(
+              color: pressed ? _glassEdgePressed : LoopColors.glassFillEdge,
+            ),
           ),
           child: LoopIconView(icon, color: LoopColors.text, size: 20 * s),
         ),
@@ -323,15 +336,17 @@ class UndoPill extends StatelessWidget {
       // matching the "$earned / $total …" pattern of `StarRow`.
       semanticLabel: '$semanticLabel, $quota / $total hak',
       focusRadius: 22 * s,
-      child: Opacity(
+      builder: (pressed) => Opacity(
         opacity: onPressed == null ? 0.55 : 1,
         child: Container(
           width: 98.5 * s,
           height: 50 * s,
           decoration: BoxDecoration(
-            color: LoopColors.glassFill,
+            color: pressed ? _glassFillPressed : LoopColors.glassFill,
             borderRadius: BorderRadius.circular(22 * s),
-            border: Border.all(color: LoopColors.glassFillEdge),
+            border: Border.all(
+              color: pressed ? _glassEdgePressed : LoopColors.glassFillEdge,
+            ),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -340,7 +355,12 @@ class UndoPill extends StatelessWidget {
               SizedBox(width: 10 * s),
               for (var i = 0; i < total; i++) ...<Widget>[
                 if (i > 0) SizedBox(width: 5 * s),
-                Container(
+                // A spent dot dims over 120 ms (instant under reduced motion)
+                // — F03 `ui-design.md` §5 "undo / restart".
+                AnimatedContainer(
+                  duration: reduceMotionRequested()
+                      ? Duration.zero
+                      : const Duration(milliseconds: 120),
                   width: 5.5 * s,
                   height: 5.5 * s,
                   decoration: BoxDecoration(
@@ -349,6 +369,62 @@ class UndoPill extends StatelessWidget {
                         ? LoopColors.limeMid
                         : LoopColors.limeMid.withValues(alpha: 0.25),
                   ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The in-flow back control (F03 `ui-design.md` §6 "App Chrome", §7): the
+/// drawn chevron, plus an optional caps label (`SEVİYE 26`) bound to where the
+/// player is, as one pressable. The hit box is at least 44 × 44 pt; [padding]
+/// places the chevron inside it. The label is capped at 1.3× — it sits in fixed
+/// header chrome (F03 architecture §19.3 (1)).
+class LoopBackButton extends StatelessWidget {
+  const LoopBackButton({
+    required this.onPressed,
+    required this.semanticLabel,
+    this.label,
+    this.padding = EdgeInsets.zero,
+    super.key,
+  });
+
+  final VoidCallback? onPressed;
+  final String semanticLabel;
+  final String? label;
+  final EdgeInsetsGeometry padding;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = LoopScale.of(context);
+    return _Pressable(
+      onPressed: onPressed,
+      semanticLabel: semanticLabel,
+      focusRadius: 12,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+        child: Padding(
+          padding: padding,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              LoopIconView(
+                LoopIcon.back,
+                color: LoopColors.muted,
+                size: 20 * s,
+              ),
+              if (label != null) ...<Widget>[
+                SizedBox(width: 6 * s),
+                Text(
+                  label!,
+                  style: LoopText.caption(s),
+                  textScaler: loopCappedTextScaler(context),
+                  maxLines: 1,
+                  softWrap: false,
                 ),
               ],
             ],

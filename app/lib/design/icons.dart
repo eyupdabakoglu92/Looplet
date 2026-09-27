@@ -21,6 +21,11 @@ enum LoopIcon {
   lock,
   snowflake,
   upDown,
+
+  /// The loop that did not close — an open ring with an exclamation; the Play
+  /// load-error glyph (F03 `ui-design.md` §7, D1; replaces
+  /// `error_outline_rounded`).
+  loopBreak,
 }
 
 class LoopIconView extends StatelessWidget {
@@ -82,6 +87,7 @@ class LoopIconPainter extends CustomPainter {
     LoopIcon.upDown => 1.9,
     LoopIcon.snowflake => 1.7,
     LoopIcon.star => 1.6,
+    LoopIcon.loopBreak => 1.8,
     _ => 1.7,
   };
 
@@ -302,6 +308,33 @@ class LoopIconPainter extends CustomPainter {
             ..lineTo(16.5, 14.5),
           stroke,
         );
+      case LoopIcon.loopBreak:
+        // `M16.25 4.64 A8.5 8.5 0 1 0 20.37 10.52` — a ring of radius 8.5
+        // around the centre, open between 10° and 60°; then the stem
+        // `M12 8.3 v4.4` and a 2.6-wide round dot at (12, 15.9).
+        canvas
+          ..drawPath(
+            Path()
+              ..moveTo(16.25, 4.64)
+              ..arcToPoint(
+                const Offset(20.37, 10.52),
+                radius: const Radius.circular(8.5),
+                largeArc: true,
+                clockwise: false,
+              ),
+            stroke,
+          )
+          ..drawPath(
+            Path()
+              ..moveTo(12, 8.3)
+              ..lineTo(12, 12.7),
+            stroke,
+          )
+          ..drawCircle(
+            const Offset(12, 15.9),
+            1.3 * stroke.strokeWidth / defaultStroke(LoopIcon.loopBreak),
+            fill,
+          );
     }
     canvas.restore();
   }

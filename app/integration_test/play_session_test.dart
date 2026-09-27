@@ -30,10 +30,10 @@ import 'package:looplet_app/persistence/persistence_providers.dart';
 import 'package:looplet_app/persistence/repositories/active_session_repo.dart';
 import 'package:looplet_app/play/play_session_args.dart';
 import 'package:looplet_app/play/play_session_screen.dart';
-import 'package:looplet_app/play/widgets/board_tile.dart';
+import 'package:looplet_app/design/design.dart';
+import 'package:looplet_app/play/play_layout.dart';
 import 'package:looplet_app/rating/completion_panel.dart';
 import 'package:looplet_app/play/widgets/puzzle_board.dart';
-import 'package:looplet_core/looplet_core.dart' show TileStatus;
 import 'package:looplet_engine/looplet_engine.dart';
 
 const _small = Size(360, 780);
@@ -60,14 +60,7 @@ AppDatabase _freshDb() => AppDatabase.forTesting(NativeDatabase.memory());
 
 Offset _rowStart(WidgetTester tester, int row) {
   final box = tester.getRect(find.byType(PuzzleBoard));
-  const plate = 10.0;
-  const gap = 8.0;
-  final tile = (box.width - 2 * plate - 4 * gap) / 5;
-  final stride = tile + gap;
-  return Offset(
-    box.left + plate + tile * 0.5,
-    box.top + plate + row * stride + tile * 0.5,
-  );
+  return box.topLeft + BoardGeometry.forWidth(box.width).cellCenter(row, 0);
 }
 
 int _moves(WidgetTester tester) {
@@ -215,7 +208,7 @@ void main() {
       await _bootTo(tester, db, 'smoke-tr-02');
       expect(_moves(tester), 3);
 
-      await tester.tap(find.byIcon(Icons.refresh_rounded));
+      await tester.tap(find.byType(GlassIconButton));
       await tester.pumpAndSettle();
       expect(_moves(tester), 0);
       await _flush(tester);
@@ -252,14 +245,11 @@ void main() {
         await _bootTo(tester, db, 'smoke-tr-06');
 
         final tiles = tester
-            .widgetList<BoardTile>(find.byType(BoardTile))
+            .widgetList<TileFace>(find.byType(TileFace))
             .toList();
-        final frozen = tiles
-            .where((t) => t.status == TileStatus.frozen)
-            .toList();
+        final frozen = tiles.where((t) => t.state == TileState.frozen).toList();
         expect(frozen, hasLength(1));
         expect(frozen.single.letter, 'S');
-        expect(tiles.where((t) => t.status == TileStatus.thawed), isEmpty);
         await _unmount(tester);
       },
     );

@@ -6,19 +6,23 @@
 //    0–4 × {Perfect, non-Perfect} × {390×844, 440×956}, plus 393×852, OS text
 //    scale 1.3, reduce-motion, the "panel never before T0+600 ms" rule and the
 //    Retry exit.
+import 'dart:math' as math;
+
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show FontLoader, rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:looplet_app/engine/engine_providers.dart';
+import 'package:looplet_app/design/design.dart';
 import 'package:looplet_app/persistence/app_database.dart';
 import 'package:looplet_app/persistence/persistence_providers.dart';
+import 'package:looplet_app/play/play_layout.dart';
 import 'package:looplet_app/play/play_session_args.dart';
 import 'package:looplet_app/play/play_session_providers.dart';
 import 'package:looplet_app/play/play_session_screen.dart';
 import 'package:looplet_app/play/widgets/docked_row.dart';
 import 'package:looplet_app/play/widgets/puzzle_board.dart';
-import 'package:looplet_app/play/widgets/target_rail.dart';
 import 'package:looplet_app/play/won_composition.dart';
 import 'package:looplet_app/rating/completion_panel.dart';
 import 'package:looplet_content/looplet_content.dart';
@@ -75,60 +79,89 @@ void main() {
     });
   });
 
-  group('WonGeometry (ui-design §16.3)', () {
-    // (screen, dividerBottom in stack-local, tile) from the QA measurements.
-    const cases = <(String, double, double, double, double)>[
-      ('390×844', 844, 110, 58, 34),
-      ('393×852', 852, 123, 59, 34),
-      ('440×956', 956, 130, 67, 34),
+  group('WonGeometry (ui-design §16.3, D1: the row docks onto the goal)', () {
+    // The D1 Loop Glass header: the rail tiles come from `PlayLayout`; the
+    // won stack is the safe area (status bar 47 / 59 / 62, home indicator 34).
+    const cases = <(String, Size, double)>[
+      ('390×844', Size(390, 844), 47),
+      ('393×852', Size(393, 852), 59),
+      ('440×956', Size(440, 956), 62),
     ];
-    for (final (name, h, divider, tile, bottomInset) in cases) {
-      test(
-        '$name: dock centred in the free zone, clear of the capped panel',
-        () {
-          const top = 59.0; // status-bar inset above the stack
-          final g = WonGeometry.compute(
-            screenHeight: h,
-            stackTopGlobal: top,
-            stackBottomGlobal: h - bottomInset,
-            dividerBottomLocal: divider,
-            tile: tile,
-          );
-          final unit = WonGeometry.unitHeight(tile);
-          final dockTopG = top + g.dockTopLocal;
-          final dividerG = top + divider;
-          expect(g.fits, isTrue);
-          expect(g.dockScale, 1.0);
-          expect(dockTopG, greaterThanOrEqualTo(dividerG + 12 - 1e-6));
-          // Worst case: the panel top sits exactly at 0.36 H.
-          final panelTop = 0.36 * h;
-          expect(panelTop - (dockTopG + unit), greaterThanOrEqualTo(16 - 1e-6));
-          expect(g.panelMaxHeight, closeTo(h - bottomInset - panelTop, 1e-6));
-        },
-      );
+    for (final (name, size, top) in cases) {
+      test('$name: tiles centred on the goal, panel at the shipped 0.36 H', () {
+        final layout = PlayLayout(size);
+        final tile = layout.board.tile;
+        final g = WonGeometry.compute(
+          screenHeight: size.height,
+          stackTopGlobal: top,
+          stackBottomGlobal: size.height - 34,
+          railTopLocal: layout.railTop - top,
+          railBottomLocal: layout.railBottom - top,
+          tile: tile,
+        );
+        final unit = WonGeometry.unitHeight(tile);
+        final dockTopG = top + g.dockTopLocal;
+        expect(g.fits, isTrue);
+        expect(g.dockScale, 1.0);
+        expect(
+          dockTopG + tile / 2,
+          closeTo((layout.railTop + layout.railBottom) / 2, 1e-9),
+        );
+        // The panel keeps the shipped cap (≤ 64 % of H), floored 16 pt under
+        // the docked unit — which binds by < 3 pt on 390/393-pt phones.
+        final floor = dockTopG + unit + 16;
+        expect(
+          g.panelTopGlobal,
+          closeTo(math.max(0.36 * size.height, floor), 1e-9),
+        );
+        expect(g.panelTopGlobal - 0.36 * size.height, lessThan(3));
+        expect(
+          g.panelMaxHeight,
+          closeTo(size.height - 34 - g.panelTopGlobal, 1e-6),
+        );
+      });
     }
 
-    test(
-      'a too-short free zone scales the row (≥ 0.8) then reports no fit',
-      () {
-        final shrink = WonGeometry.compute(
-          screenHeight: 500,
-          stackTopGlobal: 0,
-          stackBottomGlobal: 480,
-          dividerBottomLocal: 120,
-          tile: 58,
-        );
-        expect(shrink.dockScale, inInclusiveRange(0.8, 1.0));
-        final none = WonGeometry.compute(
-          screenHeight: 400,
-          stackTopGlobal: 0,
-          stackBottomGlobal: 380,
-          dividerBottomLocal: 130,
-          tile: 58,
-        );
-        expect(none.fits, isFalse);
-      },
-    );
+    test('a lower rail floors the panel under the docked unit', () {
+      final g = WonGeometry.compute(
+        screenHeight: 852,
+        stackTopGlobal: 59,
+        stackBottomGlobal: 818,
+        railTopLocal: 250,
+        railBottomLocal: 296,
+        tile: 57,
+      );
+      final dockTopG = 59 + g.dockTopLocal;
+      expect(dockTopG, closeTo(59 + 273 - 28.5, 1e-9));
+      expect(
+        g.panelTopGlobal,
+        closeTo(dockTopG + WonGeometry.unitHeight(57) + 16, 1e-9),
+      );
+      expect(g.dockScale, 1.0);
+    });
+
+    test('a too-short frame scales the row (≥ 0.8) then reports no fit', () {
+      final shrink = WonGeometry.compute(
+        screenHeight: 500,
+        stackTopGlobal: 0,
+        stackBottomGlobal: 440,
+        railTopLocal: 380,
+        railBottomLocal: 420,
+        tile: 58,
+      );
+      expect(shrink.dockScale, inInclusiveRange(0.8, 1.0));
+      expect(shrink.dockScale, lessThan(1.0));
+      expect(shrink.fits, isTrue);
+      final none = WonGeometry.compute(
+        screenHeight: 500,
+        stackTopGlobal: 0,
+        stackBottomGlobal: 420,
+        railTopLocal: 380,
+        railBottomLocal: 420,
+        tile: 58,
+      );
+      expect(none.fits, isFalse);
+    });
   });
 
   // --- on the real screen -----------------------------------------------------
@@ -167,6 +200,58 @@ void main() {
     _expectRestVisibility(tester, size);
   });
 
+  // D1: the Loop Glass header moved the rail down; the panel top is floored
+  // under the dock (WonGeometry). Checked with the real fonts and the device
+  // safe-area insets, where the stack is shortest.
+  group('D1 dock on the device geometry', () {
+    setUpAll(() async {
+      for (final (family, asset) in <(String, String)>[
+        ('SpaceGrotesk', 'assets/fonts/SpaceGrotesk.ttf'),
+        ('Manrope', 'assets/fonts/Manrope.ttf'),
+      ]) {
+        final loader = FontLoader(family)..addFont(rootBundle.load(asset));
+        await loader.load();
+      }
+    });
+
+    for (final (name, size, top) in <(String, Size, double)>[
+      ('16e 390×844', const Size(390, 844), 47),
+      ('16 393×852', const Size(393, 852), 59),
+      ('16 Pro Max 440×956', const Size(440, 956), 62),
+    ]) {
+      for (final scale in <double>[1.0, 1.3]) {
+        for (final perfect in <bool>[true, false]) {
+          testWidgets('$name @${scale}x · ${perfect ? "Perfect" : "2★"}: row '
+              'docked on the goal, panel clear of it and ≤ 64 % H', (
+            tester,
+          ) async {
+            tester.view.padding = FakeViewPadding(top: top, bottom: 34);
+            tester.view.viewPadding = FakeViewPadding(top: top, bottom: 34);
+            if (scale != 1.0) {
+              tester.platformDispatcher.textScaleFactorTestValue = scale;
+              addTearDown(
+                tester.platformDispatcher.clearTextScaleFactorTestValue,
+              );
+            }
+            await _win(tester, size, row: 4, perfect: perfect);
+            _expectRestVisibility(tester, size);
+            final panel = tester.getRect(find.byType(CompletionPanel));
+            final density = tester
+                .widget<CompletionPanel>(find.byType(CompletionPanel))
+                .density;
+            // ignore: avoid_print
+            print(
+              'won $name @${scale}x ${perfect ? "P" : "2*"}: panel '
+              '${panel.height.toStringAsFixed(1)} pt (top '
+              '${panel.top.toStringAsFixed(1)}), density ${density.name}',
+            );
+            expect(panel.bottom, lessThanOrEqualTo(size.height - 34 + 0.5));
+          });
+        }
+      }
+    }
+  });
+
   testWidgets('F04 variants: first-clear → matched → newBest+Perfect, row 4', (
     tester,
   ) async {
@@ -180,7 +265,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(CompletionPanel), findsNothing);
     expect(find.byType(DockedAnswerRow), findsNothing);
-    expect(find.byIcon(Icons.chevron_left_rounded), findsOneWidget);
+    expect(find.byType(LoopBackButton), findsOneWidget);
 
     await _playOut(tester, row: 4, perfect: false); // same 2 moves → matched
     _expectRestVisibility(tester, size);
@@ -325,25 +410,19 @@ Future<void> _boot(WidgetTester tester, Size size, {required int row}) async {
 
 Offset _rowStart(WidgetTester tester, int row) {
   final box = tester.getRect(find.byType(PuzzleBoard));
-  const plate = 10.0;
-  const gap = 8.0;
-  final tile = (box.width - 2 * plate - 4 * gap) / 5;
-  return Offset(
-    box.left + plate + tile * 0.5,
-    box.top + plate + row * (tile + gap) + tile * 0.5,
-  );
+  return box.topLeft + BoardGeometry.forWidth(box.width).cellCenter(row, 0);
 }
 
 Future<void> _swipeRow(WidgetTester tester, int row) async {
   await tester.dragFrom(_rowStart(tester, row), const Offset(140, 0));
 }
 
-/// Advances frame by frame until the back chevron disappears — the `won` frame
+/// Advances frame by frame until the back control disappears — the `won` frame
 /// (`T0`); the won timeline starts on the following frame.
 Future<void> _pumpToWonT0(WidgetTester tester) async {
   for (var i = 0; i < 400; i++) {
     await tester.pump(const Duration(milliseconds: 4));
-    if (find.byIcon(Icons.chevron_left_rounded).evaluate().isEmpty) return;
+    if (find.byType(LoopBackButton).evaluate().isEmpty) return;
   }
   fail('the session never reached `won`');
 }
@@ -374,13 +453,19 @@ Future<void> _win(
   await _playOut(tester, row: row, perfect: perfect);
 }
 
-/// `ui-design.md` §16.5 — the rect-testable visibility rule, at rest.
+/// `ui-design.md` §16.5 — the rect-testable visibility rule, at rest, with
+/// the D1 adaptation (the row docks onto the goal; `won_composition.dart`).
 void _expectRestVisibility(WidgetTester tester, Size size) {
   final w = tester.getRect(find.byType(DockedAnswerRow));
   final p = tester.getRect(find.byType(CompletionPanel));
-  final rail = tester.getRect(find.byType(TargetRail));
+  final tile = tester
+      .widget<DockedAnswerRow>(find.byType(DockedAnswerRow))
+      .tile;
+  final railTiles = find.byType(RailTile);
+  final railTop = tester.getRect(railTiles.first).top;
+  final railBottom = tester.getRect(railTiles.first).bottom;
 
-  // 1. Docked unit clear of the panel, below the rail, inside the screen.
+  // 1. Docked unit clear of the panel, on the goal, inside the screen.
   expect(w.overlaps(p), isFalse, reason: 'docked row $w overlaps panel $p');
   expect(
     p.top - w.bottom,
@@ -388,10 +473,15 @@ void _expectRestVisibility(WidgetTester tester, Size size) {
     reason: 'clearance panel↔row',
   );
   expect(
-    w.top,
-    greaterThanOrEqualTo(rail.bottom + 12 - 0.5),
-    reason: 'row below the target rail divider',
+    w.top + tile / 2,
+    closeTo((railTop + railBottom) / 2, 0.5),
+    reason: 'the answer tiles sit on the goal tiles',
   );
+  // The goal tiles have faded out beneath the answer.
+  final railFade = tester.widget<Opacity>(
+    find.ancestor(of: railTiles.first, matching: find.byType(Opacity)).first,
+  );
+  expect(railFade.opacity, 0);
   expect(w.left, greaterThanOrEqualTo(0));
   expect(w.right, lessThanOrEqualTo(size.width));
   // The whole answer row is on screen: five glyph tiles inside the unit.

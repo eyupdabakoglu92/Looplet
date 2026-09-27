@@ -17,6 +17,7 @@ class DockedAnswerRow extends StatelessWidget {
     required this.statuses,
     required this.tile,
     required this.dockProgress,
+    this.gap = PlayTheme.tileGap,
     this.scale = 1.0,
     super.key,
   });
@@ -24,6 +25,10 @@ class DockedAnswerRow extends StatelessWidget {
   final List<String> letters;
   final List<TileStatus> statuses;
   final double tile;
+
+  /// The board's tile gap, so the docked row keeps the x of every tile of its
+  /// home row (§16.3 "the row keeps its x"; the D1 board uses 6.5·s).
+  final double gap;
 
   /// 0 (at home / travelling) → 1 (docked). Drives the shadow only: deeper
   /// (y+10, blur 24) in flight, resting (y+6, blur 16) at the dock.
@@ -36,14 +41,17 @@ class DockedAnswerRow extends StatelessWidget {
   static double heightFor(double tile) => tile + 6;
 
   /// Width of a row of [count] tiles.
-  static double widthFor(double tile, int count) =>
-      count * tile + (count - 1) * PlayTheme.tileGap;
+  static double widthFor(
+    double tile,
+    int count, {
+    double gap = PlayTheme.tileGap,
+  }) => count * tile + (count - 1) * gap;
 
   @override
   Widget build(BuildContext context) {
     final n = letters.length;
-    final stride = tile + PlayTheme.tileGap;
-    final width = widthFor(tile, n);
+    final stride = tile + gap;
+    final width = widthFor(tile, n, gap: gap);
     final radius = tile * PlayTheme.tileRadiusFraction;
     final lift = 1 - dockProgress.clamp(0.0, 1.0);
 

@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/animation.dart';
 
 import 'play_theme.dart';
@@ -108,16 +110,25 @@ class WonTimeline {
 ///
 /// Coordinates: `screenHeight` and the `*Global` values are in the same global
 /// space; results in `dockTopLocal` are relative to the stack (`stackTopGlobal`).
+///
+/// **Phase D1 adaptation** (F03 `frontend.md` §16, Needs Tech Lead
+/// Clarification): the Loop Glass header puts the target rail's bottom at
+/// ≈ 33 % of H, so the §16.3 free zone `[rail + 12, 0.36 H − 16]` no longer
+/// holds a docked row on any supported phone, and flooring the panel under the
+/// rail left the Perfect panel at 1.3× text 5–13 pt short on 390/393-pt phones
+/// even after every §16.3 concession. The answer row therefore docks **onto
+/// the goal**: its tiles centre on the rail tiles (which fade out beneath it),
+/// the dock stays fixed for every variant and row, and the panel keeps its
+/// shipped `0.36 H` cap. The floor `dock + U + 16` still guards frames where
+/// the rail sits lower.
 class WonGeometry {
   const WonGeometry({
     required this.dockTopLocal,
+    required this.panelTopGlobal,
     required this.panelMaxHeight,
     required this.dockScale,
     required this.fits,
   });
-
-  /// Gap between the divider under the target rail and the top of the dock.
-  static const double dividerGap = 12;
 
   /// Minimum clearance between the docked unit's bottom and the panel top.
   static const double panelGap = 16;
@@ -131,7 +142,10 @@ class WonGeometry {
   /// Top of the docked unit (row top) in stack-local coordinates.
   final double dockTopLocal;
 
-  /// Max panel height so that its top stays at/below `0.36 H`.
+  /// The highest the panel's top may reach, in global coordinates.
+  final double panelTopGlobal;
+
+  /// Max panel height so that its top stays at/below [panelTopGlobal].
   final double panelMaxHeight;
 
   /// 1.0 normally; < 1.0 only when the free zone is shorter than the unit
@@ -142,29 +156,45 @@ class WonGeometry {
   /// the panel cover the row; it logs / raises the clarification path.
   final bool fits;
 
+  /// [railTopLocal] / [railBottomLocal] bound the rail *tiles* (not the
+  /// caption), in stack-local coordinates.
   static WonGeometry compute({
     required double screenHeight,
     required double stackTopGlobal,
     required double stackBottomGlobal,
-    required double dividerBottomLocal,
+    required double railTopLocal,
+    required double railBottomLocal,
     required double tile,
   }) {
     final unit = unitHeight(tile);
-    final zoneTop = stackTopGlobal + dividerBottomLocal + dividerGap;
-    final zoneBottom = panelTopFraction * screenHeight - panelGap;
-    final zone = zoneBottom - zoneTop;
-
+    // The answer's tiles centre on the goal's tiles.
+    final railCentreGlobal =
+        stackTopGlobal + (railTopLocal + railBottomLocal) / 2;
+    final dockTopGlobal = railCentreGlobal - tile / 2;
+    // The shipped cap (0.36 H), floored under the docked unit, never below
+    // the stack's bottom.
+    final panelTop = math.min(
+      math.max(
+        panelTopFraction * screenHeight,
+        dockTopGlobal + unit + panelGap,
+      ),
+      stackBottomGlobal,
+    );
+    // Only a frame too short for the unit itself scales the row (≥ 0.8).
+    final room = panelTop - panelGap - dockTopGlobal;
     var scale = 1.0;
     var fits = true;
-    if (zone < unit) {
-      scale = (zone / unit).clamp(0.8, 1.0);
-      fits = zone >= unit * 0.8;
+    if (room < unit - 1e-6) {
+      scale = (room / unit).clamp(0.8, 1.0);
+      fits = room >= unit * 0.8;
     }
-    final dockTopGlobal = zoneTop + (zone - unit * scale) / 2;
     return WonGeometry(
       dockTopLocal: dockTopGlobal - stackTopGlobal,
-      panelMaxHeight: (stackBottomGlobal - panelTopFraction * screenHeight)
-          .clamp(0.0, double.infinity),
+      panelTopGlobal: panelTop,
+      panelMaxHeight: (stackBottomGlobal - panelTop).clamp(
+        0.0,
+        double.infinity,
+      ),
       dockScale: scale,
       fits: fits,
     );

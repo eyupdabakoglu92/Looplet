@@ -1,21 +1,24 @@
-import 'dart:math' as math;
+import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show SystemUiOverlayStyle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:looplet_core/looplet_core.dart' show TileStatus;
 
 import '../app_router.dart';
+import '../design/design.dart';
 import '../journey/column_tutorial_overlay.dart';
 import '../journey/journey_content.dart';
 import '../journey/journey_nav.dart';
 import '../journey/journey_strings.dart';
 import '../journey/journey_tutorial.dart';
 import '../persistence/persistence_providers.dart';
-import 'package:looplet_core/looplet_core.dart' show TileStatus;
-
 import '../rating/completion_panel.dart';
 import '../rating/completion_result.dart';
 import '../rating/rating_strings.dart';
+import '../reduce_motion.dart';
+import 'play_layout.dart';
 import 'play_session_args.dart';
 import 'play_session_controller.dart';
 import 'play_session_providers.dart';
@@ -23,17 +26,16 @@ import 'play_strings.dart';
 import 'play_theme.dart';
 import 'won_composition.dart';
 import 'widgets/docked_row.dart';
-import 'widgets/moves_hud.dart';
-import 'widgets/play_stage.dart';
 import 'widgets/puzzle_board.dart';
-import 'widgets/restart_button.dart';
 import 'widgets/target_rail.dart';
-import 'widgets/undo_button.dart';
-import '../reduce_motion.dart';
 
 /// Route `'/play'` (`architecture.md` §13). Resolves the puzzle + validator,
 /// then hands off to [_LoadedPlaySession] which owns the [PlaySessionController]
 /// and the lifecycle observer.
+///
+/// Every non-`won` state is the Loop Glass Play (F03 `ui-design.md` §1–§14,
+/// architecture §19, Phase D1); the `won` moment keeps its shipped look until
+/// Phase D2 (§16).
 class PlaySessionScreen extends ConsumerWidget {
   const PlaySessionScreen({required this.args, super.key});
 
@@ -42,12 +44,23 @@ class PlaySessionScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final setup = ref.watch(playSessionSetupProvider(args));
+    final strings = PlayStrings.of('tr');
     return setup.when(
-      loading: () => const _PlayScaffold(child: _LoadingBoard()),
-      error: (error, _) => _PlayScaffold(
-        child: _LoadErrorBody(
-          strings: PlayStrings.of('tr'),
+      loading: () => _PlayScaffold(
+        builder: (context, layout) => _LoadingView(
+          layout: layout,
+          strings: strings,
+          level: args.journeyLevel,
           onBack: () => _popToCaller(context),
+        ),
+      ),
+      error: (error, _) => _PlayScaffold(
+        builder: (context, layout) => _LoadErrorView(
+          layout: layout,
+          strings: strings,
+          level: args.journeyLevel,
+          onBack: () => _popToCaller(context),
+          onHome: () => context.go(Routes.home),
         ),
       ),
       data: (data) => _LoadedPlaySession(args: args, setup: data),
@@ -66,17 +79,56 @@ void _popToCaller(BuildContext context) {
   }
 }
 
+/// The Play ground: `LoopBackdrop` edge to edge, light status-bar content, no
+/// system header. Every Play state lays out in screen coordinates from one
+/// [PlayLayout], with [LoopScale] set to its `s` so the design components use
+/// the same scale.
 class _PlayScaffold extends StatelessWidget {
-  const _PlayScaffold({required this.child});
-  final Widget child;
+  const _PlayScaffold({required this.builder});
+
+  final Widget Function(BuildContext context, PlayLayout layout) builder;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: PlayTheme.stage1,
-      body: PlayStage(child: SafeArea(child: child)),
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light,
+      child: Scaffold(
+        backgroundColor: LoopColors.groundBottom,
+        body: LoopBackdrop(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final layout = PlayLayout(constraints.biggest);
+              return LoopScale(
+                value: layout.s,
+                child: Builder(builder: (context) => builder(context, layout)),
+              );
+            },
+          ),
+        ),
+      ),
     );
   }
+}
+
+/// The header's back control: the chevron plus `SEVİYE NN` (the chevron alone
+/// without a level number — §19.8 (5)), one ≥ 44 pt control.
+Widget _backControl({
+  required PlayLayout layout,
+  required PlayStrings strings,
+  required int? level,
+  required bool showLabel,
+  required VoidCallback onPressed,
+}) {
+  return Positioned(
+    left: layout.backHitLeft,
+    top: layout.backHitTop,
+    child: LoopBackButton(
+      label: showLabel && level != null ? strings.levelLabel(level) : null,
+      semanticLabel: strings.backSemantics(level),
+      padding: EdgeInsets.only(left: layout.backHitInset, right: 8),
+      onPressed: onPressed,
+    ),
+  );
 }
 
 class _LoadedPlaySession extends ConsumerStatefulWidget {
@@ -96,6 +148,8 @@ class _LoadedPlaySessionState extends ConsumerState<_LoadedPlaySession>
   /// F05 — the 4–6 column micro-tutorial (`architecture.md §9`). Resolved once
   /// in [_init]: shown iff a Journey level in 4..6 AND the `kv` ack is unset.
   bool _showColumnTutorial = false;
+  bool _tutorialSatisfied = false;
+  Timer? _tutorialExit;
 
   @override
   void initState() {
@@ -153,9 +207,22 @@ class _LoadedPlaySessionState extends ConsumerState<_LoadedPlaySession>
     });
   }
 
-  Future<void> _dismissColumnTutorial() async {
-    if (!_showColumnTutorial) return;
-    setState(() => _showColumnTutorial = false);
+  /// The gated column move was committed: persist the ack now; the overlay
+  /// fades out and is removed after its exit (at once under reduced motion).
+  void _onColumnTutorialSatisfied() {
+    if (_tutorialSatisfied) return;
+    _tutorialSatisfied = true;
+    if (reduceMotionRequested()) {
+      setState(() => _showColumnTutorial = false);
+    } else {
+      _tutorialExit = Timer(ColumnTutorialOverlay.exitDuration, () {
+        if (mounted) setState(() => _showColumnTutorial = false);
+      });
+    }
+    unawaited(_persistColumnTutorialAck());
+  }
+
+  Future<void> _persistColumnTutorialAck() async {
     try {
       await ref.read(journeyTutorialRepoProvider).acknowledgeColumnTutorial();
     } catch (error) {
@@ -200,6 +267,7 @@ class _LoadedPlaySessionState extends ConsumerState<_LoadedPlaySession>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _tutorialExit?.cancel();
     _controller?.dispose();
     super.dispose();
   }
@@ -218,23 +286,39 @@ class _LoadedPlaySessionState extends ConsumerState<_LoadedPlaySession>
   @override
   Widget build(BuildContext context) {
     final c = _controller;
-    if (c == null) return const _PlayScaffold(child: _LoadingBoard());
+    if (c == null) {
+      return _PlayScaffold(
+        builder: (context, layout) => _LoadingView(
+          layout: layout,
+          strings: PlayStrings.of(_lang),
+          level: widget.args.journeyLevel,
+          onBack: () => _popToCaller(context),
+        ),
+      );
+    }
 
     final strings = PlayStrings.of(c.lang);
     final onNext = _nextLevelHandler();
     return _PlayScaffold(
-      child: AnimatedBuilder(
+      builder: (context, layout) => AnimatedBuilder(
         animation: c,
         builder: (context, _) {
           final won = c.phase == PlaySessionPhase.won;
           return Stack(
             children: <Widget>[
-              _PlayBody(controller: c, strings: strings, onNextLevel: onNext),
+              _PlayBody(
+                controller: c,
+                strings: strings,
+                layout: layout,
+                level: widget.args.journeyLevel,
+                onNextLevel: onNext,
+              ),
               if (_showColumnTutorial && !won)
                 ColumnTutorialOverlay(
                   controller: c,
                   strings: JourneyStrings.of(c.lang),
-                  onSatisfied: _dismissColumnTutorial,
+                  layout: layout,
+                  onSatisfied: _onColumnTutorialSatisfied,
                 ),
             ],
           );
@@ -248,11 +332,18 @@ class _PlayBody extends StatefulWidget {
   const _PlayBody({
     required this.controller,
     required this.strings,
+    required this.layout,
+    required this.level,
     this.onNextLevel,
   });
 
   final PlaySessionController controller;
   final PlayStrings strings;
+  final PlayLayout layout;
+
+  /// The Journey level number for the header label; `null` for the debug set
+  /// (and Daily later) — the chevron alone (§19.8 (5)).
+  final int? level;
   final VoidCallback? onNextLevel;
 
   @override
@@ -274,18 +365,21 @@ class _WonSnapshot {
   final List<TileStatus> statuses;
 }
 
-/// Measured layout the won moment needs (stack-local px), see [WonGeometry].
+/// Measured layout the won moment needs (won-stack-local px), see
+/// [WonGeometry].
 class _WonMetrics {
   const _WonMetrics({
     required this.rowLeft,
     required this.homeTop,
     required this.tile,
+    required this.gap,
     required this.geometry,
   });
 
   final double rowLeft;
   final double homeTop;
   final double tile;
+  final double gap;
   final WonGeometry geometry;
 }
 
@@ -305,9 +399,16 @@ class _PlayBodyState extends State<_PlayBody> with TickerProviderStateMixin {
     animationBehavior: AnimationBehavior.preserve,
   );
 
-  final GlobalKey _stackKey = GlobalKey(debugLabel: 'play.stack');
+  /// Loading → loaded (§5): the skeleton cross-fades to the tiles and the
+  /// rail, `HAMLE` card and HUD fade in over 160 ms; instant when reduced.
+  late final AnimationController _appear = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 160),
+  );
+
+  final GlobalKey _stackKey = GlobalKey(debugLabel: 'play.wonStack');
   final GlobalKey _boardKey = GlobalKey(debugLabel: 'play.board');
-  final GlobalKey _dividerKey = GlobalKey(debugLabel: 'play.divider');
+  final GlobalKey _railKey = GlobalKey(debugLabel: 'play.rail');
 
   WonTimeline _tl = WonTimeline.regular;
   _WonSnapshot? _snap;
@@ -335,6 +436,11 @@ class _PlayBodyState extends State<_PlayBody> with TickerProviderStateMixin {
         });
       }
     });
+    if (reduceMotionRequested()) {
+      _appear.value = 1;
+    } else {
+      _appear.forward();
+    }
     if (_c.phase == PlaySessionPhase.won) {
       _enterWon(animate: false);
     }
@@ -345,6 +451,7 @@ class _PlayBodyState extends State<_PlayBody> with TickerProviderStateMixin {
     _c.removeListener(_onController);
     _timeline.dispose();
     _retire.dispose();
+    _appear.dispose();
     super.dispose();
   }
 
@@ -387,112 +494,172 @@ class _PlayBodyState extends State<_PlayBody> with TickerProviderStateMixin {
   }
 
   /// Reads the live layout (after layout, before the dock starts) — `null`
-  /// until the board / divider / stack have a size.
+  /// until the board / rail / won stack have a size.
   _WonMetrics? _measure(BuildContext context) {
     final stack = _stackKey.currentContext?.findRenderObject();
     final board = _boardKey.currentContext?.findRenderObject();
-    final divider = _dividerKey.currentContext?.findRenderObject();
-    if (stack is! RenderBox || board is! RenderBox || divider is! RenderBox) {
+    final rail = _railKey.currentContext?.findRenderObject();
+    if (stack is! RenderBox || board is! RenderBox || rail is! RenderBox) {
       return null;
     }
-    if (!stack.hasSize || !board.hasSize || !divider.hasSize) return null;
-    if (!stack.attached || !board.attached || !divider.attached) return null;
+    if (!stack.hasSize || !board.hasSize || !rail.hasSize) return null;
+    if (!stack.attached || !board.attached || !rail.attached) return null;
     final snap = _snap;
     if (snap == null) return null;
 
     final stackTop = stack.localToGlobal(Offset.zero).dy;
-    final boardTopLeft = board.localToGlobal(Offset.zero, ancestor: stack);
-    final dividerBottom = divider
-        .localToGlobal(Offset(0, divider.size.height), ancestor: stack)
+    final boardTopLeft = stack.globalToLocal(board.localToGlobal(Offset.zero));
+    final g = BoardGeometry.forWidth(board.size.width, gridSize: _c.gridSize);
+    // The rail tiles: the bottom 42·s of the rail widget.
+    final railBottom = stack
+        .globalToLocal(rail.localToGlobal(Offset(0, rail.size.height)))
         .dy;
-    final tile = PuzzleBoard.tileSizeFor(board.size.width, _c.gridSize);
-    final stride = tile + PlayTheme.tileGap;
+    final railTop = railBottom - TargetRail.tilesHeightRef * g.s;
+    final home = boardTopLeft + g.cellOrigin(snap.row, 0);
     return _WonMetrics(
-      rowLeft: boardTopLeft.dx + PlayTheme.platePadding,
-      homeTop: boardTopLeft.dy + PlayTheme.platePadding + snap.row * stride,
-      tile: tile,
+      rowLeft: home.dx,
+      homeTop: home.dy,
+      tile: g.tile,
+      gap: g.gap,
       geometry: WonGeometry.compute(
         screenHeight: MediaQuery.sizeOf(context).height,
         stackTopGlobal: stackTop,
         stackBottomGlobal: stackTop + stack.size.height,
-        dividerBottomLocal: dividerBottom,
-        tile: tile,
+        railTopLocal: railTop,
+        railBottomLocal: railBottom,
+        tile: g.tile,
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final controller = widget.controller;
+    final c = widget.controller;
     final strings = widget.strings;
-    final won = controller.phase == PlaySessionPhase.won;
+    final layout = widget.layout;
+    final won = c.phase == PlaySessionPhase.won;
     final retiring = !won && _snap != null && _retire.isAnimating;
 
-    return Stack(
-      key: _stackKey,
-      children: <Widget>[
-        LayoutBuilder(
-          builder: (context, constraints) {
-            final w = constraints.maxWidth;
-            final h = constraints.maxHeight;
-            // Board-first sizing (`ui-design.md` §6): the board shrinks first;
-            // the fixed zone gaps hold until the board hits its floor.
-            const chromeAndZones = 2 * PlayTheme.zoneGap + 44 + 150 + 96;
-            const boardFloor =
-                5 * PlayTheme.minTileSize +
-                2 * PlayTheme.platePadding +
-                4 * PlayTheme.tileGap;
-            final maxByWidth = w * PlayTheme.boardWidthFraction;
-            final maxByHeight = h - chromeAndZones;
-            final board = math
-                .min(maxByWidth, math.max(maxByHeight, boardFloor))
-                .clamp(boardFloor, w * 0.94)
-                .toDouble();
+    // `HAMLE` changes at the settle, not at release (§5): the engine applies
+    // the move when the shift starts.
+    final moves = c.phase == PlaySessionPhase.animatingShift
+        ? c.moveCount - 1
+        : c.moveCount;
+    // The HUD keeps its look through a drag and a settle (the controller
+    // still drops a press while input is locked); it dims to 40 % in `won`
+    // (§16.2, unchanged).
+    final undoEnabled = !won && c.undosRemaining > 0 && moves > 0;
+    final hudOpacity = won ? PlayTheme.wonControlsOpacity : 1.0;
 
-            return Column(
-              children: <Widget>[
-                _TopBar(
-                  strings: strings,
-                  showBack: !won,
-                  onBack: () => _popToCaller(context),
-                ),
-                const SizedBox(height: 8),
-                TargetRail(
-                  label: strings.targetLabel,
-                  word: controller.targetWord,
-                  tileSize: board / controller.gridSize,
-                ),
-                _DividerGlow(key: _dividerKey),
-                const SizedBox(height: PlayTheme.zoneGap),
-                Expanded(
-                  child: Center(
-                    child: Semantics(
-                      label:
-                          '${strings.boardSemantics}. '
-                          '${strings.targetLabel}: ${controller.targetWord}. '
-                          '${strings.movesLabel}: ${controller.moveCount}.',
-                      // §16: the board hands its winning row to the dock overlay
-                      // from the moment the dock begins (ghost outlines).
-                      child: AnimatedBuilder(
-                        animation: _timeline,
-                        builder: (context, _) => PuzzleBoard(
-                          key: _boardKey,
-                          controller: controller,
-                          boardSize: board,
-                          rowVacated: won && _tl.dockStarted(_timeline.value),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: PlayTheme.zoneGap),
-                _HudBar(controller: controller, strings: strings),
-                const SizedBox(height: 8),
-              ],
-            );
-          },
+    return Stack(
+      children: <Widget>[
+        // Header — back + level (hidden from T0, §16), `HAMLE` card.
+        if (!won)
+          _backControl(
+            layout: layout,
+            strings: strings,
+            level: widget.level,
+            showLabel: true,
+            onPressed: () => _popToCaller(context),
+          ),
+        Positioned(
+          left: layout.movesCard.dx,
+          top: layout.movesCard.dy,
+          child: FadeTransition(
+            opacity: _appear,
+            child: MovesCard(moves: moves, label: strings.movesLabel),
+          ),
         ),
-        if (won || retiring) _buildWonLayers(context, won: won),
+        // Goal — `HEDEF DÖNGÜ` + the rail tiles. In `won` the answer row
+        // docks onto the tiles, which fade out beneath it (and back on Retry).
+        Positioned(
+          left: 0,
+          right: 0,
+          top: layout.captionTop,
+          child: FadeTransition(
+            opacity: _appear,
+            child: AnimatedBuilder(
+              animation: Listenable.merge(<Listenable>[_timeline, _retire]),
+              builder: (context, _) => TargetRail(
+                key: _railKey,
+                label: strings.targetLabel,
+                word: c.targetWord,
+                semanticsLabel: '${strings.targetSemantics}: ${c.targetWord}',
+                tileOpacity: (won || retiring) && _snap != null
+                    ? 1 -
+                          _tl.dock(_timeline.value) *
+                              (won ? 1 : 1 - _retire.value)
+                    : 1,
+              ),
+            ),
+          ),
+        ),
+        // The board card.
+        Positioned.fromRect(
+          rect: layout.boardRect,
+          child: Semantics(
+            label:
+                '${strings.boardSemantics}. '
+                '${strings.targetSemantics}: ${c.targetWord}. '
+                '${strings.movesLabel}: $moves.',
+            // §16: the board hands its winning row to the dock overlay from
+            // the moment the dock begins (ghost outlines).
+            child: AnimatedBuilder(
+              animation: _timeline,
+              builder: (context, _) => PuzzleBoard(
+                key: _boardKey,
+                controller: c,
+                geometry: layout.board,
+                rowVacated: won && _tl.dockStarted(_timeline.value),
+                appear: _appear,
+              ),
+            ),
+          ),
+        ),
+        // HUD — undo pill (quota dots) left, restart right; nothing between.
+        Positioned.fromRect(
+          rect: layout.undoRect,
+          child: FadeTransition(
+            opacity: _appear,
+            child: AnimatedOpacity(
+              opacity: hudOpacity,
+              duration: const Duration(milliseconds: 160),
+              child: UndoPill(
+                quota: c.undosRemaining,
+                onPressed: undoEnabled ? c.undo : null,
+                semanticLabel: strings.undoTooltip,
+              ),
+            ),
+          ),
+        ),
+        Positioned(
+          left: layout.restartRect.left,
+          top: layout.restartRect.top,
+          child: FadeTransition(
+            opacity: _appear,
+            child: AnimatedOpacity(
+              opacity: hudOpacity,
+              duration: const Duration(milliseconds: 160),
+              child: GlassIconButton(
+                icon: LoopIcon.restart,
+                onPressed: won ? null : c.restart,
+                semanticLabel: strings.restartTooltip,
+              ),
+            ),
+          ),
+        ),
+        // The won moment (§16) — scrim, docked row, F04 panel — in the safe
+        // area, exactly as shipped.
+        Positioned.fill(
+          child: SafeArea(
+            child: Stack(
+              key: _stackKey,
+              children: <Widget>[
+                if (won || retiring) _buildWonLayers(context, won: won),
+              ],
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -544,6 +711,7 @@ class _PlayBodyState extends State<_PlayBody> with TickerProviderStateMixin {
                       letters: snap.letters,
                       statuses: snap.statuses,
                       tile: metrics.tile,
+                      gap: metrics.gap,
                       dockProgress: dockP,
                       scale: metrics.geometry.dockScale,
                     ),
@@ -608,9 +776,10 @@ class _PlayBodyState extends State<_PlayBody> with TickerProviderStateMixin {
 }
 
 /// Hosts the completion panel and applies the §16.3 concessions: if its natural
-/// height exceeds [maxHeight] (`0.64 H`), step the density (compact → tight) on
-/// the next frame. Layout is measured after the fact, while the panel is still
-/// sliding in from below the stack, so the step is not visible.
+/// height exceeds [maxHeight] (`0.64 H`, or less under the D1 floor — see
+/// [WonGeometry]), step the density (compact → tight) on the next frame.
+/// Layout is measured after the fact, while the panel is still sliding in from
+/// below the stack, so the step is not visible.
 class _WonPanelHost extends StatefulWidget {
   const _WonPanelHost({required this.maxHeight, required this.builder});
 
@@ -652,209 +821,200 @@ class _WonPanelHostState extends State<_WonPanelHost> {
   }
 }
 
-class _TopBar extends StatelessWidget {
-  const _TopBar({
+/// Loading (§8, `D1-11`): the header with its level and the board card with 25
+/// glass cells at the final geometry — no rail, `HAMLE` card, HUD or spinner,
+/// so nothing jumps when the puzzle arrives. "Yükleniyor" is announced if it
+/// lasts more than 300 ms.
+class _LoadingView extends StatefulWidget {
+  const _LoadingView({
+    required this.layout,
     required this.strings,
-    required this.showBack,
+    required this.level,
     required this.onBack,
   });
 
+  final PlayLayout layout;
   final PlayStrings strings;
-  final bool showBack;
+  final int? level;
   final VoidCallback onBack;
 
   @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 44,
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: showBack
-            ? Semantics(
-                button: true,
-                label: strings.back,
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: onBack,
-                  child: const SizedBox(
-                    width: 44,
-                    height: 44,
-                    child: Icon(
-                      Icons.chevron_left_rounded,
-                      color: PlayTheme.muted,
-                      size: 28,
-                    ),
-                  ),
-                ),
-              )
-            : const SizedBox(width: 44, height: 44),
-      ),
-    );
-  }
+  State<_LoadingView> createState() => _LoadingViewState();
 }
 
-class _DividerGlow extends StatelessWidget {
-  const _DividerGlow({super.key});
+class _LoadingViewState extends State<_LoadingView> {
+  Timer? _announceTimer;
+  bool _announce = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _announceTimer = Timer(const Duration(milliseconds: 300), () {
+      if (mounted) setState(() => _announce = true);
+    });
+  }
+
+  @override
+  void dispose() {
+    _announceTimer?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(top: 18),
-      height: 1,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: <Color>[
-            PlayTheme.cyan.withValues(alpha: 0),
-            PlayTheme.muted.withValues(alpha: 0.28),
-            PlayTheme.cyan.withValues(alpha: 0),
-          ],
+    final layout = widget.layout;
+    final g = layout.board;
+    return Stack(
+      children: <Widget>[
+        _backControl(
+          layout: layout,
+          strings: widget.strings,
+          level: widget.level,
+          showLabel: true,
+          onPressed: widget.onBack,
         ),
-      ),
-    );
-  }
-}
-
-class _HudBar extends StatelessWidget {
-  const _HudBar({required this.controller, required this.strings});
-
-  final PlaySessionController controller;
-  final PlayStrings strings;
-
-  @override
-  Widget build(BuildContext context) {
-    final locked = controller.inputLocked;
-    final opacity = controller.phase == PlaySessionPhase.won
-        ? PlayTheme.wonControlsOpacity
-        : (locked ? PlayTheme.lockedControlsOpacity : 1.0);
-
-    return AnimatedOpacity(
-      opacity: opacity,
-      duration: const Duration(milliseconds: 160),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Align(
-              alignment: Alignment.centerLeft,
-              child: MovesHud(
-                moves: controller.moveCount,
-                label: strings.movesLabel,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: <Widget>[
-                UndoButton(
-                  remaining: controller.undosRemaining,
-                  enabled: controller.canUndo,
-                  onPressed: controller.undo,
-                  semanticLabel: strings.undoTooltip,
-                ),
-                const Spacer(),
-                Container(
-                  width: 1,
-                  height: 32,
-                  color: PlayTheme.paper.withValues(alpha: 0.06),
-                ),
-                const SizedBox(width: 20),
-                RestartButton(
-                  enabled: controller.canRestart,
-                  onPressed: controller.restart,
-                  semanticLabel: strings.restartTooltip,
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _LoadingBoard extends StatelessWidget {
-  const _LoadingBoard();
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final board = math.min(
-            constraints.maxWidth * PlayTheme.boardWidthFraction,
-            constraints.maxHeight * 0.6,
-          );
-          final tile =
-              (board - 2 * PlayTheme.platePadding - 4 * PlayTheme.tileGap) / 5;
-          return SizedBox(
-            width: board,
-            height: board,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: PlayTheme.plate,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Wrap(
-                spacing: PlayTheme.tileGap,
-                runSpacing: PlayTheme.tileGap,
+        Positioned.fromRect(
+          rect: layout.boardRect,
+          child: Semantics(
+            label: _announce ? widget.strings.loading : null,
+            liveRegion: _announce,
+            child: SizedBox(
+              width: g.width,
+              height: g.height,
+              child: Stack(
                 children: <Widget>[
-                  for (var i = 0; i < 25; i++)
-                    Container(
-                      width: tile,
-                      height: tile,
-                      decoration: BoxDecoration(
-                        color: PlayTheme.paper.withValues(alpha: 0.06),
-                        borderRadius: BorderRadius.circular(
-                          tile * PlayTheme.tileRadiusFraction,
-                        ),
+                  const Positioned.fill(
+                    child: BoardCard(child: SizedBox.expand()),
+                  ),
+                  for (var r = 0; r < g.gridSize; r++)
+                    for (var c = 0; c < g.gridSize; c++)
+                      Positioned.fromRect(
+                        rect: g.cellRect(r, c),
+                        child: SkeletonCell(size: g.tile),
                       ),
-                    ),
                 ],
               ),
             ),
-          );
-        },
-      ),
+          ),
+        ),
+      ],
     );
   }
 }
 
-class _LoadErrorBody extends StatelessWidget {
-  const _LoadErrorBody({required this.strings, required this.onBack});
+/// Load error (§8, `D1-07`): the chevron, and one calm glass card — the level,
+/// the drawn `loopBreak` glyph, "Bu bulmaca yüklenemedi." — over one lime way
+/// home. No red, no raw exception. The column scrolls if the OS text size ever
+/// makes it taller than the band; the pill label follows the OS scale to AX5,
+/// the headline role is capped at 1.3× (architecture §19.3 (1)).
+class _LoadErrorView extends StatelessWidget {
+  const _LoadErrorView({
+    required this.layout,
+    required this.strings,
+    required this.level,
+    required this.onBack,
+    required this.onHome,
+  });
 
+  final PlayLayout layout;
   final PlayStrings strings;
+  final int? level;
   final VoidCallback onBack;
+  final VoidCallback onHome;
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          const Icon(
-            Icons.error_outline_rounded,
-            color: PlayTheme.danger,
-            size: 32,
-          ),
-          const SizedBox(height: 12),
-          Text(strings.loadFailed, style: PlayTheme.helper),
-          const SizedBox(height: 16),
-          GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: onBack,
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Text(
-                strings.back,
-                style: PlayTheme.helper.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: PlayTheme.paper,
+    final s = layout.s;
+    final bandTop = 140 * s;
+    final bandBottom = layout.screen.height - 40 * s;
+    final capped = loopCappedTextScaler(context);
+    return Stack(
+      children: <Widget>[
+        // The chevron alone — the level is on the card.
+        _backControl(
+          layout: layout,
+          strings: strings,
+          level: null,
+          showLabel: false,
+          onPressed: onBack,
+        ),
+        Positioned(
+          left: layout.left + 24.5 * s,
+          width: 309 * s,
+          top: bandTop,
+          height: bandBottom - bandTop,
+          child: LayoutBuilder(
+            builder: (context, constraints) => SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    GlassCard(
+                      radius: 30,
+                      padding: EdgeInsets.fromLTRB(
+                        26 * s,
+                        28 * s,
+                        26 * s,
+                        32 * s,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Expanded(
+                                child: level == null
+                                    ? const SizedBox.shrink()
+                                    : Padding(
+                                        padding: EdgeInsets.only(top: 4 * s),
+                                        child: ExcludeSemantics(
+                                          child: Text(
+                                            strings.levelLabel(level!),
+                                            style: LoopText.caption(s),
+                                            textScaler: capped,
+                                          ),
+                                        ),
+                                      ),
+                              ),
+                              Opacity(
+                                opacity: 0.9,
+                                child: LoopIconView(
+                                  LoopIcon.loopBreak,
+                                  color: LoopColors.periwinkle,
+                                  size: 44 * s,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 18 * s),
+                          ConstrainedBox(
+                            constraints: BoxConstraints(maxWidth: 230 * s),
+                            child: Text(
+                              strings.loadFailed,
+                              style: LoopText.headline(s),
+                              textScaler: capped,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 24 * s),
+                    LimePill(
+                      label: strings.backHome,
+                      onPressed: onHome,
+                      icon: null,
+                      height: 63 * s,
+                    ),
+                  ],
                 ),
               ),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

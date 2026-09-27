@@ -1,420 +1,333 @@
 # F03 — puzzle-play-session: Frontend Delivery
 
-> Delivery + traceability artifact. Contract authority: `architecture.md`. Visual/state authority: `ui-design.md`. Direct-edit mode — real files under `app/lib/play/` + `app/lib/{main,app_router,home_screen}.dart`.
+> **Phase D1 — Loop Glass Play** (task F03-FE-D1, Frontend/Mobile Developer, 2026-09-27 → 2026-09-28).
+>
+> **Authority:** `architecture.md` §19 and the checkpoint rulings §19.8; `ui-design.md` §1–§14 (acceptance list §11.5, matrix §12a, manifest §12b) with §16 for the won moment; F00 `ui-design.md` (tokens, components).
+>
+> **Source revision of this delivery:** HEAD `991584c` + working tree (the harness commits it after this turn).
+>
+> **History:** the pre-D1 F03 frontend reports (the original F03-FE, F03-FE9, F03-FE-WON / F03-FE-INTEG, F03-FE-CANCEL / F03-FE-REDUCEMOTION) are archived byte-for-byte in `history/f03-puzzle-play-session-2026-09-27/frontend-before-phase-d1.md`.
 
 ---
 
 ## 1. Feature Summary
 
-The playable screen is implemented: a swipe manipulates the 5×5 backlit board (one cell per settled move, circular/wrap), the always-visible outline-ghost target sits above it, a live `MOVES` HUD + a 3-action Undo + a physically-separated Restart sit below, and forming the target in a row runs the bounded win sequence into a minimal functional completion sheet. State is written through to the F08 active-session snapshot on every settled boundary and hydrated back on open via the F08 restore path. Client-only; no backend; `Release Scope = none`.
+Every non-`won` Play state now renders on the Selected Foundation (Direction C, Loop Glass), built from `app/lib/design`:
 
-**Stack:** Flutter + Riverpod + `go_router` (introduced this feature — `MaterialApp.router`). The state machine lives in a ticker-free `ChangeNotifier` ([PlaySessionController]); the board widget owns the `AnimationController`s and calls back into the controller when a transition settles.
+* **Ground and header:** `LoopBackdrop`; the drawn back chevron + `SEVİYE NN` as one ≥ 44-pt control (chevron alone without a level number); the `HAMLE` card top-right.
+* **Goal:** `HEDEF DÖNGÜ` + indigo `RailTile`s; no divider.
+* **Board:** `BoardCard` with cream `TileFace`s at the width-scaled geometry (card 308.5·s, tiles 52·s, gap 6.5·s).
+* **Drag:** the lifted line gets the periwinkle rim + glow + deeper shadow, rails at the card edges across the line, the rest of the board at 42 %, and a wrap ghost at 30 % that fills to 100 % over the settle; all fade in and out over 90 ms. The settle overshoots to 101.5 % at 80 % of its 190 ms.
+* **Special tiles:** locked = indigo + lock icon; frozen = ice + dashes + snowflake; **thaw = a 180 ms cross-fade** with the snowflake shrinking 1 → 0.6 (instant under Reduce Motion).
+* **HUD:** `UndoPill` with lime quota dots and "n / 3 hak" semantics; restart as a 44-pt `GlassIconButton`; both brighten while pressed.
+* **Loading:** the board card with 25 skeleton cells at the final geometry, then a 160 ms cross-fade to the tiles; no spinner.
+* **Load error:** a calm glass card (level, the drawn `loopBreak` glyph, "Bu bulmaca yüklenemedi.") and the lime pill "Ana ekrana dön" → `/`.
+* **F05 column tutorial (cross-feature):** a glass hint pill centred between the board and the HUD, and a periwinkle ghost ring on the tutorial cell that hides on touch-down and returns after 600 ms of idle. The pill fades out on the gated column move; the F05 gate, ack and re-show are unchanged.
+* **Text scale:** every Play text role is capped at 1.3× (§19.3 (1), §19.8 (1)); the load-error pill label follows the OS scale and its column scrolls.
+* **Icons:** the six Material icons are gone; no `Icon` widget is left in `app/lib` (a doc comment in `completion_panel.dart` still mentions `Icons.star` in prose).
+
+**Shipped defects fixed:** A-1 (the hint no longer overlaps the HUD), A-2 for the board (tile and rail glyphs capped; no overflow at AX5), A-5 (frozen tile cue + real thaw), A-6 (the ghost steps aside under the finger).
+
+**The won moment keeps its shipped look** (amber row, seam, bloom, dock, F04 panel), with one geometry adaptation the D1 header forced — the answer row now docks **onto** the goal rail (§4 row 1, §16 NTLC-1).
 
 ---
 
 ## 2. Impacted Files
 
-**Created — `app/lib/play/`:**
+**Created**
+* `app/lib/play/play_layout.dart` — `PlayLayout` + `BoardGeometry` (pure D1 geometry).
+* `app/lib/design/components/play_decor.dart` — `LineRail`, `TutorialGhost`, `HintPill`, `SkeletonCell`.
+* `app/test/play/play_test_support.dart` — shared helpers for the D1 widget tests.
+* `ai-system/features/f03-puzzle-play-session/design/src/measure-d1.swift`, `parity-d1.sh`, `pill-clearance-d1.swift`, `video-d1.swift`, `seed-sim.sh` — reproducible parity tooling.
+* `ai-system/features/f03-puzzle-play-session/design/runtime-d1/` — runtime screenshots (`RT-*`), videos (`RV-*`), composites (`PC-*`) and `parity-measurements.txt`.
+* `ai-system/history/f03-puzzle-play-session-2026-09-27/frontend-before-phase-d1.md` — the archived pre-D1 report (one index line added to that folder's README).
 
-| File | Role |
-| --- | --- |
-| `play_theme.dart` | F03 design tokens (colour / radius / motion / type) + a dark `ColorScheme` for the app shell |
-| `play_strings.dart` | externalized strings, per-language table (`tr` / `en`), `PlayStrings.of(lang)` |
-| `play_session_args.dart` | `PlaySessionArgs` route args; re-exports F08 `PuzzleSource` |
-| `gesture_resolver.dart` | **pure** swipe→`Move` mapping (threshold, dominant axis, tie-band→horizontal, one-cell) + `trackingAxis` |
-| `debug_puzzle_library.dart` | the temporary debug puzzle source — the 5 F06 smoke puzzles as `const` maps (F05 deletes this) |
-| `play_session_controller.dart` | the state machine: engine + counters + `ElapsedTimer` + write-through persistence + hydrate + won-row detection |
-| `play_session_providers.dart` | `playSessionSetupProvider` (resolves `Puzzle` + `WordValidator`) + `debugPuzzleLibraryProvider` |
-| `play_session_screen.dart` | route `'/play'`; loading / error / loaded; lifecycle observer; layout; completion-sheet overlay |
-| `widgets/play_stage.dart` | dark gradient + radial spotlight + vignette background |
-| `widgets/target_rail.dart` | outline-ghost target tiles + micro-label |
-| `widgets/board_tile.dart` | one tile — neutral / locked (brass ring + pin) / frozen (frost + crystal border) / winning (amber) / pressed / dimmed |
-| `widgets/puzzle_board.dart` | the hero: plate, tiles, loop rails, gesture surface, wrap-shift animation, bounce, win choreography (seam bar + bloom) |
-| `widgets/moves_hud.dart` | tabular `MOVES` figure + micro-label + settle-tick |
-| `widgets/undo_button.dart` | loop-back-arrow pill + 3→0 pips; dead (no dialog/ad) at 0 |
-| `widgets/restart_button.dart` | outline circle, full-loop icon, 180° spin on press, no confirm |
-| `widgets/completion_sheet.dart` | minimal functional sheet (kicker + word + `MOVES` stat + dominant Retry + quiet Close) |
+**Updated**
+* Design layer (§19.8 (2)): `app/lib/design/components/tile.dart`, `components/buttons.dart`, `icons.dart`, `design.dart`.
+* Play: `app/lib/play/play_session_screen.dart`, `play_strings.dart`, `won_composition.dart`, `widgets/puzzle_board.dart`, `widgets/target_rail.dart`, `widgets/board_tile.dart`, `widgets/docked_row.dart`.
+* F05 overlay: `app/lib/journey/column_tutorial_overlay.dart`.
+* Tests: `app/test/design/components_test.dart`, `test/journey/column_tutorial_test.dart`, `test/play/play_session_screen_test.dart` (rewritten), `test/play/play_session_runtime_test.dart`, `test/play/won_composition_test.dart`, `test/reduce_motion_test.dart`, `integration_test/play_session_test.dart`.
 
-**Created — `app/lib/`:** `app_router.dart` (the `GoRouter`, the bootstrap gate, `StoreErrorScreen`), `home_screen.dart` (placeholder home + debug chip row).
-
-**Created — `app/test/play/`:** `gesture_resolver_test.dart` (13), `play_session_controller_test.dart` (11), `play_session_screen_test.dart` (5).
-
-**Updated:** `app/lib/main.dart` — `MaterialApp` → `MaterialApp.router`; the F08 `_SessionLifecycle` observer moved from wrapping `home:` to wrapping the router `builder:` (see §4 + §10); dark theme from `PlayTheme.colorScheme`. `app/test/widget_test.dart` — unchanged assertions still pass (home still shows `LOOPLET`).
+**Deleted**
+* `app/lib/play/widgets/moves_hud.dart`, `undo_button.dart`, `restart_button.dart` (replaced by `MovesCard`, `UndoPill`, `GlassIconButton`). `play_stage.dart` stays — Home (D3) still uses it.
 
 ---
 
 ## 3. Task-to-Code Traceability
 
-| Task | Status | Files | Behaviour |
+**F03-FE-D1 — Complete.** Per item of the brief's fix scope:
+
+| # | Brief item | Code | Behaviour |
 | --- | --- | --- | --- |
-| **F03-FE1** screen scaffold + route + args + portrait + debug entry | Complete | `app_router.dart`, `play_session_screen.dart`, `play_session_args.dart`, `home_screen.dart`, `debug_puzzle_library.dart`, `main.dart` | `GoRouter` with `'/'` (bootstrap gate) + `'/play'`; `PlaySessionArgs{source, journeyLevel?, debugPuzzleId?}`; portrait lock kept in `main()`; the home shows a debug chip row (`L1…L6`) that `context.push('/play', extra: …)` — not a shipping nav path. |
-| **F03-FE2** pure gesture→Move mapping | Complete | `gesture_resolver.dart` | `resolve()` — below `thresholdLogicalPx` (18) → `null` (AC4); `max(|dx|,|dy|)` dominant axis; `||dx|-|dy|| ≤ tieBandRatio·max` (0.15) → **horizontal** (architecture §7 diagonal-tie resolution); dx/dy sign → `rowRight/rowLeft` / `columnDown/columnUp`; exactly one cell regardless of magnitude. Values are constructor params, exposed for QA device tuning (architecture §18). |
-| **F03-FE3** state machine + shift animation + input lock + no queue + swipe-begin highlight | Complete | `play_session_controller.dart`, `widgets/puzzle_board.dart` | `PlaySessionPhase {idle, tracking, animatingShift, animatingBounce, won}`. `beginDrag` is ignored unless `idle` (**no queue** — AC5). Shift = 190 ms `cubic-bezier(0.22,1,0.36,1)`, whole active line translates one `stride` with a **wrap**: `ClipRRect` on the plate + the active line rendered as `N+2` tiles (two edge ghosts) with an opacity ramp on the ghosts. Rejected → `animatingBounce` (140 ms rubber-band back). Tracking past threshold → the active row/col lifts via a translated moving-line layer + the two end **loop rails** ignite (directional `cyan` gradient) + non-active tiles dim 8% (AC9). |
-| **F03-FE4** MOVES / Undo / Restart | Complete | `widgets/moves_hud.dart`, `widgets/undo_button.dart`, `widgets/restart_button.dart`, `play_session_controller.dart`, `play_session_screen.dart` | `MOVES = engine.moveCount` — updates on **settle** only (`commitShift`), tabular, 140 ms scale-pulse. Undo: `canUndo = idle && quota>0 && moveCount>0 && !solved`; `engine.undo()` + `quota--` + persist; at 0 the pill is a dead control — tap inert, **no dialog / ad / toast** (AC6). Restart: `idle` only; `engine.restart()` + `MOVES→0` + `quota→3` + `restartCount++` + persist, **no confirmation** (AC7); placed right of a divider, ≥ 20 pt gap, outline treatment (unlike Undo). |
-| **F03-FE5** persistence integration | Complete | `play_session_controller.dart`, `play_session_screen.dart` | Write-through `ActiveSessionRepo.save(_snapshot(inProgress))` after every settled move / undo / restart, and an initial snapshot on a fresh start. Snapshot serialized into the **F08-frozen keys** (`appliedMoves` via `formatMoveList(engine.appliedMoves)`; `moveCount`; `undosRemaining`; `restartCount`; `elapsedMsAccumulated` from `ElapsedTimer`; `thawedFrozenCells` = sorted `"r,c"` cache; `startedAtUtcMs`; `lastPersistedAtUtcMs` from an injectable clock). On open: `read()` → if `puzzleId` matches → `restoreSession(...)` (F08 restore path; thaw re-derived by replay); else fresh + overwrite. On win: `status: completed` snapshot → `ActiveSessionRepo.clear()`. `ElapsedTimer` pauses on `won` / `paused`, resumes on `resumed`. F03 schedules **no** background work (F08's app-level `_SessionLifecycle` owns the sync drain). Persist failures are caught + logged (`persist_failed`, non-fatal — architecture §Resilience). |
-| **F03-FE6** completion sequence + minimal panel | Complete | `widgets/puzzle_board.dart` (`_buildSeam`, `_buildBloom`), `widgets/completion_sheet.dart`, `play_session_screen.dart` | On `GridStep.solvedThisStep` (settled only — AC11, engine-enforced): `phase → won`, input locked hard (HUD → 40% opacity), `wonRow` computed by a Turkish-normalized L→R scan. `_win` (600 ms) drives: winning-row tiles → amber fill + `ink-amber` letters + 1.06 lift; a **drawn L→R amber seam bar** (colour **and** shape — the non-colour cue) grows under the row; one restrained amber radial bloom (`sin(π·t)·0.2`); other rows dim 0.12. The completion sheet slides up (`AnimatedSlide` + scrim `AnimatedOpacity`): kicker `ÇÖZÜLDÜ` + the formed word (amber) + `HAMLE {n}` + **Retry** (filled amber, dominant) + **Close** (quiet). No stars / optimal / best / Next — F04 seam. `Retry` → `retryFromCompletion()` (restart in place, re-arm timer, fresh snapshot). |
-| **F03-FE7** backgrounding / interruption | Complete | `play_session_controller.dart` (`onAppPaused` / `onAppResumed`), `play_session_screen.dart` | `paused`: `tracking` → gesture cancelled (no move); `animatingShift` → `_finishShift()` runs synchronously (the move was already applied to the engine at release, so this is a settled commit, never a torn snapshot — architecture §12); `animatingBounce` → back to `idle`; timer paused; a settled snapshot persisted (unless already `won`). `resumed`: timer restarts for an unfinished session. |
-| **F03-FE8** localization + alignment + gates + report | Complete | `play_strings.dart`, all widgets, this file | Every user-facing string comes from `PlayStrings` (`MOVES`/`HAMLE`, `HEDEF`, `ÇÖZÜLDÜ`, `Yeniden`, `Kapat`, `Geri`, load-error). `flutter analyze` + `dart format --set-exit-if-changed` clean; 99 app tests green; iOS release build green. |
+| 1 | Play screen | `play_session_screen.dart` (`_PlayScaffold`, `_PlayBody`, `_LoadingView`, `_LoadErrorView`, `_backControl`), `play_layout.dart`, `widgets/puzzle_board.dart`, `widgets/target_rail.dart` | ground, header (chevron + `SEVİYE NN`, `MovesCard`), goal, board card + `TileFace`, lift / rails / ghost / dim, thaw, HUD, skeleton loading, error card + `LimePill('Ana ekrana dön', icon: null)` → `/` |
+| 2 | Tutorial overlay | `journey/column_tutorial_overlay.dart` | hint pill in the board → HUD band (§19.8 (3) fallback on — §19), ghost ring + `LoopIcon.upDown` on cell (2,2), hide on touch-down (120 ms), return after 600 ms idle (160 ms), pill + ghost fade (160 ms) on the gated move; ack written at once; announced once |
+| 3 | Design layer | `tile.dart` (glyph cap; `iconScale`), `buttons.dart` (pressed fill .14 / edge .18; spent dot dims 120 ms; `LoopBackButton`), `icons.dart` (`LoopIcon.loopBreak`), `play_decor.dart` (rails, ghost ring, hint pill, skeleton cell) | each with component tests; no token value or dependency changed |
+| 4 | Motion | `puzzle_board.dart` (`_lift` 90 ms ease-out / ease-in, settle keyframes 101.5 % at 80 %, ghost 30 → 100 %, bounce 140 ms, `_thaw` 180 ms), `column_tutorial_overlay.dart`, `_PlayBody._appear` (160 ms) | every path has its reduced branch (`reduceMotionRequested()`); the shift and bounce keep 190 / 140 ms with an ease-out under reduced motion |
+| 5 | Strings, semantics | `play_strings.dart` (`HEDEF DÖNGÜ`, `SEVİYE %02d`, `Bu bulmaca yüklenemedi.`, `Ana ekrana dön`, `Yükleniyor`, `Hedef döngü`, "Geri, Seviye 26") | back "Geri, Seviye 26"; rail one node "Hedef döngü: TARİH"; `MovesCard` "HAMLE 3"; undo "…, 2 / 3 hak"; hint announced once, ghost excluded; loading announced after 300 ms |
+| 6 | Icons | `chevron_left_rounded` → `LoopIcon.back`; `undo_rounded` → `LoopIcon.undo`; `refresh_rounded` → `LoopIcon.restart`; `push_pin` → `LoopIcon.lock` (also in the won-only `BoardTile`); `unfold_more_rounded` → `LoopIcon.upDown`; `error_outline_rounded` → `LoopIcon.loopBreak` | `grep -rn "Icons\." app/lib` finds only the prose mention in `completion_panel.dart` |
+| 7 | Won moment | `puzzle_board.dart` (won branch: `BoardTile(winning: true)`, seam, bloom, `_GhostCell`, 12 % recede on `TileFace`), `docked_row.dart` (+ `gap`), `won_composition.dart` (dock onto the goal), `_PlayBody` won layers (unchanged timeline, panel host, SafeArea stack) | timeline, T0 + 600 ms rule, density concessions, Retry / Next / Close unchanged; dock geometry adapted (§4, NTLC-1) |
 
 ---
 
 ## 4. Authority Reconciliation
 
-| Conflict source | Winning authority | Decision | Downstream impact |
+| Conflict | Winning authority | Applied decision | Downstream impact |
 | --- | --- | --- | --- |
-| `ui-design.md` §8 "board recede = 12% dim **+ 1.5 px blur**" vs. mid-tier frame-rate budget (`prd.md` §6 "smooth on mid-tier") | `architecture.md` §16 QA-focus perf intent + `ui-design.md` §11 "flexible: don't cost frames" | Implemented the **dim only** (0.12) on non-winning rows during `won`; skipped the per-frame backdrop blur (expensive on mid-tier). Visual intent (board recedes, winning row + sheet own focus) is preserved. | Flagged in §11 + §16 for Tech Lead — a blur can be added later behind a device-tier check if QA wants it. |
-| `ui-design.md` §5 optional "breathing" spotlight ambient | `ui-design.md` §5 ("optional; drop it if it costs frames") + deterministic tests | Omitted (no `repeat()` animation on screen). | None — cosmetic; can be added as a `TweenAnimationBuilder` loop later. |
-| `active_session_snapshot.dart` doc names `ActiveSessionRepo.clearActiveSession()`; the real method is `clear()` | the code (`ActiveSessionRepo`) | Called `clear()`. | None — behaviour identical; a doc nit in the F08 snapshot contract, not a code change. |
-
-No conflict touched the interaction contract (`architecture.md` §6/§7/§8/§9/§11/§13) — all honoured verbatim.
+| §16.3 dock rule (row 12 pt under the goal, panel top ≥ 0.36 H) vs the D1 header, which moved the rail tiles' bottom to ≈ 33 % of H | §16.3 "do not let the panel cover the row" (its own escape clause: stop and raise NTLC) | The answer row docks **onto** the goal: its tiles centre on the rail tiles, which fade out beneath it (and back on Retry); the panel keeps the shipped 0.36 H cap, floored 16 pt under the docked unit. Raised as NTLC-1 | Won moment only (legacy until D2). Measured in §16 |
+| ui-design §5 "the load-error text follows the OS scale to AX5" vs §19.3 (1) "display / headline roles use `loopCappedTextScaler`" | §19.3 (1) (role rule) + `LoopText.headline`'s documented cap | The error headline is capped at 1.3× (it would break mid-word at AX5); the pill label follows the OS scale (`LimePill` reflows) and the column scrolls | None |
+| Architecture §8 "the counter *may* update on settle" + ui-design §5 "`HAMLE` swaps to +1 at the settle" vs the shipped count at release | ui-design §5 | `HAMLE` shows `moveCount − 1` while `animatingShift`; the engine count is unchanged | Display only; AC5 no-double-count tests unchanged and green |
+| Shipped Direction-A HUD dimming to 55 % during every drag / settle vs the D1 prototype (HUD steady; undo on at the settle) | ui-design §5 / MP-D1 | The HUD keeps its look through a drag and a settle; presses during input lock are still dropped by the controller (`canUndo` / `canRestart`); `won` keeps the 40 % dim (§16.2) | None |
+| F05's Direction-A re-prompt pulse (hint text scale 1.06 on a row move / 6 s idle) vs the D1 motion table (the ghost returns after 600 ms idle) | D1 handoff (visual authority moved to F03, §19.5; F05 §9 amended) | Pulse removed; the returning ghost is the re-prompt | F05 behaviour (trigger, gate, ack, re-show) unchanged |
+| ui-design §5 "existing 120 ms grid swap (unchanged)" — no such swap exists in the code (`PlayTheme.swapDuration` is unused) | "unchanged" | Undo / restart still swap the grid instantly; the spent quota dot now dims over 120 ms (instant when reduced) | Informational (NTLC-5) |
+| §19.8 (3) hint-pill fallback | §19.8 (3) | Device run measured 3.93 pt above the pill (16e, 1.3× cap) → `ColumnTutorialOverlay.compactPillAbove115 = true` (padding 7·s → 5·s above 1.15×); re-measured 6.27 / 6.37 pt | None; the pre-agreed fallback |
 
 ---
 
 ## 5. Components
 
-* **`PlayStage`** — background system (gradient + spotlight + vignette). Static.
-* **`TargetRail`** — the goal as outline-ghost tiles + micro-label; separated from the board by scale + treatment (here) + a divider glow + air (screen).
-* **`BoardTile`** — one cell; every special status (`locked` / `frozen` / winning) carries a non-colour cue (pin glyph + brass ring / frost texture + crystal border / — the seam is drawn by the board). `pressed` (0.97) + `dim` overlay props.
-* **`PuzzleBoard`** — the hero + the only stateful animation owner. Gesture surface (`GestureDetector` pan) → `controller.beginDrag/updateDrag/endDrag`; drives `_shift` / `_bounce` / `_win` `AnimationController`s; calls `commitShift` / `commitBounce` on settle. Renders the recessed plate, static tiles, the translated moving line (with wrap ghosts), the loop rails, the winning seam bar + bloom.
-* **`MovesHud`** — tabular figure + settle-tick + micro-label, directly on the stage (no card).
-* **`UndoButton`** — pill + loop-back arrow + 3 pips; disabled visual + inert at quota 0.
-* **`RestartButton`** — outline circle + full-loop icon + press spin; no confirm.
-* **`CompletionSheet`** — minimal functional result panel (F04 seam).
-* **`HomeScreen`** — placeholder wordmark + debug chip row (dev entry).
+| Component | Where | Responsibility |
+| --- | --- | --- |
+| `PlayLayout`, `BoardGeometry` | `play/play_layout.dart` | Pure D1 geometry: `s = min(W/358, H/717)` (= W/358 on the supported phones), `e = H − 717 s`, every rect of §6; the cell math shared by the board, the won layers and the tests |
+| `PuzzleBoard` | `play/widgets/puzzle_board.dart` | Card + tiles, lift (rim / rails / 42 % rest), moving line with wrap ghosts clipped to the card interior (±5·s, open on the cross axis), settle / bounce, thaw cross-fade, skeleton cross-fade, legacy won branch. Drag logic unchanged |
+| `TargetRail` | `play/widgets/target_rail.dart` | Caption + `RailTile`s from the caption's glyph-box top; one semantics node; `tileOpacity` for the won dock |
+| `ColumnTutorialOverlay` | `journey/column_tutorial_overlay.dart` | Ghost ring + hint pill; hide / return / exit motion; announce once |
+| `LoopBackButton` *(design layer)* | `design/components/buttons.dart` | Chevron + optional capped caps label in one `_Pressable` (≥ 44 pt, focus ring, 0.98 press) |
+| `LineRail`, `TutorialGhost`, `HintPill`, `SkeletonCell` *(design layer)* | `design/components/play_decor.dart` | The §19.8 (2) decoration widgets; static — Play drives their motion |
+| `TileFace` / `RailTile` *(design layer, edited)* | `design/components/tile.dart` | Glyph takes `loopCappedTextScaler`; `TileFace.iconScale` for the thaw |
+| `GlassIconButton` / `UndoPill` *(design layer, edited)* | `design/components/buttons.dart` | Pressed fill .075 → .14, edge .07 → .18 (also under reduced motion); spent dot dims over 120 ms |
+| `LoopIcon.loopBreak` *(design layer)* | `design/icons.dart` | The open ring + exclamation, stroke 1.8, dot 2.6 |
+| `BoardTile`, `DockedAnswerRow` *(legacy, won only)* | `play/widgets/` | Amber winning row and docked unit; the pin glyph is now the drawn lock; the docked row takes the board's gap |
 
 ---
 
 ## 6. Screens
 
-| Route | Screen | Header / chrome | Back |
-| --- | --- | --- | --- |
-| `/` | bootstrap gate → `_SplashScreen` (loading) / `HomeScreen` (ready) / `StoreErrorScreen` (migration failure) | none | n/a |
-| `/play` | `PlaySessionScreen` → loading skeleton / `_LoadErrorBody` / `_LoadedPlaySession` | **no system header**; one quiet back chevron top-left (`Icons.chevron_left_rounded`, `PlayTheme.muted`, 44×44 target); **hidden while `won`** (the completion sheet's Close owns exit) | chevron / system / gesture back → `Navigator.pop` to the caller; snapshot kept `inProgress` (resumable). Direct entry with an empty stack → `maybePop`. In `won` the sheet's **Close** is the exit. |
+`/play` (route and args unchanged):
 
-Portrait-locked app-wide (`main()`). No confirmation dialogs anywhere.
+| State | Header / back | Notes |
+| --- | --- | --- |
+| Loading (provider or controller still resolving) | chevron + `SEVİYE NN` from the route args; back pops to the caller | 25 skeleton cells in the final card rect; no rail, `HAMLE` or HUD; "Yükleniyor" announced after 300 ms |
+| Loaded — idle / tracking / animating | chevron + `SEVİYE NN` (chevron alone for the debug set and Daily); system back and the edge swipe behave the same (pop, snapshot kept, no confirmation) | tutorial overlay on levels 4–6 until acknowledged |
+| Loaded — `won` (T0 onward) | back hidden (unchanged) | scrim, docked row on the goal, F04 panel in the safe area |
+| Load error | chevron alone (the level is on the card); pops to the caller; system back the same | "Ana ekrana dön" → `context.go('/')` |
 
 ---
 
 ## 7. State Management
 
-* **`PlaySessionController` (`ChangeNotifier`)** — the single source of play state: `PlaySessionPhase`, `displayLetters` / `tileStatuses` (from `engine.state`), `moveCount` (= `engine.moveCount`), `undosRemaining`, `restartCount`, `wonRow`, `activeLine`, `gridVersion`. Owns the `GridEngine`, the `ElapsedTimer`, and write-through persistence. **Ticker-free** → unit-testable without a `TickerProvider`.
-* **UI state (widget-local):** the `AnimationController`s + `_dragOffset` / `_pressedCell` live in `_PuzzleBoardState`; the completion-sheet slide/scrim is `AnimatedSlide` / `AnimatedOpacity` keyed on `controller.phase == won`.
-* **Riverpod:** `playSessionSetupProvider.family<PlaySessionSetup, PlaySessionArgs>` resolves `Puzzle` + `WordValidator` (async); `appRouterProvider` holds the `GoRouter`. The controller is **not** a provider — it is created + disposed by `_LoadedPlaySessionState` for the screen's lifetime (a screen-scoped object; F08's sync service stays the session-scoped one).
-* **Server vs UI:** F03 has no server state. The F08 snapshot is local durable state; the controller treats a mismatched-`puzzleId` snapshot as "not ours" and starts fresh (architecture §9).
-
----
-
-## 8. API / Event Integration
-
-None — F03 calls no endpoint and emits no analytics (F12). It consumes:
-* **F02 engine** — `GridEngine.applyMove/undo/restart/restoreMoves`, `GridStep.{applied, rejectedReason, solvedThisStep, thawedThisStep}`, `GridState.{letters, thawedCells, statusAt, isSolved}`. Rejected moves are values, not throws → the bounce path.
-* **F08 persistence** — `ActiveSessionRepo.{read, save, clear}`, `restoreSession(...)`, `ActiveSessionSnapshot` (frozen keys), `ElapsedTimer`, `toEngineConfig(Puzzle)`, `formatMoveList` / `parseMoveList`.
-* **F01** — `WordValidator` via `wordValidatorProvider` (only consulted by the engine for frozen-row thaw).
+* **Controller** (`PlaySessionController`) — unchanged; still the only authority for phase, moves, quota and persistence.
+* **Board-local** — `_shift`, `_bounce` (`AnimationBehavior.preserve`: state feedback keeps its duration under Android "remove animations"), `_win`, `_lift` (+ `_liftLine`, kept while fading out), `_thaw` (+ the set of thawing cells, taken by comparing statuses across `commitShift`).
+* **Overlay-local** — `_loop`, `_ghost`, `_exit`, the 600 ms return timer.
+* **Screen-local** — `_appear` (loading → loaded), the won `_timeline` / `_retire` (unchanged), the tutorial exit timer in `_LoadedPlaySessionState`.
+* **Display derivations** — `HAMLE` = `moveCount − 1` while `animatingShift`; undo is enabled when not `won`, quota > 0 and the displayed count > 0.
 
 ---
 
 ## 9. Contract Compliance Check
 
-| Area | Result | Note |
+| Area | Status | Note |
 | --- | --- | --- |
-| Screen / route contract (`architecture.md` §13) | **Preserved** | `'/play'` + `PlaySessionArgs`; portrait-locked; no system header + quiet chevron, hidden in `won`; back keeps a resumable snapshot. |
-| Screen state machine (§6) | **Preserved** | `idle / tracking / animatingShift / animatingBounce / won`; **no input queue** (`beginDrag` ignored unless `idle`). |
-| Gesture → Move mapping (§7) | **Preserved** | threshold + dominant axis + **tie-band → horizontal**; exactly one cell; first pointer only (`GestureDetector` pan is single-pointer); off-screen release resolves from the last delta. `T` / `B` numbers exposed for QA tuning. |
-| MOVES / Undo / Restart (§8) | **Preserved** | `MOVES = engine.moveCount`, settled only; Undo 3-action quota, no prompt/ad at 0; Restart reset + `restartCount++`, no dialog, separated from Undo. |
-| Persistence integration (§9) | **Preserved** | write-through into the F08-frozen snapshot; hydrate via the F08 restore path; `completed` + `clear()` on win; `paused` flush; F03 schedules no background work. |
-| Completion sequence (§10) | **Preserved** | lock → win-row highlight **+ drawn seam bar (colour + shape)** → bounded (≤ 600 ms) success anim → minimal functional panel (no rating logic — F04 seam). |
-| Animation / input-lock (§11) | **Preserved** | 190 ms shift (in the 150–250 band), full input lock for the phase, **no queue**, diegetic lock affordance (HUD dim, not a spinner), transient valid word mid-animation does not win (engine evaluates settled state). |
-| Backgrounding (§12) | **Preserved** | gesture cancelled on `paused`; mid-shift commits synchronously; snapshot always settled. |
-| Localization (§14) | **Preserved** | all strings via `PlayStrings`; see §14 assumption re: no `gen_l10n`. |
-| Validation responsibility (§15) | **Preserved** | F03 owns the 3-undo quota, no-moves-during-animation, the state machine, snapshot serialization, portrait lock; the engine owns move legality; F08 owns storage + restore. |
-| `Release Scope` (§17) | **Preserved** | `none` — no infra / CI / deploy change. |
-| Async authority / lifecycle / boundary (frontend rules) | **Preserved** | the F08 sync service stays session-scoped (app-level observer); the F03 controller is screen-scoped and disposed with the screen; a snapshot whose `puzzleId` ≠ the open puzzle is not applied. |
+| Screen / route contract (§13) | Preserved | `/play`, `PlaySessionArgs`, `_popToCaller`, no new route |
+| Backend response / event mapping | Not Applicable | client-only |
+| Error mapping | Extended | same trigger (setup provider error); new card, Turkish copy, no exception text |
+| UI state / store state consistency | Preserved | controller authoritative; only the `HAMLE` display lags to the settle (≤ 190 ms) |
+| Navigation / back / header behaviour | Extended | new chevron + label; same pop semantics; hidden in `won`; chevron alone without a level |
+| Async authority / lifecycle / boundaries | Preserved | pointer cancel, `paused` mid-drag / mid-animation, input lock, persistence write-through — suites and integration green |
 
 ---
 
 ## 10. Behavior Preserved
 
-* **F08 `_SessionLifecycle` (sync-drain observer)** — was wrapping `home:` under a plain `MaterialApp`. With routing introduced this feature it now wraps `MaterialApp.router`'s `builder:` so it stays mounted across every route. This is the correct home for a **session-level** resource (`platform.md` §7 / F08 architecture "never screen-owned"); under `home:` it would have unmounted on the first navigation to `/play` and stopped draining. The drain trigger (`paused` / `resumed` → `dailyResultSyncServiceProvider.drain()`) is byte-identical.
-* **F08 recovery screens** — `_SplashScreen` / `_StoreErrorScreen` / the migration-error branch moved verbatim from `main.dart` into `app_router.dart` (`StoreErrorScreen` is now public; the copy `"Couldn’t open your saved data"` / `"Your progress is safe. Please try again."` + the Retry `FilledButton` + the muted raw-error line are unchanged — `widget_test.dart` still asserts the same strings and passes).
-* **`appBootstrapProvider` + `_bootstrapFirebase`** — untouched; the router's `/` builder watches it exactly as `LoopletApp.home` did.
-* **F02 engine / F08 persistence** — consumed only through their public APIs; no package changed. `looplet_engine` 83 tests, `looplet_content` 17, F08 persistence suites — all unchanged and green.
+* **Gesture → move:** threshold 18 px, tie band 0.15 → horizontal, one cell per move, first pointer only, off-plate release, OS pointer cancel = no move.
+* **Input lock (AC5):** gestures during `animatingShift` / `animatingBounce` / `won` dropped, never queued — `play_session_runtime_test` §17.2 and the integration group 2 are green.
+* **Undo / restart (AC6 / AC7):** quota 3, no prompt at 0, restart refills and has no dialog.
+* **Persistence:** write-through after every settle / undo / restart; resume after a kill; the tampered `thawedFrozenCells` cache is re-derived, not trusted.
+* **Won moment:** T0 + 600 ms before any panel or scrim; the reduced timeline (≥ 300 ms hold, fade); density concessions; Retry fades the won layers and re-lights the board; Next Level / Close unchanged. The docked row is still one `RepaintBoundary` layer.
+* **F05 tutorial:** shown iff Journey level 4–6 and the `kv` ack is unset; satisfied only by a committed column-axis drag; the ack is persisted at that moment; it re-shows after a quit before the gate (AC4, AC11).
+* **Reduce motion:** both OS signals (`reduceMotion`, `disableAnimations`) still read through `reduceMotionRequested()`.
 
 ---
 
 ## 11. UX Decisions
 
-* **Loading** — the debug puzzle load is synchronous (`const` maps) so the skeleton is essentially never seen; it still renders (stage + 25 dim tile silhouettes + ghost target slots, **no spinner**) so a future async source can't flash a blank board.
-* **Error** — an unsupported `source` (Daily / Journey before F05/F07) or an unknown debug id → the contained dev-only error body (`Icons.error_outline`, `Bu bulmaca yüklenemedi`, a `Geri` text button). Not a premium surface, by design.
-* **Empty** — n/a (there is always a puzzle or an error).
-* **Disabled** — Undo at quota 0: dark pill, muted icon + hollow pips, no glow, inert tap. HUD controls drop to 55% during animation, 40% during `won` (the diegetic input-lock — no spinner/modal).
-* **Selected / pressed** — a touched tile presses in (0.97) inside 90 ms even for a tap that becomes a no-op, so input always feels registered.
-* **Visual hierarchy** — the lit board is the only bright/saturated cluster; stage + chrome stay dark and quiet; `MOVES` / Undo / Restart are tiered by size + placement + treatment; there is **no CTA on the playing screen** (the board is the action) — the one CTA is `Retry` in the sheet, and it dominates (`Close` is a quiet text link).
-* **Accessibility** — winning row = amber fill **and** a drawn unbroken seam bar (legible without colour); `locked` = brass ring + pin glyph; `frozen` = frost texture + crystal border. Board exposes a `Semantics` label (target + move count). Controls carry `Semantics(button:, label:)`. Cell hitboxes scale with the board; the shrink-floor keeps them ≥ ~56 pt on real portrait devices. **Full screen-reader grid navigation is out of F03 scope** (architecture §16 / `ui-design.md` §13).
-* **`ui-design.md` alignment** — Direction A implemented: spotlight stage, backlit-keycap tiles, loop-rail motif, wrap animation (edge-mask + opposite-edge ghost), outline-ghost target, amber win + seam bar, diegetic input-lock, undo pips, separated outline Restart, minimal-but-crafted sheet. **Deviations (both flagged):** board-recede blur → dim-only (perf); breathing ambient → omitted (perf / determinism).
-* **premium-ui-rubric self-check** — the implementation holds the `ui-design.md` self-review (94/100): one hero, tiered chrome, layered surfaces (stage < plate < tiles < sheet), heavy tile glyphs, dominant single CTA in the sheet, distinct felt states, no wireframe/card-stack feel. The two perf deviations are the known gap vs. the design's 10/10 ceiling on "Surface & Depth" / "Modernity".
+* **Hierarchy per §6 rhythm:** header band → goal + board as one unit → a quiet HUD. Nothing sits between undo and restart (no F09 hint line).
+* **One accent per meaning:** periwinkle for the lifted line, rails, ghost ring and focus ring; lime only for quota dots, the sparkle and the error pill. The lifted line is never lime (a widget test asserts no `winning` face during a drag).
+* **Pivots in a lifted line keep their own face** (locked / frozen, no rim) — they are the tiles that stay (engine rule). The handoff has no render of this case.
+* **The wrap ghost is the active face at 30 %,** so it becomes the rimmed first tile at the settle (MP-D1); the static render D1-01 draws the ghost without the rim — at 30 % the difference is marginal.
+* **Loading:** identical card rect before and after (asserted); the skeleton cross-fades under the arriving tiles (160 ms).
+* **Error:** calm glass, periwinkle `loopBreak`, one lime action, the chevron; no red, no raw text.
+* **Accessibility:** 44-pt targets (back hit box 16 pt from the edge, 8 pt past the label); the 2 px focus ring on back, undo, restart and the error pill (`_Pressable`); the capped text keeps the fixed geometry while VoiceOver reads the full labels.
+* **Premium-rubric self-check (advisory):** the runtime matches the D1 renders to ≤ 0.83 pt on the iPhone 16 and ≤ 0.67 pt on the D1 16e / Pro Max renders, token colours within ΔE2000 1.5; no fail condition known. The independent score is QA's.
+
+---
+
+## Visual Parity Evidence
+
+**Common provenance:** iOS Simulator 18.6 — iPhone 16 `D0011CE7-6E50-4367-93FA-B323E81270BE` (393×852 @3x), iPhone 16e `6DBDFD97-7BF7-4051-914C-76609DDF8697` (390×844 @3x), iPhone 16 Pro Max `02FDE776-C263-4DAB-A16A-76902AC18189` (440×956 @3x); debug build of `lib/main.dart` at HEAD `991584c` + the F03-FE-D1 working tree ("991584c + WT" in the table); captured by the Frontend/Mobile Developer. States were reached through the real app: `design/src/seed-sim.sh` sets `journey_progress` / the `active_session` snapshot / the tutorial `kv` ack, then Home CONTINUE opens the level. Stills are `xcrun simctl io … screenshot`; held gestures use the simulator touch-path with a delayed background screenshot; videos are `xcrun simctl io … recordVideo`, trimmed and re-encoded (588×1276, 1.5 Mbps) with `design/src/video-d1.swift`, which also extracted the thaw and reduced-motion frames. The two AX5 tutorial records were retaken after the §19.8 (3) fallback was switched on; that one flag does not affect the other records (it only acts on the pill above 1.15×). Artifacts are in `features/f03-puzzle-play-session/design/runtime-d1/`.
+
+| Evidence ID | Kind | Screen / State | Viewport / Device | Artifact | Source Revision | Captured By | Captured At | Result / Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| RT-16-00 | runtime-screenshot | Play · idle (L5, 0 moves; undo disabled) | 393×852 iPhone 16 | design/runtime-d1/RT-16-00-idle-L5.png | 991584c + WT | Frontend/Mobile Developer | 2026-09-28 00:20 | matches D1-00 (PC-00) |
+| RT-16-lift | runtime-screenshot | Play · row 2 lifted, held ~0.55 stride (L5 after R1) | 393×852 iPhone 16 | design/runtime-d1/RT-16-lift-row-L5.png | 991584c + WT | Frontend/Mobile Developer | 2026-09-28 00:04 | rim + glow, side rails, rest 42 %, wrap ghost "T" at 30 % clipped; vs D1-M-lift-t0400 / S-02 (PC-lift) |
+| RT-16-01 | runtime-screenshot | Play · column 2 drag (L4 after R0 L3) | 393×852 iPhone 16 | design/runtime-d1/RT-16-01-play-column-drag.png | 991584c + WT | Frontend/Mobile Developer | 2026-09-28 00:05 | rails top + bottom; ghost enters from the top; vs D1-01 (PC-01) |
+| RT-16-05 | runtime-screenshot | Play · locked + frozen (L26, `SEVİYE 26`) | 393×852 iPhone 16 | design/runtime-d1/RT-16-05-play-locked-frozen-L26.png | 991584c + WT | Frontend/Mobile Developer | 2026-09-27 23:58 | lock icons + indigo; snowflakes + dashes + ice; vs D1-05 (PC-05) |
+| RT-16-06 | runtime-screenshot | Play · thaw L23 ("SAAT"): T0 / T0+83 / T0+168 ms, plus before / after and a tile sheet | 393×852 iPhone 16 | design/runtime-d1/RT-16-06-thaw-L23-t000.png, …-t090.png, …-t180.png, …-before.jpg, …-after.jpg, …-tile-sheet.jpg | 991584c + WT | Frontend/Mobile Developer | 2026-09-28 00:07 | frames from RV-16-thaw (≈ 50 fps); the ice face fades, the snowflake shrinks, cream at the end; at T0 the rest is still dimmed by the lift fade-out (spec) |
+| RT-16-02 | runtime-screenshot | HUD · undo, 2 left (L5 after R1) | 393×852 iPhone 16 | design/runtime-d1/RT-16-02-hud-undo-two-left.png | 991584c + WT | Frontend/Mobile Developer | 2026-09-27 23:55 | two lime dots + one 25 %; vs D1-02 (PC-02) |
+| RT-16-03 | runtime-screenshot | HUD · undo exhausted (L5 after R1 L3 D0 R4, quota 0) | 393×852 iPhone 16 | design/runtime-d1/RT-16-03-hud-undo-exhausted.png | 991584c + WT | Frontend/Mobile Developer | 2026-09-27 23:56 | pill at 55 %, three dim dots; vs D1-03 (PC-03) |
+| RT-16-04 | runtime-screenshot | HUD · restart pressed (held) | 393×852 iPhone 16 | design/runtime-d1/RT-16-04-hud-restart-pressed.png | 991584c + WT | Frontend/Mobile Developer | 2026-09-27 23:57 | fill .14 / edge .18 while held; the release restarted with no dialog (HAMLE 3 → 0); vs D1-04 (PC-04) |
+| RT-16-11 | runtime-screenshot | Play · loading → loaded (first frame under the route push) | 393×852 iPhone 16 | design/runtime-d1/RT-16-11-loading-crossfade.png | 991584c + WT | Frontend/Mobile Developer | 2026-09-28 00:09 | skeleton cells cross-fading to tiles in the same card rect, no spinner; loading itself lasts < 300 ms under the push, so no clean still exists (the rect identity is asserted by a widget test); vs D1-11 (PC-11) |
+| RT-16-07 | runtime-screenshot | Play · load error (level 07 asset corrupted in the installed bundle, restored after) | 393×852 iPhone 16 | design/runtime-d1/RT-16-07-play-load-error.png, RT-16-07b-load-error-pill-home.jpg | 991584c + WT | Frontend/Mobile Developer | 2026-09-28 00:12 | card + `loopBreak` + lime pill; the pill went Home; vs D1-07 (PC-07) |
+| RT-16-08 | runtime-screenshot | Tutorial · pill above the HUD (L4) | 393×852 iPhone 16 | design/runtime-d1/RT-16-08-tutorial-hud.png | 991584c + WT | Frontend/Mobile Developer | 2026-09-28 00:00 | clearance 9.9 / 9.7 pt (pill-clearance-d1); vs D1-08 (PC-08) |
+| RT-16-09 | runtime-screenshot | Tutorial · column held — ghost hidden, pill stays | 393×852 iPhone 16 | design/runtime-d1/RT-16-09-tutorial-drag-ghost-hidden.png | 991584c + WT | Frontend/Mobile Developer | 2026-09-28 00:00 | vs D1-09 (PC-09) |
+| RT-16-debug | runtime-screenshot | Play · debug set (no level) — chevron alone | 393×852 iPhone 16 | design/runtime-d1/RT-16-debug-smoke01-idle.jpg | 991584c + WT | Frontend/Mobile Developer | 2026-09-28 00:13 | §19.8 (5) |
+| RT-16-won | runtime-screenshot | Won · at rest, Perfect (smoke-tr-01) — default and AX5 | 393×852 iPhone 16 | design/runtime-d1/RT-16-won-docked-on-goal-perfect.jpg, …-ax5.jpg | 991584c + WT | Frontend/Mobile Developer | 2026-09-28 00:13–00:14 | NTLC-1 evidence: row on the goal, panel regular density, clear of the row. AX5: the legacy F04 panel overflows exactly as in the audit's AUD capture `cur-a11y-ax5-result.png` (pre-existing A-2, D2 scope) |
+| RT-16e-00 | runtime-screenshot | Play · idle (L5) | 390×844 iPhone 16e | design/runtime-d1/RT-16e-00-idle-L5.png | 991584c + WT | Frontend/Mobile Developer | 2026-09-28 00:15 | vs S-v-16e-play-idle (PC-v16e-idle) |
+| RT-16e-01 | runtime-screenshot | Play · column 2 drag (L4 after R0 L3) | 390×844 iPhone 16e | design/runtime-d1/RT-16e-01-play-column-drag.png | 991584c + WT | Frontend/Mobile Developer | 2026-09-28 00:16 | vs D1-v-16e-play-column-drag (PC-v16e-01) |
+| RT-16e-08 | runtime-screenshot | Tutorial (L4) | 390×844 iPhone 16e | design/runtime-d1/RT-16e-08-tutorial-hud.png | 991584c + WT | Frontend/Mobile Developer | 2026-09-28 00:17 | clearance 8.9 / 9.0 pt; vs D1-v-16e-tutorial-hud (PC-v16e-08) |
+| RT-pm-00 | runtime-screenshot | Play · idle (L5) | 440×956 iPhone 16 Pro Max | design/runtime-d1/RT-promax-00-idle-L5.png | 991584c + WT | Frontend/Mobile Developer | 2026-09-28 00:15 | vs S-v-promax-play-idle (PC-vpm-idle) |
+| RT-pm-01 | runtime-screenshot | Play · column 2 drag (L4 after R0 L3) | 440×956 iPhone 16 Pro Max | design/runtime-d1/RT-promax-01-play-column-drag.jpg | 991584c + WT | Frontend/Mobile Developer | 2026-09-28 00:16 | no Pro Max render of this state exists; geometry per §6 (widget test) |
+| RT-pm-08 | runtime-screenshot | Tutorial (L4) | 440×956 iPhone 16 Pro Max | design/runtime-d1/RT-promax-08-tutorial-hud.png | 991584c + WT | Frontend/Mobile Developer | 2026-09-28 00:17 | clearance 11.9 / 12.0 pt; vs D1-v-promax-tutorial-hud (PC-vpm-08) |
+| PC-D1 | parity-comparison | every pair above: render \| runtime \| difference, plus measured edges and colour patches | 393×852, 390×844, 440×956 | design/runtime-d1/PC-*.jpg, design/runtime-d1/parity-measurements.txt (from design/src/parity-d1.sh + measure-d1.swift) | 991584c + WT | Frontend/Mobile Developer | 2026-09-28 00:27 | **Layout:** ≤ 0.83 pt against every D1 render on all three devices (16 features per pair, flat-edge probes); exceptions are explained in the deviation list below. **Colour:** token surfaces within ΔE2000 1.5 (tile, rail, `HAMLE`, undo, board card, ground bottom / left); one gradient patch at 3.32–3.35 (see list) |
+| RV-16-lift | runtime-video | row lift + settle, then column lift + settle (L5 after R1) | 393×852 iPhone 16 | design/runtime-d1/RV-16-row-and-column-lift.mp4 | 991584c + WT | Frontend/Mobile Developer | 2026-09-28 00:10 | lift fade-in, tracking with the 30 % ghost, settle (ghost → 100 %), rim / rails / dim fade-out |
+| RV-16-thaw | runtime-video | thaw L23 (the U4 that forms "SAAT") | 393×852 iPhone 16 | design/runtime-d1/RV-16-thaw.mp4 | 991584c + WT | Frontend/Mobile Developer | 2026-09-28 00:07 | 180 ms cross-fade after the settle; the visible change ends ≈ T0 + 130 ms (the curve front-loads), last pixel change at T0 + 168 ms |
+| RV-16-tutorial | runtime-video | tutorial ghost loop → touch-down hides it → row move → returns after idle → column move → pill + ghost fade out | 393×852 iPhone 16 | design/runtime-d1/RV-16-tutorial-ghost.mp4 | 991584c + WT | Frontend/Mobile Developer | 2026-09-28 00:02 | the ghost never plays under the finger (A-6); undo stays visible and usable |
+| RV-16-rm | runtime-video | Reduce Motion ON: row lift, then the thawing column move | 393×852 iPhone 16 | design/runtime-d1/RV-16-reduced-motion-lift-thaw.mp4 (+ RT-16-rm-*.jpg frames) | 991584c + WT | Frontend/Mobile Developer | 2026-09-28 00:12 | the rest dims to 42 % and back in one frame; the thaw is complete in the settle frame; the shift keeps its 190 ms ease-out |
+| A11Y-16-text | accessibility | OS text default / xxxLarge / AX5 on L26 | 393×852 iPhone 16 | design/runtime-d1/RT-16-05-play-locked-frozen-L26.png, RT-16-10-a11y-xxxl-L26.jpg, RT-16-10-a11y-ax5-L26.png | 991584c + WT | Frontend/Mobile Developer | 2026-09-27 23:58 | every Play text at the 1.3× cap from xxxL up; no clipping or overlap; the `HAMLE` label sits ≈ 1.7 pt inside the card's bottom border at the cap (as in D1-10; F00 `MovesCard`, NTLC-3); vs D1-10 (PC-10) |
+| A11Y-tutorial-ax5 | accessibility | Tutorial at AX5 (1.3× cap, fallback on) | 393×852 iPhone 16; 390×844 iPhone 16e | design/runtime-d1/RT-16-10b-a11y-ax5-tutorial.png, RT-16e-10b-a11y-ax5-tutorial.png | 991584c + WT | Frontend/Mobile Developer | 2026-09-28 00:27 | two lines, sparkle hidden; clearance 7.23 / 6.99 pt (16) and 6.27 / 6.37 pt (16e) — before the fallback the 16e measured 3.93 / 4.04 pt; vs D1-10b and D1-v-16e-tutorial-text-ax5-capped (PC-10b, PC-v16e-10b) |
+| A11Y-rm | accessibility | Reduce Motion on and off | 393×852 iPhone 16 | RV-16-rm (on); RV-16-lift, RV-16-thaw, RV-16-tutorial (off) | 991584c + WT | Frontend/Mobile Developer | 2026-09-28 00:02–00:12 | set with `simctl spawn … defaults write com.apple.Accessibility ReduceMotionEnabled`, app relaunched; restored to 0 afterwards |
+| A11Y-focus | accessibility | Keyboard focus ring (D1-12) | — | test/design/components_test.dart "QA-03: focus ring …" | 991584c + WT | Frontend/Mobile Developer | 2026-09-28 | **not captured at runtime:** this host cannot inject hardware Tab keys into the simulator (pasted `\t` and System Events keystrokes did not reach it). Covered by the widget test; runtime check left to QA |
+| AND | accessibility | Android | — | — | — | — | — | not run — stated limit (ANDROID-CI-EVIDENCE) |
+
+**Deviation list** (layout ±2 pt and colour ΔE 3 of the token, F00 ui-design §14):
+
+1. **Top-right ground light, ΔE2000 3.32–3.35** (render `42,51,97` vs runtime `33,41,83` at (W − 20, 40·s)). The render draws the design's elliptical radial light; F00 `LoopBackdrop` approximates it with a circular gradient (documented in `surfaces.dart`, accepted in F00 QA). It is a gradient, not a token surface, and D1 may not change the design layer beyond §19.8 (2). Every token patch is ≤ 1.5.
+2. **Active rim drawn inside vs outside the tile.** The render uses `box-shadow: 0 0 0 2px` (outside); `TileFace.active` draws a 2 px `Border` (inside) — visible as thin double outlines in the difference panels of PC-lift / PC-01 / PC-09. F00 component, unchanged.
+3. **`HAMLE` label ≈ 2 pt lower than in the render.** F00 `MovesCard` sets the counter on the font's default line height; the render sets both lines at `line-height: 1`. The card rect itself matches (≤ 0.33 pt).
+4. **Restart square vs the F00 S-v Pro Max render: +3.17 pt** (PC-vpm-idle). S-v predates the D1 decision "restart is a 44-pt square" (ui-design §2); against the D1 Pro Max render it is 0.00–0.33 pt.
+5. **"undo pill top" probe in the AX5 tutorial pairs: 2.00 / 2.83 pt.** With the §19.8 (3) fallback the hint pill is 4.4 pt shorter than in the renders, so its bottom edge enters the probe's ±8 pt window; the undo pill's left edge matches, and widget tests assert its rect to 0.01 pt.
+6. **Thaw T0 frame:** the runtime rest of the board is still at 42 % at T0 (the lift fades out over the 90 ms after the settle, per §5); the render's thaw demo has no drag in front of it.
+7. **Text rasterisation:** Blink vs Flutter anti-aliasing and ≈ ±0.5 pt baseline differences; the status bar is the real one, not the render's mock.
+8. **Tutorial ghost phase** differs between the stills (it loops).
 
 ---
 
 ## 12. Implemented Files
 
-(Paths + change summary; see §2 for the table and §3 for task mapping.)
-
-* **New** `app/lib/play/**` (16 files) + `app/lib/app_router.dart` + `app/lib/home_screen.dart` — the feature.
-* **Modified** `app/lib/main.dart` — `MaterialApp.router` + relocate `_SessionLifecycle` to the router `builder:` + adopt `PlayTheme.colorScheme`; `_SplashScreen`/`_StoreErrorScreen`/`_HomePlaceholder` removed (moved to `app_router.dart` / `home_screen.dart`).
-* **New** `app/test/play/**` (3 files, 29 tests).
-* **Unchanged** `app/test/widget_test.dart` — still green.
-* No `pubspec.yaml` change (`go_router` was already a dependency); no native / Podfile change (confirmed by the green iOS release build).
+* **`app/lib/play/play_layout.dart`** (new) — `PlayLayout(Size)`: `s`, `left`, `extra`, `e1`; `backIcon`, `backHitLeft/Top/Inset`, `movesCard`, `captionTop`, `railTop/Bottom`, `boardRect`, `hudTop`, `undoRect`, `restartRect`, `hintBand`. `BoardGeometry`: card 308.5 × 307.5·s, `pad`, `gap`, `tile`, `stride`, `rowWidth`, `cellOrigin/Rect/Center`, `cellAt`, `forWidth`.
+* **`app/lib/play/play_session_screen.dart`** — rewritten around `_PlayScaffold` (`AnnotatedRegion` light status bar, `LoopBackdrop`, `LayoutBuilder` → `PlayLayout` → `LoopScale`). `_PlayBody`: absolute D1 layout, `_appear`, won layers kept (now in a `SafeArea` stack, measured against the rail tiles, `DockedAnswerRow.gap`), `_WonPanelHost` unchanged. `_LoadingView`, `_LoadErrorView`, `_backControl`. Tutorial: ack on satisfaction, removal after `ColumnTutorialOverlay.exitDuration`.
+* **`app/lib/play/widgets/puzzle_board.dart`** — rewritten render (see §5); `geometry` + `appear` parameters replace `boardSize`; the gesture handlers are the shipped ones (`cellAt` from `BoardGeometry`).
+* **`app/lib/play/widgets/target_rail.dart`** — rewritten (caption + `RailTile`s, one semantics node, `tileOpacity`).
+* **`app/lib/play/won_composition.dart`** — `WonGeometry.compute(railTopLocal, railBottomLocal, …)`: dock tiles centred on the rail tiles; `panelTopGlobal = min(max(0.36 H, dock + U + 16), stackBottom)`; row-scale fallback only for frames too short for the unit (float tolerance 1e-6). `WonTimeline` unchanged.
+* **`app/lib/play/widgets/docked_row.dart`** — `gap` parameter (default `PlayTheme.tileGap`).
+* **`app/lib/play/widgets/board_tile.dart`** — doc: won-only; `Icons.push_pin` → `LoopIconView(LoopIcon.lock)` (same size / alpha).
+* **`app/lib/play/play_strings.dart`** — `targetLabel` → `HEDEF DÖNGÜ`; new `targetSemantics`, `levelCaps`, `levelWord`, `backHome`, `loading`; `loadFailed` → `Bu bulmaca yüklenemedi.`; `levelLabel(n)` (two digits), `backSemantics(level)`; English table mirrored.
+* **`app/lib/journey/column_tutorial_overlay.dart`** — rewritten visuals (no dim layer, no Material icon); `layout` parameter; motion and timer logic per §4; `compactPillAbove115 = true` (§19.8 (3)).
+* **`app/lib/design/components/tile.dart`** — glyph `textScaler: loopCappedTextScaler` on `TileFace` and `RailTile`; `TileFace.iconScale`.
+* **`app/lib/design/components/buttons.dart`** — `_Pressable.builder(pressed)`; pressed fill / edge on `GlassIconButton` and `UndoPill`; dots as `AnimatedContainer` (120 ms, zero when reduced); new `LoopBackButton`.
+* **`app/lib/design/icons.dart`** — `LoopIcon.loopBreak` (+ stroke 1.8).
+* **`app/lib/design/components/play_decor.dart`** (new) — `LineRail`, `TutorialGhost`, `HintPill`, `SkeletonCell`; exported from `design.dart`.
+* **Deleted:** `moves_hud.dart`, `undo_button.dart`, `restart_button.dart`.
+* **Tests:** see §17.
 
 ---
 
 ## 13. Performance Notes
 
-* **Board rebuilds** are driven by one `AnimatedBuilder` merging `_shift` / `_bounce` / `_win` plus a `ChangeNotifier` listener; the 25 static tiles are plain `Positioned` widgets rebuilt per frame only during an active phase (idle frames don't animate). Acceptable for a 5×5 grid; no `ListView` / large tree.
-* **Wrap animation** uses a `ClipRRect` + a translated `Stack` of `N+2` tiles — no `BackdropFilter` / shader. Release→animation-start is synchronous (`engine.applyMove` then `_shift.forward`), targeting the `< 50 ms` budget.
-* **Deliberately skipped:** the board-recede backdrop blur and the breathing ambient loop (see §4 / §11) — both to protect mid-tier frame rate. This is the one place the implementation trades a design flourish for performance; QA validates the trade on the device matrix.
-* Persistence writes are `unawaited` single Drift upserts off the interaction path; failures are caught (non-fatal).
+* The rest-of-board dim is **one group `Opacity`** over the static tiles (one layer), never a per-tile or whole-board opacity; at 1.0 it adds no layer.
+* The lift cross-fade stacks two faces only for the 5–7 moving tiles and only during the 90 ms fades; the thaw stacks two faces only for the thawing cell(s) for 180 ms.
+* The moving line is one `ClipRect` + `Transform.translate` over a `Stack` (as shipped). As before, the board rebuilds on every animation tick through its `AnimatedBuilder`; nothing new rebuilds per frame outside the board.
+* Won: the docked row stays a single `RepaintBoundary` layer; no backdrop blur anywhere.
+* Measured behaviour on the simulator is fluid; a mid-tier Android frame-rate check remains with QA (Android not run).
 
 ---
 
 ## 14. Assumptions
 
-* **No `gen_l10n` / `.arb` toolchain** — F03 strings live in a small per-language table (`PlayStrings`, `tr` + `en`), matching the "look up by language key" shape the dictionary layer uses and the `architecture.md` §14 / `ui-design.md` §13 "externalized, no hard-coded strings" requirement. Wiring full Flutter localization is a separate Tech Lead call; the string keys are ready for it.
-* **Debug puzzle source = Dart `const` maps** copied from `content/smoke/tr/level0{1,2,4,5,6}.json`. Flutter asset paths cannot reference `../content`, and F05 replaces the debug entry with real bundled-content resolution — so embedding the fixtures is the lowest-risk scaffold. `debug_puzzle_library.dart` names `content/smoke/tr/` as the source of truth.
-* **Gesture threshold `T = 18` logical px, tie-band ratio `B = 0.15`** — the F03-FE2 starting values; exposed as `GestureResolver` constructor params so QA can sweep them on device (architecture §18).
-* **Board sizing** — `~88%` of width, shrinking board-first to a floor of `5·56 pt + plate + gaps`, then gaps compress. Tuned by eye; QA validates the ≥ 44 pt hitbox + one-handed reach on the device matrix.
-* **`optimalMoves` / stars / elapsed** are tracked (elapsed) or available (`optimalMoves`) but **not displayed** by F03 — F04 (completion panel) and F07 (Daily) own that surface. F03's sheet shows the move count only.
+* **Safe-area insets used in the device-geometry won tests:** 16e 47 / 34, 16 59 / 34, Pro Max 62 / 34.
+* **The widget tests with real fonts are representative of device text metrics** — confirmed where both exist: the hint pill measured 4.2 pt (test) vs 3.93 pt (device, including the border's anti-aliasing) on the 16e at the cap; after the fallback 6.4 pt (test) vs 6.27 / 6.37 pt (device).
+* **Loading states are sub-300 ms** on the simulator; the evidence relies on the cross-fade frame plus the rect-identity test.
 
 ---
 
 ## 16. Needs Tech Lead Clarification
 
-Carried from `ui-design.md` §14 (non-blocking — sensible defaults are implemented) plus two implementation deviations:
-
-1. **No primary CTA on the playing screen** — implemented as designed (the board is the action; `Retry` in the sheet is the only CTA). Please confirm so QA does not flag it as a missing CTA.
-2. **F03 owns the first-pass *visual* treatment of `locked` / `frozen` tiles** — implemented (brass ring + pin glyph / frost fill + crystal border). Confirm this stays F03's, or name the later feature that owns a dedicated tile-state visual pass.
-3. **Shared "no title bar + quiet back chevron, hidden in terminal states" chrome** — implemented for `/play`. Confirm whether to lock it as a cross-screen rule now (F10) or leave it feature-local.
-4. **Microcopy** — `HEDEF / HAMLE / ÇÖZÜLDÜ / Yeniden / Kapat / Geri` are placeholders in `PlayStrings`; PO / localization owns the final strings.
-5. **Deviation — board-recede blur → dim-only** during `won` (perf on mid-tier). Accept, or require the blur behind a device-tier gate?
-6. **Deviation — breathing spotlight ambient omitted** (perf / test determinism). Accept, or want it back as a bounded `TweenAnimationBuilder` loop?
+1. **NTLC-1 — the won dock moved onto the goal (deviation from §16.3 / §16.5 (1)).**
+   * **Why:** with the D1 header the rail tiles end at 281.9 pt (393×852), so §16.3's free zone `[rail + 12, 0.36 H − 16]` is −3.2 pt on the 16, −3.5 on the 16e and +0.1 on the Pro Max — no room for a 63-pt unit.
+   * **First attempt — floor the panel under the goal:** panel top = max(0.36 H, rail + 12 + U + 16). With real fonts and device insets the Perfect panel at 1.3× is 473.7 pt at tight density against 440.1 (16e) / 445.1 pt (16) of room. Every §16.3 concession combined (row scale 0.8, gaps −4 pt) still leaves 5–13 pt short, so the panel would cover the row.
+   * **Implemented:** the row docks onto the goal — its tiles centre on the rail tiles, which fade out beneath it (1 − dock progress; back on Retry). The panel keeps its shipped 0.36 H cap and regular density at 1.0× on all three phones (compact at 1.3× on the 16 / 16e). All §16.5 rules hold except (1)'s "W.top ≥ dividerY + 12", replaced by "the answer tiles centre on the goal tiles". Tests: 20 rect tests (rows 0–4 × Perfect / 2★ × 390 / 440), 12 device-geometry tests (3 devices × 1.0 / 1.3 × Perfect / 2★, real fonts, insets), timeline, reduced motion, Retry. Runtime: RT-16-won.
+   * **Decision needed:** accept for the D1 hybrid period (D2 replaces the whole moment), or name another fallback.
+2. **NTLC-2 — design-layer edits beyond the §19.8 (2) list.** They implement accepted handoff decisions; no token value or dependency changed; each has component tests. Please confirm:
+   * `LoopBackButton` — ui-design §7 specifies the header as `LoopIconView` + caption "in one `_Pressable`", and `_Pressable` is library-private;
+   * `TileFace.iconScale` — the §5 thaw shrinks the snowflake 1 → 0.6;
+   * `UndoPill`'s spent dot as an `AnimatedContainer` — §5 "the spent quota dot dims over 120 ms".
+3. **NTLC-3 (informational) — `HAMLE` label at the 1.3× cap** sits ≈ 1.7 pt inside the card's bottom border on the device. There is no clipping or overlap, and it matches D1-10. `MovesCard` keeps its values per ui-design §13. A 2–3 pt larger minimum height at the cap would add margin if you want it.
+4. **NTLC-4 (informational) — the repo-wide `melos run format:check` fails** on a pre-existing QA artefact, `ai-system/features/f00-design-foundation/qa/src/qa_probe_main.dart` (unchanged since 3647cef, outside `app/`). `app/`, `packages/` and `tools/` are formatted (0 changed). Not touched here.
+5. **NTLC-5 (informational) — the "existing 120 ms grid swap"** of ui-design §5 does not exist in the shipped code, so undo / restart still swap instantly.
+6. **NTLC-6 (informational) — the legacy won moment / F04 panel at AX5** overflows and covers the screen exactly as in the Phase C audit capture (pre-existing A-2, D2 scope). The §16.5 (6) scope (1.0 and 1.3×) holds.
 
 ---
 
 ## 17. Test Evidence by Task
 
-| Task / behaviour | Test type | File · scenario proven |
-| --- | --- | --- |
-| F03-FE2 threshold (AC4) | unit | `gesture_resolver_test.dart` — below threshold on both axes → `null`; exactly at threshold → a move |
-| F03-FE2 dominant axis + direction (AC2 / AC3) | unit | `gesture_resolver_test.dart` — +dx→`rowRight(startRow)`, −dx→`rowLeft`, +dy→`columnDown(startCol)`, −dy→`columnUp` |
-| F03-FE2 diagonal tie → horizontal (architecture §7) | unit | `gesture_resolver_test.dart` — near-equal axes → row move; clearly-vertical (outside band) still vertical |
-| F03-FE2 one cell only | unit | `gesture_resolver_test.dart` — a 22 px drag and a 600 px flick map to the same move |
-| F03-FE2 tracking-axis lift (AC9) | unit | `gesture_resolver_test.dart` — `null` below threshold; row / column past threshold |
-| F03-FE5 fresh start writes an initial in-progress snapshot | unit | `play_session_controller_test.dart` — `repo.read()` → `puzzleId`, `status inProgress`, `moveCount 0`, `undosRemaining 3` |
-| F03-FE3 legal drag → shift phase → commit → idle + MOVES 1 + persisted (AC2) | unit | `play_session_controller_test.dart` — `endDrag` → `DragResolution.shift`, `phase animatingShift`; `commitShift()` → `false`, `phase idle`, `moveCount 1`; snapshot `appliedMoves == ['R1']` |
-| F03-FE6 solving → won, wonRow 0, completed-then-cleared (AC8) | unit | `play_session_controller_test.dart` — `commitShift()` → `true`, `phase won`, `wonRow 0`, `isSolved`; `repo.read()` → `null` (completed snapshot written then cleared) |
-| F03-FE3 rejected move → bounce → idle, MOVES unchanged, not persisted | unit | `play_session_controller_test.dart` — vertical drag on a `columnMovesEnabled:false` puzzle → `DragResolution.bounce`; `commitBounce()` → `idle`, `moveCount 0`; snapshot still `moveCount 0` |
-| F03-FE3 **no input queue** (AC5) | unit | `play_session_controller_test.dart` — `beginDrag` while `animatingShift` is ignored (phase unchanged) |
-| F03-FE4 undo quota + no-op at 0 (AC6) | unit | `play_session_controller_test.dart` — 3 moves then 3 undos → `moveCount 0`, `undosRemaining 0`, `canUndo false`; a 4th `undo()` → `false`, no state change |
-| F03-FE4 restart resets + `restartCount++` (AC7) | unit | `play_session_controller_test.dart` — after a move + an undo, `restart()` → `moveCount 0`, `undosRemaining 3`, `restartCount 1`; snapshot `restartCount 1` |
-| F03-FE5 hydrate from a matching snapshot (AC10) | unit | `play_session_controller_test.dart` — seed a snapshot (`['R1']`, quota 2, restarts 2) → controller `hydratedFromSnapshot`, `moveCount 1`, `undosRemaining 2`, `restartCount 2` |
-| F03-FE7 paused mid-shift-animation commits (no torn snapshot) | unit | `play_session_controller_test.dart` — `endDrag` → `animatingShift`; `onAppPaused()` → `phase idle`, `moveCount 1`; snapshot `appliedMoves == ['R1']` |
-| F03-FE7 paused mid-drag cancels the gesture | unit | `play_session_controller_test.dart` — `tracking` → `onAppPaused()` → `phase idle`, `moveCount 0` |
-| F03-FE1/FE4 renders target + board + MOVES 0 (AC1) | widget | `play_session_screen_test.dart` — `HEDEF`, `HAMLE`, `0`, one `PuzzleBoard`, target letters shown |
-| F03-FE3/FE6 legal swipe forms target → completion sheet (AC2 / AC8) | widget | `play_session_screen_test.dart` — a rightward drag on row 0 of `smoke-tr-01` → `ÇÖZÜLDÜ` + `Yeniden` + `Kapat`; sheet shows `MASAL` + `1`; back chevron hidden in `won` |
-| F03-FE6 Retry resets the board (AC7) | widget | `play_session_screen_test.dart` — tap `Yeniden` → sheet gone, `MOVES 0`, back chevron restored |
-| F03-FE2 sub-threshold tap doesn't change MOVES (AC4) | widget | `play_session_screen_test.dart` — a 6×4 px drag from board centre → `MOVES 0`, no sheet |
-| F03-FE1 unsupported source → load-error state | widget | `play_session_screen_test.dart` — `PuzzleSource.daily` → `Bu bulmaca yüklenemedi` + `Geri` |
+**Gates on the final tree** (2026-09-28, macOS host, Flutter 3.32.8):
 
-**Gates:** `flutter analyze` (app) + `dart analyze` (6 packages) clean; `dart format --output=none --set-exit-if-changed .` clean; **295 workspace tests green** (app **99** = 4 pre-existing + 68 F08 + 27 F03; engine 83, core 22, content 17, dictionary 32, solver 23, authoring 19); `infra` offline tests 18/18 (unchanged); **`flutter build ios --release --no-codesign` GREEN** — `✓ Built build/ios/iphoneos/Runner.app (54.5MB)`.
+| Command | Target | Result |
+| --- | --- | --- |
+| `melos run analyze` | all packages + `flutter analyze` (app) | SUCCESS — "No issues found!" |
+| `dart format --output=none --set-exit-if-changed app packages tools` | Dart code | 172 files, 0 changed, exit 0 |
+| `melos run format:check` | whole repo | FAILED only on the pre-existing `ai-system/…/qa_probe_main.dart` (NTLC-4) |
+| `melos run test` | packages + app | SUCCESS — app **405** passed; core 22, content 17, dictionary 32, authoring 25, engine 83, solver 23 |
+| `flutter test integration_test -d D0011CE7-6E50-4367-93FA-B323E81270BE` | iPhone 16 simulator, iOS 18.6 | **13 / 13 passed** (groups 1–4, incl. `paused` mid-drag / mid-animation) |
+
+**Mocks / overrides:** in-memory Drift databases; `wordValidatorProvider` / `playSessionSetupProvider` overridden with `NeverValidWordValidator` or a set validator; Journey assets from a map source (tutorial tests); a `GoRouter` with a `/` home for navigation tests. The integration suite runs the real app code on the simulator with in-memory databases.
+
+| Task / behaviour | Test (file → name) | Type | Proves |
+| --- | --- | --- | --- |
+| §11.5 (1)–(4) geometry on 3 devices | `test/play/play_session_screen_test.dart` → "D1 layout … every rect sits on the width-scaled geometry" ×3; "393×852 matches the handoff table to 0.15 pt" | widget | board card, tiles, chevron (25, 96)·s, back hit box ≥ 44 from x 16, `HAMLE` card (273.5, 75)·s ≥ 60 × 63·s, label ≥ 12 pt, rail tiles, undo, restart 44 pt centred on the pill; 71.1-pt board → HUD gap |
+| Header binding and back | same file → "SEVİYE NN is bound …; back pops to /", "two digits below 10", "no level number → chevron alone", "system back behaves like the chevron" | widget | `SEVİYE 26` / `07`; "Geri, Seviye 26"; pop to `/`; the debug set shows no label |
+| Loading → loaded | same → "loading → loaded: the board card does not move; no spinner; 'Yükleniyor' only after 300 ms" | widget | identical card rect, 25 skeleton cells, no rail / `HAMLE` / HUD while loading, announcement timing |
+| Load error | same → "calm error card", "error pill goes home (/)", "system back returns to /", "reflows at AX5" | widget | copy, `loopBreak`, no raw exception text, pill → `/`, no exception at 3.12× |
+| Lift / rails / dim / ghost | same → "a lifted row …", "a lifted column …", "the lift fades in over 90 ms; reduced motion: instant" | widget | 7 active faces (5 + 2 ghosts), no lime; rails on the side / top-bottom card edges; rest 0.42; ghosts 0.30; 90 ms fade; instant when reduced |
+| `HAMLE` at the settle | same → "HAMLE changes at the settle, not at release" | widget | 0 mid-settle, 1 after |
+| Undo quota + semantics (AC6) | same → "undo: lime quota dots + 'n / 3 hak' …" | widget | disabled at 0 moves and at quota 0; "Geri al, 3/2/1/0 / 3 hak"; no dialog |
+| Restart (AC7) | same → "restart is a 44 pt glass square with no dialog" | widget | `LoopIcon.restart`, 44 × 44, "Baştan", reset without dialog |
+| Special tiles | same → "special tiles: locked = indigo + lock, frozen = ice + snowflake" | widget | states and icons |
+| Thaw (A-5) | same → "a 180 ms cross-fade; the snowflake shrinks as it fades", "reduced motion: the thaw is instant at the settle" | widget | real thaw through the engine rule (set validator "SAAT"); at +90 ms: veil 0–1, icon scale 0.6–1; gone at +200 ms; instant when reduced |
+| Text cap (A-2) | same → "{390×844, 393×852} at OS text {1.0, 1.35, 3.12}×: every Play text is capped …" (6) | widget, real fonts | every `Text` on Play resolves to min(scale, 1.3); glyphs inside their tiles; no exception |
+| Glyph cap in the design layer | `test/design/components_test.dart` → "TileFace and RailTile glyphs are capped at 1.3× — no overflow at AX5 (3.12) on a 390-pt width (A-2)" | widget | scaler 1.3; `Ş İ Ğ` inside their tiles |
+| Pressed fill | same file → "GlassIconButton / UndoPill brighten fill .075 → .14 and edge .07 → .18 while pressed — also under reduced motion" | widget | colours while held, 0.98 vs 1.0 scale |
+| Dot dim, back button, decorations, `loopBreak` | same file → "UndoPill: a spent dot dims over 120 ms …", "LoopBackButton …", "LineRail …", "TutorialGhost …", "HintPill at {1.0, 1.15, 1.2, 1.3}x …", "HintPill padding …", "SkeletonCell …", "TileFace iconScale …", icons "loopBreak paints …", "every icon has a designed stroke weight" (13 icons) | widget | the §19.8 (2) additions |
+| Tutorial pill vs board / HUD (A-1) | `test/journey/column_tutorial_test.dart` → "{390×844, 393×852, 440×956}, OS text {1.0, 1.3, 3.12}x: the pill sits between the board and the HUD with ≥ 4 pt clearance" (9) | widget, real fonts | ≥ 4 pt each side (fallback on: 6.4 / 7.1 / 8.5 pt at the cap), centred, no overlap with undo / restart, sparkle only ≤ 1.15× |
+| Tutorial HUD usable | same → "undo and restart stay usable under the tutorial" | widget | row move → undo → restart with the overlay up |
+| Ghost hide / return (A-6) | same → "the ghost hides on touch-down and returns after 600 ms idle" | widget | 0 after touch-down (+130 ms), 0 while dragging and < 600 ms idle, 1 after the timer + 160 ms fade; overlay kept after a row move |
+| Pill exit + ack timing | same → "the first column move fades the pill out over 160 ms" | widget | opacity 0–1 mid-fade; ack persisted before the fade ends; overlay gone after it |
+| Announcement | same → "the hint is announced once; the ghost is excluded" | widget | one `announce` message; `ExcludeSemantics` on the ghost |
+| F05 gate / ack / re-show (AC4 / AC11) | same → the four pre-existing tests (rewired to `BoardGeometry`) | widget | unchanged behaviour |
+| Won moment (§16 + NTLC-1) | `test/play/won_composition_test.dart` → timeline (4), `WonGeometry` (5), §16.5 at 390 / 440 × rows 0–4 × Perfect / 2★ (20), 393 row 4, text 1.3, F04 variants, T0 + 600 ms, reduced motion ×2, "D1 dock on the device geometry" (12) | unit + widget | tiles centred on the goal, rail tiles at opacity 0 at rest, panel ≥ 0.36 H and ≥ 16 pt under the unit, buttons ≥ 44 pt |
+| AC1–AC11 runtime scenarios | `test/play/play_session_runtime_test.dart` (updated helpers) and `integration_test/play_session_test.dart` | widget + device integration | gesture wiring on 2 sizes, no double count, resume + tampered cache (now read through `TileFace`), lifecycle |
+| Reduce-motion reads | `test/reduce_motion_test.dart` (board built with `BoardGeometry`) | widget | seam static under both OS signals |
 
 ---
 
 ## 18. Test Notes
 
-* **Runtime-only (not covered by automated tests, per `architecture.md` §16 — QA on a device/simulator):** real gesture accuracy + the diagonal tie-band feel on the device matrix; 0 double-registered moves during the real 190 ms animation window (the no-queue guard is unit-proven at the controller level, but the on-screen animation timing is device-runtime); the wrap animation visual (edge-mask + emerging ghost); the win choreography timing (seam draw + bloom); backgrounding mid-animation on a real OS; portrait-lock on a rotating device; resume fidelity after a real OS kill.
-* **Tile-state visuals** (`locked` brass ring + pin, `frozen` frost + crystal border, thaw cross-fade) are rendered from `smoke-tr-05` / `smoke-tr-06` via the debug entry — visual QA on device; no golden tests in this delivery.
-* **Header / back consistency:** `/play` has no system header (intentional, contract §13); the chevron pops to the caller on all three back paths (button / system / gesture) and is hidden in `won` (sheet Close owns exit). Direct entry falls back via `maybePop`.
-* Existing `widget_test.dart` re-run: home still shows `LOOPLET`, no `StoreErrorScreen` — unchanged behaviour after the `MaterialApp.router` switch.
-
----
-
-## F03-FE9 — runtime-validation closure (2026-09-06)
-
-**Task:** close the `Runtime Validation Pending` gap (`qa.md §17`) — an `integration_test/` suite + CI wiring + a manual device confirmation list. No product-code change: F03's implementation was contract-compliant and QA found no defect. This is additive test infrastructure.
-
-### Files
-
-| File | Change | Why |
-| --- | --- | --- |
-| `app/test/play/play_session_runtime_test.dart` | **new** — 13 `flutter_test` widget tests covering `qa.md §17` scenarios 1–4 | the **fast, always-green** automated closure; runs in the existing `melos run test` / CI `verify` gate (no device needed). Uses `tester.view.physicalSize` for the 2 surface sizes, `pump(Duration)` for the real animation-window, `handleAppLifecycleStateChanged` for lifecycle, and a shared in-memory `AppDatabase` across a `pumpWidget(SizedBox)` "kill" for resume. |
-| `app/integration_test/play_session_test.dart` | **new** — the same 4 scenario groups on the `integration_test` binding | the on-device / device-matrix form (`flutter test integration_test -d <device>`). Headless `flutter test integration_test/` is slow + timing-sensitive for this app's drift-backed boot (the setup + snapshot read are real async futures that a single `pumpAndSettle` doesn't reliably await), so it is wired as a **best-effort, non-blocking** CI step per `release.md §4` ("failure is investigated, not auto-blocking until F03 lands"). |
-| `.github/workflows/ci.yml` | added an `Integration tests (play session — best-effort)` step to `verify` with `continue-on-error: true` | runs `flutter test integration_test/` after `melos run test` |
-| `melos.yaml` | added `test:integration` script | `flutter test integration_test/` for the app |
-
-### `qa.md §17` scenario coverage (in `play_session_runtime_test.dart`)
-
-| Scenario | Tests | What is proven end-to-end (real widget tree + gesture + animation pump) |
-| --- | --- | --- |
-| **1 — gesture → shift wiring at 2 surface sizes** (AC2/AC3/AC4) | `§17.1` × 6 (small `360×780` + large `430×932`) | a row-0 right swipe on `smoke-tr-01` drives `rowRight(0)` → engine → win → the completion sheet; a `(6,4)` sub-threshold drag → `MOVES` stays 0, no sheet; a vertical drag on a `columnMovesEnabled:false` puzzle → engine rejects → bounce → `MOVES` unchanged, no error surfaced. Identical behaviour at both sizes. |
-| **2 — 0 double-registered moves during the ~190 ms window** (AC5) | `§17.2` × 2 | after a settled shift starts, `pump(60 ms)` into the window then a **second** `dragFrom` → `MOVES` ticks **once** (the second is dropped, not queued); two `dragFrom`s each with a `pumpAndSettle` between → `MOVES == 2` (each counts only post-settle). |
-| **3 — kill / relaunch resume** (AC10) | `§17.3` × 3 | 3 moves → `pumpWidget(SizedBox)` (disposes the controller) → remount on the **same** `AppDatabase` → `MOVES` restored to 3; then Restart → remount → `MOVES` 0 (restart persisted). A repo-seeded `['R1']` / quota 2 / restarts 1 snapshot → the screen hydrates to `MOVES` 1. A repo-seeded `smoke-tr-06` snapshot with a bogus `thawedFrozenCells: ['2,2']` → after restore the tile at 2,2 renders **`TileStatus.frozen`**, not `thawed` (the cache is re-derived by replay, not trusted). |
-| **4 — app lifecycle** (`architecture.md §12`) | `§17.4` × 2 | `handleAppLifecycleStateChanged(paused)` while a pointer is held mid-drag → the gesture is cancelled, `MOVES` 0, no exception; `paused` fired 50 ms into a shift → the move commits **settled** (`MOVES` 1, not lost, not doubled) and survives a subsequent kill/relaunch; `resumed` is a safe no-op. |
-
-### Manual device / simulator confirmation list (for the next QA pass — `qa.md §17` 5–7, not automatable here)
-
-* **5 — win choreography + tile-state visuals:** the amber fill + the drawn L→R **seam bar** are legible with colour off / in greyscale (accessibility); the bounded ≤ ~600 ms sequence reads as "earned", not a wait; `smoke-tr-05` locked pivot renders the brass ring + pin glyph and never moves while its row rotates; `smoke-tr-06` frozen tile renders the frost fill + crystal border, is immovable, and plays the thaw cross-fade when its row forms a valid word.
-* **6 — portrait lock:** a device rotation attempt leaves the layout unchanged.
-* **7 — navigation:** the quiet back chevron pops to the caller via the button, the system back, and the edge-swipe gesture; it is hidden in `won` (the sheet's Close owns exit); a direct entry to `/play` with an empty stack falls back safely.
-
-### Gates
-
-`flutter analyze` (app, incl. `integration_test/`) + `dart analyze` (6 packages) clean; `dart format --output=none --set-exit-if-changed .` clean; `flutter test` (app) **112/112** green (99 + **13 new F03-FE9**), no regression; the 196 package tests unchanged → **308 workspace tests**. `flutter build ios --release --no-codesign` unaffected (no product-code change). The `integration_test/` suite is analyze-clean and wired into CI as best-effort; its authoritative device-matrix run is `flutter test integration_test -d <emulator>`.
-
-## F03-FE-WON / F03-FE-INTEG — win-sequence rework (2026-09-20)
-
-**Tasks:** `F03-FE-WON` (F03-QA-01: win sequence *then* panel + the `Won composition` of `ui-design.md` §16) and `F03-FE-INTEG` (F03-QA-02: the device-form suite must complete). Authority: `architecture.md` §18 "Won-sequence authority" (contract), `ui-design.md` §16 (design). No controller / persistence / product-AC change.
-
-### Impacted files
-
-| File | Change | Why |
-| --- | --- | --- |
-| `app/lib/play/won_composition.dart` | **new** — `WonTimeline` (regular 940 ms / reduced 660 ms; dock, scrim, panel intervals) and `WonGeometry.compute` (fixed dock, `panelTop ≥ 0.36 H`, 0.8 scale fallback) | one testable source for the §16.2 timeline and §16.3 geometry |
-| `app/lib/play/widgets/docked_row.dart` | **new** — `DockedAnswerRow` (row tiles + drawn seam as one `RepaintBoundary` unit, contact shadow, `ExcludeSemantics`) | §16.3 docked row |
-| `app/lib/play/play_session_screen.dart` | `_PlayBody` → stateful won coordinator: one timeline `AnimationController`, live layout measurement (board / divider / stack), scrim → docked row → panel layers, panel built only from `T0+680 ms`, Retry fade-out (180 ms), `_WonPanelHost` (density fit) | F03-QA-01 sequencing + geometry |
-| `app/lib/play/widgets/puzzle_board.dart` | `rowVacated` (ghost outlines, no board seam/bloom once docked), static win under OS reduce-motion, `tileSizeFor` shared metric | §16.3 ghost slot, §16.2 reduce-motion |
-| `app/lib/rating/completion_panel.dart` | `PanelDensity` (regular / compact / tight), `startReveal` (reveal held until at rest), `spineGlow` (off while the dock carries the glow), **Close tap target 42 → 44 pt** | §16.3 concessions, §16.2 star reveal at rest, §16.5 rule 5 |
-| `app/integration_test/play_session_test.dart` | group 4 rewritten (no frame requested while paused; state asserted from the store at pause; 90 s hang guard) | F03-QA-02 |
-| `app/test/play/won_composition_test.dart` | **new** — 33 tests (pure timeline/geometry + on-screen §16.5 rule) | `F03.WIN-LAYOUT` |
-
-### Task-to-code traceability
-
-| Task | Status | Where | Behaviour |
-| --- | --- | --- | --- |
-| F03-FE-WON — sequencing | **Complete** | `won_composition.dart` `WonTimeline`; `_PlayBodyState._enterWon` / `_buildWonLayers` | T0 = the frame `won` starts; win sequence 0–600 ms unchanged (board `_win`); scrim from 620, dock 600–840, panel built and sliding from 680–940, star reveal (`startReveal`) only at rest ≥ 940; panel/scrim absent before 600 |
-| F03-FE-WON — geometry | **Complete** | `WonGeometry.compute`, `_measure`, `_WonPanelHost`, `DockedAnswerRow`, `PuzzleBoard.rowVacated` | dock centred in `[dividerBottom+12, 0.36 H−16]`, fixed for all rows/variants; panel max height = `stackBottom − 0.36 H`; ghost outlines at home; one glow (panel spine glow off) |
-| F03-FE-WON — reduce motion | **Complete** | `WonTimeline.reduced`, `AnimationBehavior.preserve` on the timeline/retire controllers | static amber row + seam, ≥ 300 ms hold, dock fade 160 ms, scrim + panel fade from 460, at rest ≈ 660 ms |
-| F03-FE-WON — exits | **Complete** | `_leaveWon` / `_retire` | Retry: panel + docked row fade out (180 ms), board re-lights on the restarted grid, `idle`; Next / Close unchanged |
-| F03-FE-INTEG | **Complete** | `integration_test/play_session_test.dart` group 4 | see evidence; hang cause confirmed as harness (frames stop while paused), product behaviour unchanged |
-
-### Authority reconciliation
-
-* Sequencing: F03 §10, F03 `ui-design.md`, F04 `ui-design.md` §4 and `architecture.md` §18 agree — implemented as specified.
-* Geometry: `ui-design.md` §16 wins over F04 `ui-design.md` §5 where they conflict (strip 34–42 % → dock; panel ≤ 64 %; spine glow off) per `architecture.md` §18. The F04 panel's content, copy, ACs, star logic and personal-best logic are untouched.
-* Constants (`dividerGap` 12, `panelGap` 16, `0.36`) are `WonGeometry` statics; the reference-device numbers in §16.3 are not used at runtime — layout is measured.
-* Preserved deviation: §18 perf clarification (12 % dim only, no backdrop blur) stays.
-
-### Behavior preserved
-
-Controller state machine and persistence timing (`completed` snapshot + clear, F04 personal-best write, F05 `_resolveJourneyUnlock`) still trigger at `won`; input stays locked and the back chevron hidden from T0; Retry restarts in place; Next Level (`pushReplacement`), Close (`_popToCaller`) and column-tutorial overlay are unchanged; `CompletionPanel` defaults (`density regular`, `startReveal true`, `spineGlow true`) keep every F04 test and standalone use identical.
-
-### Test evidence by task
-
-| Task / behaviour | Class | Command / action | Target | Result | Provenance / isolation |
-| --- | --- | --- | --- | --- | --- |
-| F03.WIN-LAYOUT: rows 0–4 × Perfect/2★ × 390×844 and 440×956 (20), 393×852 row 4, text scale 1.3, F04 variants first-clear → matched → newBest+Perfect (with Retry), reduce-motion, timeline before/after 600 ms | automated functional | `flutter test test/play/won_composition_test.dart` (part of `melos run test`) | app widget tests, in-memory DB, custom `Puzzle` injected via `playSessionSetupProvider`, `NeverValidWordValidator` | **33/33 PASS** (8 pure + 25 widget) | working tree on HEAD `a136a9b` (uncommitted), 2026-09-20; not the production bootstrap graph |
-| Mutation check | automated | panel start set to 100 ms in `WonTimeline.regular` | same | unit tests **and** the on-screen timeline test FAIL as they must; source restored | proves the ordering assertions are live |
-| F03.INTEG-DEVICE | repeatable integration | `flutter test integration_test/play_session_test.dart -d <UDID>` | iPhone 16 (393×852), iPhone 16e (390×844), iPhone 16 Pro Max (440×956), iOS 18.6 simulators | **12/12 PASS, exit 0** on each (≈ 56 s / 74 s / 57 s; earlier run: group 4 hung 16m46 s) | same tree; integration harness uses in-memory DB + `_bootTo`, not the production root |
-| Regression | automated functional | `melos run analyze` / `melos run format:check` / `melos run test` | workspace | analyze exit 0 (only the pre-existing `looplet_solver` info lint), format exit 0 (152 files, 0 changed), **197 package + 214 app tests pass** (was 181 app) | same tree |
-| Real-app check (developer self-check, **not QA evidence**) | runtime | debug build on iPhone 16, `smoke-tr-06` row-2 win, `simctl recordVideo` + 60 ms frame sheet | iPhone 16 sim | sequence as designed: amber row at home ≈ 0.7 s → ghost + glide → panel rises as the row lands → star reveal after rest; row 2 (previously fully hidden) now visible above the panel | debug build, real `main.dart` root; QA re-verifies independently |
-
-### Findings and notes from this delivery
-
-1. **New bug caught by the tests:** `AnimationController` defaults to `AnimationBehavior.normal`, which collapses durations to ~5 % under OS reduce-motion; the reduced timeline's hold would have vanished. Both won controllers use `AnimationBehavior.preserve`.
-2. **F04 defect fixed in passing:** the Close ("Kapat") tap target was 42 pt tall; §16.5 requires ≥ 44 pt → `minHeight: 44`.
-3. **F03-QA-02 root cause (confirmed by the fix):** on a live binding `handleAppLifecycleStateChanged(paused)` disables frame scheduling, so `pumpAndSettle` issued while paused never completes. Product behaviour was not at fault; `onAppPaused` commits synchronously (now asserted from the store at pause).
-4. **Visual note (design, not a defect claim):** at rest the dimmed board's row 0 remains as a half-cut strip between the docked row and the panel (`Y C D F G` on `smoke-tr-06`). It sits under the 12 % dim + 40 % scrim; the dock overlays the plate's top edge exactly as specified. Tech Lead / QA may judge whether it reads clean.
-5. **Pre-existing, not in scope:** `ui-design.md` §8/§16.2 describe a 30 ms L→R stagger of the amber fill; the tiles switch to `winning` together (one 90 ms scale). Left unchanged.
-6. **Density concessions:** `PanelDensity` steps (compact → tight) on the next frame when the measured panel exceeds `0.64 H − inset`. At scale 1.0 no step is needed on the three simulator sizes; whether the step engaged in the 1.3 text-scale test is not separately asserted (the rule-2 assertion passes either way).
-7. **Not proven here (QA owns):** greyscale legibility, rotation, HOME during a held touch (F03.RUNTIME-LIMITS route A), AC9 highlight capture, and the win frames on real reachable rows through home/CONTINUE.
-
-## F03-FE-CANCEL / F03-FE-REDUCEMOTION — QA-03 / QA-04 rework (2026-09-21)
-
-**Tasks:** `F03-FE-CANCEL` (F03-QA-03: an OS interruption during a held drag committed the swipe) and `F03-FE-REDUCEMOTION` (F03-QA-04: iOS Reduce Motion was not honoured). Authority: `architecture.md` §12 (backgrounding), §18 / `ui-design.md` §16.2 (reduce motion), F04 `ui-design.md` §4/§9 and F05 `ui-design.md` §13 (reduced-motion end states — unchanged). **Visual Scope: none** — no visual output is added or changed on the normal-motion path. Revision: base HEAD `6ad8268` + uncommitted working tree (files below); every result below was produced on that tree.
-
-### Impacted files
-
-| File | Change | Why |
-| --- | --- | --- |
-| `app/lib/reduce_motion.dart` | **new** — `reduceMotionRequested()` = `accessibilityFeatures.reduceMotion \|\| .disableAnimations` | one shared read (iOS flag is `reduceMotion`, Android's is `disableAnimations`) |
-| `app/lib/home_screen.dart`, `app/lib/journey/column_tutorial_overlay.dart` (F05) | reduce-motion read → helper (1 site each) | QA-04 |
-| `app/lib/rating/completion_panel.dart` (F04) | reduce-motion read → helper (2 sites) | QA-04 |
-| `app/lib/play/play_session_screen.dart`, `app/lib/play/widgets/puzzle_board.dart` | reduce-motion read → helper (1 site each) | QA-04 |
-| `app/lib/play/play_session_controller.dart` | `cancelDrag()` — `tracking` → `idle`, line dropped, no move/persist; inert in every other phase | QA-03 |
-| `app/lib/play/widgets/puzzle_board.dart` | `Listener(onPointerCancel)` around the pan `GestureDetector`; `_onPanCancel` and the listener both call `_abort()` | QA-03 |
-| `app/test/play/pointer_cancel_test.dart` | **new** — 5 widget tests, real `PointerCancelEvent` | `F03.CANCEL-TEST` |
-| `app/test/play/play_session_controller_test.dart` | +2 `cancelDrag` tests | `F03.CANCEL-TEST` |
-| `app/integration_test/play_session_test.dart` | +1 group-4 case: cancel, then `paused` (no pump while paused) | `F03.CANCEL-TEST` |
-| `app/test/reduce_motion_test.dart` | **new** — 12 tests (helper truth table; board win; F04 reveal) | `F03.REDUCE-MOTION-FLAG` |
-| `app/test/journey/journey_home_test.dart` (+6), `app/test/journey/column_tutorial_test.dart` (+3), `app/test/play/won_composition_test.dart` (reduce-motion test now runs for both flags, +1) | per-site tests with a no-signal control | `F03.REDUCE-MOTION-FLAG` |
-
-### Retro-bugfix analysis
-
-* **Broken user path (QA-03):** a player holds a swipe, the OS takes the touch away (app switch, system gesture, call) and the half-finished swipe is played as a move.
-* **Root cause — differs from QA's hypothesis.** QA suspected `PuzzleBoard._onPanCancel → _release`. Flutter's `DragGestureRecognizer` reports a `PointerCancelEvent` of an **accepted** pan through `onEnd` (`didStopTrackingLastPointer → _checkEnd`), exactly like a lift-off; `onPanCancel` fires only before the pan slop is crossed. So `onPanEnd` resolved the move and `paused` then committed it. Fixing only `_onPanCancel` is not enough (verified — see the second control below). A render `Listener` receives the cancel before the recogniser's pointer router, drops the drag (`controller.cancelDrag()`), and the `onPanEnd` that follows finds the phase no longer `tracking` and does nothing.
-* **Entry paths:** iOS touch cancel before `paused`/`inactive`; cancel with no lifecycle change (system gesture, call banner); cancel before the pan slop (row never lifted); genuine release inside / outside the plate (unchanged, still resolves); `paused` with the pointer still down and no cancel (existing path — `onAppPaused` handles `tracking`); second-finger / pointer while `inputLocked` (`_onPanDown` ignores it, an abort in a non-`tracking` phase is inert).
-* **State read/written:** `PlaySessionPhase`, `activeLine`, `moveCount`, `appliedMoves` and the persisted snapshot — nothing is written on cancel; `_dragOffset` / `_pressedCell` (board-local) reset.
-* **Unaffected, deliberately:** drag threshold and tie band, `endDrag` resolution, shift/bounce animations, undo/restart, persistence timing, idle-pause path, F04/F05 behaviour.
-* **Matrix:** fresh session (widget tests) · persisted snapshot after cancel + `paused` + `resumed` (`appliedMoves` empty in the store) · alternate path: pre-slop cancel · lifecycle-only `paused` mid-drag (existing integration test, still green).
-
-### Task-to-code traceability
-
-| Task | Status | Where | Behaviour |
-| --- | --- | --- | --- |
-| F03-FE-CANCEL | **Complete** | `puzzle_board.dart` `_onPointerCancel` / `_onPanCancel` / `_abort`; `play_session_controller.dart` `cancelDrag` | a pointer cancel aborts the drag: no move, `MOVES` unchanged, `idle`, nothing persisted; a genuine release (incl. outside the plate) resolves as before |
-| F03-FE-REDUCEMOTION | **Complete** | `reduce_motion.dart`; six call sites: `home_screen.dart:144` (F05 ring), `column_tutorial_overlay.dart:49` (F05), `completion_panel.dart:110` and `:137` (F04), `play_session_screen.dart:367` (F03 won timeline), `puzzle_board.dart:105` (F03 win) | every site honours `reduceMotion` **or** `disableAnimations`; the reduced won timeline (660 ms), F04 end-state reveal, static F05 ring / tutorial ghost now run on iOS |
-
-### `AnimationController.animationBehavior` decision
-
-The won controllers already use `AnimationBehavior.preserve` (kept: the reduced timeline's 300 ms hold must not collapse). Flutter's own duration scaling for `AnimationBehavior.normal` reads only `disableAnimations` (Android); it is **not** triggered by iOS `reduceMotion`, so the helper's explicit branches are what switch iOS to the reduced paths. The board's shift / bounce controllers, the F04 panel's controllers and the home / tutorial controllers keep `normal`: no contract makes the *move* animation itself reduce-motion sensitive (architecture §18 / ui-design §16.2 name the win moment, F04 the reveal, F05 the pulse / bloom / ghost), so on iOS a tile shift still animates at normal speed while on Android `disableAnimations` still collapses it (pre-existing platform difference). **Not changed; flagged for Tech Lead (§16).**
-
-### F04 / F05 change impact
-
-Only the *source* of the reduce-motion flag changed (three files, four call sites). F04/F05 ACs, copy, layout, timing and persistence are untouched; their suites are green. On iOS with Reduce Motion ON they now take the reduced-motion end states their `ui-design.md` already specifies.
-
-### Contract compliance
-
-Screen / route: Preserved · UI state / store state: Extended (`cancelDrag`) · Navigation / back / header: Preserved · Async / lifecycle: Preserved (`onAppPaused` unchanged; the cancel now arrives first) · Backend / error mapping: Not Applicable.
-
-### Test evidence by task
-
-| Task / behaviour | Class | Command / action | Target | Result | Provenance / isolation |
-| --- | --- | --- | --- | --- | --- |
-| F03.CANCEL-TEST — cancel mid-drag then `inactive/hidden/paused/resumed`: no move, store `appliedMoves` empty, next swipe plays; pre-slop cancel; release inside / outside the plate still resolves (1-move win); non-winning release still commits one persisted move | automated functional (widget, real `PointerCancelEvent` via `TestGesture.cancel`) | `flutter test test/play/pointer_cancel_test.dart` | flutter_tester | **5/5 pass** | working tree on `6ad8268`; in-memory drift DB; validator = `NeverValidWordValidator` |
-| F03.CANCEL-TEST — controller | automated functional | `flutter test test/play/play_session_controller_test.dart` | Dart VM | **+2 pass** (`cancelDrag` while tracking; inert in idle / animatingShift) | same |
-| **Negative control 1** | mutation | listener removed **and** `_onPanCancel → _release` restored (old behaviour) | same | mid-drag cancel test **FAILS** (`MOVES` no longer 0) as it must; source restored | proves the test sees the defect |
-| **Negative control 2** | mutation | `_onPanCancel → _abort()` only, **no `Listener`** (QA's literal recommendation) | same | mid-drag cancel test **still FAILS** — the cancel arrives as `onPanEnd` | proves the root cause and that the listener is required; source restored |
-| F03.CANCEL-TEST — device form | repeatable integration | `flutter test integration_test/play_session_test.dart -d <UDID>` | iPhone 16 (393×852), iPhone 16e (390×844), iPhone 16 Pro Max (440×956), iOS 18.6 simulators | **13/13 PASS, exit 0** on each (≈ 19 s test time; 12 prior + the new cancel-then-paused case, no frame requested while paused) | synthetic pointer cancel through the live binding — **not** an OS touch cancel |
-| F03.REDUCE-MOTION-FLAG | automated functional | `flutter test test/reduce_motion_test.dart test/journey/journey_home_test.dart test/journey/column_tutorial_test.dart test/play/won_composition_test.dart` | flutter_tester | **all pass**: helper truth table (none / iOS / Android / both); per site: F03 board win (seam already full at 100 ms), F03 won timeline (static row → hold → fade, both flags), F04 reveal (end state, nothing running), F05 ring (no pulse with a real in-progress session, no terminal bloom), F05 tutorial ghost static — each with a **no-signal control** that proves the animation does run without the flag | `FakeAccessibilityFeatures(reduceMotion: true)` and `(disableAnimations: true)` |
-| **Negative control 3** | mutation | helper reads only `disableAnimations` (old behaviour) | same | every iOS-flag variant **FAILS** (helper, board, F04 reveal, F03 won, F05 ring pulse + bloom, F05 tutorial) while the Android variants pass; source restored | proves the tests distinguish the platform flags |
-| Regression | automated functional | `melos run analyze` / `melos run format:check` / `melos run test` | workspace | analyze exit 0 (**No issues found** in every package and the app), format exit 0 (155 files, 0 changed), **197 package tests (177 in `packages/*` + 20 `looplet_authoring`, unchanged) + 243 app tests pass** (214 → 243: +5 cancel, +2 controller, +12 reduce_motion, +6 home, +3 tutorial, +1 won) | same working tree |
-
-### Not proven here (QA owns — `F03.REDUCE-MOTION-RUNTIME`, LIFECYCLE-LIVE)
-
-* That the real iOS Settings toggle flips `AccessibilityFeatures.reduceMotion` (the tests fake the flags) and that F03 win / F04 reveal / F05 ring visibly follow it.
-* That a real OS app switch during a held drag now yields no move (QA's original repro: hold ≥ 3 s, then `simctl launch` another app). The synthetic cancel proves the handler and event order in Flutter's own dispatch, not the iOS touch cancellation.
-* No developer runtime self-check was run for this delivery (no recording / screenshots) — Visual Scope none; the normal-motion path is unchanged.
-* Physical-finger accuracy (unchanged N3).
+* **Device flows exercised by hand on the simulator** (see Visual Parity Evidence): Home CONTINUE → Play for L4 / L5 / L7 / L23 / L26; row, column and thawing moves; undo quota states; the held restart press; the tutorial hiding under the finger, returning after idle and exiting on the column move; the load error's pill to Home; the chevron-only debug header; a Perfect win at rest at default and AX5.
+* **Restored afterwards:** content size `large` on the 16 and 16e, Reduce Motion 0 on the 16, the level-07 asset in the 16's bundle. The simulators keep seeded test progress.
+* **Not proven here:** the keyboard focus ring at runtime (A11Y-focus), Android (stated limit), and a physical-device frame-rate check.
 
 ---
 
 # WORKFLOW HANDOFF SUGGESTION (NON-AUTHORITATIVE)
 
-* **Completed Tasks:** F03-FE1…FE9, F03-FE-WON, F03-FE-INTEG (earlier) + **F03-FE-CANCEL** and **F03-FE-REDUCEMOTION** (2026-09-21).
-* **Remaining Tasks:** Tech Lead delivery reconciliation, then F03-QA-REVERIFY2 (QA: real OS interruption, real Reduce Motion toggle).
-* **Blockers:** none.
-* **Needs Tech Lead Clarification:** see §16 (below) — shift/bounce animation vs reduce motion; the QA-03 root-cause correction.
-* **Status Suggestion:** Needs Tech Lead Review (then Ready for QA).
-
----
-
-## 16. Needs Tech Lead Clarification (2026-09-21)
-
-1. **Board shift/bounce under reduce motion.** No authority makes the tile shift / bounce reduce-motion sensitive; on iOS it keeps animating, on Android `disableAnimations` collapses it (Flutter default). Kept as is. Decide whether a contract line is wanted (then UI Designer + a follow-up task).
-2. **QA-03 root cause differs from the recorded hypothesis** (cancel of an accepted pan is delivered as `onPanEnd`); `qa.md` F03-QA-03's mechanism note should be read with §"Retro-bugfix analysis" above. No contract change.
+* **Completed Tasks:** F03-FE-D1 — the Loop Glass Play (every non-`won` state), the F05 tutorial re-skin, the §19.8 (2) design-layer additions, the icon swap, strings and semantics, tests, and runtime Visual Parity Evidence on the iPhone 16 / 16e / Pro Max (F03.D1-PARITY).
+* **Remaining Tasks:** the Tech Lead checkpoint (Ready for QA), then F03-QA-D1.
+* **Blockers:** none. NTLC-1 (won dock onto the goal) and NTLC-2 (three design-layer edits) need a ruling at the checkpoint; NTLC-3 … NTLC-6 are informational.
+* **Status Suggestion:** Needs Tech Lead Review — checkpoint → Ready for QA.
 
 ---
 
 ## 19. Sonraki Komut
 
-```
+```text
 Run Tech Lead
 ```

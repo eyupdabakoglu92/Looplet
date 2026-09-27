@@ -1,13 +1,14 @@
-import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/widgets.dart';
 import 'package:looplet_core/looplet_core.dart' show TileStatus;
 
+import '../../design/icons.dart';
 import '../play_theme.dart';
 
-/// One grid cell (`ui-design.md` §7 "Tile"). Backlit-keycap look for neutral /
-/// thawed; a brass ring + pin glyph for `locked`; a frosted fill + crystal
-/// border for `frozen`; an amber resolution fill when [winning]. Every special
-/// state carries a non-colour cue (accessibility, `prd.md` §6).
+/// The legacy (Direction A) grid cell, kept **only for the `won` moment** until
+/// Phase D2 (F03 `ui-design.md` §11.1, §16): the amber winning row on the board
+/// and in the docked answer row. Every other Play state renders the Loop Glass
+/// `TileFace`. A `locked` tile keeps its brass ring; its pin glyph is now the
+/// drawn lock icon (no Material icon remains in the app, §11.4).
 class BoardTile extends StatelessWidget {
   const BoardTile({
     required this.letter,
@@ -92,8 +93,8 @@ class BoardTile extends StatelessWidget {
           alignment: Alignment.center,
           children: <Widget>[
             if (locked)
-              Icon(
-                Icons.push_pin,
+              LoopIconView(
+                LoopIcon.lock,
                 size: size * 0.62,
                 color: PlayTheme.brass.withValues(alpha: 0.18),
               ),
