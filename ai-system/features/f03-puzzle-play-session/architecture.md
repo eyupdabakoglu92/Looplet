@@ -302,6 +302,10 @@ The app still shows the pre-Foundation look (incident 2026-09-26). Play — the 
    * **Free text** — the hint, labels outside a container, body text — follows the OS text scale up to `accessibility-extra-extra-extra-large` (AX5) with no clipping, overlap or mid-word break. The layout may reflow; for example, the hint pill may grow.
    * **Text bound to a fixed-size container** — tile, rail and answer glyphs, card numerals and captions, pill labels, the wordmark, and the display / headline roles — uses `loopCappedTextScaler` (1.3× cap, `app/lib/design/tokens.dart`) and is sized by its container.
    * Play never scrolls, and the board geometry does not change with text scale.
+   * **Applied to Play (ruling at the D1 checkpoint, 2026-09-27; `ui-design.md` §14.1):** on Play every text role sits in fixed chrome or a container, so every Play text role uses the 1.3× cap. This covers the header label, `HEDEF DÖNGÜ`, the `HAMLE` card, the rail and tile glyphs, and the tutorial hint pill.
+     * This supersedes the "hint = free text" example above.
+     * VoiceOver carries the full text.
+     * Free text up to AX5 applies where the layout can reflow or scroll — on D1, the load-error screen.
 2. **Tutorial HUD (C-5):**
    * The hint pill sits **above** the HUD; undo and restart stay visible and usable while the tutorial is up, because the player may make row moves before the column move.
    * The gesture ghost hides on touch-down and returns once the board is idle.
@@ -374,3 +378,32 @@ The app still shows the pre-Foundation look (incident 2026-09-26). Play — the 
   * Delivery Review Accepted.
 
   F03 then returns to Done, and D2 is activated.
+
+### 19.8 Visual-gate checkpoint rulings (Tech Lead, 2026-09-27)
+
+The F03-UI-D1 handoff (`ui-design.md` §1–§14, 28 renders, motion prototype; commit `4223c55`) is **accepted**. The Visual Quality Gate is **Ready for Implementation**. The rulings on `ui-design.md` §14:
+
+1. **Text cap on the whole of Play (§14.1): accepted**, as written into §19.3 (1).
+2. **Design-layer edits (§14.2): in D1 scope** as a cross-feature item. F00 stays Done — the same precedent as the F05 overlay (§19.5) and the 2026-09-20 F04 edit.
+   * **Allowed in `app/lib/design`:**
+     * `TileFace` and `RailTile` glyphs take `loopCappedTextScaler` — without it they overflow at AX5;
+     * the pressed fill of `_Pressable` glass controls (fill .075 → .14, edge .07 → .18);
+     * a new drawn `LoopIcon.loopBreak`, path in `ui-design.md` §7;
+     * new decoration widgets: active-line rails, tutorial ghost ring, hint pill, loading skeleton cell.
+   * **Requirements:** each change needs component tests; the existing F00 design tests stay green; the debug gallery may show the new pieces.
+   * **Not allowed:** token value changes or new dependencies.
+3. **Hint-pill fallback (measured at the checkpoint):**
+   * On the 390 × 844 render at the 1.3× cap, the pill clears the board card by 4.5 pt and the undo pill by 4.0 pt. The handoff table's 5.1 pt left out the 1 px border.
+   * Flutter line metrics may differ. If the device run measures under 4 pt, the pill's vertical padding drops from 7·s to 5·s above a 1.15× text scale.
+   * This fallback is pre-agreed; no new handoff round. Any other deviation is Needs Tech Lead Clarification.
+4. **Consumed-quota dot:** stays at 25 % lime (decorative; the count is carried by the bright dots and the semantics).
+5. **Non-Journey header:** the chevron alone. Daily's header belongs to F07.
+6. **New copy:** `HEDEF DÖNGÜ`, `SEVİYE NN`, `Bu bulmaca yüklenemedi.` and `Ana ekrana dön` ship as interim copy through `PlayStrings` (decision 6). PO / localization may revise it (F10-UI-LOCALIZATION).
+7. **Evidence expected from Frontend** (`frontend.md` § Visual Parity Evidence, gate schema):
+   * `runtime-screenshot` records for every `ui-design.md` §12a row on the iPhone 16, plus 16e / Pro Max for idle, tutorial and column drag;
+   * `parity-comparison` composites against the D1 / S renders, with a deviation list;
+   * a `runtime-video` screen recording of a row lift, a column lift, a thaw, and the tutorial ghost hiding and returning;
+   * `accessibility` records for OS text at default, xxxLarge and AX5, and for Reduce Motion on and off.
+8. **Informational items:**
+   * D2 follows D1 with no release in between — there is no distribution anyway.
+   * The frozen-row content observation is logged in `workflow-follow-ups.md` (content), outside F03.

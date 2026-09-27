@@ -40,11 +40,11 @@ features/f03-puzzle-play-session/orchestration.md
 
 ## Current Phase
 
-Design Adoption Phase D1 — Loop Glass Play visual rework (F03-UI-D1, carrier F03)
+Design Adoption Phase D1 — Loop Glass Play visual rework (F03-FE-D1, carrier F03)
 
 ## Current Role
 
-UI Designer
+Frontend/Mobile Developer
 
 ## Current Reason
 
@@ -56,36 +56,39 @@ UI Designer
 * it fixes four shipped defects (A-1, A-2 board, A-5, A-6);
 * D2's transition starts from the new board.
 
-F03 is therefore reopened as visual rework (`existing-parity`, architecture §19). The UI Designer first delivers the Loop Glass Play handoff with renders for the states still missing.
+F03 is therefore reopened as visual rework (`existing-parity`, architecture §19). The UI Designer's Loop Glass Play handoff was accepted at the visual-gate checkpoint (2026-09-27; gate Ready for Implementation; rulings §19.8). Frontend now implements it.
 
 ## Last Completed Action
 
-Tech Lead on 2026-09-27:
-* **Reconciliation of F00-UI-CONFORMANCE-AUDIT** (commit cc84440):
-  * checks: the 49 evidence files and their runtime dimensions; the commit scope (F00 only, no `app/` change); the code claims (six Material icons, system font, `PlayTheme` values, the tutorial hint position, no thaw transition, the English `StoreErrorScreen`, the white iOS launch screen); and the PRD claims;
-  * one correction: Android's launch background is white only in light mode;
-  * Delivery Review Accepted.
-* **Decisions:**
-  * the Phase D slices and carriers — D1 F03, D2 F03 (+ F04), D3 F05 (+ shell, F08 error screen);
-  * rulings C-2, C-5, C-8, C-9 and C-10 in F03 architecture §19;
-  * C-3: no PO revision needed; the F05 wording is resynced at D2;
-  * C-4, C-6, C-7 and C-11 as slice inputs;
-  * C-1 (N1) deferred to D3 as a product decision.
-* **Closure and reopen:**
-  * F00 closed Done again, with terminal cleanup;
-  * F03 reopened for D1: architecture §19; §13 and §18 amended; F05 architecture §9 amended; F03-UI-D1 Open, F03-FE-D1 and F03-QA-D1 Queued, with three PENDING evidence records;
-  * design-foundation §18 correction note; workflow-follow-ups (Phase C done, Phase D active, outcome and rulings).
+Tech Lead on 2026-09-27 — **the D1 visual-gate checkpoint for F03-UI-D1** (commit 4223c55).
+* **Verified independently:**
+  * the committed generator regenerates all 32 HTML / job files byte for byte;
+  * every manifest path exists (28 renders);
+  * §16 is byte-identical to the pre-D1 file;
+  * no `app/` file was touched;
+  * a pixel scan measured 4.5 / 4.0 pt of hint clearance in the tightest case (16e, 1.3×). The handoff's 5.1 pt left out the border; this is corrected in ui-design §6.
+* **Accepted:** Delivery Review Accepted; Visual Quality Gate Ready for Implementation.
+* **Rulings** (F03 architecture §19.8):
+  * the 1.3× cap covers all Play text (§19.3 (1) amended);
+  * design-layer edits are in D1 scope, with tests;
+  * the hint-padding fallback is pre-agreed;
+  * the consumed dot stays at 25 %;
+  * non-Journey sources show the chevron only;
+  * the interim copy ships as proposed;
+  * Frontend's evidence expectations are listed.
+* **Content note:** the frozen-row observation was verified and extended — with the provisional dictionary, L26, L27, L28 and L30 can never thaw. Logged as FROZEN-ROW-THAW-CONTENT.
+* **Opened:** F03-FE-D1 for the Frontend/Mobile Developer.
 
 ## Next Expected Action
 
-Run UI Designer on F03-UI-D1 (Current Brief in the F03 orchestration): the Loop Glass Play handoff in F03 `ui-design.md`, with real renders for the ten D1 states still missing and the §19.3 rulings applied. No code.
+Run Frontend/Mobile Developer on F03-FE-D1 (Current Brief in the F03 orchestration): implement the Loop Glass Play from the accepted D1 handoff (`ui-design.md` §1–§14; acceptance list §11.5; F03 architecture §19 and §19.8), with `frontend.md` Visual Parity Evidence. The won moment stays legacy until D2.
 
-It returns to the Tech Lead for the visual-gate checkpoint (Ready for Implementation). The next steps are F03-FE-D1 (Frontend) → Tech Lead → F03-QA-D1 (independent visual QA ≥ 93). Then come D2 and D3; F08 local evidence follows the design adoption.
+The next steps are: the Tech Lead checkpoint (Ready for QA) → F03-QA-D1 (independent visual QA ≥ 93) → D2, then D3. F08 local evidence follows the design adoption.
 
 ## Portfolio Summary
 
 * F01, F02, F04, F06: historical scoped Done retained.
-* F03: Rework — the active feature, reopened 2026-09-27 as Design Adoption Phase D1 (Loop Glass Play, `existing-parity`, architecture §19; F03-UI-D1 with the UI Designer). The prior closure (final QA Approved with Notes, 2026-09-21) covered behaviour and accessibility only. After D1, F03 carries D2 (the won moment + full-screen result).
+* F03: Rework — the active feature, reopened 2026-09-27 as Design Adoption Phase D1 (Loop Glass Play, `existing-parity`, architecture §19; handoff accepted 2026-09-27, F03-FE-D1 with the Frontend/Mobile Developer). The prior closure (final QA Approved with Notes, 2026-09-21) covered behaviour and accessibility only. After D1, F03 carries D2 (the won moment + full-screen result).
 * F00: Done again (2026-09-27) — Phase C is complete (the conformance audit was accepted). Its design-system layer closed 2026-09-26: Foundation Selected (Direction C), 90/100, Visual Quality Gate Passed via the scoped exception F00.VISUAL-93-THRESHOLD.
 * F05: Done (2026-09-27) — final QA Approved with Notes after the F05-FE3 rework. Its tutorial overlay is re-skinned in D1 under F03 (behaviour unchanged). Its home is re-composed in D3 (F05 carrier), where N1 needs a product decision.
 * F04: Done — the panel is replaced by the full-screen result in D2 (F03 carrier, F04 amendments).

@@ -212,6 +212,8 @@ The layout is authored in the 358 × 717 reference and scaled by width: `s = W /
 
 The rule: the pill never overlaps the board card or the HUD, with ≥ 4 pt of clearance. The sparkle icon is hidden above 1.15× to keep two lines.
 
+*Tech Lead checkpoint correction (2026-09-27):* a pixel scan of `D1-v-16e-tutorial-text-ax5-capped.png` measures 4.5 pt above the pill and 4.0 pt below it. The table's computed 5.1 pt left out the pill's 1 px border. The rule still holds, with no margin to spare. The pre-agreed fallback is in `architecture.md` §19.8 (3): padding 7·s → 5·s above 1.15× if the device run measures under 4 pt.
+
 **Rhythm.** The screen reads as three bands:
 1. the header — back + level left, the `HAMLE` card right;
 2. the goal (caption + rail) and the board card, which form one visual unit;
