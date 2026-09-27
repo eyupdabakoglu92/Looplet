@@ -32,64 +32,56 @@ feature-board.md for portfolio; features/*/orchestration.md for execution; role-
 
 ## Active Feature
 
-F05
+F00
 
 ## Active Orchestration Path
 
-features/f05-journey-progression/orchestration.md
+features/f00-design-foundation/orchestration.md
 
 ## Current Phase
 
-F05 journey-progression — final-stage re-QA (F05-QA-STRICT2) after the F05-FE3 rework
+Design Adoption Phase C — conformance audit (F00-UI-CONFORMANCE-AUDIT, carrier F00)
 
 ## Current Role
 
-QA
+UI Designer
 
 ## Current Reason
 
-F05-QA-STRICT (2026-09-26) rejected F05's final QA on three defects:
-* the strict gate enforced no band rule;
-* `content:check` had a `levels`-key bypass;
-* the home read-model was stale within a session (AC7 on the replay path).
+F05 closed Done on 2026-09-27: QA Result Approved with Notes, all required evidence PASS. The incident decision of 2026-09-26 therefore applies — the design integration takes the next slot, ahead of F08.
 
-The F05-FE3 rework (2026-09-27) fixed all three.
+The Foundation (Direction C "Loop Glass") is Selected and the design-system layer exists in `app/lib/design/`, but no shipped screen uses it yet. Phase C measures the gap between every shipped surface and the Selected Foundation, so that Phase D can reopen F03/F04/F05 in the right order with the right contract amendments.
 
-**Tech Lead reconciliation (2026-09-27):** the Tech Lead did not rely on the green suite. It read every gate check and ran its own negative cases on real content, using rule/level pairs not used before; the one-byte bundle drift test failed as expected; the new home tests fail against the old provider. `flutter analyze` is clean and the app suite is 336/336.
-
-**Evidence:** the QA evidence records are re-opened as PENDING. F05.SHARED-RUNTIME is re-opened too, because `ActiveSessionRepo` — the resume read path — changed.
+F00 is re-activated as the carrier: its PRD defines it as the Design Adoption Route's carrier, and its architecture §1 lists Phase C.
 
 ## Last Completed Action
 
-Tech Lead reconciled F05-FE3 on 2026-09-27:
-* Delivery Review = Accepted;
-* F06.CONTENT-PROMOTE-RECONCILE = PASS;
-* F05.STRICT-CONTENT, F05.HOME-LIVE-STATE and F05.SHARED-RUNTIME set to PENDING for re-verification;
-* QA plan locked — final, client-only, core + client-ui + stateful-flow, full, allowed. The `content` module was dropped: qa-preflight failed it because there is no `content-design.md`. The validator positive/negative-fixture check is required in the brief instead. Preflight PASS;
-* F05-QA-STRICT2 activated.
+Tech Lead on 2026-09-27:
+* **F05 closure:**
+  * reconciled F05-QA-STRICT2 — re-ran QA's own gate probe (21/21) and home edge probe (7/7); no code changed after QA's candidate;
+  * decided QA note N1 as an assumption — with 30/30 complete, the terminal state wins over an in-progress replay (AC9, ui-design and the shipped behaviour). F05 architecture §8/§6 were clarified and the UX question moved to Phase D;
+  * closed F05 Done with terminal cleanup.
+* **Phase C activation:** re-activated F00 as the carrier, added its architecture §8 (the audit contract) and activated F00-UI-CONFORMANCE-AUDIT for the UI Designer.
 
 ## Next Expected Action
 
-Run QA on F05-QA-STRICT2 (Current QA Brief in the F05 orchestration):
-* independently verify the three closures — the gate rule → check → negative mapping, the mirror, the `content:check` recognition, and the home warm == cold at runtime including the replay path;
-* re-verify the shared runtime (F03 device suite + AC7 kill/relaunch);
-* run full regression.
+Run UI Designer on F00-UI-CONFORMANCE-AUDIT (Current Brief in the F00 orchestration). For every shipped surface and state, pair a fresh runtime capture with its target render and record:
+* the gap list;
+* a Visual Scope proposal;
+* contract impacts;
+* future-scope exclusions;
+* missing renders;
+* a proposed Phase D order.
 
-The verdict returns to the Tech Lead.
-
-After F05 closes, the Design Adoption Route takes the next slot:
-1. Phase C — UI Designer + Tech Lead audit of the F03/F04/F05 screens against the selected renders.
-2. Phase D — the screens are redesigned one at a time, each through independent visual QA.
-
-F08 local evidence follows the design adoption (incident 2026-09-26).
+No code. The audit returns to the Tech Lead, who decides the Visual Scope per feature, the reopen order and the contract amendments, and activates the first Phase D surface. F08 local evidence follows the design adoption.
 
 ## Portfolio Summary
 
 * F01, F02, F04, F06: historical scoped Done retained.
 * F03: Done — final QA Approved with Notes (2026-09-21); Visual Scope none covered behaviour/accessibility only; visual surface pending the Design Adoption Route.
-* F00: Done (2026-09-26) — cross-cutting Design Foundation track, Visual Scope design-system; Foundation Selected (Direction C, 2026-09-21); QA-01/02/03/04 all fixed and independently confirmed, 90/100; Visual Quality Gate Passed via a user-resolved scoped one-time exception (F00.VISUAL-93-THRESHOLD option C, not a rubric change). No shipped screen uses the new design yet (by scope). Design Adoption Route Phase C is scheduled for right after F05 closes (incident 2026-09-26).
-* F05: In QA — the active feature. F05-QA-STRICT was Rejected on 2026-09-26. The F05-FE3 rework was delivered and Tech Lead-reconciled on 2026-09-27, and the final re-QA F05-QA-STRICT2 is now active.
-* F08: In Progress, queued; independent local/emulator validation pending, release task Blocked, release/final acceptance pending.
+* F00: In Progress — the active feature, re-activated 2026-09-27 as the carrier of Design Adoption Phase C (F00-UI-CONFORMANCE-AUDIT, UI Designer). Its design-system layer closed Done on 2026-09-26: Foundation Selected (Direction C), 90/100, Visual Quality Gate Passed via the scoped one-time exception F00.VISUAL-93-THRESHOLD. No shipped screen uses the new design yet; that is Phase D.
+* F05: Done (2026-09-27) — final QA Approved with Notes after the F05-FE3 rework: an enforced strict content gate and a live home read-model. N1 (terminal state vs in-progress replay) was moved to Phase D. The home and tutorial keep their legacy visuals until Phase D.
+* F08: In Progress, queued behind the design adoption (Phase C/D); independent local/emulator validation pending, release task Blocked, release/final acceptance pending.
 * F07, F09–F13: Not Started. Pending follow-ons are in workflow-follow-ups.md.
 
 ## Release Decision

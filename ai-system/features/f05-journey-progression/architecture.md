@@ -5,6 +5,8 @@
 * §6 + §10: the read-model is live on both sources. The one-shot snapshot read was the root cause of F05-QA-STRICT-3. The replay-in-progress semantics are clarified and unchanged.
 * §15: QA focus now covers the warm path and the negative cases.
 
+**Amended 2026-09-27 (Tech Lead — F05 closure):** §8 + §6 now state terminal precedence explicitly. When all 30 levels are complete, the terminal variant wins over an in-progress replay; this matches AC9, ui-design and the shipped behaviour (QA note N1). To be revisited in Design Adoption Phase D.
+
 Contract authority for F05. Execution state is in `orchestration.md`.
 
 ---
@@ -152,7 +154,7 @@ Derived from `journey_progress` + the persisted active-session snapshot, **both 
   * `unlockedIncomplete` ⇔ `n <= highestUnlockedLevel && n ∉ completedLevels`;
   * `inProgress` ⇔ an F08 snapshot exists with `puzzleSource == journey && status == inProgress && parseJourneyLevel(puzzleId) == n` (at most one).
     * This **includes a replay of an already-completed level**: for that level the in-progress state takes precedence over `completed`, and `progressCount` is unaffected.
-    * CONTINUE therefore resumes the replay (product AC7: "Given an in-progress level … that level resumes").
+    * CONTINUE therefore resumes the replay (product AC7: "Given an in-progress level … that level resumes") — except in the terminal state, where §8's terminal precedence applies.
     * These semantics are unchanged; clarified 2026-09-26.
 * `currentLevel` (for CONTINUE) = the `inProgress` level if any, else `min({n : unlockedIncomplete})`, else `null` (all 30 done → terminal).
 * `progressCount` = `|completedLevels ∩ {1..30}|` (clamp — ignore strays).
@@ -179,6 +181,10 @@ Derived from `journey_progress` + the persisted active-session snapshot, **both 
 
 * **Routes:** reuse `/` (home) and `/play`. **No new route.** The terminal "all complete" state and the tutorial overlay are **in-screen states**.
 * **CONTINUE** (home primary CTA): resolve `currentLevel` (§6). If `null` → render the terminal home variant in place. Else `context.push('/play', extra: PlaySessionArgs(source: journey, journeyLevel: currentLevel))`.
+  * **Terminal precedence [amended 2026-09-27, F05 closure — QA note N1].** Once all 30 levels are complete (`progressCount == 30`), the home renders the terminal variant (AC9; ui-design: `TEKRAR OYNA` → level 1), even when a replay of a completed level is in progress.
+    * That replay is not surfaced; starting another level supersedes its save.
+    * This is an accepted edge with low impact: it only affects post-completion personal-best replays. It is the shipped and QA-verified behaviour.
+    * To be revisited when the home is redesigned in Design Adoption Phase D.
 * **`Next Level`** (fills F04's `CompletionPanel.onNextLevel`): let `n = <this session's journeyLevel>`. If `n != null && n < 30 && manifest has n+1` → `context.pushReplacement('/play', extra: PlaySessionArgs(source: journey, journeyLevel: n + 1))`. Else → `context.go('/')` (home → terminal variant). **`pushReplacement`** so the back stack never accumulates `/play` frames.
 * **Back:** unchanged from F03 — chevron hidden in `won`; `Close` / system / gesture back → `_popToCaller`, which **must resolve to `/`** (add a `context.go('/')` fallback when `!canPop`, e.g. a deep-link entry). From any Journey level, back lands on `/`.
 * **Route graph:** `/` ⇄ `/play` only. Every `/play` exit → `/`. No 30-deep stack. No wrong-route, no empty stack.

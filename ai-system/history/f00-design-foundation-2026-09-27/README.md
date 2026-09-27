@@ -1,0 +1,3 @@
+# F00 working record — 2026-09-27 (Design Adoption Phase C activation)
+
+`orchestration-before-phase-c.md` is the byte-for-byte terminal orchestration of F00 as closed on 2026-09-26: Done, the Visual Quality Gate Passed via the scoped exception F00.VISUAL-93-THRESHOLD, and the full decision and evidence records. It was taken right before the Tech Lead re-activated F00 on 2026-09-27 as the carrier of Design Adoption Phase C (task F00-UI-CONFORMANCE-AUDIT). This follows the incident of 2026-09-26: the redesign had no scheduled slot after F00 closed, and Phase C was scheduled for right after F05's closure.

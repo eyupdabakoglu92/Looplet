@@ -6,19 +6,19 @@ F00
 
 ## Current Status
 
-In Progress
+Done
 
 ## Current Owner
 
-UI Designer
+-
 
 ## Next Role
 
-UI Designer
+-
 
 ## Active Task Ledger
 
-- [ ] Task ID: F00-UI-CONFORMANCE-AUDIT | Assigned Role: UI Designer | Status: Open | Summary: ACTIVATED 2026-09-27 by the Tech Lead (Design Adoption Route Phase C, scheduled by the incident of 2026-09-26 for right after F05's closure). Conformance audit of every shipped surface against the Selected Foundation (architecture.md §8): fresh runtime captures of the current app paired with the selected-source renders; a per-state gap list; Visual Scope proposals; contract impacts; future-scope exclusions; missing renders; a proposed Phase D order. Deliverable conformance-audit.md + design/audit/. No code, no new directions. See Current Brief | Depends On: -
+None
 
 ## Open Tasks
 
@@ -159,18 +159,9 @@ None
 
 ## Next Action
 
-Run UI Designer on F00-UI-CONFORMANCE-AUDIT (Current Brief below; architecture.md §8). Deliver `conformance-audit.md` + `design/audit/` evidence, set Delivery Review = Pending and hand back to the Tech Lead. The Tech Lead then decides Visual Scope per feature, the Phase D reopen order and the contract amendments, and activates the first Phase D surface.
+-
 
 ## Last Decision
-
-2026-09-27 (Design Adoption Phase C activation) — F05 closed Done today, so the incident decision of 2026-09-26 applies: Phase C takes the next slot, ahead of F08.
-* **Carrier:** F00 is re-activated as the carrier. Its PRD already defines it as the carrier of the Design Adoption Route, and its architecture §1 lists "Phase C conformance audit of shipped surfaces" as a later stage. A new carrier could never satisfy the terminal rules (final QA, visual gate) for a no-code audit.
-* **Gate record:** unchanged — Visual Scope design-system, Visual Quality Gate Passed via F00.VISUAL-93-THRESHOLD, QA Result Approved with Notes all refer to the shipped design-system layer. The audit ships no UI.
-* **Contract:** architecture.md §8 added (audit contract).
-* **Task:** F00-UI-CONFORMANCE-AUDIT activated for the UI Designer.
-* **Phase D:** it will reopen F03/F04/F05 one surface at a time, each under its own contract amendment and visual gate. It does not run under F00.
-
-The pre-activation terminal snapshot is in history/f00-design-foundation-2026-09-27/orchestration-before-phase-c.md.
 
 Full history through 2026-09-26 (Direction A/B rejection, Foundation Selected, design-system delivery, F00-QA-VISUAL Rejected 80/100, F00-FE-A11Y-REWORK, F00-QA-VISUAL2's Approved-with-Notes mistake corrected to Rejected 88/100, F00-FE-A11Y-REWORK2, F00-QA-VISUAL3's Rejected 90/100) is archived byte-for-byte in `history/f00-design-foundation-2026-09-{21,23,24,26}/` (each folder's README explains its checkpoint; the newest is [orchestration-at-93-threshold-decision.md](../../history/f00-design-foundation-2026-09-26/orchestration-at-93-threshold-decision.md)). Summary: every named defect across four QA rounds (QA-01 Dynamic Type, QA-02 duplicate semantics, QA-03 missing focus ring, QA-04 text-wrap at extreme scale) is now fixed and independently confirmed.
 
@@ -181,16 +172,12 @@ Full history through 2026-09-26 (Direction A/B rejection, Foundation Selected, d
 ## Last Update
 
 * Updated By: Tech Lead
-* Timestamp: 2026-09-27
-* Summary: F00 re-activated as the Design Adoption Phase C carrier (F05 closed; incident decision 2026-09-26). architecture.md §8 added; F00-UI-CONFORMANCE-AUDIT activated; owner → UI Designer.
+* Timestamp: 2026-09-26
+* Summary: User resolved F00.VISUAL-93-THRESHOLD with option C (scoped one-time exception). Visual Quality Gate set to Passed, QA Result to Approved with Notes, both explicitly reasoned on the decision gate. Full Terminal Cleanup applied — F00 is Done.
 
 ## Context & Follow-ups
 
-* **Phase status:** Phase A and Phase B are done — the Foundation is Selected and the design-system layer plus gallery shipped and passed. No shipped screen uses the new design yet (by scope).
-* **Phase C (now):** the conformance audit.
-* **Phase D (next):** F03/F04/F05 visual rework, one surface at a time, each with its own contract amendment (DESIGN-ADOPTION-CONTRACT-AMENDMENTS) and visual gate.
-* **Input for Phase D:** F05's closure note N1 — the terminal state vs an in-progress replay.
-* **F08 local evidence** is queued behind the design adoption (incident 2026-09-26).
+Why now: the ai-system upgrade (cfd6b59) made an independent visual gate (>= 93 total, every rubric dimension >= 8, rendered evidence) mandatory for visual scope, and the project has no Selected Foundation; shipped visuals use the default system font, Material icons and text-only legacy directions with self-scores only. F05-QA-STRICT and F08 local evidence continue in parallel queue positions (they are Visual Scope none / non-visual); no feature with a visual scope activates before Selected.
 
 ## History & Evidence References
 
@@ -223,56 +210,10 @@ Full history through 2026-09-26 (Direction A/B rejection, Foundation Selected, d
 * 2026-09-26 — QA: F00-QA-VISUAL3 Done with verdict Rejected (qa.md: QA-04's remaining item confirmed RESOLVED with fresh own runtime evidence, zero regression, rescored 90/100 of 100, every dimension >= 8, no fail condition; key finding — the shortfall is no longer one fixable item, it combines the rubric's unconditional Motion cap with real environment-testing limits this project currently cannot close); F00.VISUAL-QA3 PASS (mandated scope); QA Result Rejected; owner -> Tech Lead.
 * 2026-09-26 — Tech Lead: F00-QA-VISUAL3 reconciled; personally verified QA's cited gaps (closed the accessibility-category sweep gap with fresh evidence; confirmed the other two are genuinely outside this session's tools); opened decision gate F00.VISUAL-93-THRESHOLD and routed to the user; Current Status = Blocked; owner/next stay Tech Lead.
 * 2026-09-26 — Tech Lead: user resolved F00.VISUAL-93-THRESHOLD (option C, scoped one-time exception); Visual Quality Gate = Passed; QA Result = Approved with Notes; Terminal Cleanup applied (ledger/handoff cleared, owner/next/action = -); F00 Done.
-* 2026-09-27 — Tech Lead: F00 re-activated as the Design Adoption Phase C carrier (F05 closed; incident decision 2026-09-26); architecture.md §8 added; F00-UI-CONFORMANCE-AUDIT activated; owner → UI Designer.
 
 ## Current Brief
 
-**F00-UI-CONFORMANCE-AUDIT — Design Adoption Phase C (activated 2026-09-27; contract: architecture.md §8)**
-
-**Why:** the user sees the old design in the app. The Foundation (Direction C "Loop Glass") is Selected, and the design-system layer (`app/lib/design/`) and gallery exist. No shipped screen uses them yet — that is Phase D. This audit is the planning input that lets the Tech Lead reopen the right surfaces in the right order, with the right contract amendments.
-
-**Inputs:**
-* **Authority:**
-  * `project-authority/design-foundation.md` — Selected; §18 is the user's decision set. It includes the full-screen result without Close, the `Looplet` wordmark, the reference's Turkish copy as proposed copy, and the future-scope items.
-  * `features/f00-design-foundation/ui-design.md` — the design-system handoff and §11, the board → full-screen result motion spec.
-* **Target renders:** `design/S-*.png`:
-  * S-01 / S-01b play idle; S-02 lifted row; S-03 locked + frozen;
-  * S-04 / S-04b / S-05 result perfect / new best / 2★;
-  * S-06 / S-06b home design / today; S-07 column tutorial;
-  * S-08…S-16 transition incl. the reduced-motion frames; S-91 components;
-  * device variants S-v-*.
-* **Current app:** build `app/lib/main.dart` (debug) on the iPhone 16 simulator (`D0011CE7-6E50-4367-93FA-B323E81270BE`, 393×852 pt, `platform.md` §14):
-
-  ```bash
-  cd app && flutter build ios --simulator --debug -t lib/main.dart && xcrun simctl install booted build/ios/iphonesimulator/Runner.app
-  ```
-
-  * Use a fresh install for new-player states.
-  * The home's debug row (`L01 L02 L04 L05 L06` — the smoke set) is a shortcut to locked-tile (L04) and frozen-tile (L05) boards.
-  * Journey levels 1–2 solve with row-0 left ×2 (L1) and row-3 left ×2 (L2) — handy for the win sequence and result states.
-* **Design-system layer in code:** `cd app && flutter run -t lib/main_gallery.dart` (the component gallery), to note which Foundation components already exist in code for each gap.
-* **Legacy handoffs:** F03 / F04 / F05 `ui-design.md`, plus their `architecture.md` for contract constraints (e.g. F03 §16 won-moment timing, F04 Close/back, F05 §8/§10 home and terminal).
-* **Portfolio notes:** workflow-follow-ups DESIGN-ADOPTION-CONTRACT-AMENDMENTS and USER-REFERENCE-CONTENT-DELTAS; F05 closure note N1 — with 30/30 complete, the terminal state wins over an in-progress replay (architecture F05 §8). Say whether the redesigned home should surface such a replay.
-
-**Deliver** `features/f00-design-foundation/conformance-audit.md`, with captures and side-by-side pairs under `design/audit/`, per architecture.md §8.3:
-1. **Per surface and state:** a current capture paired with its target render; a gap list by category (layout, typography, colour/surface, iconography, components, copy/casing, motion, accessibility); a Visual Scope proposal with its reason; contract/AC impacts; future-scope exclusions; states with no target render yet.
-2. **Surfaces to cover:**
-   * F05 home — new, mid, in-progress, terminal; plus the splash and bootstrap-error shell.
-   * F03 play — idle, lifted row, column drag, locked, frozen and thaw, HUD undo states, back, target rail, load-error.
-   * F03 won moment + F04 panel — win sequence; 3★ / 2★ / 1★; first clear / new best / matched; each CTA; reduced motion.
-   * F05 column tutorial.
-3. **Proposed Phase D order and grouping,** with a rationale — player-visible impact, which `app/lib/design` components are reused, risk, and contract size.
-4. **Matrix and manifest:** a Screen / State / Viewport matrix and a Visual Evidence Manifest (`runtime-screenshot`, `parity-comparison`).
-
-**Non-goals:** no code or asset changes in `app/`; no new direction or exploration (the Foundation is Selected); no edits to `design-foundation.md` except flagging conflicts; no rewrite of F03/F04/F05 `ui-design.md`; no future-scope feature content; no Visual Quality Gate change.
-
-**Exit:** the Tech Lead can decide, from this document alone:
-* Visual Scope per feature;
-* the Phase D reopen order;
-* the contract amendments;
-* the first Phase D brief.
-
-Unresolved design questions go under Needs Tech Lead Clarification; the user is not asked directly. When done, set Delivery Review = Pending and hand back to the Tech Lead.
+None — F00 is Done. Terminal cleanup complete.
 
 ## Earlier briefs
 

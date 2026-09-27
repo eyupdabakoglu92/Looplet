@@ -48,3 +48,28 @@ Authority: `project-authority/design-foundation.md` (Selected) and `features/f00
 6. **Gallery.** `DesignGalleryScreen`, reachable only in debug builds, laid out like `design/S-91-components.png`, used as the runtime capture source for parity.
 7. **Evidence.** Automated: token values (hex/gradients), `turkish_case` cases (`HARİKA`, `İLK`, `YENİ EN İYİ`, `OPTİMAL`, `SEVİYE` from their lowercase forms), component state tests, analyzer/format/melos clean. Runtime: gallery screenshots on iPhone 16 (393×852) and the 16e / Pro Max variants, side by side with `S-91-components.png` and per-component crops (`Visual Parity Evidence` in `frontend.md`, kinds `runtime-screenshot` and `parity-comparison`), deviations listed; a Turkish-glyph check screenshot. Startup/cold-boot gate applies only if bootstrap/init changes (it should not).
 8. **Non-goals.** No shipped-surface restyle; no game-logic, persistence or contract change; no new feature content (settings, streak, etc.); no motion prototype in Flutter (that is a rework-time task for the Result transition).
+
+## 8. Phase C — conformance audit contract (added 2026-09-27; incident 2026-09-26)
+
+Authority: `project-authority/design-foundation.md` (Selected; §18 decisions and consequences), `features/f00-design-foundation/ui-design.md` (design-system handoff and the board → full-screen result motion spec), the selected-source renders `design/S-*.png`, `workflow-follow-ups.md` (Design Adoption Route; DESIGN-ADOPTION-CONTRACT-AMENDMENTS; USER-REFERENCE-CONTENT-DELTAS). Task: `F00-UI-CONFORMANCE-AUDIT` (UI Designer).
+
+1. **Purpose.** Measure how far every shipped surface is from the Selected Foundation, so the Tech Lead can decide, per feature, the Visual Scope, the reopen order for Phase D and the contract amendments. No design exploration (the Foundation is Selected) and no code.
+2. **Surfaces and states** (the shipped app, `lib/main.dart`; debug build on the iPhone 16 simulator — the capture baseline of `platform.md` §14):
+   * **F05 Home:** new (0/30), mid (N/30), in-progress (`· sürüyor`), terminal (`TAMAMLANDI` / `TEKRAR OYNA`), plus the app shell's splash and bootstrap-error screen.
+   * **F03 Play:** idle, row lifted mid-drag, column drag (levels 4+), locked tile, frozen tile and thaw, HUD (HAMLE, undo quota states, restart), back chevron, target rail, the load-error state.
+   * **F03 won moment + F04 completion panel:** the win sequence; 3★ / 2★ / 1★; first clear, new best, matched best; `SONRAKİ` / `Yeniden` / `Kapat`; the reduced-motion path.
+   * **F05 column tutorial (levels 4–6).**
+3. **Deliverable.** `features/f00-design-foundation/conformance-audit.md`, with evidence under `design/audit/`. For every surface and state:
+   * **Pair:** a fresh runtime capture of the current app next to its target render (or "no target render" when none exists).
+   * **Gaps:** a gap list by category — layout, typography, colour/surface, iconography, components, copy/casing, motion, accessibility.
+   * **Scope proposal:** `existing-parity` / `new-surface` / `motion-critical`, with a reason. The decision stays with the Tech Lead.
+   * **Contract impacts:** AC/contract impacts, confirming or extending DESIGN-ADOPTION-CONTRACT-AMENDMENTS — e.g. the full-screen result without `Kapat`, the `Looplet` wordmark, Turkish copy.
+   * **Future-scope exclusions:** items visible in the renders that must NOT be built (USER-REFERENCE-CONTENT-DELTAS).
+   * **Missing renders:** states Phase D must still render before implementation.
+
+   The document ends with:
+   * a proposed Phase D grouping and order, with a rationale (player-visible impact, dependency on `app/lib/design` components, risk);
+   * a Screen / State / Viewport matrix;
+   * a Visual Evidence Manifest (records of kind `runtime-screenshot` and `parity-comparison`).
+4. **Exit.** The Tech Lead can decide Visual Scope, the reopen order and the first Phase D brief from the audit alone.
+5. **Non-goals.** No code or asset changes in `app/`. No change to `design-foundation.md` beyond flagging conflicts. No rewrite of the F03/F04/F05 `ui-design.md` (that is Phase D). No new feature content. No Visual Quality Gate change: the audit ships no UI, so F00's gate record stays as is.

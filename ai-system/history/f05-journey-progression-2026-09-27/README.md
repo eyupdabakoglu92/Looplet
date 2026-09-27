@@ -1,3 +1,5 @@
 # F05 working record — 2026-09-27 (F05-FE3 delivery checkpoint)
 
 `orchestration-at-fe3-delivery.md` is the byte-for-byte working orchestration of F05 right after the Frontend/Mobile Developer delivered F05-FE3-GATE and F05-FE3-HOME (Delivery Review = Pending) and before the Tech Lead reconciled the delivery and activated the F05 re-QA. It keeps the full Current Rework Brief (the brief that F05-FE3 was delivered against), the complete 2026-09-26 Last Decision text and the pre-reconciliation evidence records. The live `features/f05-journey-progression/orchestration.md` replaces the rework brief with the re-QA brief, so this snapshot is the unedited reference.
+
+`orchestration-before-closure.md` is the byte-for-byte working orchestration right after QA delivered F05-QA-STRICT2 (Approved with Notes) and before the Tech Lead closed F05 on 2026-09-27. It contains the full five-task ledger, the complete evidence records with their provenance, and the re-QA brief. The live file is reduced to the terminal snapshot.
