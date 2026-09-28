@@ -7,6 +7,8 @@
 
 **Amended 2026-09-27 (Tech Lead — F05 closure):** §8 + §6 now state terminal precedence explicitly. When all 30 levels are complete, the terminal variant wins over an in-progress replay; this matches AC9, ui-design and the shipped behaviour (QA note N1). To be revisited in Design Adoption Phase D.
 
+**Amended 2026-09-29 (Tech Lead — Design Adoption Phase D3 activation):** §18 added (Home + app shell, `new-surface`). The user decided N1: surface an in-progress replay after 30 / 30 (§18.3 (2)); it replaces the §8 terminal precedence once the Product Owner revision is resynced. §10 and §17 are superseded for the visual by §18.
+
 Contract authority for F05. Execution state is in `orchestration.md`.
 
 ---
@@ -185,6 +187,7 @@ Derived from `journey_progress` + the persisted active-session snapshot, **both 
     * That replay is not surfaced; starting another level supersedes its save.
     * This is an accepted edge with low impact: it only affects post-completion personal-best replays. It is the shipped and QA-verified behaviour.
     * To be revisited when the home is redesigned in Design Adoption Phase D.
+    * **[Superseded, 2026-09-29 — §18.3 (2), the user's N1 decision]:** an in-progress replay is surfaced; the terminal variant ⇔ `continueTarget == null`. Effective once the Product Owner revision of the AC7 / AC9 precedence is resynced; until then this paragraph describes the shipped behaviour.
 * **`Next Level`** (fills F04's `CompletionPanel.onNextLevel`): let `n = <this session's journeyLevel>`. If `n != null && n < 30 && manifest has n+1` → `context.pushReplacement('/play', extra: PlaySessionArgs(source: journey, journeyLevel: n + 1))`. Else → `context.go('/')` (home → terminal variant). **`pushReplacement`** so the back stack never accumulates `/play` frames.
 * **Back:** unchanged from F03 — chevron hidden in `won`; `Close` / system / gesture back → `_popToCaller` *[amended 2026-09-28, F03 §20.3 (7): no `Close`; the result's back button and system / gesture back]*, which **must resolve to `/`** (add a `context.go('/')` fallback when `!canPop`, e.g. a deep-link entry). From any Journey level, back lands on `/`.
 * **Route graph:** `/` ⇄ `/play` only. Every `/play` exit → `/`. No 30-deep stack. No wrong-route, no empty stack.
@@ -208,6 +211,8 @@ Derived from `journey_progress` + the persisted active-session snapshot, **both 
 ---
 
 ## 10. Home Surface [LOCKED contract; `[PENDING — UI]` visual]
+
+> **[Amended 2026-09-29 — Design Adoption Phase D3]** The visual, the wordmark (`Looplet`), the progress indicator (the loop track) and the terminal variant are re-specified in §18. The content rules below (AC10, live binding, no back affordance, not the F10 menu) are unchanged.
 
 * Replaces `app/lib/home_screen.dart` (currently a debug `Wrap` of `smoke-tr-*` buttons). The debug buttons move behind `kDebugMode` or are removed (`[IMPL — Frontend]`).
 * **Content (AC10):** LOOPLET wordmark; **CONTINUE** (primary CTA — §8); a **journey-progress indicator** ("`progressCount` / 30" + a completed/unlocked visual), bound to `JourneyProgressRepo.watch` (live-updates when a win commits, even after the player pops back to `/`) **and** to the active-session snapshot (§6). The in-progress state and the CONTINUE target update as soon as the player pops back to `/` [amended 2026-09-26].
@@ -299,3 +304,125 @@ F04's forward note (`f04 frontend.md §4`): once `Next Level` is live, revisit t
 * `[DEFERRED — F10]` — the full menu re-homes F05's minimal home surface; F10 owns `settings` + multi-language + the language-switch-mid-progress story. **Also `[DEFERRED — F10]` (recorded 2026-09-09, F05-QA reconcile):** a **level-select surface** (the grid of level tiles) + AC2's **explicit locked affordance** + a **resolver guard** that rejects a direct `PlaySessionArgs(journeyLevel:)` request for an un-unlocked level. MVP has **no** navigation path that can produce a locked-level request (`prd.md §5` / `ui-design.md §10` — "no level-select map"; the home resolves only to `currentLevel`, `Next Level` only to an earned `N+1`, no deep links) → F05 satisfies AC2's "no navigation" clause by construction (test-asserted, §15). F10 (or a future deep-link feature) owns the affordance + the guard when a surface that can request an arbitrary level first exists.
 * `[DEFERRED — F11/F12]` — audio/haptics on unlock; `level_started` / `level_completed` analytics (with the level number) are F12 seams.
 * `[DEFERRED — first-app-distribution]` — TestFlight / Play internal + the folded-in F03/F04 device smokes; parked alongside F08's Firebase deploy pending the user's paid-account decision. **Not an F05 gate.**
+
+---
+
+## 18. Design Adoption Phase D3 — Home + app shell [LOCKED 2026-09-29]
+
+> **Added by:** the Tech Lead on 2026-09-29, at the D3 activation right after the D2 closure (F03 `architecture.md` §20.11). It reopens F05 as visual rework under rework control. F05 is the carrier (audit C-2). The app shell — native launch, the Flutter splash and the F08 `StoreErrorScreen` — is a cross-feature item in the same reopen (C-6, C-7).
+>
+> **Authority:**
+> * `project-authority/design-foundation.md` — Direction C "Loop Glass"; the user's decisions in §18, in particular 4 (future-scope items stay out), 5 (wordmark `Looplet`) and 6 (reference copy as proposal), and consequences 4–5.
+> * `features/f00-design-foundation/ui-design.md` — §6 Home layout, §7 components (glass card, loop track, primary CTA with glow, wordmark), §8 state design (load error / recovery pattern), §10 visual direction, §13 accessibility.
+> * The selected-source renders `S-06b-home-today.png` (the shipped-scope composition) and `S-06-home-design.png` (with future-scope items — **not** to be built); `S-91-components.png`.
+> * The audit: `conformance-audit.md` §2, §3, §7, §9 items 3, 5, 10, 11, §10 renders 19–26, §11 matrix rows Shell / Home; rulings C-1, C-6, C-7, C-8, C-9.
+> * The D1 and D2 surfaces (F03 §19, §20): Home is the caller of `/play` and the landing of every `/play` exit.
+
+### 18.1 User-visible symptom
+
+Home, the first screen of every launch, still has the pre-Foundation look: an uppercase `LOOPLET`, a 30-tick amber ring with the count at its centre, an amber `DEVAM ET` pill, and the system font. Since D1 and D2 it opens into a Loop Glass Play and returns from a Loop Glass result, so the hybrid period (C-8) is most visible here.
+
+The shell carries three player-visible defects:
+* **A-4:** a white native launch frame before the dark app on iOS, and on Android in light mode;
+* **A-3:** an English error screen that prints the raw exception (`SqliteException(26) …`) to the player;
+* **A-2 (home):** at AX5 the wordmark breaks as "LOOPL / ET", `TAMAMLANDI` breaks mid-word, the CTA label is cut, and the debug build reports a 10 px bottom overflow (F03-QA-D2R N5).
+
+### 18.2 Scope
+
+* **Affected journey:** cold start (native launch → Flutter splash → Home, or → the store-error screen) → Home → CONTINUE → `/play` → back / Next to Home.
+* **Surfaces and states:**
+  * **Home (`/`, F05 §10):**
+    * new player (0 / 30);
+    * mid, no session in progress;
+    * in progress (the frontier level);
+    * a replay of a completed level in progress before 30 / 30;
+    * terminal 30 / 30 with no session in progress;
+    * terminal 30 / 30 with a replay in progress (§18.3 (2));
+    * the model not yet loaded (first frame);
+    * the pressed CTA;
+    * AX5.
+  * **Flutter splash** (`_SplashScreen`, `app_router.dart`).
+  * **Store-error screen** (`StoreErrorScreen`, F08 AC9 / F08 App Init Sequence step 1): the bootstrap failure and the migration failure, both with Retry.
+  * **Native launch:** the iOS `LaunchScreen.storyboard`; Android `drawable/` and `drawable-v21/launch_background.xml` and `values/` / `values-night/` `styles.xml` (`LaunchTheme` and `NormalTheme`).
+  * **App-level theme** (`main.dart` `MaterialApp`): its scaffold ground, so that no frame between native launch, splash, Home and the error screen shows a different colour.
+* **Visual Scope `new-surface`:** a new composition with a new component (the loop track) and unrendered states. Home motion is not specified by the Foundation (audit §3), so the scope is not `motion-critical`. Any Home motion the UI Designer proposes is specified with a reduced path, and QA judges it from video (§18.6).
+
+### 18.3 Decisions (Tech Lead, and the user's N1 decision)
+
+1. **Composition = `S-06b` (Home · today), future-scope items excluded.**
+   * Built: the `Looplet` wordmark top-left; the glass card with the `YOLCULUK · N / 30` label, the two-line headline with its lime emphasis word and the loop track; the full-width lime CTA with its glow and trailing arrow, below the card; the subtitle under the CTA.
+   * **Not built** (decision 4, audit §3): the settings square (F10), the level-info card (F05 level metadata), the streak chip (F07), the stars chip (no aggregate-stars decision), the gesture hint (F09).
+   * The app root has no back affordance (F05 §10, unchanged).
+2. **N1 — an in-progress replay after 30 / 30: surface it.** **User decision, 2026-09-29** (decision gate F05.D3-N1-REPLAY-PRECEDENCE, recorded in the orchestration). This replaces the 2026-09-27 terminal-precedence assumption in §8.
+   * **Rule:** with 30 / 30 complete and a Journey session in progress, CONTINUE resumes that session (AC7). The card keeps the completion status (`YOLCULUK · 30 / 30`), and the subtitle reads "Seviye N · sürüyor".
+   * With 30 / 30 complete and no session in progress, the terminal variant is unchanged: AC9's graceful state, and the CTA replays level 1.
+   * The CTA never discards a session in progress. A secondary action that would start another level while a replay is in progress is not part of this contract. If the UI Designer proposes one, it needs a Tech Lead ruling.
+   * In model terms: the terminal variant ⇔ `continueTarget == null` (`JourneyProgressModel`, §6). The §6 derivation is unchanged; only the §8 override is removed.
+   * **Product precedence (AC7 over AC9 in their overlap) changes a product acceptance criterion.** It takes effect only after the Product Owner revision records it in `product/product-prd.md` and the Tech Lead resyncs F05 `prd.md` (role-execution-contract §4, "Product authority"). Until then, no F05 delivery task runs.
+3. **The loop track (new design-layer component).**
+   * Rounded-square numbered nodes joined by a lime → periwinkle line along a rising curve, with the decorative swirl arcs of `S-06b`. Done = lime; current = periwinkle with the 76 pt halo; locked = the UI Designer's treatment, never colour-only.
+   * **30-level windowing:** the card shows a window of the Journey, not all 30 nodes. The UI Designer proposes the rule, and it is rendered at 0 / 30, 4 / 30, 12 / 30, 25 / 30 and 30 / 30. Required: the current node is always inside the window; nodes never overlap each other or sit under another element; the window reads as a place in a longer journey.
+   * Allowed in `app/lib/design` as a D3 addition, on the §19.8 (2) / §20.7 (6) terms: component tests; the F00 design tests stay green; **no token value change and no new dependency**. The shipped `_JourneyRing` painter is removed from Home.
+4. **Copy (interim, through `JourneyStrings`; final with PO / localization, F10-UI-LOCALIZATION).**
+   * Wordmark `Looplet` (decision 5). The label is `YOLCULUK · N / 30` (authored caps). The headline is "Sıradaki döngüyü çöz." with "döngüyü" in lime (reference copy, decision 6). The CTA is "Devam et", sentence case, with an arrow. The subtitle is "Seviye N" / "Seviye N · sürüyor".
+   * The terminal variant has no Foundation copy. The UI Designer proposes its headline and CTA label ("Tekrar oyna" is the default); they are interim copy.
+   * Turkish casing is authored or `tr`-aware only (`turkish_case.dart`). No locale-blind `toUpperCase`.
+5. **Home `Semantics`.** The progress keeps "N / 30 seviye tamamlandı — Seviye M" (`JourneyStrings.progressSemantics`). The CTA announces its target, including "sürüyor" when it resumes. The decorative swirl arcs are excluded from the tree.
+6. **Text scale (C-9) on Home and the shell.**
+   * Container text uses `loopCappedTextScaler` (1.3×): the wordmark, the card label, the headline, the node numerals and the error headline.
+   * Free text follows the OS scale up to AX5 with no clipping, overlap or mid-word break: the subtitle, the CTA label and the error body.
+   * **Scrolling:** at every OS size up to the 1.3× cap, Home and the error screen fit without scrolling on 390 × 844 to 440 × 956. Above the cap the content column **may** scroll; the CTA stays reachable, and nothing is clipped. The same rule as the result (F03 §20.3 (9)).
+   * The OPTIONAL-QUALITY-NOTES item from F03 §19.12 (6) is resolved here for the error surfaces: the `LimePill` label may outgrow the capped headline, but it must not clip, and the pill grows to fit.
+7. **Store-error screen (C-6; F08 contract amended in place, see §18.4).**
+   * The Foundation pattern (F00 ui-design §8): the ground, a glass card, a Space Grotesk headline, a Manrope body and one primary `LimePill` Retry (≥ 44 pt).
+   * Turkish copy through a strings table (the UI Designer proposes it; interim; e.g. "Kayıtlı verilerin açılamadı." / "İlerlemen güvende. Lütfen tekrar dene." / "Tekrar dene").
+   * **The raw exception is never shown to the player.** It is logged (`debugPrint`) and may be shown in debug builds only (`kDebugMode`), visibly separated from the player copy.
+   * Behaviour is unchanged: Retry re-runs the bootstrap (`ref.invalidate(appBootstrapProvider)`); the data stays intact (F08 AC9).
+8. **Native launch and splash (C-7).**
+   * The launch background is the Foundation ground colour (a solid, the gradient's top stop or the UI Designer's choice), on iOS and on Android in light and dark mode, API < 21 included. There is no white frame anywhere.
+   * The Flutter splash matches the native launch pixel for pixel, or starts from it without a visible jump. The UI Designer decides whether it shows the wordmark (the final drawn wordmark asset is a Phase D item, design-foundation §18 consequence 4). If the native launch shows the wordmark too, it is a bundled image asset, not a system font.
+   * `MaterialApp`'s scaffold background moves to the ground colour. The in-app title follows decision 5 (`Looplet`).
+   * Out of scope: the OS app display name and the app icon (FIRST-APP-DISTRIBUTION).
+9. **Performance:** no backdrop blur (F03 §18); Home holds the mid-tier frame budget on the iPhone 16e simulator.
+
+### 18.4 Contract amendments
+
+* **§8 CONTINUE / terminal:** the 2026-09-27 terminal-precedence paragraph lapses and is replaced by §18.3 (2) **once the Product Owner revision is resynced**. Until then the shipped behaviour stands.
+* **§10 Home Surface:** "LOOPLET wordmark" becomes `Looplet`; the ring-style indicator becomes the loop track (§18.3 (3)); the terminal variant is rendered with copy (§18.3 (4)). AC10 is met by `YOLCULUK · N / 30` together with the track.
+* **§17 Open Items:** the `[PENDING — UI]` home item is superseded by the D3 handoff.
+* **F05 `ui-design.md`:** its home sections (Direction A, `PlayTheme` tokens) are superseded by the D3 handoff. The micro-tutorial overlay sections were already superseded by F03 D1 (§9).
+* **F08 `architecture.md`, App Init Sequence step 1 and the failure table:** "plain text + retry; no design handoff" becomes the Foundation pattern, Turkish copy and no raw exception shown (§18.3 (7)). F08's behaviour and status are unchanged.
+* **Tests:** Home and shell strings and widgets change with the rework. Affected: `journey_home_test`, `journey_home_live_test`, `journey_next_level_test`, `journey_progress_model_test` and `widget_test`, plus any F08 test on `StoreErrorScreen`. Every F05 AC keeps a passing test. The N1 terminal-precedence tests change to the §18.3 (2) rule after the resync.
+
+### 18.5 Non-goals
+
+* No engine, scoring, unlock, persistence, snapshot, lifecycle or route change. `/` ⇄ `/play` stays the only route graph (§8). The §6 read-model and the F09 seam (§11) are unchanged.
+* Play, the tutorial overlay and the result (D1 / D2, closed). F10's menu (DAILY, settings, level select), F07's streak, F09 onboarding, F11 audio / haptics, F12 analytics.
+* The app icon, the OS display name and store assets (FIRST-APP-DISTRIBUTION).
+* F03-MULTITOUCH-FIRST-POINTER and RESULT-APP-SWITCHER-SNAPSHOT stay separate follow-ups.
+* MOVESCARD-COUNTER-LINE-HEIGHT and RESULT-F00-COMPONENT-ALIGN may be taken if D3 touches those components. If they are taken, they are stated in the handoff and tested; otherwise they stay open.
+
+### 18.6 Evidence and exit criteria
+
+* **UI Designer (F05-UI-D3)** — the D3 handoff in F05 `ui-design.md`, per the handoff gate in `visual-quality-gate.md`:
+  * Home on 393 × 852 plus the 390 × 844 / 440 × 956 variants, and every §18.2 state, including the terminal-with-replay state of §18.3 (2);
+  * the loop track with its windowing rule rendered at 0, 4, 12, 25 and 30 / 30;
+  * the store-error screen, the native launch and splash (iOS; Android light and dark), and AX5 frames for Home and the error screen;
+  * components, states, copy proposals, `Semantics` and contrast;
+  * the Home motion (if any) with its reduced path;
+  * a Screen / State / Viewport matrix, a Visual Evidence Manifest and a **D3 acceptance list**;
+  * gate → Ready for Implementation at the Tech Lead checkpoint.
+* **Frontend/Mobile Developer (F05-FE-D3)** — implement from `app/lib/design` (tokens, `GlassCard`, `LoopNode`, `LimePill(glow)`, `LoopletWordmark`, `LoopBackdrop`, `LoopIconView`, and the new loop track); drop `PlayTheme` from Home and the shell; the native launch assets; the §18.3 (2) CONTINUE rule; tests updated (§18.4). `frontend.md` Visual Parity Evidence:
+  * runtime screenshots of every Home state on the iPhone 16, and the main states on the 16e and Pro Max, beside the renders;
+  * a **cold-start recording** on the simulator from the native launch to Home, showing no white frame and no jump at the splash hand-off. Android light / dark is stated as a limit if it cannot run (ANDROID-CI-EVIDENCE);
+  * the store-error screen, forced on the simulator (e.g. a failing bootstrap), with no raw exception in a release-mode or profile-mode capture;
+  * the OS text sweep large → AX5 on Home and the error screen;
+  * `melos run analyze` / `test` green; `integration_test` green on the simulator.
+  * **Startup impact: yes** (native launch assets, the splash, the app theme). The production-shaped cold boot (`prompt-evidence-integrity-standard.md` §4) is required, from an empty store and from an existing one.
+* **QA (F05-QA-D3)** — final stage, client-only; modules core + client-ui + visual-quality + stateful-flow; regression full (startup / routing):
+  * an independent runtime rubric ≥ 93, every dimension ≥ 8, no fail condition;
+  * F05 AC7–AC10 and AC12 on the new Home, including the §18.3 (2) replay rule warm and cold;
+  * the error screen and Retry, and cold start with no white frame;
+  * D1 / D2 regression across the Home ⇄ `/play` round trip;
+  * Android stated as a limit.
+* **Exit:** Visual Quality Gate Passed; final QA Approved or Approved with Notes; Delivery Review Accepted. F05 then returns to Done, Phase D is complete, and the resume point is F08 local evidence (Design Adoption Route).

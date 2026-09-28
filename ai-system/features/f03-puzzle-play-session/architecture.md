@@ -822,3 +822,44 @@ The F03-FE-D2R delivery (commit `77c33b9`; `frontend.md` § F03-FE-D2R) is **acc
   * a full-motion win + retry smoke with video on the iPhone 16, measured with QA's own tool;
   * the app suite;
   * a **full rubric re-score** (≥ 93, every dimension ≥ 8, no fail condition).
+
+### 20.11 D2 closure rulings (Tech Lead, 2026-09-29)
+
+F03-QA-D2R (`qa.md`; HEAD `d0ae8f1`, `app/` tree `5298c81a…`; QA commit `5677471`) returned **Approved with Notes**. The independent rubric is **94 / 100**, every dimension ≥ 9, with no fail condition and complete runtime evidence (video for the motion). F03.D2R-VISUAL-QA is PASS. The verdict is **accepted**; the Visual Quality Gate is **Passed**, and D2 closes (F03 Done).
+
+**Verified independently at the closure:**
+* **Revision:** `app/` is tree `5298c81a…` at `77c33b9`, `d0ae8f1` and `5677471` alike. The QA commit touches only `ai-system/` (F03 `qa.md`, `orchestration.md`, `qa/d2r/`, the history README and the archived D2 report). The verdict covers exactly the F03-FE-D2R delivery, and the working tree was clean.
+* **Captures:** all 42 PNGs in `qa/d2r/` match `data/png-sha1.txt`.
+* **Measurements:** QA's tools (`qa/d2r/src/qa-band-d2r.swift`, `qa-diff-d2r.swift`) were recompiled and re-run on every capture. The output reproduces `data/band-measurements-qa.txt` line for line: 48 / 48 lines (9 controls, 23 band readings, 16 pixel diffs). This includes 0 px against the offset-0 control after the shrink on all three devices, and the 1.87 M px negative control.
+* **Timing:** `qa/d2/src/qa-probe-d2.swift` was recompiled and re-run on QA's two smoke videos. It regenerates `S1-probe.csv` and `S2-probe.csv` byte for byte. `qa-t0-fit.py` reproduces T0 (2.8063 / 2.8641 s), the row on its cells to +602 / +601 and the first move at +617 / +619. `qa-pill-rest.py` reproduces the pill cells ((+935, +950] and (+949, +974]).
+* **The tools catch a faint band:** a Tech Lead negative, not run by QA. `#0B1234` was painted at 10 % and 5 % over the band region of `QA-16-T5-shrunk-xxxL.png`. Against its control, the band tool reads alpha 0.062 / 0.042 and a back-chevron drop of −22.3 / −11.5 luma, and the diff tool flags 29 954 / 3 053 px. The real captures read 0.000, Δ 0.0 and 0 px.
+  * Caveat: the strip estimate under-reads a synthetic band (0.062 for 10 %). The diff and the back-chevron luma are the sharper probes, and QA reports both.
+* **Suite:** `flutter test` (app) re-run — 512 passed.
+* **Captures read:** the contact sheets `QS-16-T5-before-after.jpg` and `QS-16e-pm-T5.jpg`. After the shrink, `HARİKA` and the back button are clear on the three devices; the pre-fix pair shows the badge dimmed under the band.
+
+**Rulings:**
+1. **Score and evidence reuse: accepted.** The +2 over F03-QA-D2 sits in Layout (9 → 10) and Accessibility (8 → 9). Both were lowered only for F03-QA-D2-01.
+   * The unchanged surface was reused under the §20.10 fingerprint rule, reasoned from the two-file diff. The smoke run independently matches the D2 timeline within one capture frame.
+   * The Tech Lead does not re-grade (`visual-quality-gate.md` §3).
+2. **F03.D2-VISUAL-QA re-evaluated as superseded: accepted** (the §19.12 (4) precedent). The F03-QA-D2 FAIL text is kept verbatim in the record and in `history/f03-puzzle-play-session-2026-09-28/qa-at-d2-verdict.md`.
+3. **The pill at rest, +972 in the cross-check (E-X1):** the same capture jitter as §20.10 (1). QA's run reaches 99 % by +938, and its last ≈ 1-luma step sits behind a 25 ms capture gap. The timeline code is unchanged since `67d9ecb`. Not a defect.
+4. **Non-blocking notes (qa.md §6), routed:**
+   * **N1 — RESULT-APP-SWITCHER-SNAPSHOT:** stays OPEN in `workflow-follow-ups.md` (§20.9 (3)).
+   * **N2 — debug-build pacing:** same ruling as §20.9 (3). Debug simulator video is the accepted class; release pacing belongs to the device-feel smoke in FIRST-APP-DISTRIBUTION. No task.
+   * **N3 — RESULT-F00-COMPONENT-ALIGN and the slightly faint subtitle:** stays OPEN (§20.8 (2)). The subtitle stays inside the Frontend's parity tolerance; no task.
+   * **N4 — no mid-fling shrink reachable:** accepted as a limit. The harder case (shrink during an active drag, E-M3) passed.
+   * **N5 — Home overflows at AX5** ("BOTTOM OVERFLOWED BY 10 PIXELS", debug): A-2 home, D3 scope.
+   * **N6 — limits:** VoiceOver and the focus ring on the automated class (§19.9 (4), §20.8 (3)); Android not run (ANDROID-CI-EVIDENCE); D2-07 widget-tested only; debug builds only.
+   * **N7 — evidence size:** `qa/d2r/` is ≈ 95 MB, and `design/runtime-d2r/` holds ≈ 44 MB. Both are **kept lossless**: the 0 px claims and this closure's reproduction depend on them. Converting them to JPEG would make every pixel-diff claim unverifiable. Repository-size housekeeping, if wanted, is a separate portfolio decision, not F03 scope.
+5. **Contract status:** the §20.4 amendments are in force. The F03 §18 geometry requirement and the §19.9 (1) goal-rail dock lapse now that D2 has shipped. The D2 items of DESIGN-ADOPTION-CONTRACT-AMENDMENTS (C-3, C-4, C-11, the full-screen result rule) are closed; the D3 items (C-1 N1, C-6, C-7) remain.
+
+**Closure:** every D2 task is Done, Delivery Review is Accepted and QA is final Approved with Notes. There is no release scope. Every Pending Evidence record is PASS, and there is no blocker or open decision. F03 returns to **Done**; F04 stays Done, with its ACs met on the full-screen result.
+
+**Resume point: Phase D3 — Home + app shell.** The carrier is F05 (`new-surface`), with native launch, the Flutter splash and the F08 `StoreErrorScreen` as cross-feature items. Its inputs:
+* A-2 home at AX5, A-3 and A-4;
+* the C-1 N1 product decision (terminal state vs an in-progress replay), which needs a user / Product Owner decision gate at activation;
+* C-6 and C-7;
+* the error-surface text-scale note from §19.12 (6);
+* MOVESCARD-COUNTER-LINE-HEIGHT and RESULT-F00-COMPONENT-ALIGN, if D3 touches the design layer.
+
+The next Tech Lead turn activates D3. It writes the D3 contract in F05 `architecture.md` and opens the N1 decision gate and the UI Designer task.

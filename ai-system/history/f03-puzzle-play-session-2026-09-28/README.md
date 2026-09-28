@@ -22,3 +22,6 @@
 * **`qa-at-d2-verdict.md`** — `features/f03-puzzle-play-session/qa.md` at the F03-QA-D2 verdict (Rejected, 92 / 100, blocking F03-QA-D2-01, 2026-09-28, commit `f28aedb`), byte for byte (SHA-1 `52155e9b…`; moved by QA at F03-QA-D2R, 2026-09-29).
   * Moved rather than appended to because `tools/workflow-flow-audit.mjs` reads the first `Final Score` / `Lowest Dimension` in `qa.md` (the D1R precedent, `architecture.md` §19.12 (3)).
   * The live `qa.md` carries the F03-QA-D2R re-QA report and links here; its evidence ledger reuses this report's runtime rows (E-J*, E-V*, E-R1, E-N*, E-B*, E-L*, E-M*, E-RM*, E-D1, E-P1) under the fingerprint rule.
+* **`orchestration-at-qa-d2r-verdict.md`** — the F03 orchestration at the F03-QA-D2R verdict (2026-09-29, commit `5677471`), byte for byte (SHA-1 `156d88c3…`).
+  * Contents: the full D2 task ledger (F03-UI-D2 … F03-QA-D2R), the F03-QA-D2R brief (Current Brief), F03.D2R-VISUAL-QA PASS, and the D2 rework-checkpoint decision (Last Decision).
+  * Taken right before the Tech Lead's D2 closure on 2026-09-29. That closure accepted the verdict, set the gate to Passed, recorded the rulings in `architecture.md` §20.11 and returned F03 to Done. The resume point is Phase D3 (F05 carrier).

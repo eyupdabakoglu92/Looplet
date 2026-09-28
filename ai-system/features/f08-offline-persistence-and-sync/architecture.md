@@ -201,7 +201,7 @@ The DURUM 0 seeds the kill-switch keys `release.md` §6 requires: `daily_enabled
 
 ## App Init Sequence [LOCKED]
 
-1. Open `AppDatabase` → run migrations (`onCreate` seeds; `onUpgrade` steps + never-drop guard). Migration failure → recoverable error screen (the only F08-owned UI; plain text + retry; no design handoff).
+1. Open `AppDatabase` → run migrations (`onCreate` seeds; `onUpgrade` steps + never-drop guard). Migration failure → recoverable error screen (the only F08-owned UI; plain text + retry; no design handoff). *[Amended 2026-09-29 — Design Adoption Phase D3, F05 `architecture.md` §18.3 (7), audit C-6: the screen adopts the Foundation pattern (glass card, Space Grotesk headline, one `LimePill` Retry), Turkish copy through a strings table, and the raw exception is logged, never shown to the player (debug builds only). Behaviour unchanged: Retry re-runs the bootstrap; data stays intact (AC9).]*
 2. Read `kv['active_session']` (validate; corrupt → discard active only, continue).
 3. **Async, non-blocking:** `Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform)` → **App Check activation** (see below) → Anonymous `signInAnonymously()` → on success persist `player.firebaseUid`. **Every step here is best-effort — a failure is caught and logged, never rethrown**; play + local persistence proceed, and the sync queue waits in `awaitingAuth` until a `firebaseUid` exists.
 4. Construct the session-level `DailyResultSyncService`; start the connectivity listener; `drain()` once.
