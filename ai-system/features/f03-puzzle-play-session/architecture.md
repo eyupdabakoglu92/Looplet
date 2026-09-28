@@ -782,3 +782,43 @@ F03-QA-D2 (`qa.md`, HEAD 86c7318, `app/` tree `f5641d2f…`) is **Rejected**: an
    * QA's F03-QA-D2 evidence (`app/` `f5641d2f…`) stays valid for every surface and state the rework's `app/` diff does not render differently — QA confirms that from `git diff` against `67d9ecb`;
    * invalidated and re-run: every result capture above the 1.3× cap and the text-size change paths (E-T1 … E-T5) on the three devices; a win + retry smoke with video on the iPhone 16; the app suite; and a **full rubric re-score** (≥ 93, every dimension ≥ 8, no fail condition);
    * if the diff reaches beyond the band state, QA widens the re-run to what it touches.
+
+### 20.10 Rework checkpoint rulings (Tech Lead, 2026-09-28)
+
+The F03-FE-D2R delivery (commit `77c33b9`; `frontend.md` § F03-FE-D2R) is **accepted**. F03.D2R-PARITY is accepted, Delivery Review is **Accepted**, the Visual Quality Gate is **Ready for QA**, and F03-QA-D2R is open.
+
+**Verified independently at the checkpoint** (HEAD `77c33b9`, `app/` tree `5298c81a…`):
+* **Scope:** `git diff 67d9ecb 77c33b9 -- app` touches only `app/lib/play/widgets/result_view.dart` (the band state) and `app/test/rating/result_view_test.dart` (9 new tests). The diff hash (`262864be…`) and the source SHA-1 (`cc45d505…`) equal the Frontend's record.
+  * `ScrollBand` and the rest of `app/lib/design` are unchanged, and so are `win_timeline.dart` and `play_session_screen.dart`.
+  * The commit touches no `feature-board.md`, `system-state.md`, `architecture.md` or `ui-design.md`.
+* **The fix matches §20.9 (1):** `_onScroll` derives the band from `position.pixels`, and a `NotificationListener<ScrollMetricsNotification>` filtered to depth 0 calls it on every metrics change. The notification is not consumed.
+* **Suites re-run:** `melos run analyze` SUCCESS; `dart format` 0 changed (177 files); `flutter test` in `app/` **512 passed**. `integration_test` was not re-run: the Frontend's 13 / 13 on the iPhone 16 was taken on this exact diff.
+* **Tests read:** the new group asserts `ScrollBand.visibility` and the absence of a painted `Opacity` inside the band, not only the offset. The 2.1× case pins a clamped offset below the 12-pt fade distance on all three widths.
+* **Negative runs** beyond the Frontend's two: each rule was broken on purpose, the file was run and then restored (SHA-1 verified, tree clean). All four were caught:
+  * TA — the depth filter set to 1: 9 fail;
+  * TB — a metrics change forces the band to 0 instead of recomputing it: 3 fail (the partial cases);
+  * TC — a binary band with no 12-pt fade: 3 fail;
+  * TD — no update once the column cannot scroll: 6 fail (the 1.0× and 1.3× cases).
+* **Runtime measurements reproduced:** `band-d2r.swift` recompiled from `design/src` and re-run on the committed captures reproduces `band-measurements.txt` line for line (14 / 14). `timing-d2.py` with a recompiled `video-d2` reproduces `timing-d2r.txt` (27 / 27).
+* **The band tool catches a faint band:** a synthetic band at 30 % and 10 % opacity painted onto `RT-16-D2R-05` differs from its control by 12.5 % and 2.1 %, against 0.000 % for the real captures.
+* **Captures read:** Pro Max `RT-pm-D2R-05` and 16e `RT-16e-D2R-03`: after the shrink, `HARİKA` and the back button are fully clear and the column is at offset 0.
+
+**Rulings:**
+1. **The pill cell at +964 ms (run 1): accepted as capture jitter, not a timing change.**
+   * The timeline code and the Play host are unchanged since `67d9ecb`.
+   * The pill's luma curve matches QA's pre-fix run within one capture frame: 222.4 at +930 vs 222.3 at +934, with a final ≈ 1-luma step.
+   * Run 2 reads +947, the same as the D2 records (947–954).
+   * QA re-measures it in its own smoke run.
+2. **A lost first recording** (a shell timeout ended `recordVideo` before the win) was discarded and re-recorded. No evidence depends on it; the raw captures are not committed, as in D2.
+3. **Independence note:** the rework and this checkpoint ran in the same session as the §20.9 reconciliation. QA's verdict must rest on its own runtime probes, not on the Frontend's band tool or this checkpoint.
+4. **Evidence size:** `design/runtime-d2r/` adds ≈ 44 MB of lossless captures, which the pixel comparison needs. They are kept; pruning goes with the feature's artefact housekeeping after D2 closes.
+
+**Re-QA (F03-QA-D2R)** — the §20.9 (5) plan, bound to this revision:
+* final stage, client-only; modules core, client-ui, visual-quality, stateful-flow; Regression Depth **full**; Evidence Reuse **allowed**;
+* **fingerprint:** `app/` tree `5298c81a9f36163a88a32eab5e0ef4dc4676b13d` at `77c33b9`. The Frontend's `integration_test` 13 / 13 and this checkpoint's app suite may be reused only while the tree is unchanged;
+* QA's F03-QA-D2 evidence (`app/` `f5641d2f…`) stays valid for every surface the `67d9ecb → 77c33b9` diff does not render differently — everything except the band after a metrics change. QA confirms that from the diff;
+* **re-run:**
+  * the text-size paths E-T1 … E-T5 on the three devices, with QA's own capture and measurement;
+  * a full-motion win + retry smoke with video on the iPhone 16, measured with QA's own tool;
+  * the app suite;
+  * a **full rubric re-score** (≥ 93, every dimension ≥ 8, no fail condition).

@@ -16,3 +16,6 @@
 * **`orchestration-at-qa-d2-verdict.md`** — the F03 orchestration at the F03-QA-D2 verdict (2026-09-28, commit `f28aedb`), byte for byte.
   * Contents: the F03-QA-D2 brief (Current Brief), the delivered QA task line (Rejected, 92 / 100), F03.D2-VISUAL-QA FAIL, and the D2 parity-checkpoint decision (Last Decision).
   * Taken right before the Tech Lead's QA-verdict reconciliation on 2026-09-28. That reconciliation accepted F03-QA-D2-01 as an implementation defect, recorded the rulings in `architecture.md` §20.9 and opened F03-FE-D2R.
+* **`orchestration-at-fe-d2r-delivery.md`** — the F03 orchestration at the F03-FE-D2R delivery (2026-09-28, commit `77c33b9`), byte for byte.
+  * Contents: the F03-FE-D2R brief (Current Brief), the delivered task line, F03.D2R-PARITY PASS (Frontend provenance), Delivery Review Pending, and the D2 QA-verdict decision (Last Decision).
+  * Taken right before the Tech Lead's D2 rework checkpoint on 2026-09-28. That checkpoint accepted the rework, set the gate to Ready for QA, recorded the rulings in `architecture.md` §20.10 and opened F03-QA-D2R.

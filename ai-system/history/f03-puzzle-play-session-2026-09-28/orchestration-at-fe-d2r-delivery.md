@@ -6,15 +6,15 @@ F03
 
 ## Current Status
 
-In QA
+Rework
 
 ## Current Owner
 
-QA
+Tech Lead
 
 ## Next Role
 
-QA
+Tech Lead
 
 ## Active Task Ledger
 
@@ -22,7 +22,7 @@ QA
 - [x] Task ID: F03-FE-D2 | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: DELIVERED 2026-09-28 (commit 67d9ecb) — the D2 win sequence, board → result transition, full-screen `ResultView` and retry transition A implemented from `app/lib/design` per architecture §20 / §20.7 (C1–C3); `docked_row.dart`, `board_tile.dart`, `won_composition.dart` and `CompletionPanel` deleted; design-layer additions `TileFace.answer`, `StarRow.revealMs`, `ScrollBand` with component tests; tests updated (§20.4 + four F05) and added (`won_sequence_test`, `result_view_test`, `result_components_test`); app suite 503 passed, analyze / format clean, integration_test 13 / 13 on the iPhone 16. `frontend.md` Visual Parity Evidence: runtime screenshots, parity composites, 10 recordings with the frame-timing table, the text sweep and Reduce Motion on the three simulators. NTLC-D2-1 … 3 ruled in architecture §20.8. Accepted at the Tech Lead's parity checkpoint 2026-09-28 | Depends On: F03-UI-D2
 - [x] Task ID: F03-QA-D2 | Assigned Role: QA | Status: Done | Summary: DONE 2026-09-28 — verdict **Rejected** (qa.md, final, client-only, HEAD 86c7318; app/ = f5641d2f…, the brief's fingerprint). Independent runtime rubric **92 / 100** (lowest Accessibility and Inclusive Quality 8; no fail condition). Blocking F03-QA-D2-01: after a live OS text-size reduction while the result is scrolled at AX5, the ScrollBand stays visible at offset 0 and dims the `HARİKA` badge and the back button (§16.11.1 (12)). Everything else passed at runtime on the iPhone 16 / 16e / Pro Max: the other 17 §16.11.1 items (C2 measured with QA's own tools, first moved frame +616…+619), F04 AC1–AC10 (AC9 automated), F05 AC1 / AC12, F03 AC8 / AC11, lifecycle mid-sequence (system back, background, kill), Reduce Motion on / off, D1 regression | Depends On: F03-FE-D2
 - [x] Task ID: F03-FE-D2R | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: DELIVERED 2026-09-28 (HEAD 3cd4a3b + working tree; `app/` diff SHA-1 262864be, two files) — F03-QA-D2-01 fixed: `ResultView` recomputes the band from `position.pixels` on every scroll and on every depth-0 `ScrollMetricsNotification` (`result_view.dart`); `ScrollBand` untouched. 9 new widget tests (AX5 scrolled → 1.0× / 1.3× → band 0, badge and back clear; → 2.1× → band = clamped offset / 12) fail 9 / 9 on the old code and with the listener detached, pass with the fix; app 512 passed, analyze / format clean, integration_test 13 / 13 on the iPhone 16. Runtime on the 16 / 16e / Pro Max: after AX5 → scrolled → xxxL and → `large`, the band region equals the offset-0 control (0.000 % differ, 6 / 6 pairs; QA's pre-fix capture differs 51 %). Win + retry smoke on the 16: timeline as in D2 (first result pixel +714, pill rest +947 / +964 capture jitter, retry board +330). `frontend.md` § F03-FE-D2R; evidence design/runtime-d2r/ | Depends On: F03-QA-D2
-- [ ] Task ID: F03-QA-D2R | Assigned Role: QA | Status: Open | Summary: ACTIVATED 2026-09-28 (rework checkpoint, architecture §20.10). Independent final-stage re-QA of D2 on `77c33b9` (`app/` 5298c81a): the text-size paths E-T1 … E-T5 on the iPhone 16 / 16e / Pro Max with QA's own capture and measurement; a full-motion win + retry smoke with video on the 16; the app suite; F03-QA-D2 evidence reused where the 67d9ecb → 77c33b9 diff leaves the surface unchanged; full rubric re-score (≥ 93, every dimension ≥ 8, no fail condition). See Current Brief | Depends On: F03-FE-D2R
+- [ ] Task ID: F03-QA-D2R | Assigned Role: QA | Status: Queued | Summary: Re-QA of D2 after F03-FE-D2R and the Tech Lead checkpoint: final stage, full regression with fingerprint-based reuse of the F03-QA-D2 evidence (§20.9 (5)); the text-size paths E-T1 … E-T5 on the three devices, a win + retry smoke with video, the app suite, full rubric re-score (≥ 93, every dimension ≥ 8, no fail condition) | Depends On: F03-FE-D2R
 
 ## Open Tasks
 
@@ -34,7 +34,7 @@ None
 
 ## Delivery Review
 
-Accepted
+Pending
 
 ## QA Scope
 
@@ -46,7 +46,7 @@ final
 
 ## QA Result
 
-None
+Rejected
 
 ## Release Scope
 
@@ -66,7 +66,7 @@ ai-system/project-authority/design-foundation.md
 
 ## Visual Quality Gate
 
-Ready for QA
+Ready for Implementation
 
 ## Visual Evidence
 
@@ -96,9 +96,7 @@ D2 implementation parity records (2026-09-28, Frontend/Mobile Developer, commit 
 
 Accepted at the Tech Lead's parity checkpoint on 2026-09-28 (architecture §20.8): parity reproduced byte for byte, frame timing within 1–3 ms apart from two corrected cells.
 
-D2 QA records (2026-09-28, QA, HEAD 86c7318, `app/` `f5641d2f…`) are in `qa.md` §1 and features/f03-puzzle-play-session/qa/d2/ (QA-*.jpg, QV-*.mp4, QS-*.jpg, tools in qa/d2/src). Verdict Rejected, 92 / 100 (architecture §20.9). The gate went back to Ready for Implementation for the F03-FE-D2R rework; the D2 handoff acceptance (§20.7) stands.
-
-D2 rework records (2026-09-28, Frontend/Mobile Developer, commit 77c33b9; `frontend.md` § F03-FE-D2R Visual Parity Evidence) are in features/f03-puzzle-play-session/design/runtime-d2r/: runtime-screenshot RT-{16,16e,pm}-D2R-* (AX5 offset 0, scrolled end, shrink → xxxL / `large`, offset-0 controls), accessibility A11Y-D2R (`band-measurements.txt`, tool design/src/band-d2r.swift), runtime-video RV-16-D2R-win-L5(-2) and RV-16-D2R-retry-L5 (`timing-d2r.txt`). Accepted at the Tech Lead's rework checkpoint on 2026-09-28 (architecture §20.10): both logs reproduced line for line; gate Ready for QA. The QA record is pending (F03.D2R-VISUAL-QA).
+D2 QA records (2026-09-28, QA, HEAD 86c7318, `app/` `f5641d2f…`) are in `qa.md` §1 and features/f03-puzzle-play-session/qa/d2/ (QA-*.jpg, QV-*.mp4, QS-*.jpg, tools in qa/d2/src). Verdict Rejected, 92 / 100 (architecture §20.9). The gate is back at Ready for Implementation for the F03-FE-D2R rework; the D2 handoff acceptance (§20.7) stands.
 
 ## QA Modules
 
@@ -162,7 +160,7 @@ allowed
   * Re-evaluation Trigger: F03-FE-D2R delivery
   * Blocks: Visual Quality Gate = Ready for QA; F03-QA-D2R
   * Result: PASS
-  * Provenance / Note: Opened by the Tech Lead 2026-09-28 at the F03-QA-D2 reconciliation (§20.9 (4)). 2026-09-28 Frontend/Mobile Developer, HEAD 3cd4a3b + working tree (`app/` diff SHA-1 262864be), debug build (`App` SHA-1 d7a7c0af) on iOS Simulator 18.6 — iPhone 16 / 16e / Pro Max. `frontend.md` § F03-FE-D2R (Visual Parity Evidence, §17); artefacts design/runtime-d2r/ (RT-*-D2R-*, RV-16-D2R-*, band-measurements.txt, timing-d2r.txt); tool design/src/band-d2r.swift with positive and negative controls. Tests: 9 new, failing first (9 / 9) and with the listener detached (9 / 9); app 512 passed; integration_test 13 / 13. Limits: debug builds; Android not run (ANDROID-CI-EVIDENCE). **Accepted by the Tech Lead 2026-09-28** (architecture §20.10): scope two files; suites re-run (app 512 passed); four further negative runs caught (TA 9, TB 3, TC 3, TD 6 fail); `band-measurements.txt` 14 / 14 and `timing-d2r.txt` 27 / 27 reproduced; the band tool flags a synthetic 10 % band; the +964 pill cell ruled capture jitter.
+  * Provenance / Note: Opened by the Tech Lead 2026-09-28 at the F03-QA-D2 reconciliation (§20.9 (4)). 2026-09-28 Frontend/Mobile Developer, HEAD 3cd4a3b + working tree (`app/` diff SHA-1 262864be), debug build (`App` SHA-1 d7a7c0af) on iOS Simulator 18.6 — iPhone 16 / 16e / Pro Max. `frontend.md` § F03-FE-D2R (Visual Parity Evidence, §17); artefacts design/runtime-d2r/ (RT-*-D2R-*, RV-16-D2R-*, band-measurements.txt, timing-d2r.txt); tool design/src/band-d2r.swift with positive and negative controls. Tests: 9 new, failing first (9 / 9) and with the listener detached (9 / 9); app 512 passed; integration_test 13 / 13. Limits: debug builds; Android not run (ANDROID-CI-EVIDENCE). Awaiting the Tech Lead's acceptance at the rework checkpoint.
 
 - Evidence ID: F03.D2R-VISUAL-QA
   * Scenario: An independent final-stage re-QA of D2 on the reworked revision — the text-size paths E-T1 … E-T5 on three devices, a win + retry smoke, the app suite, a full rubric re-score ≥ 93 (every dimension ≥ 8, no fail condition); F03-QA-D2 evidence reused where the diff leaves the surface unchanged
@@ -170,10 +168,10 @@ allowed
   * Target / Environment: iOS Simulator 18.6, iPhone 16 / 16e / Pro Max; Android stated as a limit (ANDROID-CI-EVIDENCE)
   * Owner Role: QA
   * Prerequisite / External Decision: F03.D2R-PARITY accepted (gate Ready for QA)
-  * Re-evaluation Trigger: F03-QA-D2R delivery
+  * Re-evaluation Trigger: F03-QA-D2R activation
   * Blocks: Visual Quality Gate = Passed; F03 Done; D3 activation
   * Result: PENDING
-  * Provenance / Note: Opened by the Tech Lead 2026-09-28 at the F03-QA-D2 reconciliation (§20.9 (5)); prerequisite met at the rework checkpoint 2026-09-28 (§20.10), F03-QA-D2R Open.
+  * Provenance / Note: Opened by the Tech Lead 2026-09-28 at the F03-QA-D2 reconciliation (§20.9 (5)).
 
 ## Open Decision Gates
 
@@ -185,33 +183,31 @@ None
 
 ## Next Action
 
-Run QA on F03-QA-D2R (Current Brief): the independent final-stage re-QA of D2 on `77c33b9` — the text-size paths on three devices, a win + retry smoke with video, the app suite, and a full rubric re-score. Then the Tech Lead's QA-verdict reconciliation.
+Run Tech Lead for the D2 rework checkpoint: reconcile F03-FE-D2R (`frontend.md` § F03-FE-D2R; F03.D2R-PARITY), set Delivery Review and the Visual Quality Gate, then activate F03-QA-D2R (§20.9 (5)).
 
 ## Last Decision
 
-2026-09-28 (D2 rework checkpoint) — the Tech Lead reconciled F03-FE-D2R (commit `77c33b9`) and accepted it. Full record: architecture §20.10.
-
-**Task coverage.** The one brief item is implemented: `ResultView` derives the band from `position.pixels` on every scroll and on every depth-0 `ScrollMetricsNotification`. `ScrollBand`, the timeline, layout, copy, lifecycle and persistence are untouched.
+2026-09-28 (D2 QA-verdict reconciliation) — the Tech Lead accepted F03-QA-D2 **Rejected** (92 / 100, lowest Accessibility 8, no fail condition). Full record: architecture §20.9.
 
 **Verified independently:**
-* the scope — two `app/` files; hashes equal the Frontend's record;
-* the suites — analyze, format, app 512 passed;
-* four negative runs of the Tech Lead's own, all caught (TA 9, TB 3, TC 3, TD 6 fail);
-* both runtime logs reproduced line for line (band 14 / 14, timing 27 / 27);
-* the band tool flags a synthetic 10 % band;
-* two captures read.
+* the revision — HEAD `f28aedb` keeps `app/` tree `f5641d2f…`; the QA commit touches only `ai-system/`;
+* the finding — QA's captures show the band drawn over the badge and back button after the shrink, and not in the offset-0 control;
+* the cause — `ResultView._band` is updated only by the scroll listener; Flutter clamps the offset on a content shrink through `correctPixels`, which does not notify listeners.
 
-**Rulings** (§20.10): the +964 pill cell is capture jitter (run 2 +947; timeline code unchanged since 67d9ecb); the lost first recording is discarded; independence note — QA uses its own probes; the ≈ 44 MB of lossless captures is kept.
+**Rulings** (§20.9):
+* F03-QA-D2-01 is an implementation defect; the band must follow the current scroll position after any metrics change; the fix stays in the `ResultView` band state;
+* the rubric is not re-graded by the Tech Lead;
+* N1 → RESULT-APP-SWITCHER-SNAPSHOT (follow-up); N2 accepted as the debug evidence class; N3 → RESULT-F00-COMPONENT-ALIGN, subtitle noted; N4 D3; N5 stated limits.
 
-**State:** In QA; Delivery Review Accepted; Visual Quality Gate Ready for QA; QA plan final / client-only, modules core + client-ui + visual-quality + stateful-flow, regression full, evidence reuse allowed (fingerprint `app/` 5298c81a at 77c33b9); QA Result None; F03-QA-D2R Open; owner → QA.
+**State:** Rework; Delivery Review Pending; Visual Quality Gate back to Ready for Implementation (handoff acceptance §20.7 stands); QA Result stays Rejected until the re-QA; F03-FE-D2R Open, F03-QA-D2R Queued; owner → Frontend/Mobile Developer.
 
-The pre-checkpoint orchestration is archived byte-for-byte as history/f03-puzzle-play-session-2026-09-28/orchestration-at-fe-d2r-delivery.md.
+The orchestration at the verdict is archived byte-for-byte as history/f03-puzzle-play-session-2026-09-28/orchestration-at-qa-d2-verdict.md.
 
 ## Last Update
 
-* Updated By: Tech Lead
+* Updated By: Frontend/Mobile Developer
 * Timestamp: 2026-09-28
-* Summary: D2 rework checkpoint — F03-FE-D2R accepted (architecture §20.10); F03.D2R-PARITY accepted; Delivery Review Accepted; gate Ready for QA; F03-QA-D2R Open; owner → QA.
+* Summary: F03-FE-D2R delivered — the scroll band follows the scroll position after metrics changes (F03-QA-D2-01); 9 failing-first tests + two negative runs; suites and integration_test green; runtime on three simulators; F03.D2R-PARITY PASS; Delivery Review Pending; owner → Tech Lead.
 
 ## Context & Follow-ups
 
@@ -226,7 +222,7 @@ The pre-checkpoint orchestration is archived byte-for-byte as history/f03-puzzle
 ## History & Evidence References
 
 * [QA report](qa.md) (D2, 2026-09-28), [contract](architecture.md) (§12, §18, §19, §20), [UI design](ui-design.md) (§1–§14 D1; §16 D2), [frontend delivery](frontend.md) (D2).
-* [Orchestration at the F03-FE-D2R delivery](../../history/f03-puzzle-play-session-2026-09-28/orchestration-at-fe-d2r-delivery.md); [orchestration at the F03-QA-D2 verdict](../../history/f03-puzzle-play-session-2026-09-28/orchestration-at-qa-d2-verdict.md); [orchestration at the F03-FE-D2 delivery](../../history/f03-puzzle-play-session-2026-09-28/orchestration-at-fe-d2-delivery.md); [orchestration at the F03-UI-D2 delivery](../../history/f03-puzzle-play-session-2026-09-28/orchestration-at-ui-d2-delivery.md); [ui-design.md before D2](../../history/f03-puzzle-play-session-2026-09-28/ui-design-before-phase-d2.md); [frontend.md before D2](../../history/f03-puzzle-play-session-2026-09-28/frontend-before-phase-d2.md).
+* [Orchestration at the F03-QA-D2 verdict](../../history/f03-puzzle-play-session-2026-09-28/orchestration-at-qa-d2-verdict.md); [orchestration at the F03-FE-D2 delivery](../../history/f03-puzzle-play-session-2026-09-28/orchestration-at-fe-d2-delivery.md); [orchestration at the F03-UI-D2 delivery](../../history/f03-puzzle-play-session-2026-09-28/orchestration-at-ui-d2-delivery.md); [ui-design.md before D2](../../history/f03-puzzle-play-session-2026-09-28/ui-design-before-phase-d2.md); [frontend.md before D2](../../history/f03-puzzle-play-session-2026-09-28/frontend-before-phase-d2.md).
 * [Terminal D1 orchestration](../../history/f03-puzzle-play-session-2026-09-28/orchestration-before-phase-d2.md); the D1 working record in [history/f03-puzzle-play-session-2026-09-27/](../../history/f03-puzzle-play-session-2026-09-27/README.md); the [closure record of 2026-09-21](../../history/f03-closure-2026-09-21/orchestration.md) — historical only, not a run queue.
 * [Portfolio follow-ups](../../workflow-follow-ups.md); [Phase C audit](../f00-design-foundation/conformance-audit.md).
 * Canonical execution: role-execution-contract.md.
@@ -246,81 +242,60 @@ The pre-checkpoint orchestration is archived byte-for-byte as history/f03-puzzle
 * 2026-09-28 — QA: F03-QA-D2 done — **Rejected** (92 / 100, lowest Accessibility 8); blocking F03-QA-D2-01; F03.D2-VISUAL-QA FAIL; the D1R qa.md moved to history/f03-puzzle-play-session-2026-09-28/qa-at-d1r-verdict.md; owner → Tech Lead.
 * 2026-09-28 — Tech Lead: D2 QA-verdict reconciliation — Rejected accepted; F03-QA-D2-01 confirmed (captures + code); §20.9 rulings; RESULT-APP-SWITCHER-SNAPSHOT logged; Rework; gate Ready for Implementation; F03-FE-D2R Open, F03-QA-D2R Queued; owner → Frontend/Mobile Developer.
 * 2026-09-28 — Frontend/Mobile Developer: F03-FE-D2R delivered (working tree on 3cd4a3b); F03.D2R-PARITY PASS; Delivery Review Pending; owner → Tech Lead.
-* 2026-09-28 — Tech Lead: D2 rework checkpoint — F03-FE-D2R accepted (§20.10; 4 / 4 extra negative runs caught, both runtime logs reproduced); gate Ready for QA; F03-QA-D2R Open; owner → QA.
 
 ## Current Brief
 
-**F03-QA-D2R — independent final-stage re-QA of D2 after the scroll-band rework** (contract: architecture.md §20; rulings §20.7, §20.8, §20.9, §20.10)
+**F03-FE-D2R — D2 scroll-band rework** (contract: architecture.md §20.9; everything in §20.3, §20.7 and §20.8 still applies)
 
-**What changed since F03-QA-D2** (`git diff 67d9ecb 77c33b9 -- app`):
-* `app/lib/play/widgets/result_view.dart` — the band state only. `_onScroll` reads `position.pixels`, and a `NotificationListener<ScrollMetricsNotification>` (depth 0) recomputes the band on every metrics change;
-* `app/test/rating/result_view_test.dart` — 9 new tests;
-* nothing else in `app/`. Delivery record: `frontend.md` § F03-FE-D2R; evidence in `design/runtime-d2r/`.
+**User-visible symptom** (F03-QA-D2, `qa.md` § Findings F03-QA-D2-01, evidence `qa/d2/` E-T5):
+* a player with the OS text size at AX5 scrolls the result to its end, then lowers the text size (e.g. to xxxL or the default) while the result is open;
+* the content jumps back to the top, but the dark scroll band stays drawn across the top of the screen;
+* the `HARİKA` / `YENİ EN İYİ` badge is dimmed — barely visible at the default size — and so is the back button;
+* the column can no longer scroll, so the player cannot clear the band; it stays until they leave the result.
 
-**Authority:** `ui-design.md` §16.11.1 (the acceptance list; item (12) is the one that failed), §16.5 / §16.6 / §16.8; architecture §20.3 with the rulings §20.7–§20.10; F04 PRD AC1–AC10, F05 PRD AC1 / AC12, F03 PRD AC8 / AC11; `design/visual-quality-gate.md`, `premium-ui-rubric.md`, `design-doctrine.md`.
+**Affected journey and entry paths:**
+* any `/play` session that reaches the full-screen result (Home CONTINUE, Next, Retry, resume) with an OS text size above the 1.3× cap, then a live OS text-size reduction (Settings / Control Center) while the result is scrolled;
+* state source: `ResultView`'s `_band` (`app/lib/play/widgets/result_view.dart`), set only by the `ScrollController` listener `_onScroll`. A content shrink clamps the offset through `correctPixels`, which notifies no listener (§20.9, cause confirmed).
 
-**QA plan:**
-* QA Scope client-only; QA Stage final; Release Scope none.
-* QA Modules: core, client-ui, visual-quality, stateful-flow.
-* **Regression Depth full** (final stage), with the reuse below.
-* **Evidence Reuse allowed:**
-  * **fingerprint** `app/` tree `5298c81a9f36163a88a32eab5e0ef4dc4676b13d` at `77c33b9`;
-  * the Frontend's `integration_test` 13 / 13 (iPhone 16) and the Tech Lead's app suite (512 passed) were taken on this tree and may be reused while it is unchanged;
-  * QA's own F03-QA-D2 evidence (`qa.md` §1, `app/` `f5641d2f…`) stays valid for every surface and state the diff does not render differently: the win sequence, the transition, the variants, Retry / Next / back, lifecycle, Reduce Motion, the D1 regression. Confirm it from the diff;
-  * the Frontend's captures, `band-d2r.swift` and the checkpoint's re-measurements are comparison inputs only. They never substitute for QA's own runtime probes (§20.10 (3)).
+**Fix scope:**
+1. `app/lib/play/widgets/result_view.dart` — the band state only:
+   * the band's visibility equals `clamp(pixels / ResultView.bandFadeDistance, 0, 1)` for the current position at every frame, including after a scroll-metrics change (text size down or up, content extent change);
+   * when the column cannot scroll (max extent 0), the band is 0;
+   * recompute on metrics changes as well as on scroll — e.g. listen for `ScrollMetricsNotification`, or read the position after layout. The approach is yours; state it in `frontend.md`.
+2. `ScrollBand` (`app/lib/design`) changes only if the fix needs it, inside the §20.7 (6) allowance, with its component tests green.
+3. `frontend.md` — append an F03-FE-D2R section; the D2 delivery text stays.
 
-**Required this round** (runtime, debug build of `77c33b9` on iOS Simulator 18.6 — iPhone 16 `D0011CE7`, 16e `6DBDFD97`, Pro Max `02FDE776`):
-1. **F03-QA-D2-01 re-test (E-T5)** on all three devices: AX5 → win → scroll the result to the end → live shrink to xxxL, and again → `large`. Expected: the band is gone at offset 0, and `HARİKA` and the back button are fully visible. Capture it and measure it with QA's own method.
-2. **The rest of the text-size set (E-T1 … E-T4):**
-   * AX5 at offset 0: back and badge on top, the headline capped, free text wrapping between words;
-   * AX5 scrolled to the end: back fixed, the band behind it, "Tekrar oyna" above the home indicator;
-   * the 1.3× cap with no scroll on three devices;
-   * the 16e at AX5.
-3. **Misuse and edge paths around the fix:**
-   * text size **up** while at offset 0 → no band;
-   * a partial scroll (a few points) at a size that still scrolls → the band partly visible and proportional, and it clears on scrolling back;
-   * a shrink while mid-fling, if reachable;
-   * leaving the result (Retry / Next / back) after a text-size change → Play and Home look normal.
-4. **Smoke — win + retry on the iPhone 16 with video,** measured with QA's own tool (`qa/d2/src`):
-   * the row on its cells to ≈ +600;
-   * the first result pixel ≈ +715;
-   * the pill at rest ≤ 940 within ± one capture frame. §20.10 (1): the Frontend's run 1 read +964, run 2 +947;
-   * retry at rest ≤ 400.
-5. **App suite** (`flutter test` in `app/`), or reuse under the fingerprint rule.
-6. **Full rubric re-score** from runtime (video for motion), every dimension explained. The D2 run scored 92 / 100 (lowest Accessibility 8) with F03-QA-D2-01 as the only blocking item.
+**Tests:**
+* a widget test that lays out the result at AX5 (a real text scaler), scrolls to the end, then drops the scale to 1.0 and, in a second case, to the 1.3× cap. Assert band visibility 0 and that the badge and back button are not under the band (read the `ScrollBand` visibility or its painted opacity; do not assert only the offset);
+* a case where the shrunk content still scrolls: the band equals the rule's value for the clamped offset;
+* **negative run:** remove the fix, show the new test fails, restore it. Record the counts in `frontend.md`;
+* existing suites stay green: `melos run analyze`, `flutter test` in `app/`, `dart format` 0 changed; `integration_test` 13 / 13 on the iPhone 16 if the diff touches a path it exercises (otherwise state why it was not re-run).
 
-**Critical journeys** carried from F03-QA-D2 by reuse unless the diff says otherwise: J1–J3 (rows 2, 0, 4), variants V1–V10, R1, N1 / N2, B1–B3, L1 / L2, M1 / M2, RM1 / RM2, D1.
+**Runtime evidence (F03.D2R-PARITY):**
+* QA's E-T5 steps on the iPhone 16, 16e and Pro Max: `capture-d2.sh seed <udid> 5 '["D0","D1"]'` → content size AX5 → CONTINUE → win → scroll the result to the end → `extra-extra-extra-large`, and again → `large`. Capture after each shrink: band gone, badge and back button clear;
+* the offset-0 control (shrink without scrolling) — unchanged;
+* one full-motion win + retry on the iPhone 16 with video, and a statement that the §20.3 timeline windows are unchanged (the timing tools may be reused);
+* restore the simulator settings: `large`, Reduce Motion 0.
 
-**Known deviations and limits** (not F03-FE-D2R defects unless the evidence says otherwise):
-* RESULT-F00-COMPONENT-ALIGN (the `EN İYİ` ★ offset, the pressed pill brightness);
-* RESULT-APP-SWITCHER-SNAPSHOT (qa.md N1 — follow-up, not in this rework);
-* D2-07 widget-tested only;
-* debug builds; Android not run (ANDROID-CI-EVIDENCE);
-* VoiceOver and the focus ring on the automated class;
-* Home in the legacy look (D3).
+**Non-goals:**
+* no layout, timeline, copy, input-lock, lifecycle, persistence or route change;
+* N1 (app-switcher snapshot mid-reveal) stays out → RESULT-APP-SWITCHER-SNAPSHOT;
+* the F00 component deviations stay out → RESULT-F00-COMPONENT-ALIGN;
+* F03-MULTITOUCH-FIRST-POINTER, MOVESCARD-COUNTER-LINE-HEIGHT, Home (D3) stay out;
+* no dependency or token change.
 
-**Startup impact:** none — no entry point, bootstrap, persistence or routing change.
+**Exit:**
+* the rule holds at runtime on the three devices;
+* the new test fails on the old code and passes on the new;
+* suites green;
+* F03.D2R-PARITY recorded (Frontend's provenance; the Tech Lead accepts it at the checkpoint);
+* Delivery Review → Pending, owner → Tech Lead for the rework checkpoint.
 
-**Exit criteria (Approved):**
-* an independent runtime rubric ≥ 93, every dimension ≥ 8, no `premium-ui-rubric` fail condition;
-* §16.11.1 (12) passes at runtime on the three devices, and every other §16.11.1 item holds (re-run or validly reused);
-* F04 AC1–AC10, F05 AC1 / AC12 and F03 AC8 / AC11 hold;
-* Android stated as a limit.
-
-On approval QA sets F03.D2R-VISUAL-QA to PASS, and may re-evaluate F03.D2-VISUAL-QA as superseded (the D1R precedent, §19.12 (4)). The Tech Lead then sets the gate to Passed and closes D2. Findings are welcome wherever the evidence contradicts this brief.
-
-**Deliver:**
-* **`qa.md`** — the final-stage report with the rubric table, evidence records in the gate schema, and findings.
-  * First move the current F03-QA-D2 report byte-for-byte to `history/f03-puzzle-play-session-2026-09-28/qa-at-d2-verdict.md` and add a README entry.
-  * **Why:** `tools/workflow-flow-audit.mjs` reads the first `Final Score` / `Lowest Dimension` in `qa.md`.
-* QA evidence in `qa/d2r/`.
-* The F03.D2R-VISUAL-QA record.
-* The local orchestration update, per the QA prompt.
+The Tech Lead then activates F03-QA-D2R (§20.9 (5)).
 
 ## Earlier briefs
 
 * F03-UI-D2 (UI Designer, done 2026-09-28) — archived byte-for-byte in history/f03-puzzle-play-session-2026-09-28/orchestration-at-ui-d2-delivery.md.
 * F03-FE-D2 (Frontend/Mobile Developer, done 2026-09-28) — archived byte-for-byte in history/f03-puzzle-play-session-2026-09-28/orchestration-at-fe-d2-delivery.md.
 * F03-QA-D2 (QA, done 2026-09-28, Rejected) — archived byte-for-byte in history/f03-puzzle-play-session-2026-09-28/orchestration-at-qa-d2-verdict.md.
-* F03-FE-D2R (Frontend/Mobile Developer, done 2026-09-28) — archived byte-for-byte in history/f03-puzzle-play-session-2026-09-28/orchestration-at-fe-d2r-delivery.md.
 * D1 briefs (F03-UI-D1, F03-FE-D1, F03-QA-D1, F03-FE-D1R, F03-QA-D1R) — archived byte-for-byte in history/f03-puzzle-play-session-2026-09-27/.
