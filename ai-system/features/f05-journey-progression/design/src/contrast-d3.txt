@@ -1,0 +1,16 @@
+# F05-UI-D3 contrast (WCAG 2.x; translucent fills composited on the navy ground; gen-d3.mjs contrastTable)
+ 17.24 : 1   wordmark "Loop" #F4F6FF on navy
+ 15.90 : 1   wordmark "let" #DDFA6B on navy
+  6.37 : 1   label #AEB4CA on glass (top)
+ 12.19 : 1   headline #F4F6FF on glass (top)
+ 11.24 : 1   headline lime #DDFA6B on glass (top)
+ 14.05 : 1   done numeral #0B1020 on lime #CDEB4B
+  6.67 : 1   current numeral #0B1020 on #8792F0 (darkest stop)
+ 10.19 : 1   open numeral #F4F6FF on open node
+  5.75 : 1   locked numeral #AEB4CA on locked node
+  3.41 : 1   locked outline rgba(174,180,202,.62) on glass (non-text, ≥ 3)
+  3.52 : 1   open outline rgba(168,180,249,.62) on glass (non-text, ≥ 3)
+ 15.01 : 1   CTA ink #0B1020 on #D5F252
+  9.35 : 1   subtitle #AEB4CA on ground mid #070C25
+  6.37 : 1   error body #AEB4CA on glass (top)
+  6.61 : 1   error glyph #A8B4F9 on glass (non-text)

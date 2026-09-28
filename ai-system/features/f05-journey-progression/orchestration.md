@@ -10,15 +10,15 @@ Rework
 
 ## Current Owner
 
-UI Designer
+Tech Lead
 
 ## Next Role
 
-UI Designer
+Tech Lead
 
 ## Active Task Ledger
 
-- [ ] Task ID: F05-UI-D3 | Assigned Role: UI Designer | Status: Open | Summary: The D3 handoff in F05 `ui-design.md` (replacing the Direction A home sections): Home in every §18.2 state incl. the N1 terminal-with-replay state, the loop track and its 30-level windowing (0 / 4 / 12 / 25 / 30), the store-error screen, the native launch + splash (iOS; Android light / dark), AX5, copy proposals, a D3 acceptance list and the Visual Evidence Manifest. Contract architecture §18. Brief: Current Brief | Depends On: -
+- [x] Task ID: F05-UI-D3 | Assigned Role: UI Designer | Status: Done | Summary: DELIVERED 2026-09-29 — ui-design.md rewritten as the D3 handoff (the pre-D3 file archived: history/f05-journey-progression-2026-09-29/ui-design-before-phase-d3.md). 41 renders + 4 contact sheets in design/ from design/src/gen-d3.mjs (deterministic): every Home state incl. the N1 terminal-with-replay (D3-07), the loop-track windowing A "sliding five" (recommended) vs B "band window" (rendered alternative), the store-error screen (normal, AX5 top / end, debug), native launch iOS / Android, splash, a 1290×2796 launch asset, 1.3× / AX5, device variants; the entrance prototype + stills; window table (src/window-d3.txt) and contrast table (src/contrast-d3.txt); acceptance list §11.1; manifest §12b; NTLC §14 (windowing selection, LoopNode states, headlines, dropped pulse, one-action error). No code. Original brief: The D3 handoff in F05 `ui-design.md` (replacing the Direction A home sections): Home in every §18.2 state incl. the N1 terminal-with-replay state, the loop track and its 30-level windowing (0 / 4 / 12 / 25 / 30), the store-error screen, the native launch + splash (iOS; Android light / dark), AX5, copy proposals, a D3 acceptance list and the Visual Evidence Manifest. Contract architecture §18. Brief: Current Brief | Depends On: -
 - [ ] Task ID: F05-FE-D3 | Assigned Role: Frontend/Mobile Developer | Status: Queued | Summary: Implement the D3 handoff from `app/lib/design` (Home, the loop-track addition, splash, `StoreErrorScreen`, native launch assets, `MaterialApp` ground) and the §18.3 (2) CONTINUE rule; tests updated (§18.4); `frontend.md` Visual Parity Evidence with a cold-start recording and the production-shaped cold boot (architecture §18.6) | Depends On: F05-UI-D3
 - [ ] Task ID: F05-QA-D3 | Assigned Role: QA | Status: Queued | Summary: Final-stage independent visual QA of D3 (rubric ≥ 93 from runtime; F05 AC7–AC10 / AC12 incl. the N1 replay rule warm and cold; error screen + Retry; cold start with no white frame; D1 / D2 regression over Home ⇄ `/play`) (architecture §18.6) | Depends On: F05-FE-D3
 
@@ -107,7 +107,8 @@ The D1 / D2 surfaces that Home opens into and returns from (gate Passed 2026-09-
   * Prerequisite / External Decision: the N1 Product Owner revision resynced — met 2026-09-29 (PO-REV-2026-09-29-F05-CONTINUE)
   * Re-evaluation Trigger: F05-UI-D3 delivery
   * Blocks: Visual Quality Gate = Ready for Implementation; F05-FE-D3
-  * Result: PENDING
+  * Result: PASS
+  * Provenance / Note: 2026-09-29 UI Designer, HEAD 9a36147 + working tree. ui-design.md (D3); 41 PNG renders + 4 contact sheets in features/f05-journey-progression/design/ from design/src/gen-d3.mjs + render-d3.sh (HTML/CSS → headless Chrome @2x; the launch asset @3x); `node gen-d3.mjs` regenerates every page byte for byte. Motion prototype design/src/D3-motion-prototype.html (`?t=`, `?rm=1`). Window table src/window-d3.txt; contrast src/contrast-d3.txt (locked outline raised to 3.41 : 1). Generated design artefacts, not runtime; Android rendered as a frame, not run. Windowing A recommended, Pending Selection (§14 (1)).
 
 - Evidence ID: F05.D3-PARITY
   * Scenario: The runtime matches the D3 handoff on the canonical simulators — every Home state beside its render; a cold-start recording from the native launch to Home with no white frame and no splash jump; the store-error screen forced, with no raw exception outside debug; the OS text sweep large → AX5 on Home and the error screen; the production-shaped cold boot from an empty and from an existing store; suites and integration_test green
@@ -147,7 +148,7 @@ None
 
 ## Next Action
 
-Run UI Designer on F05-UI-D3 — the D3 handoff (Current Brief; architecture §18).
+Run Tech Lead — the D3 visual-gate checkpoint: reconcile F05-UI-D3 (ui-design.md, F05.D3-HANDOFF), rule on ui-design §14 (windowing A vs B, the `LoopNode` state extension, the headlines, the dropped pulse, the one-action error screen), then set the gate and open F05-FE-D3.
 
 ## Last Decision
 
@@ -166,9 +167,9 @@ The pre-resync orchestration (the D3 activation decision) is archived byte-for-b
 
 ## Last Update
 
-* Updated By: Tech Lead
+* Updated By: UI Designer
 * Timestamp: 2026-09-29
-* Summary: PO revision resync — PO-REV-2026-09-29-F05-CONTINUE resynced (feature PRD AC7 / AC9; §8 / §6 / §15 amended; §18.3 (2) effective); blocker cleared; F05-UI-D3 Open; owner → UI Designer.
+* Summary: F05-UI-D3 delivered — the D3 handoff with 41 renders, the entrance prototype and the acceptance list; F05.D3-HANDOFF PASS; Delivery Review Pending; owner → Tech Lead (visual-gate checkpoint).
 
 ## Context & Follow-ups
 
@@ -203,6 +204,7 @@ The pre-resync orchestration (the D3 activation decision) is archived byte-for-b
 * 2026-09-29 — Tech Lead: PO revision resync.
   * **Decided:** feature PRD AC7 / AC9 resynced; §8 terminal precedence lapsed; §6 / §15 amended; §18.3 (2) effective; revision flag cleared.
   * **Next:** Rework; F05-UI-D3 Open; owner → UI Designer.
+* 2026-09-29 — UI Designer: F05-UI-D3 delivered (ui-design.md D3; renders in design/; the pre-D3 ui-design.md archived); F05.D3-HANDOFF PASS; Delivery Review Pending; owner → Tech Lead.
 
 ## Current Brief
 

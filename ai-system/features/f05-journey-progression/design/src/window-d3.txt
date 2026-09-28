@@ -1,0 +1,10 @@
+# F05-UI-D3 loop-track window (direction A) per rendered state — gen-d3.mjs windowA / nodeState
+new         count  0 inProgress  - current  1 → window 1–5: 1:current 2:locked 3:locked 4:locked 5:locked
+new_ip      count  0 inProgress  1 current  1 → window 1–5: 1:current 2:locked 3:locked 4:locked 5:locked
+mid         count  4 inProgress  - current  5 → window 1–5: 1:done 2:done 3:done 4:done 5:current
+ip          count  4 inProgress  5 current  5 → window 1–5: 1:done 2:done 3:done 4:done 5:current
+w12         count 12 inProgress 13 current 13 → window 9–13: 9:done 10:done 11:done 12:done 13:current
+w25         count 25 inProgress  - current 26 → window 22–26: 22:done 23:done 24:done 25:done 26:current
+replay      count 12 inProgress  7 current  7 → window 5–9: 5:done 6:done 7:current 8:done 9:done
+term        count 30 inProgress  - current  - → window 26–30: 26:done 27:done 28:done 29:done 30:finish
+termReplay  count 30 inProgress 12 current 12 → window 10–14: 10:done 11:done 12:current 13:done 14:done

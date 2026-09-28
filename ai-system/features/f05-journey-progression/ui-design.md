@@ -1,381 +1,394 @@
-# F05 — journey-progression: UI Design Handoff
+# F05 — journey-progression: UI Design Handoff (Phase D3 — Home + app shell)
 
-> UI Designer output. Contract authority stays in `architecture.md` (LOCKED — §4 identity, §8 navigation, §9 the micro-tutorial contract, §10 the home surface contract, §16 the F04 CTA-weighting follow-on). This handoff resolves `architecture.md §17 [PENDING — UI]` and must not change the interaction contract.
-> Mandatory references: `design/design-doctrine.md`, `design/premium-ui-rubric.md`, `features/f03-puzzle-play-session/ui-design.md` (Direction A — the app's established chrome), `features/f04-star-rating-and-personal-best/ui-design.md` (the `CompletionPanel` being re-weighted). No user-specified aesthetic → default premium doctrine applies.
-> Reuses F03's `PlayTheme` tokens (`app/lib/play/play_theme.dart`). **No new colour tokens.**
+> **Task:** F05-UI-D3 (UI Designer, 2026-09-29). **Contract:** `architecture.md` §18 — composition (1), N1 (2), loop track (3), copy (4), `Semantics` (5), text scale (6), store-error screen (7), launch and splash (8), performance (9); amendments §18.4; evidence §18.6.
+>
+> **Authority chain:** design-foundation §18 (decisions 4, 5, 6; consequences 4–5) → F00 `ui-design.md` §6–§8, §10, §13 and the selected source `S-06b-home-today.png` → this handoff → Frontend. The D1 load error (F03 `ui-design.md`, `D1-07`) is the sibling of the store-error screen.
+>
+> **Supersedes:** the Direction A home handoff (F05-UI, 2026-09-08: the 30-tick amber ring, `PlayTheme` tokens, the pulsing in-progress node). Its micro-tutorial sections were already superseded by F03 D1 (F03 `ui-design.md` §1–§14, architecture §19.5), and its `CompletionPanel` weighting by F03 D2 (F03 `ui-design.md` §16). The whole previous file is archived byte for byte as `history/f05-journey-progression-2026-09-29/ui-design-before-phase-d3.md` (SHA-1 `f2c133d8…`).
+>
+> **Unchanged:** the §6 read-model, unlock, persistence, the F09 seam, routes (`/` ⇄ `/play`). Presentation plus the N1 CONTINUE rule of §18.3 (2), which is already in the contract.
 
 ---
 
 ## 1. Feature Summary
 
-Three surfaces turn F03's isolated play session into a campaign:
-
-1. **The home surface** (`/`, replaces the debug `HomeScreen`) — the first screen a real build shows. LOOPLET wordmark, one dominant **CONTINUE** CTA, and a **journey-progress ring** that reads campaign momentum at a glance. Not the F10 menu (no DAILY, no Settings, no level-select map).
-2. **The "all 30 complete" terminal variant** of the home — an earned end-state; CONTINUE repurposes to "replay".
-3. **The levels 4–6 column micro-tutorial** — an action-gated, diegetic coach-mark over the F03 board that teaches the column shift and re-shows until the player performs one.
-
-Plus **(4)** a weighting rule for F04's existing `CompletionPanel` now that `Next Level` is live: at 3★ the amber pill moves to `Next Level`; at 1–2★ it stays on `Retry`.
-
-**Primary user intent:** *know where I am in the campaign, and get back into it in one tap.* The home's job is to make "4 / 30, next node glowing" feel like momentum worth continuing — this is the surface that drives the Level 5 Reach KPI.
-
----
+* **What changes:** the first screen of every launch. Home becomes the Loop Glass composition of `S-06b`:
+  * the `Looplet` wordmark;
+  * a glass card with the Journey position (`YOLCULUK · N / 30`), a two-line headline and a **loop track** — a window of five levels along a rising line;
+  * one lime "Devam et" pill with its glow, and the caption of where it leads.
+* **The app shell** joins it:
+  * the native launch and the Flutter splash become the same navy ground, with no white frame;
+  * the store-error screen becomes a Turkish glass card that never shows the raw exception.
+* **Primary user intent:** know where I am in the Journey, and get back into it in one tap.
+* **Fixes carried:** A-2 home (AX5 clipping; the 10 px debug overflow of F03-QA-D2R N5), A-3 (English + raw exception), A-4 (white launch), and the N1 rule (a replay in progress is never hidden, also after 30 / 30).
 
 ## 2. Design Direction
 
-### Direction A — "The loop, filling" (a progress ring as the home's hero)
+The Exploration Gate for Home closed at F00. Three directions were rendered on Home (`A-06`, `B-06`, `C-06`, `C-06b` in `features/f00-design-foundation/design/`), and **the user selected Direction C "Loop Glass" on 2026-09-21** (design-foundation §18). D3 builds `S-06b` (the shipped-scope composition) and does not reopen the direction.
 
-* **Visual character:** the same deep, warm-dark atmospheric **stage** as F03 (gradient `#0B0C16 → #141322`, one soft radial spotlight, corner vignette, optional grain). On it: the LOOPLET wordmark, and beneath it a large **progress ring** — a ~300° arc with a 60° gap at the bottom, divided into **30 tick-segments**. Completed levels light **amber** (a continuous glowing run from the top-left, clockwise); the **current** level is a brighter amber tick with a glowing node at its outer tip; locked levels are dim `muted`. At the ring's heart sits the count — a big tabular **"`N`"** with a smaller **"/ 30"** and a micro `SEVİYE` label. The **CONTINUE** pill nests into the ring's bottom gap, so the whole thing reads as one composed object: *wordmark → the loop, partly filled, with your count at its centre → CONTINUE emerging from the loop's base*. The ring is the campaign's namesake mechanic made into a progress meter, and it rhymes with F03's luminous loop-rails.
-* **Why it's strong:** the momentum read is the composition, not a widget bolted to a corner — a player who opens the app sees "4 / 30" *inside a loop that's clearly meant to fill* and wants to close the gap. It ties the home to the product's identity (the loop) and to F03's visual language (amber = resolution, cyan = active, luminous edges). One hero, one CTA, deliberate stage negative space — exactly the doctrine's "App-Store-featured game at first glance". It scales cleanly (30 ticks is legible; the fill is obvious in greyscale by length).
-* **Risks:** a 30-segment ring can tip fussy if the ticks are thin/noisy or the glow is overdone — the ticks must be confident, the glow a whisper, the amber run continuous (not 30 individually-glowing dots). On very short devices the ring must shrink before the wordmark/CTA do.
+What D3 designs that the selected source did not settle is **how 30 levels fit a card that shows five**. Two materially different windowing directions are rendered on the same states (12 / 30, 25 / 30, 4 / 30):
 
-### Direction B — "Stacked minimal" (wordmark, a bar, a button)
+### Direction A — "sliding five" (recommended)
 
-* **Visual character:** LOOPLET wordmark top; a plain horizontal progress bar + "12 / 30" mid-screen; the CONTINUE pill below; centred on the dark stage.
-* **Why it's strong:** trivial to build, unambiguous, fast.
-* **Risks (why it loses):** it is the generic "app home" — a bar and a button on a background. It reads mid-segment / template, has no identity, and makes campaign progress a thin horizontal strip rather than the thing you feel. `design-doctrine.md §8` explicitly rejects "üstte gradient, altta rastgele kartlar / buton" as a default. It would fail the "would this look natural inside a top mobile game?" check.
+* **Character:** the track is a trail. Five consecutive levels ride a rising line. The current level sits at the top end with its halo, the four behind it are lime, and a lead-in line fading in from the card's edge says "there is more behind you". It reads as climbing.
+* **Why strong:** it is `S-06b` itself: the same five slots, the same rising curve and the current node at the top. It has one fixed geometry for every state (always five nodes), so layout, tests and parity are predictable. Every state stays legible, including the new player (current at the foot of the line, four dashed locked nodes ahead) and the finish (26–30 lime, 30 crowned).
+* **Risks:** the absolute position in the Journey is carried by the label (`12 / 30`), not by the track; the track shows local context only.
+* **Artefacts:** `design/D3-03-home-in-progress-4of30.png`, `D3-04a-home-window-12of30.png`, `D3-04b-home-window-25of30.png` (+ every state in §8).
 
-### Selected Direction — **A ("The loop, filling")**
+### Direction B — "band window" (rendered alternative)
 
-The doctrine's default-when-unspecified rules all point at A: more premium, less generic, stronger single hero, tied to the product's identity, momentum-as-composition. B is the safe bar-and-button the rubric fails. **We take A, with discipline:** confident ticks, a restrained continuous glow on the completed run, one bright current-node, the ring shrinks first on small devices, the CTA always dominates.
+* **Character:** the window is the current **difficulty band** (1–3, 4–6, 7–10, 11–15, 16–20, 21–25, 26–30), so it shows 3 to 5 nodes. Seven band pips under the label map the whole Journey (done bands lime, the current band periwinkle, the rest outlined), with widths proportional to band size.
+* **Why strong:** it shows the whole Journey at a glance, and the window matches the difficulty curve's "one new idea at a time".
+* **Risks:**
+  * The node count varies (3–5), so the composition changes from band to band. At 4 / 30 the card shows only three nodes and feels empty (`D3-B-04of30-band`).
+  * At the start of a band the current node sits at the foot with four locked nodes (`D3-B-25of30-band`), so a player at 25 / 30 sees "mostly locked".
+  * The pips imply named chapters, which is level metadata the Foundation keeps as future scope (decision 4).
+  * The pips are a second progress indicator competing with the label.
+* **Artefacts:** `design/D3-B-04of30-band.png`, `D3-B-12of30-band.png`, `D3-B-25of30-band.png`; side by side in `D3-sheet-windowing-A-vs-B.png`.
 
----
+### Recommendation and Selection Record
+
+* **Direction (Loop Glass, composition `S-06b`):** selected by the user, 2026-09-21 (`F00.FOUNDATION-SELECTION`). Not reopened.
+* **Windowing:** the UI Designer recommends **A**. **Pending Selection** — the Tech Lead decides at the visual-gate checkpoint whether A is adopted within §18.3 (3) (the D2 precedent for retry A: a design choice inside a selected direction, not an Exploration Gate selection).
+  * **Why A:** it is the selected source's own geometry, it keeps one stable layout for every state, and it adds no information the Foundation deferred.
+* **N1 (terminal with a replay in progress):** decided by the user, 2026-09-29 (F05.D3-N1-REPLAY-PRECEDENCE; PO-REV-2026-09-29-F05-CONTINUE). The render `D3-07` matches the preview the user answered.
 
 ## 3. Screen Goals
 
-| Surface | Goal | What the player must understand in 3 seconds |
-| --- | --- | --- |
-| **Home — mid-campaign** | Show momentum + get back in | "I'm 4 of 30 in. The next one is right there. CONTINUE." |
-| **Home — brand new (0 / 30)** | Invite the first tap | "This is a 30-level journey. I start here." |
-| **Home — in-progress level** | Signal "you have an unfinished level" | "Level 5 is still going — one tap resumes it exactly." |
-| **Home — all 30 complete** | Reward completion, offer replay | "I finished the whole Journey. I can replay to beat my moves." |
-| **4–6 micro-tutorial** | Teach the column shift, gate on doing it | "Oh — I can slide columns now, up or down. Let me try." |
-| **CompletionPanel (re-weighted)** | Make the natural next action the loud one | "I nailed it — NEXT is the big button." / "Not my best — RETRY is." |
-
----
+| Screen / state | Purpose | What the player does | First 3 seconds |
+| --- | --- | --- | --- |
+| Native launch → splash | cover app start | nothing | one continuous navy ground; the wordmark arrives; no white flash |
+| Home · new player | start the Journey | tap "Devam et" | "İlk döngüyü çöz." — one bright node at the foot of the line, four ahead |
+| Home · mid / in progress | resume | tap "Devam et" | where I am (`YOLCULUK · N / 30`), the current node at the top of the climb, "Seviye N" (· sürüyor) |
+| Home · replay in progress (before 30 / 30) | finish the replay | tap "Devam et" | "Yarım kalan döngüne dön." — the replayed level is current, done levels on both sides |
+| Home · terminal 30 / 30 | celebrate, offer a replay | tap "Tekrar oyna" (→ level 1) | "Tüm döngüler tamam." — 26–30 lime, 30 crowned |
+| Home · terminal + replay in progress (N1) | never hide a half-played puzzle | tap "Devam et" | still "30 / 30 · Tüm döngüler tamam.", with the replay as the current node and "Seviye N · sürüyor" |
+| Store error | recover calmly | tap "Tekrar dene" | "your data is safe; try again" — no technical text |
 
 ## 4. UX Flow Direction
 
-```
-app launch ──▶ _BootstrapGate (F08 splash → home)
-  ▼
-HOME (/)
-  ├─ progress ring bound to JourneyProgressRepo.watch  (live; updates when a win commits elsewhere)
-  ├─ CONTINUE ─▶ resolve currentLevel (architecture.md §6):
-  │      in-progress level ─▶ /play (journeyLevel=N)  ─▶ F03+F08 restore exact state
-  │      else lowest unlocked incomplete ─▶ /play (journeyLevel=N)  [brand new ⇒ N=1, F09 seam interim]
-  │      else all 30 done ─▶ terminal variant renders in place (CONTINUE was already "Tekrar Oyna")
-  └─ (no back — app root)
+* **Cold start:**
+  1. Native launch: the ground image, with no content.
+  2. Flutter splash: the same ground; the `Looplet` wordmark fades in at its Home position (0 → 1 in 160 ms; instant under reduced motion).
+  3. Bootstrap OK → Home: the wordmark stays; the card, the CTA and the caption enter (§5 motion).
+  4. Bootstrap or migration fails → the store-error screen.
+* **The first frame before the Journey model loads is the splash frame** (the wordmark only). The Home content enters when the model arrives. There is no empty card and no spinner (`D3-08` = `D3-22`).
+* **Home → Play:** "Devam et" → `/play` with `currentLevel` (§6 / §8, unchanged). With 30 / 30 and a session in progress, "Devam et" resumes it (§18.3 (2)). With 30 / 30 and no session, "Tekrar oyna" opens level 1.
+* **Play → Home** (back, system back, the result's back, Next at level 30): Home is live (§6). The track and caption reflect the new state when Home is shown again; the node advance itself is not animated (§5).
+* **Store error → Retry:** re-runs the bootstrap. While it runs the splash frame shows again. The screen returns if the bootstrap fails again. There is no second action — the app has nothing else to offer without a store.
+* **Chrome:** Home and the store-error screen are the app root — **no back affordance**, no top bar, and the system status bar over the ground. System back on Home leaves the app (OS default). On the store-error screen it also leaves the app; the data stays intact.
 
-/play  (F03 screen; F05 additions)
-  ├─ on load: journeyLevel ∈ 4..6 AND kv['journey_col_tutorial_ack'] absent
-  │      ─▶ COLUMN MICRO-TUTORIAL overlay (dim board + gesture ghost + one line)
-  │            player performs a column-axis drag  ─▶ overlay fades, ack persists, play continues
-  │            player performs a row drag / does nothing  ─▶ overlay stays (gentle re-prompt)
-  │            player leaves (back → /)  ─▶ ack NOT set; re-shows next 4–6 entry
-  ├─ win ─▶ F04 win choreography ─▶ CompletionPanel (re-weighted CTAs, §7.4)
-  │            unlock write fires (JourneyProgressRepo.markCompleted, fire-and-forget)
-  │            Next Level ─▶ pushReplacement /play (journeyLevel=N+1)   [N<30 & content present]
-  │                     ─▶ context.go('/') → terminal    [N==30 or N+1 missing]
-  │            Retry ─▶ retryFromCompletion() (F04, in place)
-  │            Close / back ─▶ /
-  └─ chevron: F03 rule (quiet, top-left, hidden in `won`); always resolves to /
-```
+### App Chrome & Navigation Rules
 
-* **Friction removed:** no level-select map, no "are you sure", no confirm on replay. CONTINUE is one tap to the right level. The tutorial gates on *doing*, not reading.
-* **Wait states:** the `journey_progress` read is local + seeded → effectively instant; the home renders the ring in its dim state for at most a frame, never a spinner.
-
-### Header / top bar behaviour
-
-| Surface | System header | Custom top bar | Back affordance | Returns to |
+| Screen | System header | Custom top bar | Back affordance | Hardware / gesture back |
 | --- | --- | --- | --- | --- |
-| Home (`/`) | none | none | **none** (app root) | — |
-| Home — terminal | none | none | none | — |
-| `/play` + micro-tutorial | none | none | F03's quiet `‹` chevron (top-left), works during the overlay | `/` (`_popToCaller`, with a `!canPop → context.go('/')` fallback) |
-| `/play` + CompletionPanel | none | none | chevron **hidden** in `won`; panel CTAs own exit | Next → N+1 `/play` (replace) · Retry → in place · Close/back → `/` |
+| Native launch / splash | none (status bar only) | none | none | n/a |
+| Home (`/`) | none | the `Looplet` wordmark (not a button) | none — app root | OS default (leaves the app) |
+| Store error | none | the wordmark | none — app root | OS default (leaves the app) |
 
-* Portrait-locked (inherited). No confirm dialogs anywhere in F05.
-
----
+Sibling parity: the wordmark sits at the same (25, 58)·s on the splash, Home and the store-error screen. The store-error card is the D1 load-error card (`D1-07`) with the wordmark in place of the chevron, because this screen has no caller to go back to.
 
 ## 5. Visual System
 
 ### Background Direction
 
-* **The F03 stage, verbatim** — full-bleed vertical gradient `stage-0 (#0B0C16)` → `stage-1 (#141322)`; one large soft radial spotlight `stage-glow (#2A2350)` at ~12–14 % peak, centred slightly above the ring's centre; corner vignette `#000` ~18 %; optional 2–3 % grain. The home is the **same lit stage** as the play screen — a player moving `/` ⇄ `/play` feels one continuous space.
-* Never a flat fill; never a top-gradient / bottom-panel split.
+* The Foundation ground (`LoopBackdrop`): navy `#0A1030 → #070C25 → #050A1E`, the top-right light and the teal spill on the left.
+* The native launch shows **the same ground as a bundled image** (`D3-asset-launch-backdrop.png`, 1290 × 2796, aspect-filled) over a solid `#070C25`. The native frame, the splash and Home are therefore the same picture. No texture.
 
 ### Surface Direction
 
-* **Progress ring** — not a surface, a **drawn luminous object** (a `CustomPainter`):
-  * *track* (all 30 tick positions): each locked tick is a 3 pt rounded-cap radial stroke, ~12 pt long, colour `muted` @ 30 %, no glow.
-  * *completed run*: the contiguous leading ticks in `amber`, full opacity, with **one** soft outer glow spanning the whole filled arc (`#FFE9C2` ~10 %, blur ~14) — not 30 separate glows.
-  * *current node*: the tick at `currentLevel` in bright `amber` + a small filled dot (~5 pt) at its outer tip with a tight glow; if that level is **in-progress**, the dot gets a 1.5 pt `cyan` ring and a slow 4 s breathing pulse (±6 % opacity) — cyan is F03's "active" signal.
-  * *terminal*: all 30 `amber`, the whole ring glows, one restrained bloom on entry.
-* **CONTINUE pill** — F04's `_RetryCta` treatment: filled vertical gradient `amber → amber-lo`, `ink-amber` text (weight 700, ~17 pt, tracking +0.3), radius 16, a soft amber drop shadow (`#4DFFB020`, blur 20, y+6), height 54, width ≈ 66–72 % of screen. It nests visually into the ring's bottom gap (its top edge just inside the arc's inner radius).
-* **No cards, no borders elsewhere.** The wordmark, the count, the caption all sit directly on the stage. Three tiers: **stage** (deep) < **ring glow / count** (lit) < **CONTINUE pill** (raised, saturated). Nothing flat.
+* **Primary surface:** the glass card (`GlassCard`, radius 30·s), with the two decorative swirl arcs of `S-06b` clipped inside it.
+* **Secondary surfaces:** the nodes (§7) and the CTA pill.
+* **Depth:** shadows only for hierarchy — the card (24 / 60), the current node (12 / 30 periwinkle), done nodes (8 / 20 lime) and the CTA glow (18 / 50 lime at .26, Home keeps its glow; F00 ui-design §7).
+* No blur (§18.3 (9)).
 
 ### Color Direction
 
-All from `PlayTheme` — **no new tokens.**
-
-| Role | Token | Use here |
+| Role | Value | Use |
 | --- | --- | --- |
-| Stage | `stage-0` / `stage-1` / `stage-glow` | background gradient + spotlight |
-| Progress — done / current | `amber` (`#FFC24B`) + `amber-lo` for the CTA gradient | completed ticks, current node, CONTINUE fill |
-| Progress — locked | `muted` (`#8A88A0`) @ 30 % | locked ticks |
-| Progress — resume accent | `cyan` (`#5AA9FF`) | the in-progress node's ring + pulse (only there) |
-| Count figure | `paper` (`#F4EFE6`) | the big `N` |
-| "/ 30", labels, caption | `muted` | `/ 30`, `SEVİYE`, `Seviye 12` caption, micro-labels |
-| Wordmark | `paper` | LOOPLET, with a whisper of `stage-glow` behind |
-| CONTINUE text | `ink-amber` (`#2A1B00`) | on the amber pill |
-| Terminal kicker | `amber` @ 80 % | `TAMAMLANDI` |
-| Micro-tutorial dim | `#000` @ ~45 % | board dim during the overlay |
-| Micro-tutorial ghost / rails | `cyan` | the gesture ghost + the ignited column rails (F03's drag language) |
+| Lime (resolution, emphasis, primary) | `#DDFA6B`, nodes `#E3FB7E → #CDEB4B`, CTA `#E4FB80 → #D5F252` | done nodes, the finish node, `let`, the headline's emphasis word, the CTA |
+| Periwinkle (where you are) | `#B9C3FF → #8792F0`, halo `rgba(168,180,249,.16)` | the current node only; the open-node outline; the focus ring |
+| Text / muted | `#F4F6FF` / `#AEB4CA` | headline, numerals / label, caption, locked numerals, error body |
+| Danger | none | the store error uses the calm glass card and the periwinkle `loopBreak` glyph, as the D1 load error does — nothing is the player's fault |
+| Success | lime (the finish) | 30 / 30 |
 
-* Amber = progress + the one CTA; cyan = "active / resumable / the gesture you're learning"; nothing else is saturated. No pure `#000` / `#FFF`.
+Contrast (computed, `design/src/contrast-d3.txt`): label 6.37 : 1 on glass; headline 12.19; lime emphasis 11.24; done numeral 14.05; current numeral 6.67 (on the darkest stop); open numeral 10.19; locked numeral 5.75; CTA ink 15.01; caption 9.35 on the ground; error body 6.37. Non-text: the open outline 3.52 and the **locked outline 3.41** (raised from .46 to .62 alpha to clear 3 : 1).
 
 ### Typography Direction
 
-Reuse `PlayTheme` styles; no new roles.
+* **Wordmark:** Space Grotesk 500 25·s, `Loop` `#F4F6FF` + `let` lime (`LoopletWordmark`).
+* **Label:** Manrope 600 11·s caps, +0.2 em, authored `YOLCULUK` — never `toUpperCase`.
+* **Headline:** Space Grotesk 500 28·s / 1.16, two authored lines, one lime word.
+* **Node numerals:** Space Grotesk 500, 14·s (small) / 17·s (current, finish).
+* **CTA:** Manrope 500 16·s. **Caption:** Manrope 500 14·s, muted.
+* **Error screen:** headline 28·s Space Grotesk, body Manrope 500 14.5·s / 1.4 muted, pill Manrope 500 16·s.
 
-* **LOOPLET wordmark:** `paper`, weight 800, ~30–34 pt, letter-spacing ~5–6 pt (a touch wider + larger than the current 28/4 debug home — it is the hero when there's no board). Optional: the two centre letters slightly tighter so the word reads as a unit. Type-only, no logo asset.
-* **Count `N`:** `movesNumber` scaled up — tabular lining, weight 700, `paper`, ~46–54 pt. Animates a single count-tick + 1.0→1.06→1.0 pulse (140 ms) when it changes (a level completed while the home was visible).
-* **`/ 30`:** `completionStat` at ~22–24 pt, `muted`, baseline-aligned to the `N`.
-* **`SEVİYE` / `TAMAMLANDI` micro-label:** `microLabel` (all-caps, weight 600, tracking +1.4, `muted`; the terminal kicker in `amber` @ 80 %).
-* **`Seviye 12` caption** (under CONTINUE): `helper` (weight 400, `muted`, ~13 pt); for an in-progress level add `· sürüyor` in the same style.
-* **CONTINUE label:** F04's CTA text spec (17 pt / w700 / `ink-amber`).
-* **Micro-tutorial line:** `helper` at ~14 pt, `paper`, one line, centred, positioned clear of the board.
+### Motion / Sensory Direction
 
----
+* **Home entrance** (when the Journey model arrives; prototype `design/src/D3-motion-prototype.html`, `?t=<ms>`, `?rm=1`):
+  * card 0 → 240 ms; CTA 60 → 300 ms; caption 120 → 340 ms;
+  * each is opacity 0 → 1 with a 10·s rise, ease-out `cubic-bezier(.22,.61,.36,1)`;
+  * at rest by 340 ms. The wordmark does not move — it is already there from the splash.
+* **Reduced motion** (`reduceMotionRequested()`): everything appears at once (`D3-M-entrance-reduced`); the splash wordmark appears without a fade.
+* **No idle motion on Home:**
+  * The shipped breathing pulse on the in-progress node is dropped: the Foundation specifies no Home motion, and the halo already marks the place.
+  * The node advance after a win is not animated. Home is not visible during the win, and on return it simply shows the new state.
+* **Interruption:** if the model changes during the entrance (a very fast return from `/play`), the entrance is not restarted; the content updates in place.
+* **Pressed CTA:** the shipped `LimePill` press (scale 0.98). The −5 % brightness of the Foundation render is **not** added here (RESULT-F00-COMPONENT-ALIGN stays open; do not fork the press per screen).
+* **Audio / haptics:** N/A — F11.
 
 ## 6. Layout Structure
 
-### Home surface (portrait)
+All measurements are pt at the 358 reference, × `s = W / 358`; `e = H − 717·s` is the spare height (`S-06b` parity: card top 132.8 pt, CTA top 486.3 pt on 393 × 852; the render reads 133 / 486).
 
-```
-┌───────────────────────────────────────────────┐  ← top safe-area inset
-│                                               │  ~10–14 % stage air
-│                 L O O P L E T                 │  WORDMARK (hero)
-│                                               │  ~28–36 pt air
-│              ╭───────────────╮                │
-│           ╭──┤    ▏▎▍  fill  ├──╮             │  PROGRESS RING  (~62 % screen width)
-│          │   │      4        │   │            │   300° arc, 60° gap at bottom
-│          │   │    ─────      │   │            │   30 ticks · completed run amber + one glow
-│           ╰──┤   / 30        ├──╯             │   current node bright (+ cyan ring if in-progress)
-│              ╰───┐  SEVİYE ┌──╯               │   centre: N  /  30  ·  SEVİYE
-│              ┌───┴─────────┴───┐              │
-│              │   D E V A M   E T   │          │  CONTINUE pill (nested in the ring's gap)
-│              └───────────────────┘            │
-│                   Seviye 12                   │  caption (muted)
-│                                               │  ~14–18 % stage air
-└───────────────────────────────────────────────┘  ← bottom safe-area inset (min 16 pt)
-```
-
-* **Spacing rhythm:** 4 / 8 pt. Vertical beats: safe-area → wordmark (10–14 % air) → ring (28–36 pt below the wordmark) → CONTINUE (nested, top edge ~inside the arc inner radius) → caption (10 pt below CONTINUE) → bottom air (14–18 %). The air above and below is deliberate **stage** negative space, not emptiness — the eye lands on the ring.
-* **Ring geometry:** outer diameter `min(screenWidth * 0.62, availableHeight * 0.42)`; stroke ticks ~3 pt; arc 300° (gap 60° centred on bottom). The count sits at the geometric centre. CONTINUE's width ≈ 66–72 % screen, centred, its top overlapping the arc gap.
-* **Shrink strategy (short devices):** the ring diameter shrinks first (down to a floor of ~180 pt); then the wordmark→ring air compresses (to ~16 pt); the wordmark, the count, and the CONTINUE pill never shrink. The layout never scrolls.
-* **Composition intent:** one vertical spine — wordmark, ring+count, CONTINUE — optically centred on the stage. No corners used, no floating chrome.
-
-### Micro-tutorial overlay (over the F03 `/play` board)
-
-* A full-screen dim layer (`#000` @ ~45 %) **above** the board and target rail, **below** F03's top-bar chevron.
-* Centred over the board: an animated **gesture ghost** — a rounded finger/disc + a vertical double-arrow (↕), looping a ~1.4 s up-then-down drag motion; the board's vertical **loop-rails ignite** cyan at the top/bottom edges during the ghost's motion (reusing F03's drag affordance).
-* One line of copy above or below the board (whichever has room), `helper` / `paper`: *"Sütunları da kaydırabilirsin — yukarı ya da aşağı."* / *"You can slide columns too — up or down."*
-* No button. No "skip". The overlay clears only when the player performs a column-axis drag.
-
-### CompletionPanel (F04 — re-weighted, layout otherwise unchanged)
-
-* The panel's structure, star reveal, `N / 3` caption, `SEN / OPTİMAL / EN İYİ` triptych, markers, and `Close` are **exactly as F04 shipped**. Only the **two CTA rows swap treatment + order** per §7.4.
-
----
+* **Wordmark:** (25, 58)·s.
+* **Content column:** left 24·s, width 309·s, top `115·s + 0.1·e`. It is a flow column, so free text can grow without overlap:
+  1. **Card** 308·s wide (offset 0.5·s), radius 30·s, padding 31·s / 24.5·s, min-height 300·s:
+     * the label (11·s caps);
+     * the headline (margin-top 15·s; two lines, 28·s / 1.16);
+     * the **track block**: margin-top 12·s, full card width, height 166·s. At 1.0× the card is exactly 300·s: 31 + 11 + 15 + 65 + 12 + 166. It grows only when the capped headline or label does.
+  2. **CTA:** margin-top 22·s, 309·s × min 63·s, radius 32·s, padding 12·s / 23·s; the label left, `LoopIcon.arrowRight` 20·s right.
+  3. **Caption:** margin-top 17·s, centred, 14·s.
+* **The loop track (direction A), card-local coordinates:**
+  * **Window** (`design/src/window-d3.txt` lists it for every rendered state):
+    * terminal (`currentLevel == null`) → 26–30;
+    * the current level is the frontier (no completed level above it) → `start = clamp(current − 4, 1, 26)`;
+    * the current level is a replay (a completed level above it exists) → `start = clamp(current − 2, 1, 26)`.
+  * **Spacing:** centre-to-centre 50 between two small nodes, and 64 next to a big node (current or finish, 58 pt with a 76 pt halo). The chain is centred on the card's centre (x = 154).
+  * **Height:** `y = 236 − 62·p^1.25`, with `p = (x − 40) / 230` clamped to 0…1. The track block starts at card y 134, so a node's block y is `y − 134`.
+  * **Lead-in:** if the window starts after level 1, a lime line fades in from the card's left edge (x 0, y 240) to the first node.
+  * **Tail:** if more levels follow the window and there is ≥ 48 pt of room, a dashed muted line runs to the card's right edge.
+  * **Segments:** into a done or finish node, solid lime 3.2·s (0.55 opacity when leaving the current node); into the current node, a lime → periwinkle gradient; into an open or locked node, dashed muted 2·s (2 / 5).
+  * **Guarantees**, checked in the renders: nodes never overlap each other or a halo (the minimum gap to a halo edge is 64 − 38 − 19 = 7 pt); the current node is always inside the window; nothing is drawn outside the card.
+* **Store-error screen:** the wordmark at (25, 58)·s; a column (card + pill, gap 20·s) centred between 118·s and `H − 40·s`, left 24.5·s, width 309·s. The card has padding 28 / 26 / 30·s; a row with the label and the 44·s `loopBreak` glyph; the headline (margin 16·s); the body (margin 12·s). Then one `LimePill` (no glow, no icon — the D1 sibling). In debug builds only, a dashed details box follows the pill (§8).
+* **Rhythm:** the lower third of Home stays empty on purpose, as in `S-06b`. The card and the CTA are one group, and the eye ends on the caption.
 
 ## 7. Component Decisions
 
-### 7.1 Progress ring
-
-* **Role:** the campaign-momentum read — the home's hero.
-* **Weight:** the largest object on the home; the count at its centre is the loudest number.
-* **States:** `0 / 30` (all-dim track + one bright node at level 1) · mid (`N` amber ticks + node) · in-progress (node gets a cyan ring + slow pulse) · `30 / 30` (full amber, one bloom on entry) · loading (dim track, count hidden ≤ 1 frame).
-* **Why not generic:** not a horizontal bar, not a percentage donut with a label slapped beside it — a 30-tick loop that is *obviously meant to fill*, tied to the product name and F03's rail motif. The greyscale read is the length of the amber run.
-
-### 7.2 CONTINUE CTA
-
-* **Role:** one tap back into the campaign — the only real action on the home.
-* **Weight:** dominant. F04's `_RetryCta` treatment (amber→amber-lo fill, `ink-amber` w700, soft amber shadow), ~66–72 % width, nested into the ring's bottom gap.
-* **Label logic:** `DEVAM ET` normally; `TEKRAR OYNA` in the terminal state. Caption beneath: `Seviye {N}` (+ `· sürüyor` when resuming an in-progress level).
-* **Pressed:** scale 0.97 + a 2 px inward nudge (F03's control feel). No confirm.
-* **Why not generic:** it is F03/F04's established CTA — one warm dominant action, not a "default button".
-
-### 7.3 Column micro-tutorial overlay
-
-* **Role:** teach the column shift on first entry to the 4–6 band; gate on the player doing it (AC4/AC11).
-* **Weight:** commanding but diegetic — it dims the board and points at the gesture; it does not paste a modal card of text.
-* **State behaviour:** *shown* (dim + looping ghost + one line) → *satisfied* (any gesture F03 resolves to `MoveAxis.column` — applied or bounced; a committed vertical intent — fades over ~200 ms, `ack` persists) → *re-prompt* (a row gesture or 6 s idle → the ghost does one emphatic cycle + the line pulses once). Leaving via the chevron does **not** set `ack`.
-* **Why not generic:** no "Got it" button to tap past without learning; the dismissal *is* the lesson. Reuses F03's spotlight-dim + cyan-rail language so it feels part of the same game, not a bolted-on tutorial SDK.
-
-### 7.4 CompletionPanel CTA weighting [resolves `architecture.md §16`]
-
-Now that `Next Level` is live (F05 supplies `onNextLevel`), the amber pill goes to the action the player most likely wants:
-
-| Result | Primary (amber `_RetryCta` pill, top of the stack) | Secondary (ghost pill — `muted` outline, `muted` label) | Tertiary |
-| --- | --- | --- | --- |
-| **3★ / `isPerfect`** | **SONRAKİ** (`Next Level`) | **YENİDEN** (`Retry`) | `Kapat` |
-| **1–2★ (not perfect)** | **YENİDEN** (`Retry`) — unchanged from F04 | **SONRAKİ** (`Next Level`) — now **enabled**; drop the `· yakında` suffix | `Kapat` |
-| **no-optimal fallback** | **YENİDEN** (`Retry`) | **SONRAKİ** (`Next Level`, enabled) | `Kapat` |
-| **level 30 / last available** | per the star result above | the other CTA — `Next Level` still renders; it routes to the terminal state | `Kapat` |
-
-* This is a **weighting + order swap only** — the two CTA widgets already exist in F04's panel (`_RetryCta` = amber pill, `_NextLevelCta` = ghost pill). At 3★ they trade treatment (the ghost pill's build takes the label `SONRAKİ`, the amber pill's build takes `YENİDEN`) and swap stack order (primary always on top). Everything else in the panel is untouched.
-* **Never** two amber pills; **never** an equal-weight pair. Exactly one amber pill per panel.
-* The `· yakında` / disabled affordance is **gone** in F05 (F05 always supplies a real handler — even level 30's routes to the terminal). Keep F04's `RatingStrings.soon` string for a possible future disabled state; unused now.
-
-### 7.5 LOOPLET wordmark
-
-* **Role:** identity + the home's visual anchor above the ring.
-* **Weight:** the second-loudest thing on the home (after the count). `paper`, w800, ~30–34 pt, wide tracking, a whisper of `stage-glow` behind it. Type-only.
-* **Why not generic:** deliberate tracking + a faint stage-glow halo make it feel *placed*, not a default `Text('LOOPLET')`.
-
----
+| Component | Role | Visual weight | States | Why not generic |
+| --- | --- | --- | --- | --- |
+| `LoopletWordmark` (existing) | identity, top-left | low–medium | capped at 1.3× | a text-set mark with a lime tail — not a logo lockup |
+| `GlassCard` (existing) | the Journey card | medium | grows with the capped headline | holds the swirl arcs and the track — the card is the journey |
+| **`LoopTrack`** (new, D3 design-layer addition) | the window of five levels | high | the window rule, segments, lead-in and tail (§6) | a climbing trail instead of a progress bar or ring |
+| `LoopNode` (existing, **extended**) | one level | done low / current highest | **done**: lime 38·s. **current**: periwinkle 58·s + 76·s halo. **open**: glass fill `rgba(255,255,255,.06)`, 1.5·s solid periwinkle outline (.62), text numeral. **locked**: fill `.035`, 1.5·s **dashed** outline `rgba(174,180,202,.62)`, muted numeral. **finish**: lime 58·s + lime halo (`rgba(221,250,107,.11)`, edge .30) | each state differs in fill *and* edge *and* size — readable in greyscale |
+| `LimePill(glow: true)` (existing) | the one action | highest | normal, pressed (0.98), focused (2·s periwinkle ring, 3·s offset), label wraps between words | the only lime surface outside the track |
+| Caption | where the CTA leads | low | "Seviye N" / "Seviye N · sürüyor" | no chip; plain muted text with no-break joins (§11) |
+| Store-error card | recovery | medium | normal, AX5 (scrolls), debug details | the D1 load-error card, with the wordmark in place of the chevron |
+| `ScrollBand` (existing, D2) | keeps scrolled text off the status bar | — | only when the error column scrolls (AX5) | reuse, no new pattern |
 
 ## 8. State Design
 
-| State | How it looks | How it differs | What it feels like |
-| --- | --- | --- | --- |
-| **home — mid-campaign** | wordmark; ring with `N` amber ticks + a bright current node; `N / 30`; amber CONTINUE; `Seviye N+1` caption | baseline | "momentum — one tap and I'm back" |
-| **home — brand new (0/30)** | ring all-dim except a single bright node at level 1; `0 / 30`; CONTINUE `DEVAM ET` / `Seviye 1` | no amber run yet | "a fresh 30-level journey; I start here" |
-| **home — in-progress level** | the current node carries a `cyan` ring + a slow breathing pulse; caption `Seviye N · sürüyor` | one node is cyan-accented and alive | "I have an unfinished level waiting" |
-| **home — all 30 complete (terminal)** | full amber ring + a soft one-shot bloom on entry; centre `30 / 30` + `TAMAMLANDI` kicker (amber); CONTINUE relabelled `TEKRAR OYNA` / caption `Seviye 1` | the ring is closed and glowing; the CTA is "replay" | "I finished the whole thing" — earned, not a dead-end |
-| **home — loading** | stage + wordmark instant; ring track dim, count hidden; no spinner | ring is skeletal for ≤ 1 frame | never a blank flash |
-| **micro-tutorial — shown** | board dimmed 45 %; looping vertical gesture ghost; cyan rails ignite on the ghost's motion; one line of copy | the board is "held" and pointed at | "oh — columns move too; let me try" |
-| **micro-tutorial — re-prompt** | the ghost does one emphatic up-down cycle; the copy line pulses once | a nudge, not a scold | "no, *this* way — vertically" |
-| **micro-tutorial — satisfied** | overlay fades over ~200 ms; play resumes normally; never shown again for this player | it's gone, and it stays gone | "got it" — learned by doing |
-| **CompletionPanel — 3★** | amber pill on `SONRAKİ` (top), ghost pill on `YENİDEN` | the loud button is NEXT | "I nailed it — onward" |
-| **CompletionPanel — 1–2★** | amber pill on `YENİDEN` (top), ghost pill on `SONRAKİ` (enabled) | the loud button is RETRY; NEXT is a real secondary | "close — let me beat that" |
-| **focused (assistive tech)** | 2 pt `amber` focus ring, 2 pt offset, on CONTINUE / the panel CTAs / the ring (one focusable node announcing "12 of 30 levels complete, current level 12") | a crisp on-brand ring | reachable, on-brand |
+| State | Render | Look | Differs from the baseline by | Feels like |
+| --- | --- | --- | --- | --- |
+| **Home · new (0 / 30)** | `D3-01` | label `0 / 30`; "İlk döngüyü çöz."; node 1 current at the foot, 2–5 locked (dashed); "Devam et" / "Seviye 1" | no lime yet; the line ahead is dashed | a clear first step |
+| Home · new, level 1 started | `D3-01b` | as new; caption "Seviye 1 · sürüyor" | the caption only | "I've started" |
+| **Home · mid (4 / 30)** | `D3-02` | 1–4 lime, 5 current at the top; "Sıradaki döngüyü çöz."; "Seviye 5" | baseline | momentum |
+| **Home · in progress (4 / 30)** | `D3-03` | as mid; "Seviye 5 · sürüyor" (`S-06b` parity) | the caption | "pick up where I left" |
+| Home · window 12 / 30, 25 / 30 | `D3-04a`, `D3-04b` | 9–13, 22–26; the lead-in line from the edge | the numbers and the lead-in | a longer road behind |
+| **Home · replay in progress (12 / 30, replaying 7)** | `D3-05` | window 5–9: 7 current in the middle, 8–9 lime after it; "Yarım kalan döngüne dön."; "Seviye 7 · sürüyor" | the headline and the current node's position | "finish what I opened" |
+| **Home · terminal (30 / 30)** | `D3-06` | 26–29 lime, 30 **finish** (lime, crowned by its halo); "Tüm döngüler tamam."; "Tekrar oyna" / "Seviye 1" | no periwinkle anywhere | earned completion |
+| **Home · terminal + replay (N1)** | `D3-07` | `30 / 30`, "Tüm döngüler tamam."; window 10–14 with 12 current; "Devam et" / "Seviye 12 · sürüyor" | the CTA and caption resume; the card still says complete | nothing is lost |
+| Home · loading | `D3-08` | = the splash (`D3-22`): ground + wordmark | no card or CTA yet | calm, continuous |
+| Home · CTA pressed | `D3-09` | the pill at 0.98 | scale | responsive |
+| Home · focus (keyboard) | `D3-11` | 2·s periwinkle ring, 3·s offset, on the pill | the ring | reachable without touch |
+| Home · 1.3× | `D3-10`, `D3-v-*-text-cap-1_3` | the headline, label, wordmark and numerals at the cap; the card grows 12 pt | the size only | the same composition |
+| Home · AX5 | `D3-10b`, `D3-10c`, `D3-v-16e-home-ax5` | container text at 1.3×; CTA label and caption at the OS scale; the caption wraps before "·" | larger free text; **no scroll needed** on 390–440 widths | readable, nothing clipped |
+| **Store error** | `D3-20` | glass card: `KAYITLI VERİLER`, `loopBreak`; "Kayıtlı verilerin açılamadı."; "İlerlemen güvende; hiçbir şey silinmedi."; "Tekrar dene" | no board, no chevron | calm, one way forward |
+| Store error · AX5 | `D3-20b` (offset 0), `D3-20d` (scrolled to the end, `ScrollBand` under the status bar) | the body and pill at the OS scale; the column scrolls; the pill is reached by scrolling | scroll | still one clear action |
+| Store error · debug build | `D3-20c` | a dashed box under the pill: `DEBUG · YALNIZ GELİŞTİRME DERLEMESİ` + the exception | debug only (`kDebugMode`) | developer detail, visibly apart |
+| Native launch | `D3-21` (iOS), `D3-21b` (Android; light and dark mode identical) | the ground image, nothing else | — | no white |
+| Splash | `D3-22` | ground + wordmark | — | continuous |
+| Entrance | `D3-M-entrance-t0000 … t0340`, `D3-M-entrance-reduced` | §5 | — | settled |
 
----
+Not applicable on this surface: empty (the Journey always exists), disabled CTA (there is always a target), selected (no choice). Error is covered by the store-error screen; a Home-level content error does not exist (the model is local).
 
-## 9. Premium Differentiators (concrete)
+## 9. Premium Differentiators
 
-1. **Progress-as-the-loop** — a 30-tick ring that is obviously meant to fill, named after the product, rhyming with F03's luminous rails; momentum is the composition, not a corner widget.
-2. **One continuous glow on the completed run** — not 30 individually-glowing dots; the filled arc reads as a single lit stroke.
-3. **The current node** — a bright amber tip-dot; **cyan ring + breathing pulse when the level is resumable** — one glance tells you "you have an unfinished level".
-4. **CONTINUE nested into the ring's gap** — the CTA emerges from the loop's base; wordmark → loop → CONTINUE is one object, one vertical spine.
-5. **The home shares F03's exact stage** — same gradient, spotlight, vignette; `/` ⇄ `/play` is one continuous lit space, not two different apps.
-6. **The terminal state is earned, not a dead-end** — a closed glowing ring + one restrained bloom + `TAMAMLANDI` + a repurposed CTA (`TEKRAR OYNA`), never a hidden/greyed button.
-7. **The micro-tutorial is diegetic and gated on doing** — board-dim + a looping gesture ghost + F03's cyan rails; no "Got it" button; the dismissal *is* the lesson; it survives a force-quit until the player actually shifts a column.
-8. **Exactly one amber pill per completion panel, chosen by the result** — 3★ makes NEXT loud, 1–2★ keeps RETRY loud; the replay hook and the progress hook each get the emphasis when it matters.
-9. **Tabular count with a settle-tick** — the "`N` / 30" figure count-ticks + pulses when a level completes while the home is visible (live via `JourneyProgressRepo.watch`).
-10. **Zero new tokens** — the whole feature is drawn from F03's `PlayTheme`; identity parity is structural, not a re-theme.
+1. **The track is a climb, not a bar:** the current node sits at the top of a rising line; the finish at 30 / 30 is crowned in lime.
+2. **Four node states that read in greyscale:** fill vs outline, solid vs dashed, and size with a halo — colour is never the only cue.
+3. **A lead-in line that fades from the card's edge,** so a window of five still says "there is more behind you" without a second indicator.
+4. **One headline per situation, one lime word:** "İlk / Sıradaki döngüyü çöz.", "Yarım kalan döngüne dön.", "Tüm döngüler tamam." — authored lines, not a template.
+5. **The N1 state keeps both truths:** the card says complete (30 / 30), and the CTA resumes the replay.
+6. **One continuous picture from cold start:** the native launch image is the Flutter backdrop, the wordmark lands where Home keeps it, and only the content enters.
+7. **An error screen that looks like the product:** the sibling of the D1 load-error card; calm periwinkle glyph, reassurance first, no stack trace.
+8. **The same anchors as the selected source** (card 133, CTA 486 pt on 393 × 852), so the redesign reads as the Foundation, not an interpretation of it.
 
----
+## 10. Anti-Patterns to Avoid
 
-## 10. Anti-Patterns to Avoid (F05-specific)
-
-* A flat home: wordmark on top, a thin grey progress bar, a blue "Continue" button (Direction B — the rubric fails it).
-* A full level-select map / grid of 30 level tiles — explicitly out of MVP scope; the ring + CONTINUE is the whole navigation.
-* A percentage donut with "40 %" and a label beside it — generic dashboard language; use the tick-ring + "`N` / 30".
-* 30 separately-glowing dots (noise) instead of one continuous glow on the filled run.
-* A spinner / skeleton shimmer on the home while `journey_progress` reads (it's local + instant).
-* A modal card of tutorial text with a "Got it" / "Skip" button — the tutorial must be diegetic and action-gated.
-* The tutorial blocking the whole screen so the player can't see the board they're meant to act on.
-* Two amber pills (or two ghost pills) on the completion panel; an equal-weight CTA pair.
-* Keeping the `· yakında` affordance on `Next Level` in F05 (it's always enabled now).
-* A dead / hidden primary CTA in the terminal state.
-* A DAILY button, a Settings icon, or any F10 menu element creeping onto this surface.
-* Re-theming — introducing colours/type outside `PlayTheme`, or a lighter "menu" background that breaks stage parity with `/play`.
-
----
+* A progress bar or percentage for the Journey, or showing all 30 nodes in the card.
+* Colour-only node states; a locked node that is just greyed lime.
+* The future-scope items (the settings square, the level-info card, the streak and stars chips, the gesture hint).
+* Locale-blind uppercasing (`YOLCULUK`, `KAYITLI VERİLER` are authored).
+* An empty card or a spinner during load — use the splash frame.
+* A white or theme-dependent native launch (Android `?android:colorBackground`).
+* Showing the exception text to players, or a red error treatment.
+* An idle pulse or breathing animation on Home.
+* A second button on Home (a "start over" beside "Devam et") — it would discard a session in progress (§18.3 (2)).
 
 ## 11. Frontend Handoff
 
-### Must not be broken (contract-level UI decisions)
+**Must not break**
+* The composition and the anchors of §6 at 1.0× (±2 pt): wordmark, card top and height 300·s, track block, CTA top, caption.
+* **The window rule** and the node states exactly as in §6 / §7 (`window-d3.txt` is the expected-value table for a component test).
+* The N1 CONTINUE rule: CTA = "Devam et" whenever a Journey session is in progress, including at 30 / 30; "Tekrar oyna" only when the model is terminal (`continueTarget == null`).
+* Text scale: container text (wordmark, label, headline, node numerals, error headline and label) through `loopCappedTextScaler`. Free text (CTA label, caption, error body, error pill) follows the OS scale, wrapping between words only. Home does not scroll at AX5 on 390–440 widths. The error column may scroll above the cap, with `ScrollBand` at the top.
+* No-break joins in the caption: `Seviye N` and `· sürüyor`.
+* No raw exception outside `kDebugMode`, and the exception is logged in every build.
+* The native launch: iOS `LaunchScreen.storyboard` (background `#070C25` + the launch image, aspect fill); Android `drawable/` and `drawable-v21/launch_background.xml` (solid `#070C25` + the image, fill); `LaunchTheme` **and** `NormalTheme` in `values/` and `values-night/` point at that drawable — no `?android:colorBackground`.
+* The `MaterialApp` scaffold background is `#070C25`; `title: 'Looplet'`.
 
-* **The home is on F03's exact stage** — `stage-0 → stage-1` gradient, the radial spotlight, the vignette. `/` and `/play` must feel like one lit space.
-* **One vertical spine:** LOOPLET wordmark → progress ring (count at its centre) → CONTINUE nested in the ring's bottom gap → `Seviye N` caption. Deliberate stage air above and below.
-* **The ring is a drawn object** (`CustomPainter`), 30 ticks, ~300° arc / 60° bottom gap. **Completed run = one continuous amber glow**, not per-tick glows. Locked = `muted` @ 30 %. **Current node = a bright amber tip-dot**; **in-progress ⇒ that node gets a `cyan` ring + a slow (~4 s, ±6 %) breathing pulse** — the only place `cyan` appears on the home.
-* **The count is `N` / `30`** (tabular, `paper` `N` big, `muted` `/ 30` smaller) + a `SEVİYE` micro-label — **not** a percentage, **not** a donut label. It **settle-ticks + pulses** when it changes (bind to `JourneyProgressRepo.watch`).
-* **CONTINUE** = F04's amber `_RetryCta` treatment, ~66–72 % width, dominant, nested into the ring gap. Label `DEVAM ET` / caption `Seviye {N}` (+ `· sürüyor` for in-progress); terminal → `TEKRAR OYNA` / `Seviye 1`.
-* **Terminal state:** full amber ring + **one** restrained bloom on entry + `30 / 30` + `TAMAMLANDI` (amber) + CONTINUE **repurposed** to `TEKRAR OYNA` (→ Level 1). Never hidden, never greyed.
-* **Home chrome:** app root — **no back affordance**, no system header, portrait-locked.
-* **No spinner** on the home; render the ring's dim state for the ≤ 1-frame read.
-* **Micro-tutorial:** a dim layer (`#000` ~45 %) **above the board, below F03's chevron**; a **looping vertical-drag gesture ghost** + F03's **cyan loop-rails igniting** on its motion + **one line** of copy. **No button.** Clears **only** on a gesture F03 resolves to `MoveAxis.column` (applied or bounced). Re-prompt (one emphatic ghost cycle + copy pulse) on a row gesture / 6 s idle. Leaving via the chevron must **not** persist `ack`. Fade-out ~200 ms.
-* **CompletionPanel weighting (§7.4):** exactly **one amber `_RetryCta`-style pill per panel**, primary, top of the stack. **3★ / `isPerfect` → the amber pill is `SONRAKİ`**, the ghost pill is `YENİDEN`. **1–2★ / no-optimal → the amber pill stays `YENİDEN`**, the ghost pill is `SONRAKİ` (**enabled**, no `· yakında`). `Kapat` unchanged, tertiary. Everything else in F04's panel (star reveal, `N / 3`, triptych, markers, six variants) is **untouched**.
-* **Portrait-locked; no confirm dialogs; no system header** anywhere in F05.
+**Flexible**
+* Entrance durations ±40 ms and the rise 8–12·s; the splash wordmark fade 120–200 ms.
+* The segment curve may be any smooth monotone curve through the node centres (the renders use a symmetric cubic with 0.45 handles).
+* The launch image may be regenerated from `LoopBackdrop` at build time instead of the provided PNG, if the result is the same picture.
+* The debug details box's exact styling.
 
-### Flexible (FE may tune within these bounds)
+**Do not cheapen**
+* The halo on the current and finish nodes, and the dashed locked outline at ≥ 3 : 1.
+* The lead-in line (the only sign of the levels behind the window).
+* The CTA glow on Home (the one place it is allowed).
+* Reassurance copy on the error screen ("İlerlemen güvende…"), not a technical message.
 
-* Ring: outer diameter (`min(w*0.60–0.66, h*0.40–0.44)`), tick length (10–14 pt) + weight (2.5–3.5 pt), arc sweep (290–310°) + gap (50–70°), glow blur (±4 px) / opacity (±3 %).
-* Wordmark size (30–34 pt) + tracking (5–6 pt); the count figure size (46–54 pt).
-* The in-progress node's pulse period (3–5 s) + amplitude (≤ 8 %).
-* The gesture-ghost cycle (1.2–1.6 s) + the re-prompt idle threshold (5–8 s).
-* Whether the tutorial copy sits above or below the board (device-dependent — keep it clear of the board and the chevron).
-* Terminal CONTINUE target — Level 1 (recommended) vs the last completed level; FE's call, documented.
-* Exact `JourneyStrings` keys / TR wording — placeholders below; PO / localization owns final copy (same track as F03's `PlayStrings` / F04's `RatingStrings`).
+**Implementation map**
 
-### Do not cheapen
+| Shipped | D3 |
+| --- | --- |
+| `home_screen.dart` `PlayStage` / `PlayTheme.stage1` | `LoopBackdrop` |
+| `_Wordmark` (uppercase `LOOPLET`) | `LoopletWordmark(fontSize: 25·s)` at (25, 58)·s |
+| `_JourneyRing` (30-tick ring, count at its centre, one-shot terminal bloom, breathing pulse) | removed → `GlassCard` + label + headline + **`LoopTrack`** (new, in `app/lib/design`) |
+| `_ContinueCta` (amber) | `LimePill(glow: true)` + `LoopIconView(arrowRight)` |
+| `JourneyStrings` (`DEVAM ET`, `TEKRAR OYNA`, `SEVİYE`, `TAMAMLANDI`) | new values — §12 copy table |
+| `app_router.dart` `_SplashScreen` (`Text('LOOPLET')`) | `LoopBackdrop` + `LoopletWordmark` at the Home position, fading in |
+| `app_router.dart` `StoreErrorScreen` (English `FilledButton`, raw message) | the §6 card + `LimePill`; strings table; `debugPrint` the message; the details box only under `kDebugMode` |
+| `main.dart` `MaterialApp` (`PlayTheme` ground, `title: 'LOOPLET'`) | ground `#070C25`, `title: 'Looplet'` |
+| iOS / Android launch assets (white / theme) | the launch image over `#070C25` (§11 Must) |
 
-* Don't replace the ring with a horizontal `LinearProgressIndicator` + a label.
-* Don't render 30 discrete glowing dots; the completed run is one lit stroke.
-* Don't give the home a lighter / different background than `/play`.
-* Don't add a "Got it" / "Skip" button to the micro-tutorial, or make it a text modal.
-* Don't leave `Next Level` showing `· yakında` in F05, and don't ship two amber pills on the panel.
-* Don't let the terminal state present a dead or hidden primary button.
-* Don't fall back to system-regular weight for the wordmark or the count.
+**Design-layer additions (§18.3 (3); on the §19.8 (2) / §20.7 (6) terms):** `LoopTrack`; `LoopNode` gains the `open`, `locked` and `finish` states (the existing `done` and `current` states are unchanged). Each needs component tests; there is no token value change and no new dependency. The outline alphas `.62` are local constants of the component, not new tokens.
 
----
+### 11.1 D3 acceptance list (for Frontend and QA)
 
-## 12. Self-Review Against Rubric
+1. **Anchors (1.0×, 393 × 852):** wordmark (25, 58)·s; card top `115·s + 0.1·e` (132.8 pt), height 300·s; CTA top card bottom + 22·s (486.3 pt); caption 17·s under the CTA — ±2 pt.
+2. **Window:** for every state of `window-d3.txt` the rendered levels and node states equal the table (component test over the rule, incl. a replay at 1, 2, 29, 30 and a frontier at 1–5, 26–30).
+3. **Node states** are distinguishable in greyscale (fill / outline type / size + halo); the locked outline and the open outline are ≥ 3 : 1 on the card.
+4. **No overlap:** no node overlaps another node or a halo; nothing is drawn outside the card (all windows).
+5. **Lead-in** present iff the window starts after level 1; **tail** only when more levels follow and there is room.
+6. **Copy per state** exactly as §12 (headline, label, CTA, caption).
+7. **N1:** 30 / 30 + a Journey session in progress → "Devam et" + "Seviye N · sürüyor"; the label stays `30 / 30`; tapping resumes that session at its saved state. 30 / 30 without a session → "Tekrar oyna" → level 1. Warm (Home mounted) and cold (relaunch) equal.
+8. **Replay before 30 / 30:** the replayed level is current with done levels on both sides; the headline is "Yarım kalan döngüne dön."
+9. **Loading:** before the model loads, the screen equals the splash frame — no empty card, no spinner.
+10. **Entrance:** content at rest ≤ 340 ms after the model arrives (±40 ms); reduced motion — no animation; no idle motion afterwards.
+11. **Text scale:** at 1.3× no scroll, nothing clipped; at AX5 container text capped, free text scaled, words never broken, the caption breaks only before "·", Home does not scroll on 390 × 844 – 440 × 956.
+12. **CTA:** ≥ 44 pt tall at every scale; pressed = scale 0.98; a visible focus ring; `Semantics` per §12.
+13. **Store error:** Turkish copy per §12; the raw exception is not visible in a profile or release build; it is logged; Retry re-runs the bootstrap; at AX5 the pill is reachable by scrolling and the text never passes under the status bar.
+14. **Launch:** no white or light frame from the native launch to Home on iOS (and Android light and dark, if run); no visible jump at the splash hand-off (a cold-start recording).
+15. **Chrome:** no back affordance on Home or the store-error screen; no future-scope item on Home.
+16. **No Material icon, `PlayTheme` or amber** on Home, the splash or the store-error screen.
 
-| Criterion | Score | Rationale |
+## 12. Copy, `Semantics` and the Provisional Self-Review
+
+### Copy (interim — PO / localization, F10-UI-LOCALIZATION; `JourneyStrings` + a shell strings table)
+
+| Where | TR | EN (dev) |
 | --- | --- | --- |
-| Visual Hierarchy | 10 | One hero (the ring + its count), one dominant CTA (CONTINUE), wordmark clearly secondary, caption quiet. First-3-seconds read is designed: "N / 30 → CONTINUE". |
-| Layout & Composition | 9 | A single optically-centred vertical spine with deliberate stage air; a defined ring-first shrink strategy; no scroll. −1: a 300° ring + a nested CTA needs care to balance on very tall/short aspect ratios. |
-| Surface & Depth | 9 | F03's layered stage (gradient + spotlight + vignette + grain), a drawn luminous ring with a single glow, a raised saturated CTA. Three real tiers. −1: the home has fewer surfaces than the play screen by nature — depth rides on the ring glow + the CTA. |
-| Typography | 9 | Reuses F03's roles — tabular count with a settle-tick, tracked micro-labels, a considered wordmark. −1: no new type expression (correct restraint for a minimal home). |
-| CTA Quality | 10 | One dominant amber CONTINUE, nested into the ring; the completion-panel rule guarantees exactly one amber pill and puts it on the result-appropriate action. |
-| State Design | 10 | home (mid / new / in-progress / terminal / loading), micro-tutorial (shown / re-prompt / satisfied), panel (3★ / 1–2★), focused — all specified with distinct, felt treatments and non-colour cues (the amber-run length; the cyan resume ring; the closed terminal ring). |
-| Product Feel | 10 | Progress-as-the-loop + shared F03 stage + a diegetic gated tutorial = an App-Store-featured campaign home tied to the product's identity, not a menu. |
-| Modernity | 9 | 2026 dark, atmospheric, restrained motion, a drawn progress object over a chart widget. −1: a progress ring is a known idiom — differentiation rides on the tick/glow execution + the loop framing. |
-| Non-Generic Originality | 9 | The 30-tick loop as the home hero, CONTINUE nested in its gap, the cyan resume node, the action-gated diegetic tutorial. −1: "wordmark + progress + CTA" is inherently a familiar home structure; originality is in the ring + the stage parity. |
-| Implementability | 9 | `CustomPainter` ring with concrete geometry, `PlayTheme` tokens only, defined states + shrink rules, a weighting swap on an existing panel. −1: the ring painter + the gesture-ghost animation need care to hit 60 fps and read cleanly at 30 ticks. |
+| Label | `YOLCULUK · N / 30` | `JOURNEY · N / 30` |
+| Headline · new (0 / 30, nothing started) | `İlk⏎döngüyü çöz.` (lime: döngüyü) | `Solve your⏎first loop.` |
+| Headline · next | `Sıradaki⏎döngüyü çöz.` (lime: döngüyü) | `Solve the⏎next loop.` |
+| Headline · replay in progress (before 30 / 30) | `Yarım kalan⏎döngüne dön.` (lime: döngüne) | `Back to your⏎open loop.` |
+| Headline · terminal (with or without a session) | `Tüm döngüler⏎tamam.` (lime: döngüler) | `Every loop⏎complete.` |
+| CTA | `Devam et`; terminal without a session `Tekrar oyna` | `Continue` / `Play again` |
+| Caption | `Seviye N`, `Seviye N · sürüyor` (NBSP joins) | `Level N`, `Level N · in progress` |
+| Error label / headline / body / pill | `KAYITLI VERİLER` / `Kayıtlı verilerin⏎açılamadı.` / `İlerlemen güvende; hiçbir şey silinmedi.` / `Tekrar dene` | `SAVED DATA` / `Couldn't open⏎your saved data.` / `Your progress is safe; nothing was deleted.` / `Try again` |
+| Debug box label | `DEBUG · YALNIZ GELİŞTİRME DERLEMESİ` (debug only) | `DEBUG · DEVELOPMENT BUILD ONLY` |
 
-**Total: 93 / 100** — within the target band (93–96). No fail conditions present (clear hero, dominant CTA, strong state design, layered surface, strong hierarchy, non-generic identity, "top mobile game" register). Finalized.
+Optional alternative for PO: the CTA "Başla" for the brand-new state (not rendered; "Devam et" is the contract default).
 
----
+### `Semantics`
+
+* **Progress:** one node — "N / 30 seviye tamamlandı — Seviye M" (`progressSemantics`). The track, nodes and swirl arcs are excluded; the headline is read as text.
+* **CTA:** a button — "Devam et, Seviye M" / "Devam et, Seviye M, sürüyor" / "Tekrar oyna, Seviye 1".
+* **Wordmark:** "Looplet" (existing).
+* **Error:** the headline, then the body, then the button "Tekrar dene". The debug box is excluded from semantics.
+
+### Provisional self-review (advisory; the gate score is QA's)
+
+| Dimension | Score | Reason |
+| --- | --- | --- |
+| Experience Fit | 10 | one-tap return with the Journey in view; the N1 state never discards progress |
+| Visual Hierarchy | 10 | label → headline → current node → one lime action; the caption closes |
+| Layout, Rhythm & Responsiveness | 9 | `S-06b` anchors; a flow column that absorbs AX5 without scroll; the lower third intentionally empty (the Foundation's rhythm), which some may read as sparse on the Pro Max |
+| Typography & Content Craft | 9 | authored headlines per situation; NBSP joins; copy is interim |
+| Color, Surface & Asset System | 10 | tokens only; lime / periwinkle roles held; the error screen without red |
+| Interaction, State & Feedback | 9 | every state rendered; the press follows the shipped component (no brightness step) |
+| Motion & Sensory Quality | 9 | a short, calm entrance and a continuous cold start; no Home motion beyond it (by the Foundation) |
+| Originality & Product Identity | 10 | the climbing loop track and the crowned finish are specific to Looplet |
+| Accessibility & Inclusive Quality | 9 | ≥ 3 : 1 non-text, greyscale-safe nodes, AX5 without clipping; VoiceOver untested (design artefact) |
+| Implementation Fidelity & Polish | 9 | geometry and states are specified as data (`window-d3.txt`); two small component extensions |
+| **Total** | **94** | provisional — not an acceptance input |
+
+### 12a. Screen / State / Viewport Matrix
+
+| Screen | State | Viewport | Source artefact | Critical assertions |
+| --- | --- | --- | --- | --- |
+| Home | new 0 / 30; level 1 started | 393×852 | `D3-01`, `D3-01b` | current at the foot; 2–5 locked (dashed); §11.1 (2), (6) |
+| Home | mid 4 / 30; in progress 4 / 30 | 393×852; 390×844; 440×956 | `D3-02`, `D3-03`, `D3-v-16e-home-in-progress`, `D3-v-promax-home-in-progress` | `S-06b` anchors; §11.1 (1) |
+| Home | window 12 / 30, 25 / 30 | 393×852 | `D3-04a`, `D3-04b` | lead-in; window table |
+| Home | replay before terminal | 393×852 | `D3-05` | current in the middle; headline |
+| Home | terminal 30 / 30 | 393×852 | `D3-06` | finish node; "Tekrar oyna" |
+| Home | terminal + replay (N1) | 393×852; 390×844; 440×956 | `D3-07`, `D3-v-16e-…`, `D3-v-promax-home-terminal-with-replay` | §11.1 (7) |
+| Home | loading | 393×852 | `D3-08` (= `D3-22`) | §11.1 (9) |
+| Home | pressed; focus | 393×852 | `D3-09`, `D3-11` | §11.1 (12) |
+| Home | 1.3× | 393×852; 390×844; 440×956 | `D3-10`, `D3-v-*-home-text-cap-1_3` | no scroll, no clip |
+| Home | AX5 | 393×852; 390×844 | `D3-10b`, `D3-10c`, `D3-v-16e-home-ax5` | §11.1 (11) |
+| Home | windowing B (alternative) | 393×852 | `D3-B-04of30-band`, `D3-B-12of30-band`, `D3-B-25of30-band` | comparison only |
+| Store error | normal; AX5 top; AX5 end; debug | 393×852; 390×844; 440×956 | `D3-20`, `D3-20b`, `D3-20d`, `D3-20c`, `D3-v-*-store-error` | §11.1 (13) |
+| Shell | native launch iOS / Android; splash | 393×852; 412×915 | `D3-21`, `D3-21b`, `D3-22`; asset `D3-asset-launch-backdrop` (1290×2796) | §11.1 (14) |
+| Home | entrance t 0 / 80 / 160 / 240 / 340; reduced | 393×852 | `D3-M-entrance-*`, `src/D3-motion-prototype.html` | §11.1 (10) |
+
+### 12b. Visual Evidence Manifest
+
+**Provenance for every D3 record:** Source Revision HEAD `9a36147` + working tree (`design/src/gen-d3.mjs`, derived from F00 `gen-s.mjs` and F03 `gen-d1.mjs`). Method: HTML/CSS → PNG with headless Chrome at devicePixelRatio 2 (`src/render-d3.sh D3- jobs-d3.txt`; the launch asset at 3); the entrance stills are frames of the prototype frozen with `?t=`. `node gen-d3.mjs` regenerates every page byte for byte. Captured by the UI Designer, 2026-09-29. Generated design artefacts, not runtime captures; Android is rendered as a frame, not run.
+
+| Evidence ID | Kind | Screen / State | Viewport / Device | Artifact | Source Revision | Captured By | Captured At | Result / Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| DR-F00-HOME | direction-render | Exploration Gate (F00): Home in Directions A / B / C (+ C shipped scope) | 393×852 | features/f00-design-foundation/design/A-06-home-in-progress.png, B-06-home-in-progress.png, C-06-home-in-progress.png, C-06b-home-shipped-scope.png | F00 records (design-foundation.md §13 / §17.10) | UI Designer | 2026-09-21 | pointer; selection F00.FOUNDATION-SELECTION (Direction C) |
+| DR-D3-A | direction-render | windowing A "sliding five" at 4 / 12 / 25 of 30 | 393×852 | design/D3-03-home-in-progress-4of30.png, D3-04a-home-window-12of30.png, D3-04b-home-window-25of30.png | 9a36147 + working tree | UI Designer | 2026-09-29 | recommended; Pending Selection (Tech Lead) |
+| DR-D3-B | direction-render | windowing B "band window" at 4 / 12 / 25 of 30 | 393×852 | design/D3-B-04of30-band.png, D3-B-12of30-band.png, D3-B-25of30-band.png | 9a36147 + working tree | UI Designer | 2026-09-29 | alternative |
+| SS-06b | selected-source | Home · today (shipped scope) | 393×852 | features/f00-design-foundation/design/S-06b-home-today.png | F00 | UI Designer | 2026-09-21 | anchors kept (133 / 486 pt) |
+| D3-HOME | selected-source | Home · new, level 1 started, mid, in progress, replay, terminal, terminal + replay (N1), loading, pressed, focus | 393×852 | design/D3-01 … D3-09, D3-11 (*.png) | 9a36147 + working tree | UI Designer | 2026-09-29 | audit renders 19–23; window table `src/window-d3.txt` |
+| D3-A11Y | accessibility | Home 1.3× / AX5; store error AX5 (top, end) | 393×852, 390×844, 440×956 | design/D3-10-home-text-cap-1_3.png, D3-10b-home-ax5.png, D3-10c-home-ax5-terminal-replay.png, D3-v-16e-home-ax5.png, D3-v-*-home-text-cap-1_3.png, D3-20b-store-error-ax5.png, D3-20d-store-error-ax5-scrolled-end.png; `src/contrast-d3.txt` | 9a36147 + working tree | UI Designer | 2026-09-29 | audit render 24; Home needs no scroll at AX5 |
+| D3-SHELL | selected-source | store error (normal, debug); native launch iOS / Android; splash; launch asset | 393×852, 412×915, 1290×2796 px | design/D3-20-store-error.png, D3-20c-store-error-debug-build.png, D3-21-launch-ios.png, D3-21b-launch-android.png, D3-22-splash.png, D3-asset-launch-backdrop.png | 9a36147 + working tree | UI Designer | 2026-09-29 | audit renders 25–26 |
+| D3-V | selected-source | device variants | 390×844, 440×956 | design/D3-v-16e-*.png, D3-v-promax-*.png | 9a36147 + working tree | UI Designer | 2026-09-29 | — |
+| MP-D3 | motion-prototype | Home entrance (`?t=`, `?rm=1`) + stills t 0 / 80 / 160 / 240 / 340 and reduced | 393×852 | design/src/D3-motion-prototype.html; design/D3-M-entrance-*.png | 9a36147 + working tree | UI Designer | 2026-09-29 | HTML/CSS animation (Blink); the Flutter cold-start recording is Frontend's parity evidence |
+| D3-SHEETS | parity-comparison | contact sheets (review aid) | sheet | design/D3-sheet-*.png | 9a36147 + working tree | UI Designer | 2026-09-29 | not a gate artefact |
+| AUD-D3-BASE | runtime-screenshot | shipped Home / shell baseline | 393×852 iPhone 16 | features/f00-design-foundation/design/audit/ (cur-home-*.png, cur-a11y-ax5-home-terminal.png, cur-a11y-xxxl-home-terminal.png, cur-shell-*.png, pair-01, pair-02) | 615e94c | UI Designer | 2026-09-27 | the "before" for Frontend parity |
 
 ## 13. Assumptions
 
-* **No brand palette / logo asset** → the LOOPLET wordmark is type-only on F03's `PlayTheme`; if an official logo/palette lands later, the wordmark + `amber`/`cyan`/`stage` tokens rebind, the structure holds.
-* **Turkish primary** → copy here is illustrative TR (+ EN). Proposed `JourneyStrings` keys: `continueLabel` (`DEVAM ET`), `replayLabel` (`TEKRAR OYNA`), `levelCaption` (`Seviye {n}`), `inProgressSuffix` (`· sürüyor`), `progressUnit` (`SEVİYE`), `allCompleteKicker` (`TAMAMLANDI`), `columnTutorialHint` (`Sütunları da kaydırabilirsin — yukarı ya da aşağı`). PO / localization confirms.
-* **The count is `|completedLevels ∩ {1..30}|`** (`architecture.md §6 progressCount`), not `highestUnlockedLevel` — a player can have unlocked more than they've completed; the ring's amber run = *completed*, the bright node = *current* (= `currentLevel`).
-* **The ring shows 30 ticks always** (even at 0 / 30) — the "shape to fill" is visible from the first launch.
-* **The micro-tutorial gate = a column-axis `endDrag`** (committed vertical intent), applied or bounced — a player who attempts an illegal column move still learned the gesture. FE may tighten to "applied only" if bounced-column proves too permissive; document the choice.
-* **Terminal CONTINUE → Level 1** for replay (recommended); progress is not reset — it is pure replay (F04's `personal_best` + the star chase still apply).
-* **Reduced motion** (`MediaQuery.disableAnimations` / `accessibilityFeatures.disableAnimations`): the count settle-tick, the in-progress pulse, the terminal bloom, and the gesture-ghost loop all render as their **static end state** (ghost shown static, arrow visible; ring fully drawn; count final). The tutorial still gates on the column shift.
-* **Screen-reader:** the ring is one `Semantics` node ("`N` of 30 levels complete — current level `N+1`"); CONTINUE announces its target level; the micro-tutorial announces its hint line. Full assistive campaign navigation is out of F05 scope (consistent with F03).
-
----
+* The Journey model arrives within a few frames of the bootstrap, so "the loading state = the splash frame" is not a visible wait. If it ever takes longer, the splash frame simply stays — no spinner is added without a Tech Lead ruling.
+* The launch image is aspect-filled. Modern iPhones share a ≈ 2.17 aspect (16e 2.164, 16 2.168, Pro Max 2.173), so the crop is < 1 %. On Android aspects vary, and the glow position may shift slightly (not measurable here).
+* The error body text is new interim copy (the shipped one was English). "İlerlemen güvende" restates F08 AC9 (data intact); it promises nothing more.
+* The finish node reuses the done lime with a halo; it is not a new token.
+* The node states `open` and `locked` rarely appear together: `open` only exists in a replay window that reaches the frontier (e.g. replaying 11 with 12 done and 13 the frontier).
 
 ## 14. Needs Tech Lead Clarification
 
-1. **Terminal CONTINUE target** — this handoff picks **`TEKRAR OYNA` → Level 1** (a working primary CTA over a hidden one). Confirm, or specify a different replay entry (last completed level / a lightweight picker — noting the "no level-select map" MVP constraint).
-2. **Micro-tutorial gate strictness** — dismiss on any column-axis `endDrag` (applied **or** bounced), or only on an **applied** column move? This handoff recommends the former (the gesture is the lesson). Non-blocking; FE + QA can tune on device.
-3. **Wordmark treatment** — type-only with a faint `stage-glow` halo is assumed. If a logo asset is expected before F05 ships, say so (it would replace the `Text` wordmark; the layout slot is unchanged).
-4. **Microcopy** — the `JourneyStrings` keys above are placeholders; PO / localization owns final wording (same track as F03 / F04).
+1. **Windowing A vs B** — select A (recommended) or B (§2). Non-blocking for the checkpoint if A is adopted as the handoff design within §18.3 (3).
+2. **`LoopNode` state extension** (`open`, `locked`, `finish`) — confirm it is inside the §18.3 (3) allowance (it is the loop track's own node). There are no token changes.
+3. **Headlines per situation** — three new interim headlines ("İlk…", "Yarım kalan…", "Tüm döngüler tamam.") beyond the contract's reference copy. The contract leaves the terminal copy to the designer; the new-player and replay headlines are proposals. With a veto, "Sıradaki döngüyü çöz." is used for those states.
+4. **The breathing pulse is dropped** on the in-progress node (shipped F05-UI behaviour) — confirm; the Foundation specifies no Home motion.
+5. **The store-error screen has one action only** (no "leave the app" link; iOS has no programmatic exit) — confirm.
 
 ---
 
-# WORKFLOW HANDOFF SUGGESTION (NON-AUTHORITATIVE)
+## Local Orchestration Update (UI Designer)
 
-* **Completed Tasks:** F05-UI — `ui-design.md` delivered. Resolves `architecture.md §17 [PENDING — UI]`: (1) the minimal home surface — Direction A "The loop, filling" (F03's stage; a 30-tick progress ring as the hero with `N / 30` at its centre; a dominant CONTINUE nested in the ring's gap; the in-progress cyan resume node); (2) the "all 30 complete" terminal variant (closed glowing ring + one bloom + `TAMAMLANDI` + CONTINUE → `TEKRAR OYNA`); (3) the levels 4–6 column micro-tutorial overlay (diegetic board-dim + a looping gesture ghost + F03's cyan rails + one line, action-gated on a column shift, re-shows until done); (4) the F04 `CompletionPanel` per-outcome CTA-weighting rule (3★ → amber pill on `SONRAKİ`; 1–2★ → amber pill stays on `YENİDEN`; `Next Level` always enabled, `· yakında` dropped). Reuses F03's `PlayTheme` — no new tokens. Self-review 93/100.
-* **Remaining Tasks:** F05-FE.CONTENT / .GATE / .PROGRESS / .UNLOCK / .NAV / .HOME / .TUTORIAL / .STRINGS+.TESTS — implement against the LOCKED `architecture.md` + this handoff. Then QA → Tech Lead close (gated also on `F06-CONTENT`).
-* **Blockers:** none for F05-FE. The four `Needs Tech Lead Clarification` items are non-blocking (sensible defaults chosen). `F06-CONTENT` remains the F05 `Done` prerequisite (user decision, tracked).
-* **Status Suggestion:** Ready for Frontend.
+* F05-UI-D3 → Done; F05.D3-HANDOFF → PASS (provenance above); Delivery Review → Pending.
+* Visual Scope is `new-surface`, so the UI Designer → implementation transition is a mandatory Tech Lead visual-gate checkpoint (role-execution-contract §5): Current Owner = Next Role = Tech Lead. F05-FE-D3 stays Queued until the checkpoint opens it.
 
----
+**Status Suggestion (non-authoritative):** Needs Tech Lead — visual-gate checkpoint (windowing selection, §14 items).
 
 ## 15. Sonraki Komut
 
-```
-Run Frontend/Mobile Developer
+```text
+Run Tech Lead
 ```
