@@ -1,6 +1,6 @@
 # LOOPLET — Product PRD
 
-Last Updated: 2026-09-03
+Last Updated: 2026-09-29 (revision PO-REV-2026-09-29-F05-CONTINUE — see Revision Log)
 Status: LIVE (Bootstrap by Product Owner)
 Authoritative Source: `/LOOPLET Product Definition Document` (user-provided) — this PRD is the derived, execution-ready translation.
 
@@ -329,13 +329,14 @@ Beklenen çıktı:
 * Given the player first enters the levels 4–6 band, When the level loads, Then a short column-shift tutorial is shown and column shifts become available.
 * Given levels 7–10, When played, Then rows and columns are both available with optimal 4–6.
 * Given levels 11–15 / 16–20 / 21–25 / 26–30, When played, Then respectively: heavier temporary-displacement puzzles / locked tiles / frozen tiles / locked+frozen combos, matching the source §20 curve.
-* Given an in-progress level, When CONTINUE is tapped, Then that level resumes at its saved state.
-* Given all 30 levels are complete, When CONTINUE is tapped, Then a graceful "all levels complete" state is shown with no crash.
+* Given an in-progress level, When CONTINUE is tapped, Then that level resumes at its saved state. This includes a replay of an already-completed level, and it applies even when all 30 levels are complete. *(Revised 2026-09-29, PO-REV-2026-09-29-F05-CONTINUE.)*
+* Given all 30 levels are complete and no Journey level is in progress, When CONTINUE is tapped, Then a graceful "all levels complete" state is shown with no crash. *(Revised 2026-09-29, PO-REV-2026-09-29-F05-CONTINUE: the state applies only when no level is in progress.)*
 
 ### Edge Cases
 
 * Stars never gate progression — 1★ still unlocks the next level.
 * Replaying a completed level cannot re-lock it or reduce progress.
+* All 30 levels complete and a replay left unfinished → CONTINUE resumes the replay; progress still reads 30 / 30. CONTINUE never silently discards a level in progress. *(Added 2026-09-29, PO-REV-2026-09-29-F05-CONTINUE.)*
 * Corrupt or missing level asset → skip with a logged error; the rest of the Journey stays playable.
 * Player force-quits during the level-4 column tutorial → it re-shows on return until acknowledged.
 * Fewer than 30 levels present in a build → caught by a build gate; runtime still shows accurate progress.
@@ -933,3 +934,17 @@ Also out of MVP (deferred by the source document):
 * `GAME_STATE_PERSISTED` — active session state is durably written locally.
 * `GAME_STATE_RESTORED` — a saved session is restored exactly on relaunch.
 * `SETTINGS_UPDATED` — a sound or haptics toggle changes.
+
+---
+
+# Revision Log
+
+## PO-REV-2026-09-29-F05-CONTINUE
+
+* **Date / authority:** 2026-09-29, Product Owner — Revise mode, on the user's decision F05.D3-N1-REPLAY-PRECEDENCE (option A, chosen by the user in chat, recorded in F05 `orchestration.md`).
+* **Changed requirement:** CONTINUE precedence after all 30 Journey levels are complete. When all 30 are complete and a replay of a completed level is in progress, CONTINUE resumes that replay at its saved state (the in-progress AC). The graceful "all levels complete" state applies only when no Journey level is in progress. Progress stays 30 / 30.
+* **Why:** the two ACs overlapped with no stated precedence. The shipped behaviour (a Tech Lead assumption of 2026-09-27) let the terminal state win and silently superseded an unfinished replay. The user chose that the one "continue" action never discards a half-played puzzle.
+* **Changed sections:** §6.1 journey-progression (F05) — Acceptance Criteria (the in-progress AC and the all-complete AC), Edge Cases (one added). No other section changes: the §5.4 resume flow already states exact restore, and no feature, dependency, priority, MVP scope, metric or domain object changes.
+* **Affected features:** F05 (Blocked in Design Adoption Phase D3; its Home CONTINUE rule, contract F05 `architecture.md` §18.3 (2), and feature PRD AC7 / AC9 need the Tech Lead resync).
+* **Not affected (checked):** F10's "CONTINUE lands on the current or next Journey level" AC is consistent (a replay in progress is the current level); F09's new-player routing, F03's resume (§5.4) and F08's snapshot restore are unchanged; no dependency chain changes.
+

@@ -4,8 +4,8 @@ Last Updated: 2026-09-29
 Active Phase: Design Adoption Phase D3 — Home + app shell (F05 carrier, `new-surface`); Blocked on a Product Owner revision (N1)
 Active Owner: Tech Lead
 Active Feature: F05
-Pending Product Revision: None
-Revision Affected Features: None
+Pending Product Revision: PO-REV-2026-09-29-F05-CONTINUE
+Revision Affected Features: F05
 
 ## Status Table
 
