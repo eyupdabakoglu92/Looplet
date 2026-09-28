@@ -1,119 +1,232 @@
-# F03 — puzzle-play-session: QA Raporu (final, re-verify 2)
+# F03 — puzzle-play-session: QA Raporu (F03-QA-D1 — Loop Glass Play, final görsel QA)
 
-QA turu: 2026-09-21 · Görev: F03-QA-REVERIFY2 · QA Stage: final · QA Scope: client-only · Release Scope: none
-Doğrulanan revizyon: HEAD `5be4dc6`, temiz ağaç. `app/`, `packages/`, `content/` `cf747f8` ile birebir aynı (`git diff cf747f8 HEAD -- app` boş; fark yalnız `ai-system/` dokümanları). Bu rapor önceki (2026-09-20, rev c0cba44, Rejected) raporun yerini alır; önceki bulguların kapanışı §3'tedir.
+QA turu: 2026-09-28 · Görev: F03-QA-D1 · QA Stage: final · QA Scope: client-only · Release Scope: none · Visual Scope: existing-parity
+Doğrulanan revizyon: HEAD `5798c70`, temiz ağaç. `app/`, `packages/`, `tools/`, `pubspec.lock`, `melos.yaml` teslim commit'i `b8b5f60` ile birebir aynı (`git diff --stat b8b5f60 HEAD -- …` boş).
+Önceki rapor (2026-09-21, HEAD 5be4dc6, Approved with Notes; yalnız davranış/erişilebilirlik) byte-for-byte arşivde: [history/f03-puzzle-play-session-2026-09-27/qa-before-phase-d1.md](../../history/f03-puzzle-play-session-2026-09-27/qa-before-phase-d1.md).
+Kanıt klasörü: [qa/d1/](qa/d1/) — ekran görüntüleri `QA-*`, videolar `QV-*`, ölçüm/probe kayıtları `QM-*`, QA'ya ait araçlar `qa/d1/src/` (`qa-frames.swift`, `qa-pixels.swift`).
 
 ---
 
 ## 0. QA Execution Plan
 
-* **Stage / Scope:** final / client-only. Release scope yok.
-* **Modüller ve tetikleyiciler:** `core` (her tur) · `client-ui` (Flutter istemci, gesture/route/UI state; `frontend.md` mevcut) · `stateful-flow` (persistence, resume, lifecycle/interruption; architecture §9/§12). `visual-quality` yok: Visual Scope = none (bu reopen'da görsel çıktı eklenmedi/değişmedi).
-* **Regression Depth: full.** Gerekçe: final gate + ortak gesture/lifecycle/persistence yüzeyi (`puzzle_board.dart`, controller) + F04/F05'in paylaştığı reduce-motion okumaları.
-* **Evidence Reuse: allowed**, fingerprint c0cba44 → cf747f8: değişen tek app dosyaları `home_screen.dart`, `journey/column_tutorial_overlay.dart`, `play/play_session_controller.dart` (+`cancelDrag`), `play/play_session_screen.dart` (1 okuma), `play/widgets/puzzle_board.dart` (Listener + `_abort`), `rating/completion_panel.dart` (2 okuma), yeni `reduce_motion.dart` + testler. `main.dart`, `ios/`, pubspec, packages, persistence, content **değişmedi**.
-* **Canonical target / runtime sınıfı:** iOS Simulator 18.6, iPhone 16 (393×852) birincil; 16e (390×844) ve 16 Pro Max (440×956) cihaz suite'i. Debug build, gerçek `main.dart` kökü, diskteki gerçek Drift store'u (sqlite3 ile okundu).
-* **Fail-fast checkpoint:** aktif QA kapısı + `qa-preflight` PASS → gate'ler (analyze/format/test/build) PASS → en küçük kritik probe (gerçek uygulama geçişi, kesilen sürükleme) PASS → geniş doğrulama. Durdurucu hard prerequisite oluşmadı.
-* **Bildirilen sınırlar:** simulator pointer'ı sentetiktir (fiziksel parmak yok); Android capture Pending (platform.md §14, kapsam dışı: iOS hedefi); OS Grayscale bu turda yeniden yürütülmedi (REUSED).
+* **Stage / Scope:** final / client-only; release scope yok (architecture §17).
+* **Modüller + tetikleyici:**
+  * `core` — her tur;
+  * `client-ui` — Flutter `/play` yüzeyi, header/back, loading/error, HUD state'leri, F05 overlay;
+  * `visual-quality` — Visual Scope `existing-parity`, gate Ready for QA;
+  * `stateful-flow` — snapshot write-through, kill/relaunch resume, tutorial ack/re-show, lifecycle.
+* **Regression Depth: full** (Tech Lead planı): bütün Play yüzeyi yeniden çizildi, cross-feature F05 overlay ve paylaşılan design-layer bileşenleri değişti, won geometrisi taşındı.
+* **Evidence Reuse: allowed**, fingerprint geçerli (E03). Yine de otomatik suite'ler ve integration bu turda QA tarafından **yeniden çalıştırıldı** (E01, E02). Frontend'in runtime yakalamaları yalnız karşılaştırma girdisidir; skor ve verdict yalnız QA'nın kendi runtime kanıtına dayanır.
+* **Canonical target / runtime sınıfı:** iOS Simulator 18.6 — iPhone 16 `D0011CE7` (birincil), 16e `6DBDFD97`, 16 Pro Max `02FDE776`.
+  * QA build: `flutter build ios --simulator --debug`, HEAD 5798c70, üç cihaza kuruldu (`App` binary SHA-1 `17125f5d0335…`).
+  * State'e gerçek uygulama yoluyla gidildi: `design/src/seed-sim.sh` + Home CONTINUE.
+  * Gesture'lar simülatör touch-path ile verildi.
+  * Kanıt sınıfları: runtime-screenshot, runtime-video (`simctl io recordVideo`), piksel ölçümü.
+* **Fail-fast checkpoint:** önce suite'ler + integration + build; hepsi yeşil olunca (E01–E04) runtime journey'lere geçildi.
 
 ## 1. Evidence Ledger
 
-| ID | Claim / Scenario | Class | Command / Action | Target | Result / Counts | Provenance / Fingerprint | Isolation |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| E1 | Statik ve otomatik kapılar | static / automated functional | `melos run analyze` · `melos run format:check` · `melos run test` | workspace | analyze exit 0 (yalnız önceden var olan 1 `looplet_solver` info), format exit 0 (155 dosya, 0 değişti), **197 paket + 243 app test geçti**, 0 fail | HEAD 5be4dc6 | widget testleri in-memory DB + override; reduce-motion bayrakları taklit |
-| E2 | Debug build | build | `flutter build ios --simulator --debug` | app | exit 0 (20.9 s) | HEAD 5be4dc6 | build ≠ davranış |
-| E3 | Cihaz suite'i (13 test, group 4 dahil) | repeatable integration | `flutter test integration_test/play_session_test.dart -d <UDID>` | iPhone 16e; iPhone 16 Pro Max (QA'nın kendi koşusu) | **13/13 pass, exit 0** (57 s / 67 s); Tech Lead + Frontend iPhone 16'da 13/13 | cf747f8 (app aynı) | in-memory DB; sentetik `PointerCancel`, OS iptali değil |
-| E4 | **F03-QA-03:** tutulan sürüklemede gerçek OS uygulama geçişi ×3 | runtime | 10 s'lik `touch_path` + 1 Hz screenshot günlüğü, ardından `simctl launch com.apple.mobilesafari`, sonra uygulamaya dönüş; store `sqlite3` | iPhone 16 | **PASS ×3**: koşu 1 (satır 1 sağa; 02:09:34 karesinde satır kalkık, dokunuş aşağıda, MOVES 0 → 02:09:35 geçiş), koşu 2 (satır 3 sola), koşu 3 (sütun 2 aşağı). Dönüşte grid değişmemiş, MOVES 0, idle; store `appliedMoves: []`, `moveCount: 0` üç koşuda da | rev 5be4dc6; aynı repro c0cba44'te 3/3 FAIL idi | ekran görüntüleri oturum scratchpad'inde (repoda tutulmadı) |
-| E5 | Cihaz kilidi sırasında tutulan sürükleme (2. tetikleyici) | runtime | tutulan sürükleme + Simulator Cmd+L. İlk deneme: menü tıklaması kilitlemedi, sürükleme dokunuş bitince normal bırakma olarak `R4` işlendi — geçerli bir bırakma, tetikleyici sayılmaz. İkinci deneme: klavye kısayolu ekranı karartıp kilitledi | iPhone 16 | **PASS**: kilitten sonra store `["R4"]`, yeni hamle yok; uyandırıp kilit açınca satır 1 dokunulmamış, MOVES 1, idle | rev 5be4dc6 | — |
-| E6 | Soğuk başlatma: kesintilerden sonra kill → relaunch → CONTINUE | runtime | `simctl terminate` → `launch` → CONTINUE | iPhone 16 | **PASS**: grid değişmemiş, MOVES 0 | rev 5be4dc6 | gerçek store |
-| E7 | Genuine release regresyonu (gerçek dokunuş) | runtime | `swipe` / uzun `touch_path`; store `appliedMoves` | iPhone 16 | **PASS**: 10 pt eşik altı → hamle yok; near-diagonal 60×56 → satır kayması (`R2`); ekran dışına (x=388) bırakma → `R0` commit; bu seviyede sütun sürükleme → reddedildi, MOVES değişmedi; 10 s tutulup bırakılan sürükleme → `R4` commit + persist | rev 5be4dc6 | — |
-| E8 | AC9 kaldırma/vurgu (tutulan dokunuş, tam çözünürlüklü kare) | runtime | E4 koşu 1'in kare kırpması | iPhone 16 | **PASS**: sürüklenen satır kalkık ve parlak, diğer satırlar kısılmış, sarma hayaleti (`S`) kenarda, sol ray vurgusu | rev 5be4dc6 | — |
-| E9 | Boşta uygulama geçişi (dokunuş yok) | runtime | 1 hamle (`D0`), `simctl launch` Safari → dönüş | iPhone 16 | **PASS**: store `journey-tr-05 ["D0"]` önce/sonra aynı; MOVES 1 | rev 5be4dc6 | — |
-| E10 | **F03-QA-04:** gerçek Settings > Accessibility > Motion > Reduce Motion **AÇIK** (ek "Prefer Cross-Fade Transitions" satırı görünür → aktif), relaunch; F05 halkası | runtime | 8 kare / ~4 s, düğüm bölgesi piksel özeti (md5) | iPhone 16 | **PASS**: düğüm 8 karede **aynı** (statik) | rev 5be4dc6 | — |
-| E11 | E10 kontrolü: Reduce Motion **KAPALI** | runtime | aynı yöntem (düğüm konumu güncellendi: 3/30, seviye 4 sürüyor) | iPhone 16 | 8 karede **8 farklı** özet → düğüm nefes alıyor; yöntem ayırt edici | rev 5be4dc6 | düğüm konumu E10'dan farklı (seviye 1 vs 4); mekanizma aynı |
-| E12 | Reduce Motion AÇIK: F03 kazanma + F04 açılış | runtime + video | debug L01 (1 hamlelik kazanma), `simctl recordVideo`, 0,1 s kare tablosu | iPhone 16 | **PASS**: T0 ≈ 6,45 s; statik amber satır + dikiş yerinde ≈ 300 ms bekler; satır dock'a çapraz solar (≈ 160 ms), scrim + panel solarak gelir; ≈ T0+0,66 s'de dinlenme; **3 yıldız birden dolu**; glide/slide/yıldız sıralaması yok | rev 5be4dc6; aynı senaryo c0cba44'te FAIL idi | video oturum scratchpad'inde |
-| E13 | Reduce Motion AÇIK: F05 öğretici hayaleti (seviye 4) + Journey akışı | runtime | seviye 1–3 çözümü (`L0 L0`, `L3 L3`, `L1 L1`, her biri Perfect + SONRAKİ) → seviye 4; tam ekran 8 kare özeti | iPhone 16 | **PASS**: ipucu + hayalet görünür, 8 karede **aynı** (statik); kontrol KAPALI: **8/8 farklı** (döngü); ilk sütun hamlesiyle öğretici temizlendi | rev 5be4dc6 | debug puzzle'lar öğretici göstermez; Journey yolu kullanıldı |
-| E14 | Reduce Motion KAPALI: normal kazanma dizisi geri geliyor (seviye 4, `U0 U3 R3 D4`) | runtime + video | 75 ms kare tablosu | iPhone 16 | **PASS**: amber satır ≈ 0,6 s tutulur → dock'a kayar (glide) → panel yukarı kayar → yıldızlar tek tek vurulur (yalnız panel dinlendikten sonra) | rev 5be4dc6 | — |
-| E15 | Journey ilerleme / Next Level (Reduce Motion açık) | runtime | seviye 1→2→3→4→5 SONRAKİ zinciri | iPhone 16 | **PASS**: ana ekran `3 / 30`, "Seviye 4 · sürüyor"; seviye 4 kazanılınca seviye 5'e geçildi | rev 5be4dc6 | — |
+Tüm satırlar **EXECUTED THIS RUN** (QA, 2026-09-28, 5798c70 build, yukarıdaki üç simülatör). Yalnız E31–E32 kısmen REUSED (belirtildi). Ham ölçümler `qa/d1/QM-measurements.txt` ve `QM-*-probe.txt` içindedir.
 
-**REUSED** (kaynak koşu: QA 2026-09-20, rev c0cba44; fingerprint geçerli, ilgili dosya yolu dokunulmadı): R1 portrait kilidi / döndürme (`main.dart`, `Info.plist` değişmedi); R2 gerçek kill/relaunch resume ve persistence (persistence yolu, DB, `main.dart` değişmedi; E6 ile ayrıca yeniden doğrulandı); R3 chevron / iOS kenar kaydırma / replaced-route Close çıkışları (`play_session_screen.dart` yalnız 1 okuma değişti; E13/E15 zinciri Next Level replaced-route'unu bu turda yeniden yürüttü); R4 F04 varyantları ve normal hareket kazanma kareleri (16/16e/Pro Max, XXXL dahil; bu turda spot: satır 0 [E12], satır 4 [E14]); R5 tampered `thawedFrozenCells` + misuse seti; R6 greyscale yaklaşık kontrolü; R7 büyük metin (XXXL) yerleşimi.
-**INVALIDATED ve bu turda yeniden yürütülen:** LIFECYCLE-LIVE (E4–E6, E9), AC9 (E8), gesture regresyonu (E7), tüm reduce-motion yolları (E10–E14), CURRENT-REVISION (E1–E3).
+| Evidence ID | Claim / Scenario | Class | Command / Action | Target | Result / Counts | Provenance / Fingerprint | Isolation |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| E01 | Statik analiz + unit/widget suite'leri + format | automated | `melos run analyze`; `melos run test`; `dart format --output=none --set-exit-if-changed app packages tools` | host, Flutter 3.32.8 / Dart 3.8.1 | analyze exit 0 (No issues); test exit 0 — app **405 passed / 0 failed / 0 skipped**, core 22, content 17, dictionary 32, authoring 25, engine 83, solver 23; format exit 0 | 5798c70 (app = b8b5f60); 2026-09-27T22:29Z | in-memory Drift, validator/asset override'ları (test dosyaları) |
+| E02 | Cihaz üzerinde integration: gesture, 0 çift sayım, resume + tampered cache, lifecycle (paused mid-drag / mid-animation) | repeatable integration / runtime | `flutter test integration_test -d D0011CE7…` | iPhone 16 sim | **13 / 13 passed**, exit 0 (grup 1–4) | 5798c70; aynı oturum | in-memory DB; gerçek app kodu |
+| E03 | Fingerprint | static | `git diff --stat b8b5f60 HEAD -- app packages tools pubspec.lock melos.yaml` | repo | boş | HEAD 5798c70 | — |
+| E04 | QA build | build | `flutter build ios --simulator --debug`; `simctl install` ×3 | 3 sim | exit 0; üçü de kuruldu | 5798c70 | — |
+| E05 | §11.5 (1)–(4) idle L5 geometri/renk | runtime-screenshot + ölçüm | CONTINUE → L5; `measure-d1` D1-00 ↔ `QA-16-01-idle-L5.png` | iPhone 16 | 16 özellik **max 0.67 pt**; token yamaları ΔE ≤ 1.48; tek sapma sağ-üst zemin ışığı ΔE 3.35 (bilinen LoopBackdrop yaklaşımı) | QM-measurements `PC-QA-16-idle` | — |
+| E06 | §11.5 (5) row + column lift, settle, ghost, rim/rails/dim fade | runtime-video + screenshot | L5 satır 2 tutuldu → R2; sütun 2 tutuldu → D2 | iPhone 16 | rim + glow, kenar ray'ler (satır: yanlar, sütun: üst/alt), rest %42, wrap ghost ≈%30 kart içine kırpılmış; `HAMLE` tutulurken 0, settle sonrası +1. Settle probe: tepe **+1.0 pt = stride'ın %1.5'i**, dönüş ≈ settle başı +150 ms (80 % = 152 ms), rim ≈ +30–45 ms sonra temiz | `QA-16-02`, `QA-16-03`, `QV-16-row-column-lift.mp4`, `QM-settle-probe.txt` | — |
+| E07 | AC2 / AC3 + write-through | runtime | aynı hamleler; `kv.active_session` okundu | iPhone 16 | `["R2","D2"]`, moveCount 2, undo 3 | sqlite okuması | — |
+| E08 | AC4 eşik altı | runtime | satır 3'te 12 pt sürükleme | iPhone 16 | hamle yok, `HAMLE` 2, snapshot değişmedi | `QA-16-05` | — |
+| E09 | AC6 + §11.5 (8) undo kotası | runtime | undo ×2 → 0 hamle; hamle + undo → kota 0; hamle ×2; kota 0'da undo ×2 | iPhone 16 | 2 kalan: iki lime + bir %25; 0 hamlede pill %55; kota 0: %55, üç sönük nokta; kota 0'da dokunuş **no-op, prompt yok**; D1-02 paritesi max 0.67 pt | `QA-16-06/07/08`, `crops/hud-*.jpg` | — |
+| E10 | AC7 restart + pressed | runtime | restart basılı tutuldu → bırakıldı | iPhone 16 | basılıyken dolgu/kenar parlıyor; bırakınca diyalogsuz sıfırlama: 0 hamle, kota 3, restartCount 1 | `QA-16-09/10`, `crops/hud-restart-pressed.jpg` | — |
+| E11 | AC5 kilit sırasında girdi | runtime + E02 | settle sırasında gelen ikinci swipe ve undo dokunuşu | iPhone 16 | ikisi de düşürüldü (snapshot +1 yerine değişmedi); kuyruğa alınmadı. Kasıtlı zamanlamayla 0 çift sayım E02 grup 2'de | sqlite okumaları | zamanlama tool gecikmesiyle, E02 deterministik |
+| E12 | AC10 ayrıl / dön / öldür | runtime | chevron → Home ("Seviye 5 · sürüyor"); kill + relaunch → CONTINUE; kenar kaydırma | iPhone 16 | aynı ızgara, `HAMLE` 1, kota 3, restartCount 1 korundu; kenar kaydırma = chevron | `QA-16-11`, `QA-16-12` | — |
+| E13 | Reddedilen hamle (L3 yalnız satır) | runtime-video | sütun 2 aşağı, tutup bırakma | iPhone 16 | 140 ms bounce: bırakıştan ≈120–140 ms'de rest; `HAMLE` 0, snapshot boş | `QV-16-rejected-bounce-L3.mp4`, `QM-bounce-probe.txt`, `QA-16-13` | — |
+| E14 | §11.5 (6) L26 locked + frozen, gri tonlama | runtime + ölçüm | CONTINUE → L26; gri profil dönüşümü | iPhone 16 | `SEVİYE 26`; kilit ikonu + indigo, kar tanesi + kesikli kenar + buz; gri tonlamada ayırt edilebilir; D1-05 paritesi max 0.67 pt | `QA-16-14`, `QA-16-14g` | — |
+| E15 | §11.5 (10) OS metin taraması L26 | runtime + ölçüm | `content_size` large → xL → xxL → xxxL → AX5 | iPhone 16 | bütün Play metni 1.3× cap'te, geometri sabit — **ama `HAMLE` etiketi xxL'den itibaren kartın yuvarlak alt kenarının dışına taşıyor** (F03-QA-D1-01) | `QA-16-15/16/17-*`, `crops/hamle-*.jpg`, QM-measurements | — |
+| E16 | §11.5 (7) thaw L23 | runtime-video + probe | seed `["R1","D3","U4"]` → sütun 4 yukarı | iPhone 16 | `thawedFrozenCells ["2,1"]`; buz → krem **cross-fade** ≈7 karede (settle'dan ≈115–130 ms, 180 ms önden yüklü eğri), kar tanesi solarak küçülüyor; durum değişimi değil | `QV-16-thaw-L23.mp4`, `QM-thaw-probe.txt`, `crops/thaw-*.jpg` | — |
+| E17 | §11.5 (9) tutorial 1.0×, ghost gizle/dön, HUD kullanılabilir | runtime-video + ölçüm | L4 ack yok; satır sürükle-tut → R4; undo | iPhone 16 | pill boşluğu **10.0 / 9.7 pt**; touch-down'da ghost ≈120 ms'de soluyor, pill kalıyor; idle'dan ≈620 ms sonra ≈130 ms'de geri; R4 ack yazmadı; undo çalıştı (kota 2), harcanan nokta ≈117 ms'de söndü | `QA-16-20/21/22`, `QV-16-tutorial-ghost-drag.mp4`, `QV-16-tutorial-undo.mp4`, `QM-tutorial-probe.txt` | — |
+| E18 | F05 AC11 | runtime | gate öncesi force-quit → relaunch → CONTINUE | iPhone 16 | tutorial yeniden gösterildi | `QA-16-23` | — |
+| E19 | F05 AC4 + tekrar gösterilmeme + 4–6 dışı | runtime | sütun hamlesi D2; relaunch; L7 ack yok | iPhone 16 | pill + ghost kalktı, `journey_col_tutorial_ack` yazıldı; L4'te ack sonrası ve L7'de pill bandında piksel yok | `QA-16-24/25/26`, sqlite | — |
+| E20 | Tutorial 1.3× cap | runtime + ölçüm | AX5 | iPhone 16 | iki satır, sparkle gizli; boşluk **7.3 / 6.7 pt** | `QA-16-37`, `crops/tut-ax5-band.jpg` | — |
+| E21 | §11.5 (13) load error + çıkışlar + metin ölçeği | runtime | kurulu bundle'da `journey-tr-07.json` bozuldu; CONTINUE; kenar kaydırma; pill; boyut taraması | iPhone 16 | kart + çizilmiş `loopBreak` + Türkçe metin, ham exception yok; kenar kaydırma ve pill → Home; pill etiketi AX5'te iki satıra akıyor — **başlık xxxL/AX'te "yüklenemedi" / "." olarak kırılıyor** (F03-QA-D1-02). Asset geri yüklendi (SHA-1 `2fef993c2391…` = repo) | `QA-16-27/28/29-*/30`, `crops/err-ax5-card.jpg` | bozulma yalnız simülatör bundle'ında |
+| E22 | §11.5 (12) loading → loaded | runtime-video | CONTINUE → L26, kareler | iPhone 16 | route push içinde skeleton: `SEVİYE 26` + 25 cam hücre; rail / `HAMLE` / HUD / spinner yok; kart üst 306.6 pt ve alt kenar 643.5–644.5 pt iki karede aynı | `QV-16-loading-L26.mp4` | yükleme < 300 ms |
+| E23 | Won moment §16 (§19.9 (1) ile) | runtime-video + ölçüm | debug L01: R0 Perfect; Retry; R1 + R0 (2★); xxxL; Kapat | iPhone 16 | dock ≈ T0 + 615 ms, scrim ≈ T0 + 650, panel ≈ T0 + 700 (**T0 + 600 öncesi hiçbir şey yok**); taşlar hedef taşlarına ortalı (228.7–289 pt, rail merkezi 258.8), rail taşları görünmez; panel omurgası 316–318.7 pt ≥ 0.36 H (306.7), seam altına ≥ 22 pt; xxxL'de compact yoğunluk, satır açık, kontroller ≥ 44 pt; Retry rail'i geri getiriyor; Kapat → Home; debug setinde yalnız chevron | `QA-16-31…35`, `QV-16-won-L01-perfect.mp4`, `QM-won-probe.txt` | — |
+| E24 | §11.5 (11) Reduce Motion açık | runtime-video + capture | `ReduceMotionEnabled 1`, relaunch; L23 thaw; L4 tutorial | iPhone 16 | lift anında (tek karede %42); settle overshoot'suz monoton ease-out; thaw settle karesinde anında; ghost statik (≈1.8 s'lik dört yakalama byte-identical) | `QV-16-reduced-motion-lift-thaw.mp4`, `QM-reduced-motion-probe.txt`, `QA-16-36` | — |
+| E25 | iPhone 16e: idle, sütun, tutorial | runtime + ölçüm | L5 idle; sütun tutma; L4 tutorial 1.0× / AX5 | 16e | S-v-16e ile max **0.67 pt**; sütun ray'leri üst/alt; pill boşluğu **9.3 / 8.7 → 6.3 / 6.0 pt** | `QA-16e-01…04` | — |
+| E26 | iPhone 16 Pro Max: idle, sütun, tutorial | runtime + ölçüm | aynı | Pro Max | D1-v Pro Max render ile max **0.67 pt**; S-v ile yalnız restart +3.17 pt (S-v, 44-pt kararından eski — beklenen); pill boşluğu **12.0 / 12.0 → 8.7 / 8.3 pt** | `QA-pm-01…04` | — |
+| E27 | Multi-touch → yalnız ilk parmak | runtime | iki parmak zıt yönlere (satır 1 sağa, satır 3 sola); kontrol: tek parmak aynı yol | iPhone 16 | iki parmakta **0 hamle**; tek parmakta R1 uygulandı (F03-QA-D1-03) | `QA-16-38`, sqlite | — |
+| E28 | Diagonal eşitlik → yatay | runtime | dx 40 / dy 38 | iPhone 16 | R2 (yatay) | sqlite | — |
+| E29 | Kontrast (en düşük çift) | runtime piksel | `HAMLE` etiketi ve kart dolgusu örneklendi | iPhone 16 | etiket #AEB4CA (token birebir) / dolgu 51,60,106 → **5.1 : 1** | QM-measurements | — |
+| E30 | §11.5 (14) legacy yok | runtime + static | bütün D1 yakalamaları; `grep -rn "Icons\." app/lib` | 3 sim / repo | Material ikon, sistem fontu ya da PlayTheme rengi D1 yüzeylerinde görülmedi; grep yalnız `completion_panel.dart` doc yorumu | yakalamalar | — |
+| E31 | VoiceOver semantiği | automated (runtime yok) | E01 içindeki widget testleri (geri "Geri, Seviye 26", tek rail düğümü, "n / 3 hak", ipucu bir kez, ghost hariç, 300 ms sonra "Yükleniyor") | widget | geçti (E01) — **REUSED sınıf: automated**; bu host'ta çalışma zamanı VoiceOver sürücüsü yok | 5798c70 | test harness |
+| E32 | Klavye odak halkası | automated (runtime yok) | `components_test.dart` "QA-03: focus ring …" (E01) | widget | geçti; simülatöre donanım Tab gönderilemedi — §19.9 (4) sınıfı | 5798c70 | test harness |
 
 ## 2. Acceptance & Critical Journey Coverage
 
-| AC / Journey | Beklenen | Evidence | Sonuç |
+| AC / Journey | Expected | Evidence IDs | Result |
 | --- | --- | --- | --- |
-| AC1–AC8 temel etkileşim (grid, hamle, sayaç, kazanma, undo/restart, reddedilen hamle, eşik) | çalışıyor | E7, E12–E15 (+ REUSED R5) | PASS |
-| AC9 sürükleme sırasında kaldırma/vurgu | görünür | E8 | PASS |
-| AC10 resume | kill/relaunch grid + MOVES korunur | E6, R2 | PASS |
-| architecture §12: tutulan dokunuş kesilirse **hamle yok**, idle | OS geçişi ve kilit | E4, E5 | **PASS** (önceki FAIL kapandı) |
-| architecture §12: boşta arka plana alma | durum aynı | E9 | PASS |
-| architecture §12: animasyon sırasında pause → deterministik son durum | settled, kayıp/yarım hamle yok | E3 (group 4, `paused mid-animation`) | PASS (yalnız otomasyon; ~190 ms'lik pencerede gerçek OS geçişi güvenilir zamanlanamadı) |
-| architecture §18 / ui-design §16.2: OS reduce-motion yolu | iOS'ta erişilebilir | E10–E14 | **PASS** (önceki FAIL kapandı) |
-| Gerçek bırakmalar (plaka içi/dışı, uzun tutma) hâlâ çözülür | commit | E7 | PASS |
-| Negatif/misuse: eşik altı, çapraz, sütun reddi, kill sonrası, kesinti sonrası | güvenli durum | E6, E7, E9 (+ R5) | PASS |
-| F04 paneli: Perfect / SONRAKİ / Yeniden / Kapat, Reduce Motion açık/kapalı | tam ve tıklanabilir | E12–E15 | PASS |
-| F05 halka / öğretici: reduce-motion açık statik, kapalı canlı | iki yönlü | E10–E11, E13 | PASS |
+| AC1 / J1 açılış | hedef, ızgara, `HAMLE 0`, undo 3, restart; hedef ızgaradan ayrık | E05, E25, E26 | PASS |
+| AC2 / AC3 satır–sütun kaydırma | yalnız o hat bir hücre, +1 | E06, E07, E28 | PASS |
+| AC4 eşik altı | hamle yok | E08, E13 (sütun tutup bırakma L3) | PASS |
+| AC5 animasyonda girdi | düşürülür, kuyruk yok, çift sayım yok | E11, E02 | PASS |
+| AC6 undo kotası | 0'da no-op, prompt yok | E09 | PASS |
+| AC7 restart | diyalogsuz sıfırlama, ızgaradan uzak | E10 | PASS |
+| AC8 / AC11 kazanma | kilit + vurgu + animasyon + panel; kazanç yalnız settle'da | E23, E02 | PASS |
+| AC9 hat vurgusu | rim + ray'ler | E06, E25, E26 | PASS |
+| AC10 resume | geri / kenar kaydırma / kill → birebir | E12, E02 | PASS |
+| F05 AC4 / AC11 | ilk sütun hamlesi ack yazar; gate öncesi quit → yeniden gösterim | E17, E18, E19 | PASS |
+| J4 reddedilen hamle | 140 ms bounce, `HAMLE` değişmez | E13 | PASS |
+| J6 thaw | 180 ms cross-fade; RM'de anında | E16, E24 | PASS |
+| J10 loading | kart rect sabit, spinner yok | E22 | PASS |
+| J11 load error | kart + `loopBreak` + pill → `/`; geri → çağıran; ham metin yok; AX5'te akış | E21 | **FAIL** (F03-QA-D1-02, yalnız metin ölçeği) |
+| J13 won §16 (amended) | T0 + 600; dock hedefte; panel satırı örtmez; ≥ 44 pt; Retry | E23 | PASS |
+| Metin taraması (§11.5 (10)) | AX5'e kadar kırpma/örtüşme/kelime içi kırılma yok | E15, E20, E21 | **FAIL** (F03-QA-D1-01, -02) |
+| Reduce Motion açık / kapalı | azaltılmış yollar / tam hareket | E24 / E06, E16, E17 | PASS |
+| Misuse: settle'da girdi, undo/restart | düşürülür | E11 | PASS |
+| Misuse: multi-touch | yalnız ilk parmak | E27 | FAIL (F03-QA-D1-03 — güvenli sonuç, D1 öncesi) |
+| Misuse: diagonal eşitlik | yatay | E28 | PASS |
+| Misuse: arka plan mid-drag / mid-settle | yırtık hamle yok | E02 grup 4 | PASS |
+| Misuse: panelden Retry / Kapat; Next | Retry yeniden başlatır; Kapat → Home; Next "yakında" (F05) | E23 | PASS |
+| Misuse: 4–6 dışı / ack sonrası tutorial | gösterilmez | E19 | PASS |
 
 ## Client & UI Compliance
 
-| Journey / State / Navigation | Sonuç | Evidence |
+| Kontrol | Evidence | Sonuç |
 | --- | --- | --- |
-| Ekran hedefi: hedef kelime rayı, board, HAMLE, geri chevron; header sibling'lerle tutarlı | PASS | E4, E12–E15 |
-| Kazanma: girdi kilidi, chevron gizli, panel ancak kazanma dizisinden sonra | PASS (azaltılmış ve normal) | E12, E14 |
-| Panel çıkışları: Next Level (replaced-route), Kapat → `/` | PASS | E13, E15 |
-| Öğretici: gate, ilk sütun hamlesiyle temizlenir, reduce-motion'da statik | PASS | E13 |
-| `ui-design.md` §16 niyeti (dock satırı, hayalet hücre, tek glow, panel ≤ %64) — regresyon gözlemi | Regresyon yok (spot: satır 0 azaltılmış, satır 4 normal) | E12, E14 |
-| Animasyon sırasında girdi (çift kayıt) | Reddedilir (integration group 2) | E3 |
+| Header: chevron + `SEVİYE NN` iki haneli, seviyeye bağlı; debug setinde yalnız chevron; ≥ 44 pt | E05, E14, E23 | PASS |
+| Back / kenar kaydırma / sistem geri: çağırana döner, snapshot korunur, onay yok; `won`'da gizli | E12, E21, E23 | PASS |
+| Loading (skeleton, spinner yok) / error (tek aksiyon) / disabled / pressed / selected (lift) | E22, E21, E09, E10, E06 | PASS (error metin ölçeği hariç — F03-QA-D1-02) |
+| Controller → görünür UI eşlemesi (`HAMLE` settle'da, kota noktaları, thaw) | E06, E09, E16 | PASS |
+| F05 overlay: pill HUD üstünde, kontrol örtmüyor; ghost parmak altında oynamıyor (A-1, A-6 düzeltmesi) | E17, E20, E25, E26 | PASS |
+| `ui-design.md` §12a matrisi — her satır runtime'da görüldü | E05–E26 | PASS (odak halkası E32 sınıfında) |
+| Metin ölçeği davranışı (§19.3 (1), §11.5 (10)) | E15, E21 | **FAIL** — F03-QA-D1-01, -02 |
 
 ## Stateful Flow & Integration
 
-| Boundary / Transition | Actor / Start State | Beklenen | Evidence | Sonuç |
+| Boundary / Transition | Actor / Start State | Expected | Evidence IDs | Result |
 | --- | --- | --- | --- | --- |
-| tracking → OS iptali/geçişi → paused → resumed | tutulan dokunuş, satır kalkık | hamle yok, idle, store değişmez | E4 ×3, E5 | PASS |
-| cold boot, persisted state ile | kesinti sonrası kill | son settled snapshot | E6, R2 | PASS |
-| idle → paused → resumed | hamle sonrası, dokunuş yok | durum aynı | E9 | PASS |
-| won → completed snapshot / kapanış → unlock / SONRAKİ | seviye 1–4 | ilerleme 3/30, sonraki seviye açık | E13, E15 | PASS |
-| Listener sahipliği: `Listener` yalnız PointerCancel'de `_abort`; ardından gelen `onPanEnd` fazı `idle` görüp no-op | kaynak + davranış | çift çözümleme yok | E4 (store) + kaynak incelemesi | PASS |
+| settled move → snapshot | oyuncu / idle | her settle / undo / restart sonrası write-through | E07, E09, E10, E17 | PASS |
+| back → Home → CONTINUE | oyuncu / inProgress | aynı durum | E12 | PASS |
+| OS kill → relaunch → CONTINUE | OS / inProgress | aynı durum (kota, restartCount dahil) | E12, E02 | PASS |
+| paused mid-drag / mid-animation | OS / tracking, animating | hamle yok / settle tamamlanır | E02 | PASS |
+| tampered `thawedFrozenCells` | depolama / resume | yeniden türetilir | E02 | PASS |
+| tutorial gate öncesi quit | OS / L4, ack yok | yeniden gösterim | E18 | PASS |
+| gate (sütun hamlesi) → ack → relaunch | oyuncu / L4 | ack kalıcı, bir daha yok | E19 | PASS |
+| won → `completed` + clear → Kapat | oyuncu / won | Home'da aktif oturum yok | E23 | PASS |
+| bozuk asset → error → Home | içerik / L7 | tek çıkış, crash yok | E21 | PASS |
+
+## Visual Quality Verdict
+
+Bağımsız runtime skoru; Frontend/UI self-score'u kullanılmadı. Kapsam: `won` dışındaki Play state'leri ve F05 overlay. Won moment yalnız §16 (+ §19.9 (1)) kurallarına göre değerlendirildi (E23, PASS) ve puana katılmadı.
+
+| Rubric Dimension | Score / 10 | Runtime Evidence | Notes |
+| --- | --- | --- | --- |
+| Experience Fit | 9 | E05, E14, E17 | Seçilmiş Loop Glass dili çekirdek döngüde sakin ve bilinçli; hybrid dönem (legacy Home / won) kabul edilmiş |
+| Visual Hierarchy | 10 | E05, E06, E17 | her state'te tek odak: board, kaldırılan hat, eriyen taş, ipucu; hedef board ile eşleşiyor ama yarışmıyor; HUD sessiz |
+| Layout, Rhythm and Responsiveness | 8 | E05, E25, E26, E20, E15 | üç cihazda ≤ 0.67 pt; tutorial bütçesi her ölçekte ≥ 6 pt — ama dinamik tipte `HAMLE` etiketi kartından taşıyor (F-01) |
+| Typography and Content Craft | 8 | E14, E15, E21 | iki OFL aile, `tnum`, Türkçe büyük harf doğru; ama xxL+'da etiket taşması ve xxxL+'da hata başlığında "." yetim satırı (F-01, F-02) |
+| Color, Surface and Asset System | 10 | E05, E14, E29, E30 | token yamaları ΔE ≤ 1.5, anlam başına tek vurgu (periwinkle / lime), çizilmiş ikonlar, gri tonlamada okunur özel taşlar; zemin ışığı ΔE 3.35 kabul edilmiş gradient yaklaşımı |
+| Interaction, State and Feedback | 9 | E06, E09, E10, E13, E16, E21, E22 | her state ayırt edilebilir ve runtime'da görüldü; bounce, pressed, kota; multi-touch sapması (F-03, D1 öncesi) |
+| Motion and Sensory Quality | 9 | E06, E13, E16, E17, E24 | settle %1.5 / 80 %, 140 ms bounce, thaw cross-fade, ghost 120 / 600 / 160 ms, bütün reduced yollar anında; audio/haptic yalnız niyet (F11 planlı değil) |
+| Originality and Product Identity | 9 | E06, E21 | wrap ghost + kenar ray'leri mekaniği gösteriyor; `loopBreak` glifi ürün metaforu; navy-glass tarifi kategoride yaygın |
+| Accessibility and Inclusive Quality | 7 | E15, E21, E29, E24, E31, E32 | kontrast 5.1 : 1, non-colour cue'lar, 44 pt, RM iyi — ama OS metin boyutu xxL'den itibaren birincil durum kartında taşma (F-01) ve xxxL+ hata başlığı kırılması (F-02); VoiceOver ve odak halkası runtime'da doğrulanamadı (yalnız automated) |
+| Implementation Fidelity and Polish | 8 | E05, E14, E25, E26, E15 | varsayılan ölçekte render'lara ≤ 0.83 pt; 1.3× cap'te D1-10 etiketi kart içinde gösteriyor, runtime göstermiyor — frontend.md NTLC-3 / A11Y-16-text "örtüşme yok" kaydı yalnız kart merkezinde doğru |
+
+Final Score: `87 / 100`
+
+Lowest Dimension: `Accessibility and Inclusive Quality — 7 / 10`
+
+Fail Conditions: `clipping / overflow — HAMLE etiketi MovesCard'ın yuvarlak alt kenarını xxL (1.235×) → AX5 aralığında aşıyor; D1-10 render'ı ile açıklanmamış belirgin sapma (F03-QA-D1-01)`
+
+Runtime Evidence Complete: `Yes` (VoiceOver ve odak halkası belirtilen automated sınıfta; Android kapsam dışı sınır)
+
+Result: `FAIL`
 
 ## 3. Findings
 
-Yeni bulgu **yok**. Önceki bulguların kapanışı:
+**F03-QA-D1-01 — `HAMLE` etiketi büyük OS metin boyutlarında kartının dışına taşıyor**
+* Severity / Type: **Major** / görsel + erişilebilirlik (implementation defect). Blocking.
+* İlgili: ui-design §11.5 (10) ve (16); architecture §19.3 (1); F03-FE-D1 (MovesCard, 1.3× cap); rubric fail condition "clipping / overflow".
+* Expected: bütün Play metni 1.3× cap'te kendi kabı içinde kalır; D1-10'da etiket kartın içinde.
+* Actual: etiketin mürekkep kutusu cap'te x 304.7–361.7, y 138.7–150.0 pt. Kart ise x 301.0–365.3, alt kenar ≈ 152.3 pt, köşe yarıçapı ≈ 24 pt. "H" ve "E" alt köşelerde kartın yay kenarını ≈ 5–6 pt aşıyor ve kenar çizgisinin üstünden geçiyor.
+  * Görünür olduğu boyutlar: xxL (1.235×), xxxL ve bütün AX boyutları; xL'de kenara değiyor.
+  * Yalnız kart merkezinde ≈ 2 pt içeride; frontend.md NTLC-3 / A11Y-16-text'teki "no clipping or overlap" kaydı bu yüzden eksik.
+* Adımlar: `seed-sim.sh <16> 26 - 1` → CONTINUE → `xcrun simctl ui <16> content_size extra-extra-large` (veya xxxL / AX5).
+* Evidence: E15 — `QA-16-16-L26-text-ax5.png`, `crops/hamle-ax5-corner-left-x4.jpg`, `crops/hamle-ax5-corner-right-x4.jpg`, `crops/hamle-extra-extra-large.jpg`, `crops/hamle-ax5-render.jpg`, QM-measurements.
+* Kök neden önerisi: F00 `MovesCard`'ın cap'teki iç yerleşimi (minimum yükseklik ve etiketin alt boşluğu / tracking); follow-up MOVESCARD-CAP-MARGIN ile aynı yüzey. Design-layer düzenleme yetkisi Tech Lead'de; token değeri değişmemeli.
 
-| ID | Başlık | Durum | Kanıt |
-| --- | --- | --- | --- |
-| F03-QA-01 | Kazanma dizisi/geometri | Kapalı (önceki tur, c0cba44) | REUSED R4 + E12/E14 spot |
-| F03-QA-02 | Cihaz suite group 4 | Kapalı (önceki tur) | E3 (16e, Pro Max) |
-| F03-QA-03 | Kesilen sürükleme hamle olarak işleniyordu | **Kapalı** | E4 ×3, E5, E6 |
-| F03-QA-04 | iOS Reduce Motion yok sayılıyordu | **Kapalı** | E10–E14 |
+**F03-QA-D1-02 — Load-error başlığı xxxL ve üstünde kelimenin sonundaki "." ile kırılıyor**
+* Severity / Type: **Minor** / tipografi + erişilebilirlik (implementation defect). Blocking — §11.5 (10) kabul maddesi runtime'da sağlanmıyor.
+* İlgili: ui-design §11.5 (10) ("mid-word break yok"); architecture §19.9 (3) (başlık, AX5'te kelime içinde kırılmasın diye 1.3×'e sınırlandı).
+* Expected: "Bu bulmaca yüklenemedi." her OS boyutunda kelime sınırlarında akar.
+* Actual: 1.3× cap'te "yüklenemedi." kartın metin sütunundan geniş. Nokta ayrı üçüncü satıra zorla kırılıyor (başlık yüksekliği 2 satır ≈ 77 pt → 3 satır ≈ 115–120 pt).
+  * Görünür olduğu boyutlar: xxxL ve bütün AX boyutları; xxL'de iki satır, sorun yok.
+* Adımlar: kurulu bundle'da `journey-tr-07.json` bozulur → L7 CONTINUE → `content_size extra-extra-extra-large`. Sonra asset geri yüklenir.
+* Evidence: E21 — `QA-16-28-load-error-ax5.png`, `crops/err-ax5-card.jpg`, `QA-16-29-*`, QM-measurements.
+* Kök neden önerisi: `_LoadErrorView` başlık rolü (`LoopText.headline` 28·s × 1.3) kart iç genişliğine göre çok büyük. Çözüm (rol boyutu, kart iç boşluğu veya ölçekleme kuralı) UI / Tech Lead kararı.
 
-Not (QA-03 kök nedeni): önceki raporun mekanizma notu (`_onPanCancel → _release`) eksikti. Frontend'in düzeltmesi, kabul edilmiş bir pan'in `PointerCancel`'inin Flutter'da `onPanEnd` olarak geldiğini gösterir (iki negatif kontrolle); QA gerçek OS geçişiyle sonucu bağımsız doğruladı (E4). Sözleşme değişikliği gerekmez.
+**F03-QA-D1-03 — İki parmakla zıt yönde kaydırma hiçbir hamle üretmiyor (ilk parmak onurlandırılmıyor)**
+* Severity / Type: **Minor** / contract sapması (davranış), **D1 öncesi** — gesture kodu 2026-09-06'dan (3a6e854) beri aynı; D1 değiştirmedi. D1 gate'i için non-blocking; routing Tech Lead'de.
+* İlgili: architecture §6 ("tracking follows only the first pointer"), prd §4 edge case ("honor only the first touch"); F03 closure 2026-09-21 notu: multi-touch runtime'da denenmemişti.
+* Expected: ilk parmağın hamlesi uygulanır, ikinci yok sayılır.
+* Actual: satır 1 sağa + satır 3 sola eşzamanlı → 0 hamle. Aynı yol tek parmakla → R1. `GestureDetector` pan tanıyıcısı bütün pointer'ları tek odak deltasında birleştiriyor; zıt deltalar birbirini götürüp eşik altına düşüyor.
+  * Sonuç güvenli: çift hamle ya da yırtık durum yok.
+* Evidence: E27 — `QA-16-38.jpg`, sqlite okumaları.
+
+## 4. Pending Evidence
+
+* Scenario: Android görünümü ve `disableAnimations` runtime davranışı.
+  * Required class: runtime; target: Android emulator/cihaz; owner: DevOps/Release Engineer (ANDROID-CI-EVIDENCE).
+  * Re-evaluation trigger: Android CI/emülatör hazır olduğunda.
+  * Bu gate'i durdurmaz (brief'te belirtilmiş sınır).
+
+VoiceOver (E31) ve donanım klavye odak halkası (E32) automated sınıfta kaldı. Brief ve §19.9 (4) bu sınıfı kabul ediyor; ayrı pending kaydı açılmadı.
 
 ## 5. Regression & Evidence Reuse
 
-* **Etkilenen yüzey / depth:** gesture yolu (`puzzle_board.dart`), controller iptal API'si, altı reduce-motion çağrı noktası (F03, F04 paneli ×2, F05 halka + öğretici). Derinlik full: gate'ler, cihaz suite'i 2 genişlikte, gerçek OS kesintisi, gerçek Reduce Motion açık/kapalı, genuine-release regresyonu, Journey zinciri (F04/F05 paylaşılan yol) çalıştırıldı.
-* **Reused:** R1–R7; gerekçe = ilgili dosyalar değişmedi (fingerprint).
-* **Invalidated ve yeniden yürütülen:** LIFECYCLE-LIVE, AC9, gesture, reduce-motion, CURRENT-REVISION.
-* **Bağımsız QA probe:** E4 (gerçek OS geçişi ×3, farklı satır/sütun/eksen), E5 (gerçek cihaz kilidi), E10–E14 (gerçek Settings anahtarı + açık/kapalı kontrol çifti). Teslim sahibinin özeti kopyalanmadı; her sonuç QA'nın kendi çalıştırmasıdır.
-* **F04/F05 etkisi:** yalnız bayrak kaynağı; davranış ve kabul kriterleri değişmedi; runtime'da açık/kapalı iki yönde doğrulandı.
+* **Etkilenen yüzey / derinlik:** full.
+  * `/play` bütün state'leri, F05 overlay, design-layer (`tile.dart`, `buttons.dart`, `icons.dart`, `play_decor.dart`) ve won geometrisi runtime'da; paylaşılan bileşenlerin geri kalanı E01'de.
+  * AC1–AC11 ve F05 AC4 / AC11 regresyonu PASS.
+* **Reused:**
+  * E31 / E32 — yalnız automated sınıf; testler bu turda yeniden çalıştırıldı.
+  * Portre kilidi / rotasyon yeniden denenmedi: `Info.plist` ve kök navigasyon D1'de değişmedi; önceki QA (rev c0cba44) PASS.
+* **Invalidated:** yok. Frontend'in RT/RV kayıtları karşılaştırma girdisi olarak kullanıldı; hiçbiri skor kanıtı sayılmadı.
+* **Bağımsız QA probe'ları:**
+  * suite'ler ve integration yeniden (E01, E02);
+  * QA'ya ait `qa-frames` / `qa-pixels` ile settle, bounce, thaw, ghost, won zamanlaması ve piksel ölçümleri;
+  * `measure-d1` QA yakalamaları üzerinde yeniden çalıştırıldı ve Frontend'in parity sayılarını ≤ 0.83 pt ile teyit etti.
+* **Ek bulgu:** frontend.md'deki A11Y-16-text / NTLC-3 "no clipping or overlap" iddiası runtime'da çelişiyor (F03-QA-D1-01). Rapor düzeltmesi gerekiyor.
 
 ## 6. Final Verdict
 
-* `QA Result: Approved with Notes`
-* Blocking Issues: None
-* Required Fixes: None
+* `QA Result: Rejected`
+* Blocking Issues: F03-QA-D1-01, F03-QA-D1-02
+* Required Fixes:
+  1. `HAMLE` etiketi 1.3× cap'te MovesCard içinde kalsın (xxL → AX5; köşe yayları dahil); D1-10 ile eşleşsin.
+  2. Load-error başlığı xxxL → AX5'te kelime sınırında aksın (yetim "." yok).
+  3. Düzeltme sonrası metin taraması (large / xL / xxL / xxxL / AX5) üç cihazda yeniden; F03.D1-VISUAL-QA yeniden skorlanır.
 * Non-blocking Notes:
-  1. **Runtime'da uygulanmayan / yalnız otomatik kanıtlı:** tüm 30 seviye tamamlanınca terminal halka bloom'unun reduce-motion'da statik olması (widget testleri her iki bayrak + kontrolle geçer; runtime'da 30/30'a ulaşılmadı); çok parmaklı kullanım (ikinci parmağın iptali birincinin sürüklemesini iptal eder — AC dışı, gözlenmedi); fiziksel parmak doğruluğu; animasyon penceresinde gerçek OS pause zamanlaması (integration group 4 kanıtı).
-  2. **Tahta kaydırma/sekme animasyonu** iOS Reduce Motion'da normal hızda çalışır (sözleşme yok; Android `disableAnimations`'ta Flutter kısaltır) — Tech Lead kararı: rework değil.
-  3. **Bilinen tasarım gözlemleri (rework değil):** kazanma anında dimlenmiş satır 0'ın dock ile panel arasında şerit olarak görünmesi; ui-design §8/§16.2'deki 30 ms L→R amber stagger uygulanmamış (karolar birlikte geçer).
-  4. **Görsel kalite bu raporun kapsamı dışındadır** (Visual Scope none): F03 yüzeylerinin yeni Design Foundation / Visual Quality Gate altındaki bağımsız değerlendirmesi Design Adoption Route'a aittir. Android capture Pending (platform.md §14).
-  5. Kanıt görüntüleri/videoları oturum scratchpad'indedir, repoya eklenmedi; tekrar üretme adımları E4–E14'te yazılıdır.
+  * F03-QA-D1-03: multi-touch ilk-parmak sözleşmesi (D1 öncesi, güvenli sonuç) — Tech Lead routing kararı.
+  * frontend.md NTLC-3 / A11Y-16-text kaydının düzeltilmesi.
+  * Android, VoiceOver ve fiziksel parmak sınırları.
+  * Skor 87 / 100. Sorun yalnız dinamik tipte: iki bulgunun etkilediği boyutlar dışında yüzey güçlü (hiyerarşi ve renk/yüzey 10, varsayılan ölçekte parity ≤ 0.83 pt).
 
 ## 7. Tech Lead Note
 
-* **Root-cause alanı:** F03-QA-03/04 Frontend/Mobile Developer alanındaydı ve kapandı; başka rol/rework gerekmiyor.
-* **Routing / depth:** blocking yok; closure review Tech Lead'de. Board/system-state senkronu ve F03 kapanışı Tech Lead kararıdır. Sonraki iş kuyruğu: F05-QA-STRICT (F03 rework kilidi kalkar), F08 yerel kanıt ve Design Adoption Route Faz B.
-* **Workflow notu:** Visual Scope = none ile verilen onay yalnız davranış/erişilebilirlik kapsamlıdır. F03 terminal `Done` yapılırsa görsel yüzeylerin Design Adoption Route'ta yeniden değerlendirilmesi ve gerekirse görsel rework olarak yeniden açılması Tech Lead tarafından kayda geçirilmelidir.
-* **Ortam notu:** Reduce Motion testten sonra KAPALI konuma geri alındı (E-son durum doğrulandı); üç simulator açık; iPhone 16'daki uygulama store'u seviye 5'te (yerel test verisi).
+* **Kök neden alanı / rol:**
+  * F-01 — design-layer `MovesCard` cap yerleşimi (Frontend/Mobile Developer; design-layer düzenleme yetkisi Tech Lead kararıyla, MOVESCARD-CAP-MARGIN ile birleşebilir);
+  * F-02 — `_LoadErrorView` başlık rolü (Frontend; ölçü seçimi UI Designer / Tech Lead);
+  * F-03 — gesture tanıyıcısı (Frontend; D1 kapsamına alınıp alınmayacağı Tech Lead kararı).
+* **Routing:** rework → Frontend/Mobile Developer, ardından Tech Lead checkpoint ve hedefli re-QA.
+  * Re-QA kapsamı: metin taraması + etkilenen yüzeyler.
+  * Diğer bütün kanıt, `app/` fingerprint'i değişmediği sürece yeniden kullanılabilir.
+  * Depth değişikliği gerekmiyor.
+* **Workflow notu:**
+  * Visual Quality Gate Ready for QA'da kalır; F03.D1-VISUAL-QA = FAIL.
+  * Rotasyon tuzağı yok, release etkisi yok.
+  * Simülatör ayarları geri yüklendi: üç cihazda content size `large`, Reduce Motion 0; level-07 asset'i repo hash'ine döndü.
 
 ## Sonraki Komut
 

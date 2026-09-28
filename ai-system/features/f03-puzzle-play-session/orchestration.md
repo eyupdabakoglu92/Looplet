@@ -10,17 +10,17 @@ In QA
 
 ## Current Owner
 
-QA
+Tech Lead
 
 ## Next Role
 
-QA
+Tech Lead
 
 ## Active Task Ledger
 
 - [x] Task ID: F03-UI-D1 | Assigned Role: UI Designer | Status: Done | Summary: DELIVERED 2026-09-27 — ui-design.md §1–§14 rewritten for the Loop Glass Play surface; §16 won composition kept byte-for-byte (legacy until D2). 28 renders under design/: the audit's D1 missing states 1–10, plus idle (D1 corrections), loading, keyboard focus, 16e / Pro Max variants, the 1.3× text cap and motion stills. Executable motion prototype design/src/D1-motion-prototype.html (lift + settle, thaw, tutorial ghost; ?rm=1, ?t=). Rulings applied: C-5 (hint pill above the HUD, ≥ 4 pt clearance measured on three devices at 1.0× and 1.3×; ghost hides on touch-down), C-9 (1.3× cap), C-10 (180 ms thaw), locked/frozen treatments, copy. D1 acceptance list §11.5; manifest §12b. NTLC §14: the text cap applied to the whole of Play (deviates from the §19.3 (1) hint example), design-layer edits inside D1, and informational items. No code | Depends On: -
 - [x] Task ID: F03-FE-D1 | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: DELIVERED 2026-09-28 — every non-won Play state on Loop Glass (LoopBackdrop; chevron + SEVİYE NN; MovesCard; HEDEF DÖNGÜ + RailTiles; BoardCard + TileFace; lift with rim, card-edge rails, rest at 42 %, wrap ghost 30 → 100 %; thaw 180 ms cross-fade; UndoPill + 44-pt restart; skeleton loading; error card + LimePill → /), the F05 tutorial re-skin (pill between board and HUD, ghost hides on touch-down and returns after 600 ms idle; §19.8 (3) fallback on after a 3.93-pt device measurement), the §19.8 (2) design-layer additions, drawn icons (no Material icon left), strings and semantics, reduced-motion paths. Tests: melos analyze / test green (app 405), integration_test 13/13 on the iPhone 16 simulator. frontend.md Visual Parity Evidence: runtime screenshots on the 16 / 16e / Pro Max, parity composites and measurements (≤ 0.83 pt vs the D1 renders), four videos, text sweep and Reduce Motion. NTLC-1: the won dock moved onto the goal (the D1 header left no §16.3 zone); NTLC-2: three design-layer edits beyond the §19.8 (2) list | Depends On: F03-UI-D1
-- [ ] Task ID: F03-QA-D1 | Assigned Role: QA | Status: Open | Summary: ACTIVATED 2026-09-28 (Frontend checkpoint passed: Delivery Review Accepted, gate Ready for QA, rulings architecture.md §19.9). Final-stage independent visual QA of D1 (architecture.md §19.7): runtime rubric ≥ 93 with every dimension ≥ 8 and no fail condition on the non-won Play states and the F05 overlay; the §11.5 acceptance list on the iPhone 16 / 16e / Pro Max; regression of AC1–AC11 and F05 AC4 / AC11; the won moment against §16 as amended by §19.9 (1); text sweep to AX5; Reduce Motion on and off; Android stated as a limit. See Current Brief | Depends On: F03-FE-D1
+- [x] Task ID: F03-QA-D1 | Assigned Role: QA | Status: Done | Summary: DONE 2026-09-28 — verdict **Rejected** (qa.md, final, client-only, HEAD 5798c70; app/ = b8b5f60). Independent runtime rubric **87 / 100**, lowest Accessibility 7, one fail condition (clipping / overflow) → Visual Quality FAIL. Blocking: **F03-QA-D1-01** (Major) — the `HAMLE` label overflows the MovesCard's rounded bottom edge at the 1.3× cap from OS size xxL up to AX5 (D1-10 shows it inside; frontend.md NTLC-3 / A11Y-16-text "no overlap" is only true at the card centre); **F03-QA-D1-02** (Minor) — the load-error headline breaks "yüklenemedi" / "." at xxxL and every AX size (§11.5 (10)). Non-blocking: F03-QA-D1-03 — a two-finger opposite drag yields no move instead of honouring the first pointer (pre-D1 gesture code, safe outcome). Everything else PASS at runtime: suites re-run (analyze clean, app 405/0/0), integration 13/13 on the 16; parity ≤ 0.67 pt on 16 / 16e / Pro Max; lift / settle (1.5 % at 80 %), bounce, thaw cross-fade, ghost 120 / 600 / 160 ms, Reduce Motion paths; AC1–AC11, F05 AC4 / AC11; tutorial clearance ≥ 6 pt on all devices at 1.0× and AX5; won moment per §16 + §19.9 (1) (T0 + 600, dock on the goal, panel clear, Retry / Close). Evidence qa/d1/ | Depends On: F03-FE-D1
 
 ## Open Tasks
 
@@ -44,7 +44,7 @@ final
 
 ## QA Result
 
-None
+Rejected
 
 ## Release Scope
 
@@ -89,7 +89,14 @@ Runtime parity records (2026-09-28, Frontend/Mobile Developer; frontend.md § Vi
 * runtime-video RV-* (row and column lift, thaw, tutorial ghost, Reduce Motion);
 * accessibility records for the text sweep and Reduce Motion.
 
-The tooling is in design/src/ (parity-d1.sh, measure-d1.swift, pill-clearance-d1.swift, video-d1.swift, seed-sim.sh). The Tech Lead verified the parity records at the 2026-09-28 checkpoint: the measurements reproduce number for number, and composites were inspected (architecture §19.9). The QA record is pending (see Pending Evidence).
+The tooling is in design/src/ (parity-d1.sh, measure-d1.swift, pill-clearance-d1.swift, video-d1.swift, seed-sim.sh). The Tech Lead verified the parity records at the 2026-09-28 checkpoint: the measurements reproduce number for number, and composites were inspected (architecture §19.9).
+
+Independent QA records (2026-09-28, QA; qa.md § Visual Quality Verdict) are in features/f03-puzzle-play-session/qa/d1/:
+* runtime-screenshot QA-16-*, QA-16e-*, QA-pm-* (every §12a state on the 16; idle / column drag / tutorial at 1.0× and AX5 on the 16e and Pro Max; text sweep large → AX5; won moment);
+* runtime-video QV-16-* (row + column lift, bounce, thaw, tutorial ghost and undo, won, loading, Reduce Motion);
+* measurement and probe logs QM-*; QA tools qa/d1/src/.
+
+The gate evidence result is FAIL (F03.D1-VISUAL-QA).
 
 ## QA Modules
 
@@ -135,8 +142,8 @@ allowed
   * Prerequisite / External Decision: F03.D1-PARITY accepted (gate Ready for QA)
   * Re-evaluation Trigger: F03-QA-D1 activation
   * Blocks: Visual Quality Gate = Passed; F03 Done; D2 activation
-  * Result: PENDING
-  * Provenance / Note: -
+  * Result: FAIL
+  * Provenance / Note: 2026-09-28 QA, HEAD 5798c70 (app/ identical to b8b5f60), debug build on iOS Simulator 18.6 — iPhone 16 D0011CE7, 16e 6DBDFD97, Pro Max 02FDE776. Independent rubric **87 / 100**, lowest Accessibility and Inclusive Quality 7, fail condition clipping / overflow. Blocking F03-QA-D1-01 (the `HAMLE` label overflows the MovesCard at the 1.3× cap, xxL → AX5) and F03-QA-D1-02 (the load-error headline breaks "yüklenemedi" / "." at xxxL / AX). Everything else passed at runtime: the §11.5 items apart from (10), AC1–AC11, F05 AC4 / AC11, Reduce Motion on and off, the three devices, and the won moment per §16 + §19.9 (1). VoiceOver and the keyboard focus ring rest on the automated class (host limit; §19.9 (4)); Android not run (ANDROID-CI-EVIDENCE). Records: qa.md; artefacts in qa/d1/.
 
 ## Open Decision Gates
 
@@ -148,11 +155,13 @@ None
 
 ## Next Action
 
-Run QA on F03-QA-D1 — the independent final-stage visual QA of Phase D1 (Current Brief below; architecture.md §19.7 and §19.9).
+Run Tech Lead to reconcile F03-QA-D1 (qa.md, 2026-09-28): QA Result **Rejected**; F03.D1-VISUAL-QA FAIL (rubric 87 / 100, lowest Accessibility 7, fail condition clipping / overflow).
 
-After QA:
-* Approved or Approved with Notes, with the rubric ≥ 93 → the Tech Lead closes D1 (Visual Quality Gate Passed, F03 Done) and activates D2.
-* Rejected → rework routes through the Tech Lead.
+* **Blocking:**
+  * F03-QA-D1-01 — the `HAMLE` label overflows the MovesCard's rounded bottom edge at the 1.3× cap from OS size xxL to AX5 (design-layer `MovesCard`; overlaps follow-up MOVESCARD-CAP-MARGIN);
+  * F03-QA-D1-02 — the load-error headline breaks "yüklenemedi" / "." at xxxL and AX sizes.
+* **Non-blocking:** F03-QA-D1-03 — the two-finger drag does not honour the first pointer (pre-D1, safe outcome); the Tech Lead decides whether it joins this rework.
+* The Tech Lead decides the rework routing, the design-layer edit allowance and a targeted re-QA (text sweep + affected surfaces; the rest of the evidence stays reusable while the app/ fingerprint holds). The frontend.md NTLC-3 / A11Y-16-text "no overlap" record needs correcting.
 
 ## Last Decision
 
@@ -184,9 +193,9 @@ The previous decision (the 2026-09-27 visual-gate checkpoint) and the F03-FE-D1 
 
 ## Last Update
 
-* Updated By: Tech Lead
+* Updated By: QA
 * Timestamp: 2026-09-28
-* Summary: Frontend checkpoint — F03-FE-D1 accepted after independent verification (suites re-run, seven negative runs caught, parity reproduced); rulings architecture §19.9 (NTLC-1 won dock onto the goal, NTLC-2 design-layer edits); Visual Quality Gate Ready for QA; F03-QA-D1 activated for QA.
+* Summary: F03-QA-D1 final-stage visual QA — Rejected. Rubric 87 / 100 (lowest Accessibility 7, fail condition clipping / overflow). Blocking F03-QA-D1-01 (`HAMLE` label overflows its card at the text cap) and F03-QA-D1-02 (load-error headline mid-word break); non-blocking F03-QA-D1-03 (multi-touch). F03.D1-VISUAL-QA FAIL; owner → Tech Lead.
 
 ## Context & Follow-ups
 
@@ -224,6 +233,10 @@ The previous decision (the 2026-09-27 visual-gate checkpoint) and the F03-FE-D1 
   * **Verified:** scope clean; analyze clean and 405 tests passed on re-run; seven negative runs caught; the 19 parity measurements reproduce.
   * **Decided:** Delivery Review Accepted; architecture §19.9 rulings (NTLC-1, NTLC-2, reconciliation items, focus-ring evidence class); Visual Quality Gate Ready for QA; follow-ups MOVESCARD-CAP-MARGIN and CI-FORMAT-GATE logged.
   * **Next:** Current Status In QA; F03-QA-D1 Open; owner → QA. The F03-FE-D1 brief is archived as history/f03-puzzle-play-session-2026-09-27/orchestration-at-fe-d1-delivery.md.
+* 2026-09-28 — QA: F03-QA-D1 done; QA Result Rejected; F03.D1-VISUAL-QA FAIL; owner → Tech Lead.
+  * **Score:** 87 / 100, lowest Accessibility 7; fail condition clipping / overflow.
+  * **Findings:** F03-QA-D1-01 (Major, blocking) `HAMLE` label overflow at the cap; F03-QA-D1-02 (Minor, blocking) load-error headline break; F03-QA-D1-03 (Minor, non-blocking, pre-D1) multi-touch.
+  * **Evidence:** qa.md; qa/d1/. The previous qa.md (2026-09-21) is archived byte-for-byte as history/f03-puzzle-play-session-2026-09-27/qa-before-phase-d1.md.
 
 ## Current Brief
 

@@ -1,0 +1,262 @@
+# F03-QA-D1 numeric measurements — taken on the lossless simctl PNG captures (@3x) before the unmeasured captures were converted to JPEG.
+# Tools: src/qa-pixels.swift (QA-owned); ../../design/src/measure-d1.swift (Frontend tool, re-run independently by QA on QA captures). Build: 5798c70 (app/ tree = b8b5f60).
+
+=== PC-QA-16-idle: D1-00-play-idle.png ↔ QA-16-01-idle-L5.png
+geometry W 393 H 852  s 1.0978  e 64.90
+feature | render pt | runtime pt | Δ pt
+board card top light line (y) | 306.50 | 306.33 | -0.17
+rail tile 2 top (y) | 235.00 | 235.67 | +0.67
+rail tile 2 bottom (y) | 282.00 | 281.67 | -0.33
+rail tile 0 left (x) | 80.00 | 80.00 | +0.00
+HAMLE card top (y) | 82.00 | 82.33 | +0.33
+HAMLE card left (x) | 302.00 | 302.33 | +0.33
+undo pill top (y) | 715.50 | 715.00 | -0.50
+undo pill left (x) | 31.50 | 31.67 | +0.17
+restart square left (x) | 317.00 | 317.00 | +0.00
+restart square top (y) | 720.50 | 720.67 | +0.17
+back chevron apex (x) | 34.00 | 33.67 | -0.33
+tile (0,0) left (x) | 39.00 | 39.00 | +0.00
+tile (0,0) top (y) | 318.50 | 318.33 | -0.17
+tile (0,4) right (x) | 353.00 | 353.00 | +0.00
+tile (4,0) bottom (y) | 632.50 | 632.33 | -0.17
+tile (2,2) left (x) | 167.50 | 167.33 | -0.17
+max |Δ| 0.67 pt
+patch | render RGB | runtime RGB | ΔE2000
+ground, left middle (teal spill) | 11,31,49 | 12,32,50 | 0.29
+ground, top right (light) | 42,51,97 | 33,41,83 | 3.35
+ground, bottom | 5,10,30 | 6,11,31 | 0.29
+rail tile body | 36,36,75 | 36,36,75 | 0.03
+HAMLE card fill | 55,64,112 | 51,60,106 | 1.48
+undo pill fill | 15,20,40 | 17,22,42 | 0.62
+board card, bottom margin | 7,10,31 | 7,12,31 | 0.20
+tile (1,0) body | 252,249,242 | 252,249,242 | 0.05
+tile (3,4) body | 243,236,225 | 242,236,225 | 0.16
+max ΔE2000 3.35
+
+=== PC-QA-16-undo2: D1-02-hud-undo-two-left.png ↔ QA-16-06-undo-two-left.png
+geometry W 393 H 852  s 1.0978  e 64.90
+feature | render pt | runtime pt | Δ pt
+board card top light line (y) | 306.50 | 306.33 | -0.17
+rail tile 2 top (y) | 235.00 | 235.67 | +0.67
+rail tile 2 bottom (y) | 282.00 | 281.67 | -0.33
+rail tile 0 left (x) | 80.00 | 80.00 | +0.00
+HAMLE card top (y) | 82.00 | 82.33 | +0.33
+HAMLE card left (x) | 302.00 | 302.33 | +0.33
+undo pill top (y) | 715.00 | 715.00 | +0.00
+undo pill left (x) | 31.50 | 31.67 | +0.17
+restart square left (x) | 317.00 | 317.00 | +0.00
+restart square top (y) | 720.50 | 720.67 | +0.17
+back chevron apex (x) | 34.00 | 33.67 | -0.33
+tile (0,0) left (x) | 39.00 | 39.00 | +0.00
+tile (0,0) top (y) | 318.50 | 318.33 | -0.17
+tile (0,4) right (x) | 353.00 | 353.00 | +0.00
+tile (4,0) bottom (y) | 632.50 | 632.33 | -0.17
+tile (2,2) left (x) | 167.50 | 167.33 | -0.17
+max |Δ| 0.67 pt
+patch | render RGB | runtime RGB | ΔE2000
+ground, left middle (teal spill) | 11,31,49 | 12,32,50 | 0.29
+ground, top right (light) | 42,51,97 | 33,41,83 | 3.35
+ground, bottom | 5,10,30 | 6,11,31 | 0.29
+rail tile body | 36,36,75 | 36,36,75 | 0.03
+HAMLE card fill | 55,64,112 | 51,60,106 | 1.48
+undo pill fill | 24,28,48 | 25,30,50 | 0.77
+board card, bottom margin | 7,10,31 | 7,12,31 | 0.20
+tile (1,0) body | 252,249,242 | 252,249,242 | 0.05
+tile (3,4) body | 243,236,225 | 242,236,225 | 0.16
+max ΔE2000 3.35
+
+=== PC-QA-16-L26: D1-05-play-locked-frozen-L26.png ↔ QA-16-14-L26-locked-frozen.png
+geometry W 393 H 852  s 1.0978  e 64.90
+feature | render pt | runtime pt | Δ pt
+board card top light line (y) | 306.50 | 306.33 | -0.17
+rail tile 2 top (y) | 235.00 | 235.67 | +0.67
+rail tile 2 bottom (y) | 282.00 | 281.67 | -0.33
+rail tile 0 left (x) | 80.00 | 80.00 | +0.00
+HAMLE card top (y) | 82.00 | 82.33 | +0.33
+HAMLE card left (x) | 302.00 | 302.33 | +0.33
+undo pill top (y) | 715.50 | 715.00 | -0.50
+undo pill left (x) | 31.50 | 31.67 | +0.17
+restart square left (x) | 317.00 | 317.00 | +0.00
+restart square top (y) | 720.50 | 720.67 | +0.17
+back chevron apex (x) | 34.00 | 33.67 | -0.33
+tile (0,0) left (x) | 39.00 | 39.00 | +0.00
+tile (0,0) top (y) | 318.50 | 318.33 | -0.17
+tile (0,4) right (x) | 353.00 | 353.00 | +0.00
+tile (4,0) bottom (y) | 632.50 | 632.33 | -0.17
+tile (2,2) left (x) | 167.50 | 167.67 | +0.17
+max |Δ| 0.67 pt
+patch | render RGB | runtime RGB | ΔE2000
+ground, left middle (teal spill) | 11,31,49 | 12,32,50 | 0.29
+ground, top right (light) | 42,51,97 | 33,41,83 | 3.35
+ground, bottom | 5,10,30 | 6,11,31 | 0.29
+rail tile body | 36,36,75 | 36,36,75 | 0.03
+HAMLE card fill | 55,64,112 | 51,60,106 | 1.48
+undo pill fill | 15,20,40 | 17,22,42 | 0.62
+board card, bottom margin | 7,10,31 | 7,12,31 | 0.20
+tile (1,0) body | 252,249,242 | 252,249,242 | 0.05
+tile (3,4) body | 243,236,225 | 242,236,225 | 0.16
+max ΔE2000 3.35
+
+=== PC-QA-16-L26-ax5: D1-10-play-text-ax5-capped.png ↔ QA-16-16-L26-text-ax5.png
+geometry W 393 H 852  s 1.0978  e 64.90
+feature | render pt | runtime pt | Δ pt
+board card top light line (y) | 306.50 | 306.33 | -0.17
+rail tile 2 top (y) | 235.00 | 235.67 | +0.67
+rail tile 2 bottom (y) | 282.00 | 281.67 | -0.33
+rail tile 0 left (x) | 80.00 | 80.00 | +0.00
+HAMLE card top (y) | 82.00 | 82.33 | +0.33
+HAMLE card left (x) | 302.50 | 301.67 | -0.83
+undo pill top (y) | 715.00 | 715.00 | +0.00
+undo pill left (x) | 31.50 | 31.67 | +0.17
+restart square left (x) | 317.00 | 317.00 | +0.00
+restart square top (y) | 720.50 | 720.67 | +0.17
+back chevron apex (x) | 34.00 | 33.67 | -0.33
+tile (0,0) left (x) | 39.00 | 39.00 | +0.00
+tile (0,0) top (y) | 318.50 | 318.33 | -0.17
+tile (0,4) right (x) | 353.00 | 353.00 | +0.00
+tile (4,0) bottom (y) | 632.50 | 632.33 | -0.17
+tile (2,2) left (x) | 167.50 | 167.67 | +0.17
+max |Δ| 0.83 pt
+patch | render RGB | runtime RGB | ΔE2000
+ground, left middle (teal spill) | 11,31,49 | 12,32,50 | 0.29
+ground, top right (light) | 42,51,97 | 33,41,83 | 3.35
+ground, bottom | 5,10,30 | 6,11,31 | 0.29
+rail tile body | 36,36,75 | 36,36,75 | 0.03
+HAMLE card fill | 55,65,113 | 51,60,106 | 1.49
+undo pill fill | 24,28,48 | 17,22,42 | 1.89
+board card, bottom margin | 7,10,31 | 7,12,31 | 0.20
+tile (1,0) body | 252,249,242 | 252,249,242 | 0.05
+tile (3,4) body | 243,236,225 | 242,236,225 | 0.16
+max ΔE2000 3.35
+
+=== PC-QA-16e-idle: S-v-16e-play-idle.png ↔ QA-16e-01-idle-L5.png
+geometry W 390 H 844  s 1.0894  e 62.91
+feature | render pt | runtime pt | Δ pt
+board card top light line (y) | 303.00 | 303.67 | +0.67
+rail tile 2 top (y) | 233.50 | 233.33 | -0.17
+rail tile 2 bottom (y) | 278.50 | 279.00 | +0.50
+rail tile 0 left (x) | 79.50 | 79.33 | -0.17
+HAMLE card top (y) | 81.00 | 81.33 | +0.33
+HAMLE card left (x) | 300.00 | 300.00 | +0.00
+undo pill top (y) | 708.00 | 708.00 | +0.00
+undo pill left (x) | 31.00 | 31.33 | +0.33
+restart square left (x) | 315.00 | 314.67 | -0.33
+restart square top (y) | 713.50 | 713.33 | -0.17
+back chevron apex (x) | 33.00 | 33.67 | +0.67
+tile (0,0) left (x) | 39.00 | 38.67 | -0.33
+tile (0,0) top (y) | 315.00 | 315.67 | +0.67
+tile (0,4) right (x) | 350.00 | 350.33 | +0.33
+tile (4,0) bottom (y) | 627.00 | 627.00 | +0.00
+tile (2,2) left (x) | 166.50 | 166.33 | -0.17
+max |Δ| 0.67 pt
+patch | render RGB | runtime RGB | ΔE2000
+ground, left middle (teal spill) | 11,31,49 | 12,32,50 | 0.29
+ground, top right (light) | 42,51,97 | 33,41,83 | 3.33
+ground, bottom | 5,10,30 | 6,11,31 | 0.29
+rail tile body | 36,36,75 | 36,36,75 | 0.04
+HAMLE card fill | 55,64,112 | 51,60,106 | 1.47
+undo pill fill | 15,20,40 | 17,22,42 | 0.60
+board card, bottom margin | 6,10,30 | 7,11,31 | 0.19
+tile (1,0) body | 252,249,242 | 252,249,242 | 0.02
+tile (3,4) body | 243,236,225 | 242,236,224 | 0.17
+max ΔE2000 3.33
+
+=== PC-QA-pm-idle: S-v-promax-play-idle.png ↔ QA-pm-01-idle-L5.png
+geometry W 440 H 956  s 1.2291  e 74.77
+feature | render pt | runtime pt | Δ pt
+board card top light line (y) | 344.00 | 343.67 | -0.33
+rail tile 2 top (y) | 264.00 | 264.33 | +0.33
+rail tile 2 bottom (y) | 315.50 | 316.00 | +0.50
+rail tile 0 left (x) | 89.50 | 89.67 | +0.17
+HAMLE card top (y) | 91.50 | 92.00 | +0.50
+HAMLE card left (x) | 338.50 | 338.33 | -0.17
+undo pill top (y) | 803.00 | 803.00 | +0.00
+undo pill left (x) | 35.00 | 35.33 | +0.33
+restart square left (x) | 355.00 | 355.00 | +0.00
+restart square top (y) | 808.50 | 811.67 | +3.17
+back chevron apex (x) | 37.50 | 37.67 | +0.17
+tile (0,0) left (x) | 44.00 | 43.67 | -0.33
+tile (0,0) top (y) | 357.50 | 357.33 | -0.17
+tile (0,4) right (x) | 395.00 | 395.33 | +0.33
+tile (4,0) bottom (y) | 708.50 | 708.67 | +0.17
+tile (2,2) left (x) | 187.00 | 187.67 | +0.67
+max |Δ| 3.17 pt
+patch | render RGB | runtime RGB | ΔE2000
+ground, left middle (teal spill) | 11,31,50 | 12,32,51 | 0.33
+ground, top right (light) | 41,51,96 | 33,41,82 | 3.32
+ground, bottom | 5,10,30 | 6,11,31 | 0.34
+rail tile body | 36,36,75 | 36,36,75 | 0.03
+HAMLE card fill | 55,64,112 | 51,60,106 | 1.43
+undo pill fill | 16,21,41 | 17,22,42 | 0.33
+board card, bottom margin | 7,10,31 | 7,12,32 | 0.25
+tile (1,0) body | 252,248,242 | 252,249,242 | 0.02
+tile (3,4) body | 243,236,225 | 243,236,225 | 0.09
+max ΔE2000 3.32
+
+=== PC-QA-pm-tutorial: D1-v-promax-tutorial-hud.png ↔ QA-pm-03-tutorial.png
+geometry W 440 H 956  s 1.2291  e 74.77
+feature | render pt | runtime pt | Δ pt
+board card top light line (y) | 344.00 | 343.67 | -0.33
+rail tile 2 top (y) | 264.00 | 264.33 | +0.33
+rail tile 2 bottom (y) | 315.50 | 316.00 | +0.50
+rail tile 0 left (x) | 89.50 | 89.67 | +0.17
+HAMLE card top (y) | 91.50 | 92.00 | +0.50
+HAMLE card left (x) | 338.50 | 338.33 | -0.17
+undo pill top (y) | 803.00 | 803.00 | +0.00
+undo pill left (x) | 35.00 | 35.33 | +0.33
+restart square left (x) | 355.00 | 355.00 | +0.00
+restart square top (y) | 811.00 | 811.67 | +0.67
+back chevron apex (x) | 37.50 | 37.67 | +0.17
+tile (0,0) left (x) | 44.00 | 43.67 | -0.33
+tile (0,0) top (y) | 357.50 | 357.33 | -0.17
+tile (0,4) right (x) | 395.00 | 395.33 | +0.33
+tile (4,0) bottom (y) | 708.50 | 708.67 | +0.17
+tile (2,2) left (x) | 187.00 | 187.67 | +0.67
+max |Δ| 0.67 pt
+patch | render RGB | runtime RGB | ΔE2000
+ground, left middle (teal spill) | 11,31,50 | 12,32,51 | 0.33
+ground, top right (light) | 41,51,96 | 33,41,82 | 3.32
+ground, bottom | 5,10,30 | 6,11,31 | 0.34
+rail tile body | 36,36,75 | 36,36,75 | 0.03
+HAMLE card fill | 55,64,112 | 51,60,106 | 1.43
+undo pill fill | 14,19,39 | 15,20,40 | 0.32
+board card, bottom margin | 6,9,30 | 7,12,31 | 0.49
+tile (1,0) body | 252,248,242 | 252,249,242 | 0.02
+tile (3,4) body | 243,236,225 | 243,236,225 | 0.09
+max ΔE2000 3.32
+
+=== HAMLE label ink box (luma > 120) inside the MovesCard, L26, iPhone 16 — card x 301.0–365.3, bottom edge ≈ 152.3, radius 22·s = 24.15 pt
+QA-16-17-L26-text-large.png: box > 120: x 310.67–356.00  y 134.67–143.33 pt
+QA-16-17-L26-text-extra-large.png: box > 120: x 308.33–358.33  y 136.00–145.67 pt
+QA-16-17-L26-text-extra-extra-large.png: box > 120: x 306.00–360.67  y 137.00–147.67 pt
+QA-16-15-L26-text-xxxl.png: box > 120: x 304.67–361.67  y 138.67–150.00 pt
+QA-16-16-L26-text-ax5.png: box > 120: x 304.67–361.67  y 138.67–150.00 pt
+
+=== Load-error headline ink box (luma > 200), L07 corrupted, iPhone 16 — 2 lines ≈ 63–78 pt tall; 3 lines = the orphaned full stop
+QA-16-29-load-error-large.png: box > 200: x 58.00–250.67  y 435.67–499.00 pt
+QA-16-29-load-error-extra-large.png: box > 200: x 58.00–273.67  y 433.00–503.67 pt
+QA-16-29-load-error-extra-extra-large.png: box > 200: x 58.33–296.67  y 429.67–507.33 pt
+QA-16-29-load-error-extra-extra-extra-large.png: box > 200: x 58.33–298.33  y 405.33–520.33 pt
+QA-16-28-load-error-ax5.png: box > 200: x 58.33–298.33  y 374.00–494.00 pt
+
+=== Tutorial pill clearance — luma transitions along the board centre column (board bottom edge, pill top/bottom border, undo top from measure-d1)
+QA-16-20-tutorial-L4.png: +643.00 -644.00 +654.00 -705.33 
+QA-16-37-tutorial-ax5.png: +643.00 -644.00 +651.33 -708.33 
+QA-16e-03-tutorial.png: +637.67 -638.67 +648.00 -699.33 
+QA-16e-04-tutorial-ax5.png: +637.67 -638.67 +645.00 -702.00 
+QA-pm-03-tutorial.png: +720.67 -721.67 +733.67 -791.00 
+QA-pm-04-tutorial-ax5.png: +720.67 -721.67 +730.33 -794.67 
+
+=== Won at rest (debug smoke-tr-01), iPhone 16 — amber docked row + seam box (luma > 150) and the panel spine along x=196
+QA-16-31-won-perfect-rest.png: box > 150: x 37.67–355.00  y 228.67–318.33 pt | spine/edges: +306.33 -308.67 +316.00 -319.00 
+QA-16-33-won-2star-rest.png: box > 150: x 37.67–355.00  y 228.67–293.33 pt | spine/edges: +306.33 -309.00 +318.67 -319.33 
+
+=== HAMLE label colour and card fill (iPhone 16, 1.0x) — contrast 5.1 : 1 (WCAG, #AEB4CA on 51,60,106)
+ 351.00 pt  luma 180.3  rgb 174,180,202
+ 128.00 pt  luma  63.3  rgb  53, 62,107
+
+=== Reduce Motion tutorial ghost: four captures ≈ 0.37 s apart (> one 1200 ms loop in total), SHA-1
+b25d75736edf13f5470a9e06613aa801cc5942b0
+b25d75736edf13f5470a9e06613aa801cc5942b0
+b25d75736edf13f5470a9e06613aa801cc5942b0
+b25d75736edf13f5470a9e06613aa801cc5942b0
