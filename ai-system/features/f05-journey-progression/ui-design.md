@@ -7,6 +7,8 @@
 > **Supersedes:** the Direction A home handoff (F05-UI, 2026-09-08: the 30-tick amber ring, `PlayTheme` tokens, the pulsing in-progress node). Its micro-tutorial sections were already superseded by F03 D1 (F03 `ui-design.md` §1–§14, architecture §19.5), and its `CompletionPanel` weighting by F03 D2 (F03 `ui-design.md` §16). The whole previous file is archived byte for byte as `history/f05-journey-progression-2026-09-29/ui-design-before-phase-d3.md` (SHA-1 `f2c133d8…`).
 >
 > **Unchanged:** the §6 read-model, unlock, persistence, the F09 seam, routes (`/` ⇄ `/play`). Presentation plus the N1 CONTINUE rule of §18.3 (2), which is already in the contract.
+>
+> **Tech Lead checkpoint (2026-09-29) — pointer:** accepted; gate Ready for Implementation. The §14 items are ruled and three corrections bind Frontend and QA — C1 the copy selection rule (the §8 `D3-01b` row also changes the headline, to "Sıradaki…"), C2 the `kDebugMode` debug row, C3 when the entrance plays — in `architecture.md` §18.7. Windowing **A** is adopted.
 
 ---
 
@@ -325,7 +327,7 @@ Optional alternative for PO: the CTA "Başla" for the brand-new state (not rende
 | Implementation Fidelity & Polish | 9 | geometry and states are specified as data (`window-d3.txt`); two small component extensions |
 | **Total** | **94** | provisional — not an acceptance input |
 
-### 12a. Screen / State / Viewport Matrix
+## 12a. Screen / State / Viewport Matrix
 
 | Screen | State | Viewport | Source artefact | Critical assertions |
 | --- | --- | --- | --- | --- |
@@ -344,7 +346,7 @@ Optional alternative for PO: the CTA "Başla" for the brand-new state (not rende
 | Shell | native launch iOS / Android; splash | 393×852; 412×915 | `D3-21`, `D3-21b`, `D3-22`; asset `D3-asset-launch-backdrop` (1290×2796) | §11.1 (14) |
 | Home | entrance t 0 / 80 / 160 / 240 / 340; reduced | 393×852 | `D3-M-entrance-*`, `src/D3-motion-prototype.html` | §11.1 (10) |
 
-### 12b. Visual Evidence Manifest
+## 12b. Visual Evidence Manifest
 
 **Provenance for every D3 record:** Source Revision HEAD `9a36147` + working tree (`design/src/gen-d3.mjs`, derived from F00 `gen-s.mjs` and F03 `gen-d1.mjs`). Method: HTML/CSS → PNG with headless Chrome at devicePixelRatio 2 (`src/render-d3.sh D3- jobs-d3.txt`; the launch asset at 3); the entrance stills are frames of the prototype frozen with `?t=`. `node gen-d3.mjs` regenerates every page byte for byte. Captured by the UI Designer, 2026-09-29. Generated design artefacts, not runtime captures; Android is rendered as a frame, not run.
 
@@ -371,6 +373,8 @@ Optional alternative for PO: the CTA "Başla" for the brand-new state (not rende
 * The node states `open` and `locked` rarely appear together: `open` only exists in a replay window that reaches the frontier (e.g. replaying 11 with 12 done and 13 the frontier).
 
 ## 14. Needs Tech Lead Clarification
+
+> **Ruled by the Tech Lead on 2026-09-29** — `architecture.md` §18.7, rulings 1–5 (A adopted; the `LoopNode` extension allowed, with per-state `Semantics` and the track display-only; headlines accepted as interim copy; the pulse and the bloom dropped; one action on the error screen).
 
 1. **Windowing A vs B** — select A (recommended) or B (§2). Non-blocking for the checkpoint if A is adopted as the handoff design within §18.3 (3).
 2. **`LoopNode` state extension** (`open`, `locked`, `finish`) — confirm it is inside the §18.3 (3) allowance (it is the loop track's own node). There are no token changes.

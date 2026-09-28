@@ -307,7 +307,7 @@ F04's forward note (`f04 frontend.md §4`): once `Next Level` is live, revisit t
 
 ---
 
-## 18. Design Adoption Phase D3 — Home + app shell [LOCKED 2026-09-29]
+## 18. Design Adoption Phase D3 — Home + app shell [LOCKED 2026-09-29; visual-gate rulings §18.7]
 
 > **Added by:** the Tech Lead on 2026-09-29, at the D3 activation right after the D2 closure (F03 `architecture.md` §20.11). It reopens F05 as visual rework under rework control. F05 is the carrier (audit C-2). The app shell — native launch, the Flutter splash and the F08 `StoreErrorScreen` — is a cross-feature item in the same reopen (C-6, C-7).
 >
@@ -428,3 +428,48 @@ The shell carries three player-visible defects:
   * D1 / D2 regression across the Home ⇄ `/play` round trip;
   * Android stated as a limit.
 * **Exit:** Visual Quality Gate Passed; final QA Approved or Approved with Notes; Delivery Review Accepted. F05 then returns to Done, Phase D is complete, and the resume point is F08 local evidence (Design Adoption Route).
+
+### 18.7 Visual-gate checkpoint rulings (Tech Lead, 2026-09-29)
+
+The F05-UI-D3 handoff (`ui-design.md`, commit 981b807) is **accepted**. The Visual Quality Gate is **Ready for Implementation**, and F05-FE-D3 is open.
+
+**Verified independently at the checkpoint** (HEAD 981b807, clean tree):
+* **Handoff-gate items** (`visual-quality-gate.md` §2) are all present: the matrix §12a; component, typography, colour, asset and interaction decisions §5–§7; the motion spec with its reduced path §5; the manifest §12b; the selection record §2; the acceptance list §11.1.
+* **Artefacts:** every PNG named in `ui-design.md` exists (45 in `design/`: 41 renders + 4 contact sheets), and the F00 pointers (`S-06b`, `A-06` / `B-06` / `C-06` / `C-06b`, `audit/cur-home-*`) exist. `node gen-d3.mjs` into a scratch folder regenerates all 45 pages and tables byte for byte, so every render traces to committed source. The contact sheets are review aids, not gate artefacts.
+* **Window rule:** the frontier formula, the replay formula and the terminal window reproduce every row of `window-d3.txt` by hand (1–5, 1–5, 9–13, 22–26, 5–9, 26–30, 10–14).
+* **Scope:** no future-scope item on any Home render; no back affordance; one CTA; no blur. The N1 render `D3-07` follows §18.3 (2): the card says 30 / 30, the CTA resumes, and the caption reads "Seviye 12 · sürüyor".
+* **Shipped code the implementation map names** (`app/lib`): `_JourneyRing`, `_Wordmark`, `_ContinueCta` (`home_screen.dart`); `_SplashScreen` and the English `StoreErrorScreen` (`app_router.dart`); `title: 'LOOPLET'` (`main.dart`); the white iOS launch storyboard; `NormalTheme` on `?android:colorBackground` in `values/` and `values-night/`. `LimePill(glow:)`, `ScrollBand`, `loopCappedTextScaler`, `LoopletWordmark`, `GlassCard`, `LoopBackdrop`, `LoopIcon.arrowRight` / `loopBreak` and `reduceMotionRequested` exist. Two items the handoff does not cover are ruled below: `LoopNode`'s API and `Semantics` (ruling 2) and Home's `kDebugMode` `_DebugRow` (C2).
+* **Renders read:** the four contact sheets, `D3-01b` (level 1 started) and `D3-20c` (the debug error box).
+* **Manifest correction (structure only, no design change):** `ui-design.md` had the matrix and the manifest as level-3 headings (`### 12a.` / `### 12b.`), so the full workflow audit did not find the Visual Evidence Manifest. The Tech Lead raised both to level 2 (`## 12a.` / `## 12b.`, the F03 D2 form). No row or text changed.
+
+**Rulings on `ui-design.md` §14:**
+1. **Windowing: A ("sliding five") is adopted as the handoff design.**
+   * This is not an Exploration Gate selection. The direction is Selected (Loop Glass, `S-06b`), and §18.3 (3) left the windowing rule to the UI Designer within its bounds. A meets them: the current node is always in the window; no node overlaps another node or a halo; nothing sits outside the card; and the window reads as a place in a longer journey (the lead-in line behind, the `N / 30` label for the whole).
+   * B is not adopted: its band pips show the chapter metadata that design-foundation decision 4 keeps out, they compete with the label as a second progress indicator, and the node count changes from band to band (3 at 4 / 30; mostly locked at 25 / 30).
+   * **QA watch point, not a defect:** in frontier windows (e.g. 4 / 30, 12 / 30) the current node sits at the right end, so nothing ahead is drawn. The label carries the whole Journey. QA judges this under the rubric.
+2. **`LoopNode` state extension: inside the §18.3 (3) allowance** (it is the loop track's own node; design-layer addition on the §19.8 (2) / §20.7 (6) terms; F00 stays Done).
+   * States: `done`, `current` (both unchanged), `open`, `locked`, `finish`, as in `ui-design.md` §7. The existing call form `LoopNode(number:, current:)` keeps its behaviour, so the F00 design tests (`test/design/components_test.dart`, incl. QA-02) stay green unmodified.
+   * **`Semantics`:** standalone, each state keeps a spoken state — `N, tamamlandı` (done, finish), `N, geçerli seviye` (current), `N, açık` (open), `N, kilitli` (locked). Inside `LoopTrack` every node, line and swirl arc is excluded from the tree. The progress is announced once through `progressSemantics` (§18.3 (5), `ui-design.md` §12).
+   * **The track is display-only.** Nodes are not buttons and have no tap handler. There is no level select (F10, §17); AC2 stays satisfied by construction.
+   * The `.62` outline alphas are local constants, not tokens. No token value change and no new dependency.
+3. **Headlines per situation: accepted as interim copy** through `JourneyStrings` (final copy with PO / localization, F10-UI-LOCALIZATION). The "Başla" alternative is not adopted; the CTA stays "Devam et" (§18.3 (4)).
+4. **The breathing pulse and the one-shot terminal bloom are dropped: accepted.** The Foundation specifies no Home motion, and §18.2 made any Home motion optional. The runtime risk "terminal 30 / 30 bloom under Reduce Motion" lapses with the bloom.
+5. **The store-error screen has one action: accepted.** F08 AC9 needs Retry and data intact; iOS has no programmatic exit, and system back on Android leaves the app (OS default).
+
+**Tech Lead corrections to the handoff** (binding for Frontend and QA; `ui-design.md` carries a pointer):
+* **C1 — the copy selection rule.** The `ui-design.md` §8 row for `D3-01b` says it differs from the new state "by the caption only". The render, the §12 copy table and `gen-d3.mjs` all switch the headline to "Sıradaki döngüyü çöz." once level 1 has started. The render and the table win. The rule, in §6 model terms (`JourneyProgressModel`: `progressCount`, `completedLevels`, `inProgressLevel`, and `currentLevel` = its `continueTarget`):
+  * **Headline:** `progressCount == 30` → "Tüm döngüler tamam." (with or without a session); else `inProgressLevel ∈ completedLevels` → "Yarım kalan döngüne dön."; else `progressCount == 0 && inProgressLevel == null` → "İlk döngüyü çöz."; else "Sıradaki döngüyü çöz.".
+  * **CTA:** `currentLevel == null` → "Tekrar oyna" (→ level 1); else "Devam et" (→ `currentLevel`). The model already yields the replay at 30 / 30; the shipped override is Home's `done ? 1 : continueTarget` (`home_screen.dart`), which the D3 Home drops. Terminal ⇔ `continueTarget == null`, never `allComplete`.
+  * **Caption:** `currentLevel == null` → "Seviye 1"; else "Seviye M", plus " · sürüyor" iff `inProgressLevel != null`.
+  * **Window** (unchanged, §6 of the handoff): replay offset (`start = current − 2`) iff a completed level above `currentLevel` exists. A replay of the highest completed level (e.g. 12 of 12 done) therefore uses the frontier window (8–12, current at the top) under the replay headline. Add that case to the §11.1 (2) component test.
+* **C2 — the debug row.** Home's `_DebugRow` (the smoke-puzzle launchers) stays, **`kDebugMode` only**. It sits outside the content column, anchored to the bottom safe area in the empty lower third. It moves no §11.1 (1) anchor. It is omitted whenever it would intersect the caption (e.g. above the 1.3× cap), so a debug build never reports an overflow at AX5 (the F03-QA-D2R N5 overflow). It is exempt from §11.1 (16) (Material buttons) because players never see it. Parity and QA captures of Home are taken in a profile or release build, or else they list the row as the only debug-only deviation.
+* **C3 — when the entrance plays.** Once per app process, at the first Home frame that has the Journey model (a cold start, or after the store-error Retry). Never on a return from `/play` (Home stays mounted, §6), and never when the model updates. Under reduced motion there is no animation.
+
+**Evidence expected from Frontend** (`frontend.md` § Visual Parity Evidence, gate schema), extending §18.6:
+* `runtime-screenshot` for every §12a Home row on the iPhone 16 (incl. `D3-01b`, the replay, terminal and N1 rows), and the in-progress, N1 and 1.3× rows on the 16e and Pro Max, plus the store error (normal and AX5 top / end);
+* `parity-comparison` composites against the `D3-*` renders with a deviation list (±2 pt at 1.0×, the §11.1 (1) anchors);
+* `runtime-video`: a cold start from the native launch to Home (empty store and existing store), with the frame where the native launch hands over to Flutter named; the Home entrance with and without Reduce Motion;
+* `accessibility`: OS text default, 1.3× and AX5 on Home (in-progress and N1) and the store error (offset 0 and scrolled);
+* the store error forced in a **profile or release** build (no exception text) and in a debug build (the separated box), plus the `debugPrint` line in the log;
+* a component test over the window rule for every `window-d3.txt` row and the C1 cases (replay at 1, 2, 12 of 12, 29 and 30; frontier at 1–5 and 26–30; terminal); widget tests for the C1 copy rule and the §18.3 (2) CTA rule, warm and cold;
+* a named negative run for each new rule: the N1 CTA reverted to terminal precedence, the window's replay offset removed, the raw exception shown outside `kDebugMode`, and `NormalTheme` back on `?android:colorBackground` (a manifest / resource test) — each caught by a failing test.
