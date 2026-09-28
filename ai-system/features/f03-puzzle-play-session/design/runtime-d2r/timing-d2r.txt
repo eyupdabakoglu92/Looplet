@@ -1,0 +1,46 @@
+# timing-d2r.txt — F03-FE-D2R smoke, iPhone 16, L5 row 2, Reduce Motion off. Tool design/src/timing-d2.py + video-d2 (compiled from design/src), PX_PER_PT=2, on the committed re-encodes.
+## Run 1 — win (RV-16-D2R-win-L5.mp4)
+video RV-16-D2R-win-L5.mp4 — 84 frames, 38.7 fps average
+settle frame 0.8750 s; T0 = 0.8681 s (fit to the chrome dim over 5 frames)
+frame gaps > 30 ms in T0-50 … T0+1400: T0+29 (53 ms), T0+82 (33 ms), T0+434 (52 ms), T0+485 (33 ms), T0+519 (33 ms), T0+599 (33 ms), T0+632 (33 ms), T0+665 (32 ms), T0+980 (33 ms)
+C2   row on its board cells (max displacement 0.00 pt) through  T0     +599 ms
+     first frame the row has left its cells (> 0.5 pt):     T0     +632 ms
+     first result pixel (back-button / headline slots):     T0     +714 ms
+     HAMLE card at its final value from:                    T0     +730 ms
+     HUD at its final value from:                           T0     +714 ms
+     primary pill at rest from:                             T0     +964 ms
+     stars at rest from:                                    T0    +1285 ms
+## Run 1 — retry (RV-16-D2R-retry-L5.mp4)
+video RV-16-D2R-retry-L5.mp4 — 21 frames
+T0 = 0.4500 s (the last frame of the result at rest; the first changed frame is T0+32 ms)
+frame gaps > 30 ms in T0 … T0+600: T0+0 (32 ms), T0+32 (33 ms), T0+65 (33 ms), T0+117 (47 ms), T0+180 (37 ms)
+     lime (the flying answer) inside the rail slots:   T0      +32 …      +98 ms
+     result back-button slot    at its final value from:  T0     +117 ms
+     result headline slot       at its final value from:  T0     +117 ms
+     goal rail                  at its final value from:  T0     +252 ms
+     HAMLE card                 at its final value from:  T0     +315 ms
+     board                      at its final value from:  T0     +330 ms
+     HUD                        at its final value from:  T0     +315 ms
+## Run 2 — win (RV-16-D2R-win-L5-2.mp4)
+video RV-16-D2R-win-L5-2.mp4 — 89 frames, 45.7 fps average
+settle frame 0.6800 s; T0 = 0.6494 s (fit to the chrome dim over 4 frames)
+frame gaps > 30 ms in T0-50 … T0+1400: T0-19 (50 ms), T0+31 (50 ms), T0+81 (35 ms), T0+431 (42 ms), T0+499 (33 ms), T0+631 (33 ms)
+C2   row on its board cells (max displacement 0.00 pt) through  T0     +597 ms
+     first frame the row has left its cells (> 0.5 pt):     T0     +614 ms
+     first result pixel (back-button / headline slots):     T0     +714 ms
+     HAMLE card at its final value from:                    T0     +731 ms
+     HUD at its final value from:                           T0     +714 ms
+     primary pill at rest from:                             T0     +947 ms
+     stars at rest from:                                    T0    +1282 ms
+## Run 1 pill-region luma around rest (region pill:93:1133:598:107, T0 = 0.8681 s) vs QA's pre-fix QV-16-r2-L5.mp4 (T0 = 2.2506 s)
+D2R  T0 +914 ms  luma 210.97
+D2R  T0 +930 ms  luma 222.39
+D2R  T0 +952 ms  luma 222.41
+D2R  T0 +964 ms  luma 223.40
+D2R  T0 +980 ms  luma 223.44
+QA   T0 +903 ms  luma 190.92
+QA   T0 +919 ms  luma 211.17
+QA   T0 +934 ms  luma 222.33
+QA   T0 +951 ms  luma 223.31
+QA   T0 +968 ms  luma 223.29
+QA   T0 +986 ms  luma 223.34

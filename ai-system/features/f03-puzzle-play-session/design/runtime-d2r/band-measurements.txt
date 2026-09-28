@@ -1,0 +1,20 @@
+# band-measurements.txt — F03-FE-D2R (architecture §20.9), 2026-09-28 20:23, tool design/src/band-d2r.swift (SHA-1 1f794cb0d74a)
+# Band region: y 60 pt … 54·s + 58 pt, full width. 'differing' = luma |Δ| > 8. Revision HEAD 3cd4a3b + F03-FE-D2R working tree (app/ diff SHA-1 262864be).
+## After the fix: shrink while scrolled vs offset-0 control at the same size (expect 0 %)
+RT-16-D2R-03-shrunk-xxxL.png mean 39.25 | RT-16-D2R-08-control-top-then-xxxL.png mean 39.25 | differing 0.000 %
+RT-16-D2R-05-shrunk-large.png mean 37.78 | RT-16-D2R-07-control-top-then-large.png mean 37.78 | differing 0.000 %
+RT-16e-D2R-03-shrunk-xxxL.png mean 39.22 | RT-16e-D2R-08-control-top-then-xxxL.png mean 39.22 | differing 0.000 %
+RT-16e-D2R-05-shrunk-large.png mean 37.76 | RT-16e-D2R-07-control-top-then-large.png mean 37.76 | differing 0.000 %
+RT-pm-D2R-03-shrunk-xxxL.png mean 38.13 | RT-pm-D2R-08-control-top-then-xxxL.png mean 38.13 | differing 0.000 %
+RT-pm-D2R-05-shrunk-large.png mean 36.79 | RT-pm-D2R-07-control-top-then-large.png mean 36.79 | differing 0.000 %
+## Positive control: the band is drawn when scrolled at AX5 (expect a darker region)
+RT-16-D2R-02-ax5-scrolled-end.png mean 23.15 | RT-16-D2R-01-ax5-offset0.png mean 39.25 | differing 55.343 %
+RT-16-D2R-04-ax5-scrolled-end-2.png mean 23.15 | RT-16-D2R-01-ax5-offset0.png mean 39.25 | differing 55.343 %
+RT-16e-D2R-02-ax5-scrolled-end.png mean 23.15 | RT-16e-D2R-01-ax5-offset0.png mean 39.22 | differing 54.921 %
+RT-16e-D2R-04-ax5-scrolled-end-2.png mean 23.15 | RT-16e-D2R-01-ax5-offset0.png mean 39.22 | differing 54.921 %
+RT-pm-D2R-02-ax5-scrolled-end.png mean 22.80 | RT-pm-D2R-01-ax5-offset0.png mean 38.13 | differing 54.931 %
+RT-pm-D2R-04-ax5-scrolled-end-2.png mean 22.80 | RT-pm-D2R-01-ax5-offset0.png mean 38.13 | differing 54.931 %
+## Negative control: QA's pre-fix capture (F03-QA-D2-01, E-T5) vs QA's offset-0 control (expect a large difference)
+QA-16-A11Y-back-to-large.jpg mean 24.62 | QA-16-A11Y-ax5-top-then-large.jpg mean 37.41 | differing 51.150 %
+## Growth control: large → AX5 at offset 0 vs the first AX5 capture (expect 0 %)
+RT-16-D2R-06-control-ax5-top.png mean 39.25 | RT-16-D2R-01-ax5-offset0.png mean 39.25 | differing 0.000 %

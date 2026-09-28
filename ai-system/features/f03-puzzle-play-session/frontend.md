@@ -326,3 +326,157 @@ Also caught during development: unlocking Retry on the `completed` status (one f
 ```text
 Run Tech Lead
 ```
+
+---
+
+# F03-FE-D2R — D2 scroll-band rework
+
+> **Task:** F03-FE-D2R (Frontend/Mobile Developer, 2026-09-28). **Contract:** `architecture.md` §20.9 (rulings on F03-QA-D2); §20.3, §20.7 and §20.8 still apply.
+>
+> **Source revision:** HEAD `3cd4a3b` + working tree (`app/` diff SHA-1 `262864be…`, two files). The `app/` tree at HEAD is still `f5641d2f…`, QA's fingerprint.
+
+## 1. Feature Summary
+
+F03-QA-D2-01 is fixed; nothing else changed.
+
+* **Symptom:** at AX5 the player scrolls the result to its end, then lowers the OS text size. The content returns to offset 0, but the scroll band stayed drawn over the `HARİKA` badge and the back button, and the player could not clear it.
+* **Cause (as ruled in §20.9):** `_band` was set only by the `ScrollController` listener. When the content shrinks, the scroll position clamps its offset during layout (`correctForNewDimensions` → `correctPixels`), which notifies no listener. Only a `ScrollMetricsNotification` is dispatched, after the frame.
+* **Fix:** the band is recomputed from the position's current `pixels` on every scroll **and** on every `ScrollMetricsNotification` from the result's own scroll view. The band is therefore `clamp(pixels / 12, 0, 1)` after any metrics change, and 0 when the column cannot scroll.
+* **At runtime** (iPhone 16, 16e, Pro Max): after AX5 → scrolled → xxxL and AX5 → scrolled → `large`, the band region is **pixel-identical** to the offset-0 control at the same size (0.000 % of pixels differ, all six pairs). QA's pre-fix capture of the same step differs by 51 %.
+
+## 2. Impacted Files
+
+**Updated**
+* `app/lib/play/widgets/result_view.dart` — the band state (`_onScroll`, new `_onMetrics`, a `NotificationListener<ScrollMetricsNotification>` around the column's `SingleChildScrollView`).
+* `app/test/rating/result_view_test.dart` — new group "scroll band after a live OS text-size change (§20.9 (1))", 9 tests.
+* `ai-system/features/f03-puzzle-play-session/frontend.md` — this section (the D2 text above is unchanged).
+
+**Created**
+* `ai-system/features/f03-puzzle-play-session/design/src/band-d2r.swift` — band-region comparison on screenshots.
+* `ai-system/features/f03-puzzle-play-session/design/runtime-d2r/` — 23 runtime screenshots, 3 re-encoded videos, `band-measurements.txt`, `timing-d2r.txt`.
+
+No change to `ScrollBand` or anything else in `app/lib/design`, and none to layout, timeline, copy, input lock, lifecycle, persistence, routes, tokens or dependencies.
+
+## 3. Task-to-Code Traceability
+
+**F03-FE-D2R — Complete.**
+
+| # | Brief item | Code | Behaviour |
+| --- | --- | --- | --- |
+| 1 | Band follows the scroll position after any metrics change (§20.9 (1)) | `result_view.dart` → `_onScroll` reads `_scroll.position.pixels` (guarded by `hasClients`); `_onMetrics` calls it for depth-0 `ScrollMetricsNotification`s; the listener wraps the result's `SingleChildScrollView` | Text size down or up, content extent change → `_band` recomputed on the next frame; 0 when the column no longer scrolls; the partial value for a clamped offset below 12 pt |
+| 2 | `ScrollBand` only if needed | not touched | — |
+| 3 | `frontend.md` section | this section | — |
+
+## 9. Contract Compliance Check
+
+| Area | Status | Note |
+| --- | --- | --- |
+| Screen / route contract | Preserved | no route or navigation change |
+| Backend response / event mapping | Not Applicable | client-only |
+| Error mapping | Not Applicable | — |
+| UI state / store state consistency | Preserved | `_band` is local view state, now derived from the live scroll position; no controller or persistence state |
+| Navigation / back / header behaviour | Preserved | the back button stays fixed; the band now never covers it at offset 0 |
+| Async authority / lifecycle / boundaries | Preserved | the notification is filtered to depth 0 (only this scroll view); no timers, no lifecycle change |
+| §20.3 (9) text scale / scrolling | Preserved and now met | no scroll up to the 1.3× cap; above it the column scrolls; **the band appears only when scrolled** (§16.11.1 (12)) |
+| §20.9 non-goals | Preserved | layout, timeline, copy, input lock, lifecycle, persistence, routes, F00 components untouched |
+
+## 10. Behavior Preserved
+
+* **Scrolling by hand** still drives the band through the same listener, with the same formula (`offset` and `position.pixels` are the same value).
+* **At mount** the scroll view reports its first metrics at offset 0 → `_band` stays 0 → no extra rebuild. The existing AX5 test ("lands at 0, band only when scrolled") is unchanged and green.
+* **Win / retry timeline:** the timeline code is outside the diff. On the iPhone 16 the smoke recordings reproduce the D2 numbers (§17, `timing-d2r.txt`).
+* **Everything else in D2** (variants, C1 late read, CTA weighting, lifecycle, reduced paths) is outside the diff; the full app suite and `integration_test` are green.
+
+## Visual Parity Evidence
+
+**Common provenance:** iOS Simulator 18.6 — iPhone 16 `D0011CE7-6E50-4367-93FA-B323E81270BE` (393×852 @3x), iPhone 16e `6DBDFD97-7BF7-4051-914C-76609DDF8697` (390×844 @3x), iPhone 16 Pro Max `02FDE776-C263-4DAB-A16A-76902AC18189` (440×956 @3x).
+* **Build:** `flutter build ios --simulator --debug` of HEAD `3cd4a3b` + the F03-FE-D2R working tree (`App.framework/App` SHA-1 `d7a7c0af…`), installed on all three; captured by the Frontend/Mobile Developer on 2026-09-28, 20:09–20:21.
+* **Reaching the state:** `design/src/capture-d2.sh seed <udid> 5 '["D0","D1"]'` at content size `large` → Home DEVAM ET → content size AX5 (`xcrun simctl ui <udid> content_size accessibility-extra-extra-extra-large`; Play is capped, so the board is unaffected) → the winning column-1 swipe (simulator touch path) → the result at AX5. Scrolling to the end: two upward touch-path drags.
+* **Steps per device** (QA's E-T5 plus the controls):
+  1. AX5 at offset 0 (`-01`);
+  2. scrolled to the end (`-02`);
+  3. live shrink → xxxL (`-03`);
+  4. back to AX5, scrolled to the end again (`-04`);
+  5. live shrink → `large` (`-05`);
+  6. controls, shrinking without scrolling: AX5 → `large` (`-07`), AX5 → xxxL (`-08`).
+  * Captures are taken 2 s after each `content_size` change (live Dynamic Type update, no relaunch).
+* **Measurement:** `design/src/band-d2r.swift` compares the band region (y 60 pt to 54·s + 58 pt, full width) of a capture against its control. It reports the mean luma and the share of pixels whose luma differs by more than 8. Log: `design/runtime-d2r/band-measurements.txt`.
+  * **Positive control:** each scrolled capture vs offset 0 — the band is drawn (mean luma ≈ 23 vs ≈ 39; 55 % differ).
+  * **Negative control:** QA's pre-fix capture `QA-16-A11Y-back-to-large.jpg` vs QA's control `QA-16-A11Y-ax5-top-then-large.jpg` — 51.150 % differ, mean 24.62 vs 37.41. The tool flags the defect.
+* **Restored afterwards:** content size `large` and Reduce Motion 0 on all three (checked); the app reinstalled on the 16 after the `integration_test` run. The simulators keep seeded L5 progress.
+
+| Evidence ID | Kind | Screen / State | Viewport / Device | Artifact | Source Revision | Captured By | Captured At | Result / Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| RT-D2R-16 | runtime-screenshot | result L5 Perfect: AX5 offset 0, scrolled end, shrink → xxxL, shrink → `large`, controls | 393×852 iPhone 16 | design/runtime-d2r/RT-16-D2R-01 … 08.png | 3cd4a3b + WT | Frontend/Mobile Developer | 2026-09-28 20:10–20:12 | after both shrinks the band region equals its control: **0.000 %** differ (mean 39.25 / 37.78). `HARİKA` and the back button fully visible |
+| RT-D2R-16e | runtime-screenshot | same | 390×844 iPhone 16e | design/runtime-d2r/RT-16e-D2R-01 … 08.png | 3cd4a3b + WT | Frontend/Mobile Developer | 2026-09-28 20:12–20:13 | **0.000 %** for both shrinks (39.22 / 37.76) |
+| RT-D2R-pm | runtime-screenshot | same | 440×956 iPhone 16 Pro Max | design/runtime-d2r/RT-pm-D2R-01 … 08.png | 3cd4a3b + WT | Frontend/Mobile Developer | 2026-09-28 20:14–20:15 | **0.000 %** for both shrinks (38.13 / 36.79) |
+| A11Y-D2R | accessibility | the text-size paths above; scrolled state keeps the band | 3 devices | design/runtime-d2r/band-measurements.txt | 3cd4a3b + WT | Frontend/Mobile Developer | 2026-09-28 20:23 | §16.11.1 (12) "band only when scrolled" holds after live shrinks; positive and negative controls behave |
+| RV-D2R-16-win | runtime-video | full-motion win, L5 row 2, Reduce Motion off (two runs) | 393×852 iPhone 16 | design/runtime-d2r/RV-16-D2R-win-L5.mp4, RV-16-D2R-win-L5-2.mp4; timing-d2r.txt | 3cd4a3b + WT | Frontend/Mobile Developer | 2026-09-28 20:18, 20:20 | row on its cells (0.00 pt) through +599 / +597, first moves +632 / +614; first result pixel **+714** both; `HAMLE` final +730 / +731; pill at rest **+964 / +947**; stars +1285 / +1282. See the note below |
+| RV-D2R-16-retry | runtime-video | Retry from the Perfect result ("Tekrar oyna" link) | 393×852 iPhone 16 | design/runtime-d2r/RV-16-D2R-retry-L5.mp4; RT-16-D2R-09-after-retry.png | 3cd4a3b + WT | Frontend/Mobile Developer | 2026-09-28 20:18 | flight in the rail +32 … +98; board final **+330**, HUD +315 (≤ 400); after: `HAMLE 0`, restarted grid |
+| AND | accessibility | Android | — | — | — | — | — | not run — stated limit (ANDROID-CI-EVIDENCE) |
+
+**Note on the pill cell (+964 in run 1).** The pill region's luma is 222.39 at +930 in run 1 and 222.33 at +934 in QA's pre-fix run `QV-16-r2-L5.mp4`; final is 223.4 in both. Run 1's last ≈ 1-luma step lands one capture frame later (+964 vs +951). Run 2 reads +947, the same as the Frontend's D2 table (947–950) and QA's E-X1 (948). The timeline code is outside the diff, so this is capture-frame jitter within the method's ± one frame, not a timing change. Both traces are in `timing-d2r.txt`.
+
+**Videos:** raw `simctl io … recordVideo` captures, re-encoded at 2 px / pt with `design/src/video-d2.swift encode` and cut into win and retry segments (the timing tool reads "final" values at the end of a clip). The raw `.mov` files are not committed, as in D2. A first recording attempt was lost when a shell timeout ended `recordVideo` before the win (no frames); it was discarded and re-recorded.
+
+## 12. Implemented Files
+
+* **`app/lib/play/widgets/result_view.dart`**
+  * `_onScroll` now reads `_scroll.position.pixels` after a `hasClients` guard; the doc comment records §20.9 (1) and why a listener alone is not enough.
+  * New `_onMetrics(ScrollMetricsNotification)` calls `_onScroll` for depth 0 and returns `false`, so the notification keeps bubbling.
+  * `build`: the column's `SingleChildScrollView` is wrapped in `NotificationListener<ScrollMetricsNotification>(onNotification: _onMetrics)`. The scroll view's arguments are unchanged.
+* **`app/test/rating/result_view_test.dart`** — the new group (§17), using the file's existing `_pumpResult` harness and the real fonts.
+* **`design/src/band-d2r.swift`** — CoreGraphics / ImageIO only (no PIL on the host); usage in its header.
+
+## 17. Test Evidence by Task
+
+**Gates on the final tree** (2026-09-28, macOS host, Flutter 3.32.8, HEAD `3cd4a3b` + WT):
+
+| Command | Target | Result |
+| --- | --- | --- |
+| `melos run analyze` | all packages + app | SUCCESS |
+| `dart format --output=none --set-exit-if-changed app packages tools` | Dart code | 177 files, 0 changed, exit 0 |
+| `flutter test` (in `app/`) | app | **512 passed** (503 + 9 new), 0 failed |
+| `flutter test integration_test -d D0011CE7-6E50-4367-93FA-B323E81270BE` | iPhone 16 simulator, iOS 18.6 | **13 / 13 passed**, exit 0 — re-run because the diff touches `ResultView`, which `play_session_test` renders |
+
+**Failing first and negative runs** (`result_view_test.dart`, 63 tests; the fixed source kept as a byte copy, SHA-1 `cc45d505…`, and restored after each run — hash verified):
+
+| Run | Source | Result |
+| --- | --- | --- |
+| Before the fix | the HEAD `result_view.dart` (SHA-1 `8230f235…`) | **9 failed**, 54 passed — every new test; band read 1.0 where 0 / 0.48–0.56 was expected, with the offset already clamped |
+| N1 | the HEAD source swapped in again after the fix | **9 failed**, 54 passed |
+| N2 | the fix with the listener detached (`onNotification: (_) => false`) | **9 failed**, 54 passed — the listener is what carries the fix |
+| Fixed | `cc45d505…` | **63 passed** |
+
+| Task / behaviour | Test (file → name) | Type | Proves |
+| --- | --- | --- | --- |
+| §20.9 (1) band → 0 after a shrink to 1.0× | `result_view_test.dart` → "{390, 393, 440} pt, AX5 scrolled → 1.0x: no band over the badge and back button" (3) | widget, real fonts, live `textScaleFactorTestValue` change | at AX5, scrolled to the end, band 1; after the drop: max extent 0, pixels 0, `ScrollBand.visibility` 0, no `Opacity` painted inside the band, `LoopBadge` and the back button present |
+| same, shrink to the 1.3× cap | "… AX5 scrolled → 1.3x: …" (3) | same | same assertions at the cap |
+| Partial band for a clamped offset | "… AX5 scrolled → 2.1x (still scrolls, offset clamped below the fade distance): the band matches the clamped offset" (3) | same | max extent in (0, 12) (5.8 / 6.7 / 6.2 pt), pixels = max extent, band = pixels / 12 (≈ 0.48–0.56) |
+| No regression | the existing text-scale group ("… at AX5: scrolls, back fixed, lands at 0, band only when scrolled …") and the rest of the app suite | widget | unchanged and green |
+| Runtime | Visual Parity Evidence above | runtime + video | the rule on three devices; the timeline unchanged; Retry intact |
+
+**Isolation:** widget tests use the standalone `ResultView` harness (no controller, no persistence) with the test engine's text scaler; the live Dynamic Type change on the simulators is the real app path.
+
+## 18. Test Notes
+
+* **Entry-path matrix (retro bugfix):** the band is local view state of `ResultView`, which is the only result surface. Every way into the result (Home CONTINUE, resume, Next into a level, Retry and re-solve) mounts a fresh `ResultView` at offset 0. The failing path needs a metrics change while scrolled; covered causes are a live OS text-size change down (to 1.0×, the cap and an intermediate scrollable size) and, by the same code path, any other extent change. Text size up while at offset 0 leaves the band at 0: `RT-16-D2R-06` (`large` → AX5 at offset 0) equals `RT-16-D2R-01` in the band region, 0.000 % differ.
+* **Why the probe scale 2.1×:** a sweep of 1.30–3.10 on the three widths found 2.10 as the size where the column still scrolls but less than the 12-pt fade distance, so the partial-band case is exercised. The sweep was a throwaway test file, deleted afterwards.
+* **Not proven here:** Android (stated limit); a physical device; VoiceOver / the focus ring are untouched by the diff.
+
+---
+
+# WORKFLOW HANDOFF SUGGESTION (NON-AUTHORITATIVE) — F03-FE-D2R
+
+* **Completed Tasks:** F03-FE-D2R — the band follows the scroll position after metrics changes; 9 failing-first tests with two negative runs; suites and `integration_test` green; runtime text-size paths on the iPhone 16 / 16e / Pro Max and the win + retry smoke (F03.D2R-PARITY).
+* **Remaining Tasks:** the Tech Lead's rework checkpoint (gate → Ready for QA), then F03-QA-D2R.
+* **Blockers:** none.
+* **Status Suggestion:** Needs Tech Lead Review.
+
+---
+
+## 19. Sonraki Komut (F03-FE-D2R)
+
+```text
+Run Tech Lead
+```

@@ -215,9 +215,23 @@ class _ResultViewState extends State<ResultView>
     super.dispose();
   }
 
+  /// The band follows the current offset (architecture §20.9 (1)). Called on
+  /// every scroll and on every scroll-metrics change: when the content shrinks
+  /// (e.g. the OS text size drops while scrolled), the position clamps its
+  /// offset without notifying listeners, and only a
+  /// [ScrollMetricsNotification] reports it.
   void _onScroll() {
-    final v = (_scroll.offset / ResultView.bandFadeDistance).clamp(0.0, 1.0);
+    if (!_scroll.hasClients) return;
+    final v = (_scroll.position.pixels / ResultView.bandFadeDistance).clamp(
+      0.0,
+      1.0,
+    );
     if (v != _band) setState(() => _band = v);
+  }
+
+  bool _onMetrics(ScrollMetricsNotification notification) {
+    if (notification.depth == 0) _onScroll();
+    return false;
   }
 
   /// At rest, once: "Döngü tamamlandı. Hedef üç hamlede yerine oturdu.", then
@@ -486,16 +500,19 @@ class _ResultViewState extends State<ResultView>
         child: Stack(
           children: <Widget>[
             Positioned.fill(
-              child: SingleChildScrollView(
-                controller: _scroll,
-                physics: const ClampingScrollPhysics(),
-                padding: EdgeInsets.only(
-                  left: colX,
-                  right: layout.screen.width - colX - colW,
-                  top: ResultView.columnTop(layout),
-                  bottom: bottom,
+              child: NotificationListener<ScrollMetricsNotification>(
+                onNotification: _onMetrics,
+                child: SingleChildScrollView(
+                  controller: _scroll,
+                  physics: const ClampingScrollPhysics(),
+                  padding: EdgeInsets.only(
+                    left: colX,
+                    right: layout.screen.width - colX - colW,
+                    top: ResultView.columnTop(layout),
+                    bottom: bottom,
+                  ),
+                  child: content,
                 ),
-                child: content,
               ),
             ),
             Positioned(

@@ -537,6 +537,78 @@ void main() {
     }
   });
 
+  // F03-FE-D2R — F03-QA-D2-01, architecture §20.9 (1): the band follows the
+  // scroll position after a scroll-metrics change, not only after a scroll.
+  group('scroll band after a live OS text-size change (§20.9 (1))', () {
+    ScrollPosition position(WidgetTester tester) =>
+        tester.state<ScrollableState>(find.byType(Scrollable)).position;
+    double band(WidgetTester tester) =>
+        tester.widget<ScrollBand>(find.byType(ScrollBand)).visibility;
+    // Nothing is painted when the band is hidden: it builds a bare spacer.
+    Finder bandPaint() => find.descendant(
+      of: find.byType(ScrollBand),
+      matching: find.byType(Opacity),
+    );
+
+    // AX5 → scrolled to the end → the OS text size drops to [scale].
+    Future<void> shrinkWhileScrolled(
+      WidgetTester tester,
+      Size device,
+      double scale,
+    ) async {
+      await _pumpResult(
+        tester,
+        _model(player: 3, priorBest: 5, next: ResultNext.none),
+        size: device,
+        textScale: 3.118,
+      );
+      final p = position(tester);
+      p.jumpTo(p.maxScrollExtent);
+      await tester.pump();
+      expect(band(tester), 1);
+      tester.platformDispatcher.textScaleFactorTestValue = scale;
+      await tester.pump(); // relayout: the offset is clamped (no listener)
+      await tester.pump(); // the ScrollMetricsNotification's rebuild
+      expect(tester.takeException(), isNull);
+    }
+
+    for (final device in kPlayDevices) {
+      for (final scale in <double>[1, 1.3]) {
+        testWidgets('${device.width.toInt()} pt, AX5 scrolled → ${scale}x: '
+            'no band over the badge and back button', (tester) async {
+          await shrinkWhileScrolled(tester, device, scale);
+          final p = position(tester);
+          expect(p.maxScrollExtent, 0);
+          expect(p.pixels, 0);
+          expect(band(tester), 0);
+          expect(bandPaint(), findsNothing);
+          expect(find.byType(LoopBadge), findsOneWidget);
+          expect(
+            find.descendant(
+              of: find.byType(ResultView),
+              matching: find.byType(GlassIconButton),
+            ),
+            findsOneWidget,
+          );
+        });
+      }
+
+      testWidgets('${device.width.toInt()} pt, AX5 scrolled → 2.1x (still '
+          'scrolls, offset clamped below the fade distance): the band '
+          'matches the clamped offset', (tester) async {
+        await shrinkWhileScrolled(tester, device, 2.1);
+        final p = position(tester);
+        expect(p.maxScrollExtent, greaterThan(0));
+        expect(p.maxScrollExtent, lessThan(ResultView.bandFadeDistance));
+        expect(p.pixels, p.maxScrollExtent);
+        expect(
+          band(tester),
+          closeTo(p.pixels / ResultView.bandFadeDistance, 1e-9),
+        );
+      });
+    }
+  });
+
   // --- semantics (§16.11) ---------------------------------------------------------
 
   testWidgets('semantics: labels and traversal back → verdict → answer → '
