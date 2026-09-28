@@ -16,3 +16,6 @@
 * **`orchestration-at-fe-d1-delivery.md`** — the orchestration at the Frontend/Mobile Developer's delivery of F03-FE-D1 (commit b8b5f60), byte for byte.
   * Contents: the F03-FE-D1 brief (Current Brief), the delivered task line, F03.D1-PARITY PASS, Delivery Review Pending, and the D1 visual-gate checkpoint decision of 2026-09-27 (Last Decision).
   * Taken right before the Tech Lead's Frontend checkpoint on 2026-09-28. That checkpoint accepted the delivery, set the gate to Ready for QA, recorded the rulings in `architecture.md` §19.9 and opened F03-QA-D1.
+* **`orchestration-at-qa-d1-verdict.md`** — the orchestration at QA's F03-QA-D1 verdict (Rejected, 2026-09-28), byte for byte.
+  * Contents: the F03-QA-D1 brief (Current Brief), the done QA task line, F03.D1-VISUAL-QA FAIL, and the Frontend checkpoint decision of 2026-09-28 (Last Decision).
+  * Taken right before the Tech Lead's QA-verdict reconciliation on 2026-09-28. That reconciliation recorded the rulings in `architecture.md` §19.10, set F03 to Rework and opened F03-FE-D1R.

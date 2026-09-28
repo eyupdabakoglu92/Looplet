@@ -6,23 +6,21 @@ F03
 
 ## Current Status
 
-Rework
+In QA
 
 ## Current Owner
 
-Frontend/Mobile Developer
+Tech Lead
 
 ## Next Role
 
-Frontend/Mobile Developer
+Tech Lead
 
 ## Active Task Ledger
 
 - [x] Task ID: F03-UI-D1 | Assigned Role: UI Designer | Status: Done | Summary: DELIVERED 2026-09-27 — ui-design.md §1–§14 rewritten for the Loop Glass Play surface; §16 won composition kept byte-for-byte (legacy until D2). 28 renders under design/: the audit's D1 missing states 1–10, plus idle (D1 corrections), loading, keyboard focus, 16e / Pro Max variants, the 1.3× text cap and motion stills. Executable motion prototype design/src/D1-motion-prototype.html (lift + settle, thaw, tutorial ghost; ?rm=1, ?t=). Rulings applied: C-5 (hint pill above the HUD, ≥ 4 pt clearance measured on three devices at 1.0× and 1.3×; ghost hides on touch-down), C-9 (1.3× cap), C-10 (180 ms thaw), locked/frozen treatments, copy. D1 acceptance list §11.5; manifest §12b. NTLC §14: the text cap applied to the whole of Play (deviates from the §19.3 (1) hint example), design-layer edits inside D1, and informational items. No code | Depends On: -
 - [x] Task ID: F03-FE-D1 | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: DELIVERED 2026-09-28 — every non-won Play state on Loop Glass (LoopBackdrop; chevron + SEVİYE NN; MovesCard; HEDEF DÖNGÜ + RailTiles; BoardCard + TileFace; lift with rim, card-edge rails, rest at 42 %, wrap ghost 30 → 100 %; thaw 180 ms cross-fade; UndoPill + 44-pt restart; skeleton loading; error card + LimePill → /), the F05 tutorial re-skin (pill between board and HUD, ghost hides on touch-down and returns after 600 ms idle; §19.8 (3) fallback on after a 3.93-pt device measurement), the §19.8 (2) design-layer additions, drawn icons (no Material icon left), strings and semantics, reduced-motion paths. Tests: melos analyze / test green (app 405), integration_test 13/13 on the iPhone 16 simulator. frontend.md Visual Parity Evidence: runtime screenshots on the 16 / 16e / Pro Max, parity composites and measurements (≤ 0.83 pt vs the D1 renders), four videos, text sweep and Reduce Motion. NTLC-1: the won dock moved onto the goal (the D1 header left no §16.3 zone); NTLC-2: three design-layer edits beyond the §19.8 (2) list | Depends On: F03-UI-D1
 - [x] Task ID: F03-QA-D1 | Assigned Role: QA | Status: Done | Summary: DONE 2026-09-28 — verdict **Rejected** (qa.md, final, client-only, HEAD 5798c70; app/ = b8b5f60). Independent runtime rubric **87 / 100**, lowest Accessibility 7, one fail condition (clipping / overflow) → Visual Quality FAIL. Blocking: **F03-QA-D1-01** (Major) — the `HAMLE` label overflows the MovesCard's rounded bottom edge at the 1.3× cap from OS size xxL up to AX5 (D1-10 shows it inside; frontend.md NTLC-3 / A11Y-16-text "no overlap" is only true at the card centre); **F03-QA-D1-02** (Minor) — the load-error headline breaks "yüklenemedi" / "." at xxxL and every AX size (§11.5 (10)). Non-blocking: F03-QA-D1-03 — a two-finger opposite drag yields no move instead of honouring the first pointer (pre-D1 gesture code, safe outcome). Everything else PASS at runtime: suites re-run (analyze clean, app 405/0/0), integration 13/13 on the 16; parity ≤ 0.67 pt on 16 / 16e / Pro Max; lift / settle (1.5 % at 80 %), bounce, thaw cross-fade, ghost 120 / 600 / 160 ms, Reduce Motion paths; AC1–AC11, F05 AC4 / AC11; tutorial clearance ≥ 6 pt on all devices at 1.0× and AX5; won moment per §16 + §19.9 (1) (T0 + 600, dock on the goal, panel clear, Retry / Close). Evidence qa/d1/ | Depends On: F03-FE-D1
-- [ ] Task ID: F03-FE-D1R | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: ACTIVATED 2026-09-28 (QA verdict reconciled; rulings architecture.md §19.10). D1 text-scale rework: (1) F03-QA-D1-01 — `MovesCard` keeps the numeral and `HAMLE` label ink inside its rounded rect (arcs included) with ≥ 2 pt inset at every OS size default → AX5 on 390 / 393 / 440 (design-layer allowance §19.10 (1)); (2) F03-QA-D1-02 — the load-error headline breaks only between words at every size (§19.10 (2)); (3) correct frontend.md NTLC-3 / A11Y-16-text; tests + runtime text sweep. See Current Brief | Depends On: F03-QA-D1
-- [ ] Task ID: F03-QA-D1R | Assigned Role: QA | Status: Queued | Summary: Re-QA of D1 after F03-FE-D1R and the Tech Lead checkpoint: final stage, full regression with fingerprint-based reuse of the F03-QA-D1 evidence (§19.10 (5)); text sweep large → AX5 on the three devices, the two reworked surfaces, full rubric re-score (≥ 93, every dimension ≥ 8, no fail condition) | Depends On: F03-FE-D1R
 
 ## Open Tasks
 
@@ -34,7 +32,7 @@ None
 
 ## Delivery Review
 
-Pending
+Accepted
 
 ## QA Scope
 
@@ -66,7 +64,7 @@ ai-system/project-authority/design-foundation.md
 
 ## Visual Quality Gate
 
-Ready for Implementation
+Ready for QA
 
 ## Visual Evidence
 
@@ -147,28 +145,6 @@ allowed
   * Result: FAIL
   * Provenance / Note: 2026-09-28 QA, HEAD 5798c70 (app/ identical to b8b5f60), debug build on iOS Simulator 18.6 — iPhone 16 D0011CE7, 16e 6DBDFD97, Pro Max 02FDE776. Independent rubric **87 / 100**, lowest Accessibility and Inclusive Quality 7, fail condition clipping / overflow. Blocking F03-QA-D1-01 (the `HAMLE` label overflows the MovesCard at the 1.3× cap, xxL → AX5) and F03-QA-D1-02 (the load-error headline breaks "yüklenemedi" / "." at xxxL / AX). Everything else passed at runtime: the §11.5 items apart from (10), AC1–AC11, F05 AC4 / AC11, Reduce Motion on and off, the three devices, and the won moment per §16 + §19.9 (1). VoiceOver and the keyboard focus ring rest on the automated class (host limit; §19.9 (4)); Android not run (ANDROID-CI-EVIDENCE). Records: qa.md; artefacts in qa/d1/.
 
-- Evidence ID: F03.D1R-PARITY
-  * Scenario: The text-scale rework holds at runtime — the `MovesCard` numeral and label ink inside the card's rounded rect (≥ 2 pt inset, arcs included) and the load-error headline breaking only between words, at OS sizes large / xL / xxL / xxxL / AX5 on the iPhone 16, 16e and Pro Max; default-size parity with D1-00 / D1-07 within ±2 pt; suites and integration_test green
-  * Required Class: runtime + automated functional
-  * Target / Environment: iOS Simulator 18.6 — iPhone 16 D0011CE7, 16e 6DBDFD97, Pro Max 02FDE776
-  * Owner Role: Frontend/Mobile Developer
-  * Prerequisite / External Decision: None (rulings architecture.md §19.10)
-  * Re-evaluation Trigger: F03-FE-D1R delivery
-  * Blocks: Visual Quality Gate = Ready for QA; F03-QA-D1R
-  * Result: PENDING
-  * Provenance / Note: -
-
-- Evidence ID: F03.D1R-VISUAL-QA
-  * Scenario: An independent final-stage QA re-verdict on the D1 Play surface after the rework — rubric ≥ 93 with every dimension ≥ 8 and no fail condition; the text sweep; the reworked surfaces; regression per §19.10 (5)
-  * Required Class: runtime
-  * Target / Environment: iOS Simulator 18.6, iPhone 16 / 16e / Pro Max; Android stated as a limit (ANDROID-CI-EVIDENCE)
-  * Owner Role: QA
-  * Prerequisite / External Decision: F03.D1R-PARITY accepted (gate Ready for QA)
-  * Re-evaluation Trigger: F03-QA-D1R activation
-  * Blocks: Visual Quality Gate = Passed; F03 Done; D2 activation
-  * Result: PENDING
-  * Provenance / Note: -
-
 ## Open Decision Gates
 
 None
@@ -179,37 +155,47 @@ None
 
 ## Next Action
 
-Run Frontend/Mobile Developer on F03-FE-D1R — the D1 text-scale rework (Current Brief below; rulings architecture.md §19.10).
+Run Tech Lead to reconcile F03-QA-D1 (qa.md, 2026-09-28): QA Result **Rejected**; F03.D1-VISUAL-QA FAIL (rubric 87 / 100, lowest Accessibility 7, fail condition clipping / overflow).
 
-After delivery:
-* the Tech Lead checkpoint verifies the two rules at runtime and runs a negative case for each;
-* gate → Ready for QA;
-* F03-QA-D1R is activated.
+* **Blocking:**
+  * F03-QA-D1-01 — the `HAMLE` label overflows the MovesCard's rounded bottom edge at the 1.3× cap from OS size xxL to AX5 (design-layer `MovesCard`; overlaps follow-up MOVESCARD-CAP-MARGIN);
+  * F03-QA-D1-02 — the load-error headline breaks "yüklenemedi" / "." at xxxL and AX sizes.
+* **Non-blocking:** F03-QA-D1-03 — the two-finger drag does not honour the first pointer (pre-D1, safe outcome); the Tech Lead decides whether it joins this rework.
+* The Tech Lead decides the rework routing, the design-layer edit allowance and a targeted re-QA (text sweep + affected surfaces; the rest of the evidence stays reusable while the app/ fingerprint holds). The frontend.md NTLC-3 / A11Y-16-text "no overlap" record needs correcting.
 
 ## Last Decision
 
-2026-09-28 (QA-verdict reconciliation) — the Tech Lead reconciled F03-QA-D1 (`qa.md`, HEAD 5798c70): **Rejected**, rubric 87 / 100, F03.D1-VISUAL-QA FAIL.
+2026-09-28 (Frontend checkpoint) — the Tech Lead reconciled F03-FE-D1 (commit b8b5f60) and accepted it.
 
-**Verified independently:**
-* re-measured QA's stored captures — the `HAMLE` label ink box x 304.7–361.7, y 138.7–150.0 pt at AX5; the AX5 error headline 120 pt tall (three lines). Both match qa.md;
-* confirmed both root causes in the code: `MovesCard` has no inner vertical padding at the cap; the error headline is limited to `maxWidth: 230 * s`, below the card's inner width.
+**Task coverage:** every fix-scope item 1–7 of the F03-FE-D1 brief maps to files in frontend.md §3. There are no partial items.
 
-**Rulings** (architecture §19.10):
-* F03-QA-D1-01 — implementation defect; a `MovesCard` internal-layout allowance with a rect rule; supersedes MOVESCARD-CAP-MARGIN;
-* F03-QA-D1-02 — implementation defect; a word-boundary rule;
-* F03-QA-D1-03 — recorded as F03-MULTITOUCH-FIRST-POINTER, outside D1 (§19.6 no behaviour change);
-* frontend.md NTLC-3 / A11Y-16-text to be corrected;
-* re-QA with fingerprint-based reuse.
+**Contract compliance:**
+* route, args, gestures, input lock, persistence and the F05 gate / ack are unchanged — the suites and integration_test are green;
+* the §19.3 and §19.8 rulings are applied, including the §19.8 (3) fallback after a device measurement of 3.93 pt;
+* no token, dependency or global-doc change;
+* no Material icon left.
 
-**State:** Current Status Rework; Delivery Review Pending; Visual Quality Gate Ready for Implementation; F03-FE-D1R Open; F03-QA-D1R Queued; owner → Frontend/Mobile Developer.
+**Evidence, checked independently:**
+* `melos run analyze` clean; `flutter test` 405 passed.
+* **Seven negative runs**, each rule broken and restored from git, all caught: hint clearance (A-1), glyph cap (A-2), ghost hide (A-6), thaw (A-5), the panel floor under the docked row, `HAMLE` at the settle, undo at quota 0 (AC6).
+* `measure-d1.swift` reproduces all 19 parity measurements; composites were inspected.
 
-The previous decision (the 2026-09-28 Frontend checkpoint) and the F03-QA-D1 brief are archived byte-for-byte in history/f03-puzzle-play-session-2026-09-27/orchestration-at-qa-d1-verdict.md.
+**Rulings** (architecture §19.9):
+* NTLC-1 — the won dock onto the goal is accepted for the D1 hybrid period, with the amended §16.3 / §16.5 (1) rules; `ui-design.md` §16 banner points to it.
+* NTLC-2 — `LoopBackButton`, `TileFace.iconScale` and the `UndoPill` dot animation are accepted in D1 scope.
+* The frontend.md §4 reconciliation items are accepted as implemented.
+* Focus-ring evidence class: the automated Tab trigger (F00 E21 precedent).
+* Informational: NTLC-3 → follow-up MOVESCARD-CAP-MARGIN; NTLC-4 → follow-up CI-FORMAT-GATE (the CI format step is red on a pre-existing F00 QA probe, independent of F03); NTLC-5 → `ui-design.md` §5 corrected; NTLC-6 → D2 (A-2).
+
+**State:** Delivery Review Accepted; Visual Quality Gate Ready for QA; Current Status In QA; F03-QA-D1 Open; owner → QA.
+
+The previous decision (the 2026-09-27 visual-gate checkpoint) and the F03-FE-D1 brief are archived byte-for-byte in history/f03-puzzle-play-session-2026-09-27/orchestration-at-fe-d1-delivery.md.
 
 ## Last Update
 
-* Updated By: Tech Lead
+* Updated By: QA
 * Timestamp: 2026-09-28
-* Summary: QA-verdict reconciliation — F03-QA-D1 Rejected (87 / 100) verified independently; rulings architecture §19.10; F03 to Rework; F03-FE-D1R opened for the Frontend/Mobile Developer, F03-QA-D1R queued; gate back to Ready for Implementation.
+* Summary: F03-QA-D1 final-stage visual QA — Rejected. Rubric 87 / 100 (lowest Accessibility 7, fail condition clipping / overflow). Blocking F03-QA-D1-01 (`HAMLE` label overflows its card at the text cap) and F03-QA-D1-02 (load-error headline mid-word break); non-blocking F03-QA-D1-03 (multi-touch). F03.D1-VISUAL-QA FAIL; owner → Tech Lead.
 
 ## Context & Follow-ups
 
@@ -251,63 +237,109 @@ The previous decision (the 2026-09-28 Frontend checkpoint) and the F03-QA-D1 bri
   * **Score:** 87 / 100, lowest Accessibility 7; fail condition clipping / overflow.
   * **Findings:** F03-QA-D1-01 (Major, blocking) `HAMLE` label overflow at the cap; F03-QA-D1-02 (Minor, blocking) load-error headline break; F03-QA-D1-03 (Minor, non-blocking, pre-D1) multi-touch.
   * **Evidence:** qa.md; qa/d1/. The previous qa.md (2026-09-21) is archived byte-for-byte as history/f03-puzzle-play-session-2026-09-27/qa-before-phase-d1.md.
-* 2026-09-28 — Tech Lead: QA-verdict reconciliation.
-  * **Verified:** both blocking findings re-measured from QA's captures; root causes confirmed in `info.dart` and `play_session_screen.dart`.
-  * **Decided:** architecture §19.10 rulings; F03-MULTITOUCH-FIRST-POINTER logged outside D1; MOVESCARD-CAP-MARGIN folded into the rework.
-  * **Next:** Current Status Rework; F03-FE-D1R Open; F03-QA-D1R Queued; gate Ready for Implementation; owner → Frontend/Mobile Developer. The orchestration at the QA verdict is archived as history/f03-puzzle-play-session-2026-09-27/orchestration-at-qa-d1-verdict.md.
 
 ## Current Brief
 
-**F03-FE-D1R — D1 text-scale rework (contract: architecture.md §19.10; everything in §19.3, §19.8 and §19.9 still applies)**
+**F03-QA-D1 — independent final-stage visual QA of the Loop Glass Play (Design Adoption Phase D1; contract: architecture.md §19, rulings §19.8 and §19.9)**
 
-**User-visible symptom** (F03-QA-D1, `qa.md` § Findings, evidence `qa/d1/`):
-* with the OS text size at extra-extra-large or above, the `HAMLE` label on Play spills across the rounded bottom corners of its card;
-* on the "Bu bulmaca yüklenemedi." screen at extra-extra-extra-large or above, the full stop drops onto a line of its own.
+**Surface under test:**
+* every non-`won` `/play` state, the loading state and the load error;
+* the F05 column-tutorial overlay (cross-feature);
+* the design-layer additions of §19.8 (2) and §19.9 (2);
+* the won moment's dock geometry (§19.9 (1)).
 
-**Affected journey and entry paths:**
-* any `/play` session (Home CONTINUE, Result Retry / Next, resume after a kill) with a large OS text size — the header card is always visible;
-* the load-error state (a level asset that fails to load; QA used a corrupted `journey-tr-07.json` in the simulator bundle).
+Delivery: `frontend.md` (commit `b8b5f60`); evidence in `design/runtime-d1/`.
 
-**Fix scope:**
-1. `app/lib/design/components/info.dart` — `MovesCard`, under the §19.10 (1) allowance:
-   * the numeral and label ink stay inside the card's rounded rect, corner arcs included, inset by ≥ 2 pt;
-   * at every OS size default → AX5, on 390 / 393 / 440 pt widths;
-   * the card keeps its width 60·s and its top-left anchor (273.5, 75)·s, grows downward only and stays ≥ 8 pt above `HEDEF DÖNGÜ`;
-   * no token, `LoopText` role, font or tracking change.
-2. `app/lib/play/play_session_screen.dart` — `_LoadErrorView` headline:
-   * breaks only between words at every OS size default → AX5 on the three widths;
-   * keep the §19.9 (3) 1.3× cap; the headline may use the card's inner width.
-3. `frontend.md` — correct NTLC-3 and the A11Y-16-text record, and add the rework delivery.
-   * The earlier D1 delivery text stays; append an F03-FE-D1R section.
+**Authority:**
+* `ui-design.md` §1–§14 — the §11.5 acceptance list, the §12a matrix, the §5 motion table (with its Tech Lead correction);
+* §16 as amended by architecture §19.9 (1);
+* architecture §6–§13 (behaviour) and §19;
+* F00 `ui-design.md` (tokens, components);
+* `design/visual-quality-gate.md`, `premium-ui-rubric.md`, `design-doctrine.md`.
 
-**Tests:**
-* a component test asserting the MovesCard rule with real fonts at scales 1.0 / 1.235 / 1.3 / 3.12 on the three widths — ink or glyph boxes against the rounded rect, not the bounding box;
-* a widget test asserting that no headline line is punctuation-only and no word is split, at the same scales.
-* Each new test must fail against the current code (show that in `frontend.md`). Existing suites stay green; `integration_test` 13/13 on the iPhone 16.
+**QA plan:**
+* QA Scope client-only; QA Stage final; Release Scope none.
+* QA Modules: core, client-ui, visual-quality, stateful-flow.
+* **Regression Depth full**, because:
+  * the whole Play surface was re-rendered;
+  * a cross-feature overlay (F05) and shared design-layer components changed;
+  * the won geometry moved.
+* **Evidence Reuse allowed.** Fingerprint: the Frontend's automated suites and integration run were taken at `b8b5f60`. Reuse them only if the QA revision's `app/` tree is unchanged since. The Frontend's runtime captures are comparison inputs, never a substitute for QA's own runtime scoring.
 
-**Runtime evidence (F03.D1R-PARITY):**
-* captures at large / xL / xxL / xxxL / AX5 on the iPhone 16, 16e and Pro Max — L26 for the card, the corrupted-L07 error screen for the headline (restore the asset afterwards);
-* measurements of the label ink versus the card arcs;
-* default-size parity with D1-00 / D1-07 (±2 pt);
-* restore the simulator settings.
+**Critical journeys** (start → action → visible result) on the iPhone 16 (primary), with the 16e and Pro Max where noted:
+1. **Home CONTINUE → L5 idle:** chevron + `SEVİYE 05`, `HAMLE 0`, `HEDEF DÖNGÜ` + BULUT, the board card, the undo pill at 55 %, restart 44 pt (§11.5 (1)–(4); all three devices).
+2. **Row drag, held:**
+   * rim + glow + side rails, the rest at 42 %, the wrap ghost at 30 % clipped to the card;
+   * on release the line settles (≤ 1.5 % overshoot) and `HAMLE` +1 appears at the settle;
+   * the ghost reaches 100 %, and the rim, rails and dim fade out (§11.5 (5), §5).
+3. **Column drag on L4:** rails on the top and bottom edges (all three devices). A sub-threshold drag → the line returns, no move (AC4).
+4. **Rejected move** (a column on a rows-only level, L1–L3): the 140 ms bounce; `HAMLE` unchanged.
+5. **L26 locked + frozen:** lock icons, snowflakes and dashes; readable in greyscale (§11.5 (6)).
+6. **L23 thaw** (seed `["R1","D3","U4"]`, then swipe column 4 up): the 180 ms cross-fade and the snowflake shrink; under Reduce Motion it is instant (§11.5 (7)).
+7. **Undo quota 3 → 0:** a spent dot dims (120 ms); the pill is disabled at 0 moves and at quota 0; the semantics say "n / 3 hak"; no prompt (AC6, §11.5 (8)).
+8. **Restart:** no dialog; the dots refill (AC7).
+9. **Tutorial, L4–6 with the ack unset:**
+   * the pill sits between the board and the HUD with ≥ 4 pt clearance at 1.0× and at the 1.3× cap, on all three devices;
+   * the ghost hides on touch-down and returns after 600 ms of idle; undo and restart stay usable;
+   * the first column move fades the pill and persists the ack (F05 AC4);
+   * a force-quit before the gate → it re-shows (F05 AC11) (§11.5 (9)).
+10. **Loading → loaded:** the board card rect does not move; no spinner (§11.5 (12)).
+11. **Load error:** corrupt a level asset in the simulator bundle (Frontend used level 07; restore afterwards). Expect the card + `loopBreak` + pill → `/`; system back → the caller; no raw exception text (§11.5 (13)).
+12. **Leave and resume:** the chevron, system back and the edge swipe → Home with the snapshot kept; CONTINUE resumes the same state; a kill / relaunch resumes too (AC10).
+13. **Won moment:** e.g. debug L01, a 1-move Perfect, and a 2★ via one wasted move, at 1.0× and 1.3×:
+    * nothing of the panel before T0 + 600 ms;
+    * the row docks onto the goal while the rail tiles fade out;
+    * the panel never covers the row; its controls are ≥ 44 pt;
+    * Retry brings the rail back (§16 as amended; §16.5 (6)).
 
-**Non-goals:**
-* no behaviour change (gestures, input lock, persistence, routes, timing);
-* F03-QA-D1-03 / multi-touch stays out (follow-up F03-MULTITOUCH-FIRST-POINTER);
-* no other surface restyle; the won moment and the F04 panel stay as they are (D2);
-* no dependency or token change.
+**Misuse, invalid entry, stale state:**
+* gestures during a settle, a bounce or `won` → dropped, never queued (AC5); multi-touch → first pointer only; a diagonal tie → horizontal;
+* taps on undo / restart during a settle → no effect;
+* backgrounding mid-drag or mid-settle → never a torn move (§12);
+* Next Level / Close / Retry from the panel;
+* the tutorial on a level outside 4–6 → not shown; once acknowledged → never again.
 
-**Exit:**
-* both rules hold at runtime on the three devices;
-* the tests fail on the old code and pass on the new;
-* suites green;
-* F03.D1R-PARITY recorded;
-* Delivery Review → Pending, owner → Tech Lead for the checkpoint.
+**Text scale and accessibility** (§11.5 (10), (15)):
+* default / xxxLarge / AX5 on L26 and on the tutorial: every Play text at the 1.3× cap, no clipping or overlap;
+* the load-error pill label reflows at AX5 and its column scrolls;
+* VoiceOver: back "Geri, Seviye 26"; the rail as one node; `HAMLE`; undo "…, n / 3 hak"; the hint announced once; the ghost excluded; "Yükleniyor" only after 300 ms;
+* contrast (the lowest pair is `HAMLE` at 4.9 : 1) and 44-pt targets;
+* focus ring: check it at runtime if the environment can send hardware keys; otherwise the §19.9 (4) evidence class stands as a stated limit.
 
-The Tech Lead then activates F03-QA-D1R (§19.10 (5)).
+**Reduce Motion** (§11.5 (11)): check on and off. The iOS `reduceMotion` signal is checked at runtime; Android `disableAnimations` is widget-tested only.
+
+**Inherited or known limits.** These are not F03-FE-D1 defects unless QA's evidence says otherwise, and QA may raise any of them as a finding:
+* Android not run (ANDROID-CI-EVIDENCE); physical-finger gesture accuracy;
+* the legacy won / F04 panel overflow at AX5 (A-2, D2);
+* Home in the legacy look (D3, hybrid period C-8);
+* the top-right ground light at ΔE 3.35 (F00 `LoopBackdrop` approximation);
+* the red CI format step on a pre-existing F00 QA probe (CI-FORMAT-GATE).
+
+**Startup impact:** none — no entry point, bootstrap, persistence-open or root-navigation change. The `/play` resume after a kill is covered as journey 12.
+
+**Runtime method:**
+* debug build on iOS Simulator 18.6 — iPhone 16 `D0011CE7`, 16e `6DBDFD97`, Pro Max `02FDE776`;
+* `design/src/seed-sim.sh <udid> <level> [moves] [ack] [undos]` seeds Journey progress, the active-session snapshot and the tutorial ack; Home CONTINUE then opens the level;
+* content size: `xcrun simctl ui <udid> content_size …`;
+* Reduce Motion: `xcrun simctl spawn <udid> defaults write com.apple.Accessibility ReduceMotionEnabled -int 1|0`, then relaunch;
+* recordings: `xcrun simctl io … recordVideo`;
+* restore the simulator settings afterwards.
+
+**Exit criteria (Approved):**
+* an independent runtime rubric ≥ 93 with every dimension ≥ 8 and no `premium-ui-rubric` fail condition, scored on the non-`won` Play states and the F05 overlay. The won moment is judged only against §16 as amended (hybrid period);
+* every §11.5 item verified at runtime (the focus ring may rest on its stated evidence class);
+* AC1–AC11 and F05 AC4 / AC11 regressions pass;
+* the text sweep and Reduce Motion pass;
+* Android stated as a limit.
+
+On approval, QA sets F03.D1-VISUAL-QA to PASS, and the Tech Lead then sets the Visual Quality Gate to Passed. Findings are welcome wherever the evidence contradicts this brief.
+
+**Deliver:**
+* `qa.md` — the final-stage report with the rubric table, runtime evidence records in the gate schema, and findings;
+* the F03.D1-VISUAL-QA record;
+* the local orchestration update, per the QA prompt.
 
 ## Earlier briefs
 
 * F03-UI-D1 (UI Designer, done 2026-09-27) — archived byte-for-byte in history/f03-puzzle-play-session-2026-09-27/orchestration-at-ui-d1-delivery.md.
 * F03-FE-D1 (Frontend/Mobile Developer, done 2026-09-28) — archived byte-for-byte in history/f03-puzzle-play-session-2026-09-27/orchestration-at-fe-d1-delivery.md.
-* F03-QA-D1 (QA, done 2026-09-28, Rejected) — archived byte-for-byte in history/f03-puzzle-play-session-2026-09-27/orchestration-at-qa-d1-verdict.md.

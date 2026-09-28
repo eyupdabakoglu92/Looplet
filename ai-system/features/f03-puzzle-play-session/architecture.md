@@ -455,3 +455,30 @@ The F03-FE-D1 delivery (commit `b8b5f60`; `frontend.md`) is **accepted**. The Vi
 * regression of AC1–AC11 and the F05 AC4 / AC11 re-show;
 * the text sweep to AX5 and Reduce Motion on and off;
 * Android stated as a limit.
+
+### 19.10 QA-verdict rulings (Tech Lead, 2026-09-28)
+
+F03-QA-D1 (`qa.md`, HEAD 5798c70) is **Rejected**: an independent rubric of 87 / 100, lowest Accessibility 7, with one fail condition (clipping / overflow). F03.D1-VISUAL-QA is FAIL.
+
+The Tech Lead re-measured both blocking findings from QA's stored captures (same numbers) and confirmed their root causes in the code. F03 goes to **Rework**; the handoff and the §19.3 / §19.8 / §19.9 rulings stay in force.
+
+1. **F03-QA-D1-01 — the `HAMLE` label overflows the `MovesCard` at the text cap: accepted as an implementation defect.**
+   * **Cause:** `MovesCard` (F00 design layer, `app/lib/design/components/info.dart`) is a 60·s-wide column with a 63·s minimum height and no inner vertical padding. At the 1.3× cap the label (≈ 57 of 64 pt wide) sits against the bottom edge, so its outer glyphs cross the 22·s corner arcs (xxL → AX5).
+   * **Design-layer allowance (cross-feature, the §19.8 (2) precedent; F00 stays Done):** `MovesCard` may change its internal layout — inner vertical padding and/or minimum-height growth at scales above 1.0 — to satisfy the rule below. The card keeps its width (60·s) and its top-left anchor (273.5, 75)·s. It may grow downward only, and must stay ≥ 8 pt above the `HEDEF DÖNGÜ` caption. No token value, `LoopText` role, font or tracking may change.
+   * **Rule (rect-testable):** at every OS text size from default to AX5, on 390, 393 and 440 pt widths, the ink of the numeral and of the label lies inside the card's rounded rectangle — corner arcs included — inset by ≥ 2 pt. The default-size look stays as in D1-00 (layout within ±2 pt).
+   * **Consumers:** only Play and the debug gallery render `MovesCard`.
+   * **Follow-up:** this supersedes MOVESCARD-CAP-MARGIN, which closes with the rework.
+2. **F03-QA-D1-02 — the load-error headline breaks "yüklenemedi" / "." at xxxL and above: accepted as an implementation defect.**
+   * **Cause:** in `_LoadErrorView` (`app/lib/play/play_session_screen.dart`) the headline is constrained to `maxWidth: 230 * s` (≈ 252 pt at 393), narrower than the card's inner width (257·s ≈ 282 pt). At the §19.9 (3) cap the word no longer fits.
+   * **Rule:** at every OS text size from default to AX5, on 390, 393 and 440 pt widths, the headline breaks only between words — no line consisting only of punctuation, no break inside a word.
+   * The §19.9 (3) 1.3× cap on the headline stays. The headline may use up to the card's inner width.
+   * The D1-07 look at the default size is unchanged (layout within ±2 pt).
+3. **F03-QA-D1-03 — a two-finger drag does not honour the first pointer: recorded, not in D1.**
+   * QA observed at runtime that two simultaneous fingers moving in opposite directions produce no move, where §6 and the PRD edge case say "first touch only". The outcome is safe: no double move and no torn state.
+   * The gesture code predates D1 (3a6e854), and §19.6 forbids behaviour changes in this visual rework.
+   * Logged as follow-up **F03-MULTITOUCH-FIRST-POINTER** (`workflow-follow-ups.md`; owner Frontend/Mobile Developer, then QA). It is scheduled as a behaviour rework after Phase D and does not block D1's closure. §6 stays unchanged.
+4. **Evidence correction.** `frontend.md` NTLC-3 and A11Y-16-text say "no clipping or overlap" at the cap. That is true only at the card centre, and the Frontend corrects it in the rework delivery.
+5. **Re-QA (F03-QA-D1R, queued):**
+   * Final stage; modules core, client-ui, visual-quality, stateful-flow; Regression Depth full with Evidence Reuse allowed.
+   * QA's F03-QA-D1 evidence stays valid for every surface the rework's `app/` diff does not touch. QA confirms that from the diff.
+   * The text sweep (large → AX5) on the three devices, the two reworked surfaces and a full rubric re-score are required.
