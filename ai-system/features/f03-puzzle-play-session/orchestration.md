@@ -10,16 +10,16 @@ Rework
 
 ## Current Owner
 
-Frontend/Mobile Developer
+Tech Lead
 
 ## Next Role
 
-Frontend/Mobile Developer
+Tech Lead
 
 ## Active Task Ledger
 
 - [x] Task ID: F03-UI-D2 | Assigned Role: UI Designer | Status: Done | Summary: DELIVERED 2026-09-28 — ui-design.md §16 rewritten as the D2 handoff (replaces F03-UI-WON; §1–§14 D1 unchanged apart from cross-references). The full-screen result as a flow column on the S-04 anchors (layout table for 393 / 390 / 440), all 10 variants (C-4 markers and badge precedence, CTA weighting, no-optimal, Next not wired, level 30), the win sequence re-timed on the D1 board with special tiles (C-11), the board → result and result → Play transitions with reduced paths. 58 renders in design/ (12 result, 6 text-scale incl. the 1.3× cap on three devices and AX5, 3 device variants, 37 motion stills) + 5 contact sheets; 5 executable prototypes (rows 0 / 2 / 4 from BFS-verified solutions, a synthetic frozen case, retry); a timeline self-test (rest 940 / reduced 660, first result pixel 685 ms, retry 360 / 160). D2 acceptance list §16.11.1; manifest §16.12b. NTLC §16.14: retry transition A vs B needs a selection record (non-blocking), the re-timed chrome fade, copy items, design-layer additions. No code | Depends On: -
-- [ ] Task ID: F03-FE-D2 | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: ACTIVATED 2026-09-28 (visual-gate checkpoint passed, gate Ready for Implementation). Implement the D2 handoff (ui-design.md §16, acceptance list §16.11.1) from `app/lib/design`, per architecture §20 and the §20.7 rulings (retry A; corrections C1–C3; allowed design-layer additions). The full-screen result replaces the F04 panel and the won composition; no Close; `docked_row.dart`, `CompletionPanel` and `PlayTheme` leave the won path; tests updated (§20.4 plus four F05 tests). `frontend.md` Visual Parity Evidence per §20.6 / §20.7, with screen recordings and the frame-timing table. See Current Brief | Depends On: F03-UI-D2
+- [x] Task ID: F03-FE-D2 | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: DELIVERED 2026-09-28 — the D2 win sequence, board → result transition, full-screen `ResultView` and retry transition A implemented from `app/lib/design` per architecture §20 / §20.7 (C1–C3); `docked_row.dart`, `board_tile.dart`, `won_composition.dart` and `CompletionPanel` deleted; design-layer additions `TileFace.answer`, `StarRow.revealMs`, `ScrollBand` with component tests; tests updated (§20.4 + four F05) and added (`won_sequence_test`, `result_view_test`, `result_components_test`); app suite 503 passed, analyze / format clean, integration_test 13 / 13 on the iPhone 16. `frontend.md` Visual Parity Evidence: runtime screenshots, parity composites, 10 recordings with the frame-timing table, the text sweep and Reduce Motion on the three simulators. NTLC-D2-1 … 3 (informational / evidence limits) | Depends On: F03-UI-D2
 - [ ] Task ID: F03-QA-D2 | Assigned Role: QA | Status: Queued | Summary: Final-stage independent visual QA of D2 (rubric ≥ 93 from runtime video; F04 AC1–AC10, F05 AC1 / AC12, F03 AC8 / AC11; lifecycle mid-sequence; D1 regression) (architecture §20.6) | Depends On: F03-FE-D2
 
 ## Open Tasks
@@ -32,7 +32,7 @@ None
 
 ## Delivery Review
 
-Accepted
+Pending
 
 ## QA Scope
 
@@ -84,7 +84,14 @@ D2 handoff records (2026-09-28, UI Designer) are in ui-design.md §16.12b Visual
 * accessibility D2-10 (1.3× cap on three devices) and D2-10-AX5;
 * motion-prototype MP-D2 (design/src/D2-motion-prototype*.html), MP-D2-S (D2-M-* stills) and MP-D2-CHECK (design/src/timeline-check-d2.txt).
 
-The artefacts are in features/f03-puzzle-play-session/design/. Accepted at the Tech Lead's visual-gate checkpoint on 2026-09-28 (architecture §20.7): the retry transition A is the adopted design. The parity and QA records are pending (see Pending Evidence).
+The artefacts are in features/f03-puzzle-play-session/design/. Accepted at the Tech Lead's visual-gate checkpoint on 2026-09-28 (architecture §20.7): the retry transition A is the adopted design.
+
+D2 implementation parity records (2026-09-28, Frontend/Mobile Developer; `frontend.md` § Visual Parity Evidence) are in features/f03-puzzle-play-session/design/runtime-d2/:
+* runtime-screenshot RT-16-D2-01 … 09b, RT-16-L30-terminal, RT-16e-*, RT-promax-*, RT-16e-D2-12 (pressed);
+* parity-comparison PC-D2-*.jpg + parity-measurements.txt;
+* runtime-video RV-16-r2 / -warm / -premount, RV-16-r0 (L26), RV-16-r4, RV-16e-r4, the retries and both reduced paths, with the frame-timing table;
+* accessibility A11Y-16-sweep (large → AX5, scrolled), A11Y-16e, A11Y-pm.
+The QA record is pending (see Pending Evidence).
 
 ## QA Modules
 
@@ -125,8 +132,8 @@ allowed
   * Prerequisite / External Decision: F03.D2-HANDOFF accepted (gate Ready for Implementation)
   * Re-evaluation Trigger: F03-FE-D2 delivery
   * Blocks: Visual Quality Gate = Ready for QA; F03-QA-D2
-  * Result: PENDING
-  * Provenance / Note: -
+  * Result: PASS
+  * Provenance / Note: 2026-09-28 Frontend/Mobile Developer, HEAD 051c64c + working tree, debug build on iOS Simulator 18.6 (iPhone 16 / 16e / Pro Max). `frontend.md` § Visual Parity Evidence; artefacts in design/runtime-d2/, tooling design/src/capture-d2.sh, video-d2.swift, timing-d2.py, parity-d2.swift / .sh. Frame timing (T0 fitted to the chrome dim, ± one capture frame): the row holds its board cells (0.00 pt, C2) on every frame before T0 + 600 and first moves at 616–633; first result pixel 716–719; chrome final on the first frame after 720; pill at rest on the first frame after 940; stars done 1284–1289; retry ≤ 350 (reduced ≈ 160); reduced win ≈ 660; no gap > 30 ms in 600–1400 on the 16e row-4 run. Parity at 1.0× within 0.3–1.3 pt of the D2 renders on three devices. Suites: analyze / format clean, app 503 passed, integration_test 13 / 13 on the iPhone 16. Limits (NTLC-D2-3): D2-07 not reachable at runtime; focus ring not injectable (widget test); VoiceOver and lifecycle mid-sequence by widget tests only; debug builds only; Android not run. Two F00-component deviations recorded (NTLC-D2-2).
 
 - Evidence ID: F03.D2-VISUAL-QA
   * Scenario: An independent final-stage QA verdict on D2 — rubric ≥ 93 from runtime video (every dimension ≥ 8, no fail condition); F04 AC1–AC10 on the result, F05 AC1 / AC12, F03 AC8 / AC11; lifecycle mid-sequence; D1 Play regression
@@ -149,9 +156,7 @@ None
 
 ## Next Action
 
-Run Frontend/Mobile Developer on F03-FE-D2 (Current Brief below; architecture §20 and the §20.7 rulings; ui-design.md §16.11.1 acceptance list).
-
-Then return to the Tech Lead. That checkpoint is mandatory: the Tech Lead verifies the Visual Parity Evidence and the frame timing and sets Ready for QA before F03-QA-D2 starts.
+Run Tech Lead — the mandatory D2 parity checkpoint: reconcile F03-FE-D2 (`frontend.md`, Delivery Review Pending), verify F03.D2-PARITY and the frame-timing table, rule on NTLC-D2-1 … 3, and set the Visual Quality Gate to Ready for QA and open F03-QA-D2 if accepted.
 
 ## Last Decision
 
@@ -183,9 +188,9 @@ The pre-checkpoint orchestration (D2 activation decision, F03-UI-D2 brief) is ar
 
 ## Last Update
 
-* Updated By: Tech Lead
+* Updated By: Frontend/Mobile Developer
 * Timestamp: 2026-09-28
-* Summary: D2 visual-gate checkpoint — F03-UI-D2 accepted; Visual Quality Gate Ready for Implementation; architecture §20.7 rulings and corrections C1–C3; F03-FE-D2 activated for the Frontend/Mobile Developer.
+* Summary: F03-FE-D2 delivered — task Done; F03.D2-PARITY PASS (with stated limits); Delivery Review Pending; owner → Tech Lead (mandatory parity checkpoint before QA).
 
 ## Context & Follow-ups
 
@@ -217,6 +222,9 @@ The pre-checkpoint orchestration (D2 activation decision, F03-UI-D2 brief) is ar
   * **Verified:** HTML regenerates byte-identical; solutions solve in the real engine; self-test 7 / 7; negative controls (the row-containment check is non-discriminating — displacement probe 0.00 px before 600).
   * **Decided:** Delivery Review Accepted; Visual Quality Gate Ready for Implementation; architecture §20.7 rulings (retry A; items 2–6) and corrections C1–C3.
   * **Next:** F03-FE-D2 Open; owner → Frontend/Mobile Developer.
+* 2026-09-28 — Frontend/Mobile Developer: F03-FE-D2 delivered; task Done; F03.D2-PARITY PASS; Delivery Review = Pending; owner → Tech Lead.
+  * **Delivery:** `frontend.md` (D2; the D1 / D1R report archived as history/f03-puzzle-play-session-2026-09-28/frontend-before-phase-d2.md).
+  * **NTLC:** NTLC-D2-1 result mounted at T0 + 450; NTLC-D2-2 F00 `StatCell` ★ and `LimePill` pressed look; NTLC-D2-3 evidence limits.
 
 ## Current Brief
 

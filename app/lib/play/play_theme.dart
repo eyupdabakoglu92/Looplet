@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 
 /// F03 design tokens — "Backlit board on a dark stage" (`ui-design.md` §5).
 ///
+/// Legacy: since Phase D2 no Play or won surface draws from these — the
+/// Loop Glass layer (`app/lib/design`) does. The Play board still takes its
+/// shift / bounce timing and curves from here, and Home until D3.
+///
 /// The play screen is the first real LOOPLET surface, so it carries its own
 /// small visual system (colour / radius / motion) rather than leaning on the
 /// bootstrap `ThemeData`. F10 owns the global app theme later; these tokens are
@@ -35,12 +39,6 @@ class PlayTheme {
   static const Color muted = Color(0xFF8A88A0); // labels, chevron, Close
   static const Color danger = Color(0xFFE06A5A); // debug load error only
 
-  // --- completion panel / sheet (F03 seam → F04 realises) -----------------
-  static const Color sheetSurface = Color(0xFF191A2B); // raised dark panel
-  static const Color sheetHighlight = Color(0x14FFFFFF); // 1 px top edge
-  static const Color sheetRecess = Color(0xFF12131F); // inset comparison track
-  static const Color sheetScrim = Color(0x66000000); // ~40% over the dim board
-
   // --- geometry ----------------------------------------------------------------
   static const double boardWidthFraction =
       0.88; // of screen width (prd ~85–90%)
@@ -57,9 +55,6 @@ class PlayTheme {
   /// Rejected-move rubber-band bounce-back.
   static const Duration bounceDuration = Duration(milliseconds: 140);
 
-  /// Full bounded win choreography (`ui-design.md` §8 — ≤ ~600 ms).
-  static const Duration winDuration = Duration(milliseconds: 600);
-
   /// Undo / restart grid swap — quick, not a full shift.
   static const Duration swapDuration = Duration(milliseconds: 120);
 
@@ -69,7 +64,6 @@ class PlayTheme {
 
   /// Opacity the HUD controls drop to while input is locked.
   static const double lockedControlsOpacity = 0.55;
-  static const double wonControlsOpacity = 0.40;
 
   /// Dim overlay on non-active tiles during drag / animation.
   static const double inactiveTileDim = 0.08;
@@ -95,22 +89,6 @@ class PlayTheme {
     fontWeight: FontWeight.w600,
     letterSpacing: 1.4,
     color: muted,
-    height: 1,
-  );
-
-  static const TextStyle completionWord = TextStyle(
-    fontSize: 34,
-    fontWeight: FontWeight.w800,
-    color: amber,
-    letterSpacing: 2,
-    height: 1.05,
-  );
-
-  static const TextStyle completionStat = TextStyle(
-    fontSize: 30,
-    fontWeight: FontWeight.w700,
-    color: paper,
-    fontFeatures: <FontFeature>[FontFeature.tabularFigures()],
     height: 1,
   );
 

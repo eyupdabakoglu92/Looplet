@@ -1,4 +1,5 @@
-// F05-QA-1 — AC12: the `Next Level` (`SONRAKİ`) CTA on F04's `CompletionPanel`
+// F05-QA-1 — AC12: the `Next Level` ("Sonraki bölüm") CTA on the full-screen
+// result (F03 architecture §20)
 // must actually navigate — `pushReplacement` to level N+1's `/play` (no
 // back-stack growth), or `context.go('/')` → the terminal home when there is no
 // next level. Exercised through a real `GoRouter` + `PlaySessionScreen`, not the
@@ -18,11 +19,11 @@ import 'package:looplet_app/persistence/persistence_providers.dart';
 import 'package:looplet_app/play/play_session_args.dart';
 import 'package:looplet_app/play/play_session_screen.dart';
 import 'package:looplet_app/play/widgets/puzzle_board.dart';
-import 'package:looplet_app/rating/completion_panel.dart';
+import 'package:looplet_app/play/widgets/result_view.dart';
 import 'package:looplet_engine/looplet_engine.dart';
 
 // journey-tr-0N: row 0 = A S A L M → one cell right = M A S A L (MASAL), an
-// optimal-1 (Perfect / 3★) win — so `SONRAKİ` is the primary amber pill.
+// optimal-1 (Perfect / 3★) win — so "Sonraki bölüm" is the primary lime pill.
 Map<String, Object?> _level(int n) => <String, Object?>{
   'schemaVersion': 1,
   'contentVersion': 'nav-test',
@@ -141,46 +142,59 @@ void _phoneSurface(WidgetTester tester) {
 void main() {
   setUp(_routeLog.clear);
 
-  testWidgets('SONRAKİ on level N (N+1 present) → level N+1 via pushReplacement, '
-      'no back-stack growth', (tester) async {
-    _phoneSurface(tester);
-    final db = AppDatabase.forTesting(NativeDatabase.memory());
-    addTearDown(db.close);
+  testWidgets(
+    'Sonraki bölüm on level N (N+1 present) → level N+1 via pushReplacement, '
+    'no back-stack growth',
+    (tester) async {
+      _phoneSurface(tester);
+      final db = AppDatabase.forTesting(NativeDatabase.memory());
+      addTearDown(db.close);
 
-    await _openLevel(tester, db, 1);
-    await _solveRow0(tester);
-    expect(find.byType(CompletionPanel), findsOneWidget);
-    expect(find.text('SONRAKİ'), findsOneWidget); // primary amber pill at 3★
+      await _openLevel(tester, db, 1);
+      await _solveRow0(tester);
+      expect(find.byType(ResultView), findsOneWidget);
+      expect(
+        find.text('Sonraki bölüm'),
+        findsOneWidget,
+      ); // primary lime pill at 3★
 
-    await tester.tap(find.text('SONRAKİ'));
-    await tester.pumpAndSettle();
+      await tester.tap(find.text('Sonraki bölüm'));
+      await tester.pumpAndSettle();
 
-    expect(_routeLog, <int?>[1, 2]); // opened level 1, then replaced with 2
-    expect(find.byType(PuzzleBoard), findsOneWidget); // on level 2's /play
-    expect(find.byType(CompletionPanel), findsNothing); // a fresh session
-    // `pushReplacement`, not `push` — the /play frame was swapped, not stacked.
-    expect(
-      GoRouter.of(tester.element(find.byType(PuzzleBoard))).canPop(),
-      isFalse,
-    );
-  });
+      expect(_routeLog, <int?>[1, 2]); // opened level 1, then replaced with 2
+      expect(find.byType(PuzzleBoard), findsOneWidget); // on level 2's /play
+      expect(find.byType(ResultView), findsNothing); // a fresh session
+      // `pushReplacement`, not `push` — the /play frame was swapped, not stacked.
+      expect(
+        GoRouter.of(tester.element(find.byType(PuzzleBoard))).canPop(),
+        isFalse,
+      );
+    },
+  );
 
-  testWidgets('SONRAKİ on the last available level → context.go(/) → terminal '
-      'home', (tester) async {
-    _phoneSurface(tester);
-    final db = AppDatabase.forTesting(NativeDatabase.memory());
-    addTearDown(db.close);
+  testWidgets(
+    'Sonraki bölüm on the last available level → context.go(/) → terminal '
+    'home',
+    (tester) async {
+      _phoneSurface(tester);
+      final db = AppDatabase.forTesting(NativeDatabase.memory());
+      addTearDown(db.close);
 
-    await _openLevel(tester, db, 2); // level 2 = last available in the manifest
-    await _solveRow0(tester);
-    expect(find.byType(CompletionPanel), findsOneWidget);
+      await _openLevel(
+        tester,
+        db,
+        2,
+      ); // level 2 = last available in the manifest
+      await _solveRow0(tester);
+      expect(find.byType(ResultView), findsOneWidget);
 
-    await tester.tap(find.text('SONRAKİ'));
-    await tester.pumpAndSettle();
+      await tester.tap(find.text('Sonraki bölüm'));
+      await tester.pumpAndSettle();
 
-    expect(find.text('HOME ROUTE'), findsOneWidget);
-    expect(find.byType(PuzzleBoard), findsNothing);
-    expect(find.byType(CompletionPanel), findsNothing);
-    expect(_routeLog, <int?>[2]); // never navigated to a level 3
-  });
+      expect(find.text('HOME ROUTE'), findsOneWidget);
+      expect(find.byType(PuzzleBoard), findsNothing);
+      expect(find.byType(ResultView), findsNothing);
+      expect(_routeLog, <int?>[2]); // never navigated to a level 3
+    },
+  );
 }

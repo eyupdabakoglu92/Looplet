@@ -1,109 +1,114 @@
-/// Externalized strings for the F04 completion panel (`architecture.md` §7).
+/// Externalized strings for the F04 rating content of the full-screen result
+/// (F04 `architecture.md` §7, as amended by F03 architecture §20.4).
 ///
 /// LOOPLET is localization-ready (Turkish primary). There is no `gen_l10n`
 /// toolchain yet, so — like F03's `PlayStrings` — F04 keeps its handful of
 /// strings in a small per-language table. Final TR copy is owned by
-/// PO / localization (same track as F03's microcopy follow-on).
+/// PO / localization (F10-UI-LOCALIZATION).
 ///
-/// The panel also reuses three F03 `PlayStrings` values verbatim:
-/// `solvedKicker` (ÇÖZÜLDÜ), `retry` (Yeniden), `close` (Kapat).
+/// Phase D2 (F03 architecture §20.3 (5), audit C-4): the `3 / 3` caption, the
+/// `İLK` tag, "daha iyi" and `YENİ REKOR` are gone; the badges are `HARİKA`
+/// and `YENİ EN İYİ`. Caps strings are authored in upper case.
 class RatingStrings {
   const RatingStrings({
     required this.perfect,
     required this.newBest,
+    required this.perfectSpoken,
+    required this.newBestSpoken,
     required this.best,
     required this.you,
     required this.optimal,
-    required this.firstRecord,
-    required this.betterKept,
-    required this.nextLevel,
-    required this.soon,
-    required this.ratingUnavailable,
-    required this.starsOfThree,
+    required this.youSpoken,
+    required this.optimalSpoken,
+    required this.bestSpoken,
+    required this.perfectInline,
+    required this.noRating,
     required this.starWord,
-    required this.starsSemanticsPerfect,
   });
 
-  /// Struck plate shown when `stars == 3`. TR: "HARİKA".
+  /// Badge iff Perfect (it wins over a new best). TR: "HARİKA".
   final String perfect;
 
-  /// Ribbon shown when `bestOutcome == newBest`. TR: "YENİ REKOR".
+  /// Badge iff a new best that is not Perfect. TR: "YENİ EN İYİ".
   final String newBest;
 
-  /// Personal-best cell label. TR: "EN İYİ".
+  /// [perfect] / [newBest] as read by a screen reader. TR: "Harika",
+  /// "Yeni en iyi".
+  final String perfectSpoken;
+  final String newBestSpoken;
+
+  /// Stat labels. TR: "EN İYİ", "SEN", "OPTİMAL".
   final String best;
-
-  /// Your-moves cell label. TR: "SEN".
   final String you;
-
-  /// Optimal-moves cell label. TR: "OPTİMAL".
   final String optimal;
 
-  /// First-clear tag on the best cell. TR: "İLK".
-  final String firstRecord;
+  /// Stat names as read by a screen reader. TR: "Sen", "optimal", "en iyi".
+  final String youSpoken;
+  final String optimalSpoken;
+  final String bestSpoken;
 
-  /// `noImprovement` tag on the best cell. TR: "daha iyi".
-  final String betterKept;
+  /// "Perfect" inside the stats sentence (authored, never lower-cased at
+  /// runtime). TR: "harika".
+  final String perfectInline;
 
-  /// Secondary CTA label (disabled in F04 scope). TR: "SONRAKİ".
-  final String nextLevel;
+  /// The defensive no-optimal line in the stars slot. TR: "Bu bölüm
+  /// puanlanamadı."
+  final String noRating;
 
-  /// Disabled-affordance suffix on the secondary CTA. TR: "yakında".
-  final String soon;
-
-  /// Defensive no-optimal fallback line. TR: "Puan yok".
-  final String ratingUnavailable;
-
-  /// `{n}` filled by the caller — the "N / 3" caption under the stars.
-  final String starsOfThree;
-
-  /// The word for "stars" used in the screen-reader label. TR: "yıldız".
+  /// The word for "stars" in the star group's label. TR: "yıldız".
   final String starWord;
 
-  /// Screen-reader suffix appended to the star count when `isPerfect`.
-  /// TR: "Harika".
-  final String starsSemanticsPerfect;
-
-  /// Screen-reader label for the star group, e.g. "2 / 3 yıldız" or
-  /// "3 / 3 yıldız — Harika".
+  /// The star group's label: "2 / 3 yıldız", or "3 / 3 yıldız, Harika".
   String starGroupSemantics({required int stars, required bool perfect}) {
     final base = '$stars / 3 $starWord';
-    return perfect ? '$base — $starsSemanticsPerfect' : base;
+    return perfect ? '$base, $perfectSpoken' : base;
   }
 
-  /// The "N / 3" caption with `{n}` substituted.
-  String starsCaption(int stars) => starsOfThree.replaceFirst('{n}', '$stars');
+  /// The stats card as one node: "Sen 3, optimal 3, en iyi 3", plus
+  /// ", harika" when the best is Perfect. `null` values read as "—".
+  String statsSemantics({
+    required int you,
+    required int? optimal,
+    required int? best,
+    required bool bestIsPerfect,
+  }) {
+    String v(int? n) => n == null ? '—' : '$n';
+    final base =
+        '$youSpoken $you, $optimalSpoken ${v(optimal)}, '
+        '$bestSpoken ${v(best)}';
+    return bestIsPerfect ? '$base, $perfectInline' : base;
+  }
 
   static const RatingStrings _tr = RatingStrings(
     perfect: 'HARİKA',
-    newBest: 'YENİ REKOR',
+    newBest: 'YENİ EN İYİ',
+    perfectSpoken: 'Harika',
+    newBestSpoken: 'Yeni en iyi',
     best: 'EN İYİ',
     you: 'SEN',
     optimal: 'OPTİMAL',
-    firstRecord: 'İLK',
-    betterKept: 'daha iyi',
-    nextLevel: 'SONRAKİ',
-    soon: 'yakında',
-    ratingUnavailable: 'Puan yok',
-    starsOfThree: '{n} / 3',
+    youSpoken: 'Sen',
+    optimalSpoken: 'optimal',
+    bestSpoken: 'en iyi',
+    perfectInline: 'harika',
+    noRating: 'Bu bölüm puanlanamadı.',
     starWord: 'yıldız',
-    starsSemanticsPerfect: 'Harika',
   );
 
   static const RatingStrings _en = RatingStrings(
     perfect: 'PERFECT',
     newBest: 'NEW BEST',
+    perfectSpoken: 'Perfect',
+    newBestSpoken: 'New best',
     best: 'BEST',
     you: 'YOU',
     optimal: 'OPTIMAL',
-    firstRecord: 'FIRST',
-    betterKept: 'kept',
-    nextLevel: 'NEXT LEVEL',
-    soon: 'soon',
-    ratingUnavailable: 'No rating',
-    starsOfThree: '{n} / 3',
+    youSpoken: 'You',
+    optimalSpoken: 'optimal',
+    bestSpoken: 'best',
+    perfectInline: 'perfect',
+    noRating: 'This level has no rating.',
     starWord: 'stars',
-    starsSemanticsPerfect: 'Perfect',
   );
 
   /// Resolve by language key; falls back to Turkish (the launch language).

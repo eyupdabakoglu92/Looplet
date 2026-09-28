@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart'
+    show SchedulerBinding, SchedulerPhase, Ticker;
 import 'package:flutter/services.dart' show SystemUiOverlayStyle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -14,28 +16,28 @@ import '../journey/journey_nav.dart';
 import '../journey/journey_strings.dart';
 import '../journey/journey_tutorial.dart';
 import '../persistence/persistence_providers.dart';
-import '../rating/completion_panel.dart';
-import '../rating/completion_result.dart';
 import '../rating/rating_strings.dart';
+import '../rating/result_model.dart';
 import '../reduce_motion.dart';
 import 'play_layout.dart';
 import 'play_session_args.dart';
 import 'play_session_controller.dart';
 import 'play_session_providers.dart';
 import 'play_strings.dart';
-import 'play_theme.dart';
-import 'won_composition.dart';
-import 'widgets/docked_row.dart';
+import 'widgets/lime_glow.dart';
 import 'widgets/puzzle_board.dart';
+import 'widgets/result_view.dart';
 import 'widgets/target_rail.dart';
+import 'widgets/travelling_tile.dart';
+import 'win_timeline.dart';
 
 /// Route `'/play'` (`architecture.md` §13). Resolves the puzzle + validator,
 /// then hands off to [_LoadedPlaySession] which owns the [PlaySessionController]
 /// and the lifecycle observer.
 ///
 /// Every non-`won` state is the Loop Glass Play (F03 `ui-design.md` §1–§14,
-/// architecture §19, Phase D1); the `won` moment keeps its shipped look until
-/// Phase D2 (§16).
+/// architecture §19, Phase D1); `won` is the win sequence, the board → result
+/// transition and the full-screen result (§16, architecture §20, Phase D2).
 class PlaySessionScreen extends ConsumerWidget {
   const PlaySessionScreen({required this.args, super.key});
 
@@ -230,8 +232,7 @@ class _LoadedPlaySessionState extends ConsumerState<_LoadedPlaySession>
     }
   }
 
-  /// F05 — `Next Level` handler for F04's `CompletionPanel.onNextLevel`
-  /// (`architecture.md §8`). `pushReplacement` to N+1, or `/` (→ terminal) when
+  /// F05 — the result's `Next Level` handler (`architecture.md §8`). `pushReplacement` to N+1, or `/` (→ terminal) when
   /// there is no next level. `null` for a non-Journey session.
   VoidCallback? _nextLevelHandler() {
     final n = widget.args.journeyLevel;
@@ -302,27 +303,21 @@ class _LoadedPlaySessionState extends ConsumerState<_LoadedPlaySession>
     return _PlayScaffold(
       builder: (context, layout) => AnimatedBuilder(
         animation: c,
-        builder: (context, _) {
-          final won = c.phase == PlaySessionPhase.won;
-          return Stack(
-            children: <Widget>[
-              _PlayBody(
-                controller: c,
-                strings: strings,
-                layout: layout,
-                level: widget.args.journeyLevel,
-                onNextLevel: onNext,
-              ),
-              if (_showColumnTutorial && !won)
-                ColumnTutorialOverlay(
+        builder: (context, _) => _PlayBody(
+          controller: c,
+          strings: strings,
+          layout: layout,
+          level: widget.args.journeyLevel,
+          onNextLevel: onNext,
+          tutorial: _showColumnTutorial
+              ? ColumnTutorialOverlay(
                   controller: c,
                   strings: JourneyStrings.of(c.lang),
                   layout: layout,
                   onSatisfied: _onColumnTutorialSatisfied,
-                ),
-            ],
-          );
-        },
+                )
+              : null,
+        ),
       ),
     );
   }
@@ -335,6 +330,7 @@ class _PlayBody extends StatefulWidget {
     required this.layout,
     required this.level,
     this.onNextLevel,
+    this.tutorial,
   });
 
   final PlaySessionController controller;
@@ -346,56 +342,59 @@ class _PlayBody extends StatefulWidget {
   final int? level;
   final VoidCallback? onNextLevel;
 
+  /// F05's column tutorial overlay (a `Positioned.fill`), or `null`. It
+  /// belongs to the Play chrome: it dims and fades with it in `won`
+  /// (`ui-design.md` §16.5 "Tutorial active at T0").
+  final Widget? tutorial;
+
   @override
   State<_PlayBody> createState() => _PlayBodyState();
 }
 
-/// The won-presentation snapshot taken at `T0` (the winning row's letters and
-/// statuses), so the docked overlay and the Retry fade-out never depend on the
-/// controller after it has restarted.
+/// The winning row captured at `T0` — its index, letters and board faces — so
+/// the travelling row and the result never read the controller after Retry
+/// has restarted it.
 class _WonSnapshot {
   const _WonSnapshot({
     required this.row,
     required this.letters,
-    required this.statuses,
+    required this.faces,
   });
 
   final int row;
   final List<String> letters;
-  final List<TileStatus> statuses;
+  final List<TileState> faces;
 }
 
-/// Measured layout the won moment needs (won-stack-local px), see
-/// [WonGeometry].
-class _WonMetrics {
-  const _WonMetrics({
-    required this.rowLeft,
-    required this.homeTop,
-    required this.tile,
-    required this.gap,
-    required this.geometry,
-  });
+TileState _faceOf(TileStatus status) => switch (status) {
+  TileStatus.locked => TileState.locked,
+  TileStatus.frozen => TileState.frozen,
+  TileStatus.normal || TileStatus.thawed => TileState.normal,
+};
 
-  final double rowLeft;
-  final double homeTop;
-  final double tile;
-  final double gap;
-  final WonGeometry geometry;
-}
+/// The `won` orchestrator (F03 architecture §20.3, `ui-design.md` §16.4–§16.5):
+/// the Play surface, the win sequence on the board, the board → result
+/// transition and the full-screen [ResultView], plus the retry transition back
+/// into Play. [WinTimeline] and [RetryTimeline] drive every piece from one
+/// controller each; the result is an in-screen state of `/play` (no route).
+///
+/// Persistence and controller timing are untouched: the controller writes the
+/// completion at `won` (§20.3 (3)); this widget only presents it.
+class _PlayBodyState extends State<_PlayBody>
+    with TickerProviderStateMixin, WidgetsBindingObserver {
+  /// The win clock, 0 → 1 over [WinTimeline.total]. It is driven by
+  /// [_winTicker] from `T0` itself — the settle frame's timestamp — not from
+  /// the ticker's first tick one frame later, so every window of the timeline
+  /// (the T0 + 600 rule, rest at 940) holds on the real frame clock.
+  late final AnimationController _win = AnimationController(vsync: this);
+  late final Ticker _winTicker = createTicker(_onWinTick);
+  Duration? _t0;
 
-class _PlayBodyState extends State<_PlayBody> with TickerProviderStateMixin {
-  // `preserve`: under OS reduce-motion the default `normal` behaviour would
-  // collapse these durations to ~5 %, defeating the reduced timeline's hold.
-  late final AnimationController _timeline = AnimationController(
+  // `preserve`: under OS reduced motion the default `normal` behaviour would
+  // collapse the duration to ~5 %, defeating the reduced path's dip.
+  late final AnimationController _retry = AnimationController(
     vsync: this,
-    duration: WonTimeline.regular.total,
-    animationBehavior: AnimationBehavior.preserve,
-  );
-
-  /// Retry: the won layers fade out (~180 ms) while the board re-lights.
-  late final AnimationController _retire = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 180),
+    duration: RetryTimeline.regular.total,
     animationBehavior: AnimationBehavior.preserve,
   );
 
@@ -406,33 +405,43 @@ class _PlayBodyState extends State<_PlayBody> with TickerProviderStateMixin {
     duration: const Duration(milliseconds: 160),
   );
 
-  final GlobalKey _stackKey = GlobalKey(debugLabel: 'play.wonStack');
-  final GlobalKey _boardKey = GlobalKey(debugLabel: 'play.board');
-  final GlobalKey _railKey = GlobalKey(debugLabel: 'play.rail');
+  final GlobalKey _stackKey = GlobalKey(debugLabel: 'play.stack');
+  final GlobalKey _slotKey = GlobalKey(debugLabel: 'result.slot');
 
-  WonTimeline _tl = WonTimeline.regular;
+  WinTimeline _tl = WinTimeline.regular;
+  RetryTimeline _rt = RetryTimeline.regular;
   _WonSnapshot? _snap;
+
+  /// The result as it was at the Retry tap, and where its answer tiles were —
+  /// the retry transition plays them out after the controller has restarted.
+  ResultModel? _retryModel;
+  List<Rect>? _flightFrom;
   late PlaySessionPhase _lastPhase;
 
-  // Last panel props while won — reused during the Retry fade-out, after the
-  // controller has already restarted.
-  CompletionResult? _pResult;
-  bool _pUnavailable = false;
-  String _pWord = '';
-  int _pMoves = 0;
-
   PlaySessionController get _c => widget.controller;
+
+  double get _winMs => _win.value * _tl.endMs;
+  double get _retryMs => _retry.value * _rt.restMs;
+
+  /// The retry transition is running (the controller is already `idle`).
+  bool get _retrying => _snap != null && _c.phase != PlaySessionPhase.won;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _lastPhase = _c.phase;
     _c.addListener(_onController);
-    _retire.addStatusListener((status) {
-      if (status == AnimationStatus.completed && mounted) {
+    // Rest is the frame the retry clock reaches its end — not the
+    // `completed` status, which an `AnimationController` reports one frame
+    // later.
+    _retry.addListener(() {
+      if (_retry.value >= 1 && _retryModel != null && mounted) {
         setState(() {
           _snap = null;
-          _timeline.value = 0;
+          _retryModel = null;
+          _flightFrom = null;
+          _win.value = 0;
         });
       }
     });
@@ -448,11 +457,47 @@ class _PlayBodyState extends State<_PlayBody> with TickerProviderStateMixin {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _c.removeListener(_onController);
-    _timeline.dispose();
-    _retire.dispose();
+    _winTicker.dispose();
+    _win.dispose();
+    _retry.dispose();
     _appear.dispose();
     super.dispose();
+  }
+
+  /// Backgrounded mid-sequence → the sequence resolves to its rest state
+  /// (architecture §12, §20.3 (2)); the same for a retry in flight.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.paused) return;
+    if (_winTicker.isActive) {
+      _winTicker.stop();
+      _win.value = 1;
+    }
+    if (_retry.isAnimating) _retry.value = 1;
+  }
+
+  /// Starts the win clock at `T0`: the current frame when the settle lands in
+  /// one (it always does in play — the shift completes on a frame tick),
+  /// otherwise the next frame.
+  void _startWinClock() {
+    final binding = SchedulerBinding.instance;
+    _t0 = binding.schedulerPhase == SchedulerPhase.idle
+        ? null
+        : binding.currentFrameTimeStamp;
+    _win.value = 0;
+    _winTicker
+      ..stop()
+      ..start();
+  }
+
+  void _onWinTick(Duration elapsed) {
+    final now = SchedulerBinding.instance.currentFrameTimeStamp;
+    final t0 = _t0 ??= now;
+    final ms = (now - t0).inMicroseconds / 1000;
+    _win.value = (ms / _tl.endMs).clamp(0.0, 1.0);
+    if (ms >= _tl.endMs) _winTicker.stop();
   }
 
   void _onController() {
@@ -468,100 +513,176 @@ class _PlayBodyState extends State<_PlayBody> with TickerProviderStateMixin {
   }
 
   void _enterWon({required bool animate}) {
-    final reduceMotion = reduceMotionRequested();
-    _tl = WonTimeline.forReduceMotion(reduceMotion);
-    _timeline.duration = _tl.total;
+    _tl = WinTimeline.forReduceMotion(reduceMotionRequested());
     final row = _c.wonRow ?? 0;
     _snap = _WonSnapshot(
       row: row,
       letters: List<String>.of(_c.displayLetters[row]),
-      statuses: List<TileStatus>.of(_c.tileStatuses[row]),
+      faces: <TileState>[for (final s in _c.tileStatuses[row]) _faceOf(s)],
     );
-    _retire.value = 0;
+    _retry.value = 0;
+    _retryModel = null;
+    _flightFrom = null;
     if (animate) {
-      _timeline.forward(from: 0);
+      _startWinClock();
       if (mounted) setState(() {});
     } else {
-      _timeline.value = 1; // restored straight into `won`: settled, no replay
+      _win.value = 1; // restored straight into `won`: at rest, no replay
     }
+  }
+
+  /// "Tekrar oyna": freeze what the result shows, then restart in place. The
+  /// controller's listener starts the retry transition.
+  void _onRetry() {
+    if (_c.phase != PlaySessionPhase.won) return;
+    _retryModel = _model();
+    _flightFrom = _slotTiles();
+    _c.retryFromCompletion();
   }
 
   void _leaveWon() {
-    // Retry: freeze the timeline, fade the won layers out, board re-lights now.
-    _timeline.stop();
-    _retire.forward(from: 0);
+    _rt = RetryTimeline.forReduceMotion(reduceMotionRequested());
+    _retry.duration = _rt.total;
+    _winTicker.stop();
+    _retry.forward(from: 0);
     if (mounted) setState(() {});
   }
 
-  /// Reads the live layout (after layout, before the dock starts) — `null`
-  /// until the board / rail / won stack have a size.
-  _WonMetrics? _measure(BuildContext context) {
-    final stack = _stackKey.currentContext?.findRenderObject();
-    final board = _boardKey.currentContext?.findRenderObject();
-    final rail = _railKey.currentContext?.findRenderObject();
-    if (stack is! RenderBox || board is! RenderBox || rail is! RenderBox) {
-      return null;
+  ResultNext get _next {
+    if (widget.onNextLevel == null) return ResultNext.none;
+    final n = widget.level;
+    if (n != null &&
+        nextJourneyLevel(n, manifestLevelCount: journeyLevelCount) == null) {
+      return ResultNext.terminal;
     }
-    if (!stack.hasSize || !board.hasSize || !rail.hasSize) return null;
-    if (!stack.attached || !board.attached || !rail.attached) return null;
-    final snap = _snap;
-    if (snap == null) return null;
-
-    final stackTop = stack.localToGlobal(Offset.zero).dy;
-    final boardTopLeft = stack.globalToLocal(board.localToGlobal(Offset.zero));
-    final g = BoardGeometry.forWidth(board.size.width, gridSize: _c.gridSize);
-    // The rail tiles: the bottom 42·s of the rail widget.
-    final railBottom = stack
-        .globalToLocal(rail.localToGlobal(Offset(0, rail.size.height)))
-        .dy;
-    final railTop = railBottom - TargetRail.tilesHeightRef * g.s;
-    final home = boardTopLeft + g.cellOrigin(snap.row, 0);
-    return _WonMetrics(
-      rowLeft: home.dx,
-      homeTop: home.dy,
-      tile: g.tile,
-      gap: g.gap,
-      geometry: WonGeometry.compute(
-        screenHeight: MediaQuery.sizeOf(context).height,
-        stackTopGlobal: stackTop,
-        stackBottomGlobal: stackTop + stack.size.height,
-        railTopLocal: railTop,
-        railBottomLocal: railBottom,
-        tile: g.tile,
-      ),
-    );
+    return ResultNext.next;
   }
+
+  ResultModel _model() => ResultModel.from(
+    completion: _c.completion,
+    ratingResolved: _c.ratingResolved,
+    targetWord: _c.targetWord,
+    moveCount: _c.moveCount,
+    next: _next,
+  );
+
+  // --- geometry (stack-local; the stack spans the screen) ---------------------
+
+  Rect _boardCell(int row, int col) {
+    final layout = widget.layout;
+    return layout.board.cellRect(row, col).shift(layout.boardRect.topLeft);
+  }
+
+  /// The result's answer tiles as laid out (scroll offset 0), or `null`
+  /// before the result has a size.
+  List<Rect>? _slotTiles() {
+    final slot = _slotKey.currentContext?.findRenderObject();
+    final stack = _stackKey.currentContext?.findRenderObject();
+    final snap = _snap;
+    if (slot is! RenderBox || stack is! RenderBox || snap == null) return null;
+    if (!slot.hasSize || !slot.attached || !stack.attached) return null;
+    final s = widget.layout.s;
+    final topLeft = stack.globalToLocal(slot.localToGlobal(Offset.zero));
+    final n = snap.letters.length;
+    final w = TileFace.answerWidthRef * s;
+    final h = TileFace.answerHeightRef * s;
+    final gap = ResultView.tilesGapRef * s;
+    final rowWidth = n * w + (n - 1) * gap;
+    final left = topLeft.dx + (slot.size.width - rowWidth) / 2;
+    return <Rect>[
+      for (var i = 0; i < n; i++)
+        Rect.fromLTWH(left + i * (w + gap), topLeft.dy, w, h),
+    ];
+  }
+
+  /// The goal rail's tiles (`TargetRail`: 36 × 42·s, 8·s apart, centred).
+  Rect _railTile(int i, int n) {
+    final layout = widget.layout;
+    final s = layout.s;
+    final w = 36 * s;
+    final gap = 8 * s;
+    final left = (layout.screen.width - (n * w + (n - 1) * gap)) / 2;
+    return Rect.fromLTWH(left + i * (w + gap), layout.railTop, w, 42 * s);
+  }
+
+  // --- build ------------------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {
     final c = widget.controller;
+    final won = c.phase == PlaySessionPhase.won;
+    final retrying = _retrying;
+    return Stack(
+      key: _stackKey,
+      children: <Widget>[
+        _buildPlay(context, won: won, retrying: retrying),
+        if (won && !_tl.reduceMotion) _buildBloom(),
+        if (won || retrying) _buildResult(context, won: won),
+        if (won || retrying) _buildTravellingRow(won: won),
+      ],
+    );
+  }
+
+  /// Play — header, `HAMLE`, goal, board, HUD and the tutorial — as one group:
+  /// it dims with the win sequence and fades out by 720 (chrome), then
+  /// leaves the tree's paint and semantics; on Retry it fades back in on the
+  /// restarted grid (160–360).
+  Widget _buildPlay(
+    BuildContext context, {
+    required bool won,
+    required bool retrying,
+  }) {
+    final c = widget.controller;
     final strings = widget.strings;
     final layout = widget.layout;
-    final won = c.phase == PlaySessionPhase.won;
-    final retiring = !won && _snap != null && _retire.isAnimating;
+    final snap = _snap;
 
     // `HAMLE` changes at the settle, not at release (§5): the engine applies
     // the move when the shift starts.
     final moves = c.phase == PlaySessionPhase.animatingShift
         ? c.moveCount - 1
         : c.moveCount;
-    // The HUD keeps its look through a drag and a settle (the controller
-    // still drops a press while input is locked); it dims to 40 % in `won`
-    // (§16.2, unchanged).
-    final undoEnabled = !won && c.undosRemaining > 0 && moves > 0;
-    final hudOpacity = won ? PlayTheme.wonControlsOpacity : 1.0;
+    // The HUD keeps its look through a drag, a settle and the win sequence
+    // (the controller drops a press while input is locked).
+    final undoEnabled = c.undosRemaining > 0 && moves > 0;
+    // During the retry flight the answer row *is* the rail until rest.
+    final railTiles = retrying && !_rt.reduceMotion ? 0.0 : 1.0;
 
-    return Stack(
-      children: <Widget>[
-        // Header — back + level (hidden from T0, §16), `HAMLE` card.
-        if (!won)
-          _backControl(
-            layout: layout,
-            strings: strings,
-            level: widget.level,
-            showLabel: true,
-            onPressed: () => _popToCaller(context),
+    final board = Positioned.fromRect(
+      rect: layout.boardRect,
+      child: AnimatedBuilder(
+        animation: _retry,
+        builder: (context, child) => Transform.translate(
+          offset: Offset(0, retrying ? _rt.boardRise(_retryMs) * layout.s : 0),
+          child: child,
+        ),
+        child: RepaintBoundary(
+          child: Semantics(
+            label:
+                '${strings.boardSemantics}. '
+                '${strings.targetSemantics}: ${c.targetWord}. '
+                '${strings.movesLabel}: $moves.',
+            child: PuzzleBoard(
+              controller: c,
+              geometry: layout.board,
+              hiddenRow: won ? snap?.row : null,
+              appear: _appear,
+            ),
           ),
+        ),
+      ),
+    );
+
+    final play = Stack(
+      children: <Widget>[
+        // Header — back + level, `HAMLE` card.
+        _backControl(
+          layout: layout,
+          strings: strings,
+          level: widget.level,
+          showLabel: true,
+          onPressed: () => _popToCaller(context),
+        ),
         Positioned(
           left: layout.movesCard.dx,
           top: layout.movesCard.dy,
@@ -570,65 +691,31 @@ class _PlayBodyState extends State<_PlayBody> with TickerProviderStateMixin {
             child: MovesCard(moves: moves, label: strings.movesLabel),
           ),
         ),
-        // Goal — `HEDEF DÖNGÜ` + the rail tiles. In `won` the answer row
-        // docks onto the tiles, which fade out beneath it (and back on Retry).
+        // Goal — `HEDEF DÖNGÜ` + the rail tiles.
         Positioned(
           left: 0,
           right: 0,
           top: layout.captionTop,
           child: FadeTransition(
             opacity: _appear,
-            child: AnimatedBuilder(
-              animation: Listenable.merge(<Listenable>[_timeline, _retire]),
-              builder: (context, _) => TargetRail(
-                key: _railKey,
-                label: strings.targetLabel,
-                word: c.targetWord,
-                semanticsLabel: '${strings.targetSemantics}: ${c.targetWord}',
-                tileOpacity: (won || retiring) && _snap != null
-                    ? 1 -
-                          _tl.dock(_timeline.value) *
-                              (won ? 1 : 1 - _retire.value)
-                    : 1,
-              ),
+            child: TargetRail(
+              label: strings.targetLabel,
+              word: c.targetWord,
+              semanticsLabel: '${strings.targetSemantics}: ${c.targetWord}',
+              tileOpacity: railTiles,
             ),
           ),
         ),
-        // The board card.
-        Positioned.fromRect(
-          rect: layout.boardRect,
-          child: Semantics(
-            label:
-                '${strings.boardSemantics}. '
-                '${strings.targetSemantics}: ${c.targetWord}. '
-                '${strings.movesLabel}: $moves.',
-            // §16: the board hands its winning row to the dock overlay from
-            // the moment the dock begins (ghost outlines).
-            child: AnimatedBuilder(
-              animation: _timeline,
-              builder: (context, _) => PuzzleBoard(
-                key: _boardKey,
-                controller: c,
-                geometry: layout.board,
-                rowVacated: won && _tl.dockStarted(_timeline.value),
-                appear: _appear,
-              ),
-            ),
-          ),
-        ),
+        board,
         // HUD — undo pill (quota dots) left, restart right; nothing between.
         Positioned.fromRect(
           rect: layout.undoRect,
           child: FadeTransition(
             opacity: _appear,
-            child: AnimatedOpacity(
-              opacity: hudOpacity,
-              duration: const Duration(milliseconds: 160),
-              child: UndoPill(
-                quota: c.undosRemaining,
-                onPressed: undoEnabled ? c.undo : null,
-                semanticLabel: strings.undoTooltip,
-              ),
+            child: UndoPill(
+              quota: c.undosRemaining,
+              onPressed: undoEnabled ? c.undo : null,
+              semanticLabel: strings.undoTooltip,
             ),
           ),
         ),
@@ -637,188 +724,192 @@ class _PlayBodyState extends State<_PlayBody> with TickerProviderStateMixin {
           top: layout.restartRect.top,
           child: FadeTransition(
             opacity: _appear,
-            child: AnimatedOpacity(
-              opacity: hudOpacity,
-              duration: const Duration(milliseconds: 160),
-              child: GlassIconButton(
-                icon: LoopIcon.restart,
-                onPressed: won ? null : c.restart,
-                semanticLabel: strings.restartTooltip,
-              ),
+            child: GlassIconButton(
+              icon: LoopIcon.restart,
+              onPressed: c.restart,
+              semanticLabel: strings.restartTooltip,
             ),
           ),
         ),
-        // The won moment (§16) — scrim, docked row, F04 panel — in the safe
-        // area, exactly as shipped.
-        Positioned.fill(
-          child: SafeArea(
-            child: Stack(
-              key: _stackKey,
-              children: <Widget>[
-                if (won || retiring) _buildWonLayers(context, won: won),
-              ],
-            ),
-          ),
-        ),
+        if (widget.tutorial != null) widget.tutorial!,
       ],
+    );
+
+    final locked = won || retrying;
+    return Positioned.fill(
+      child: IgnorePointer(
+        ignoring: locked,
+        child: ExcludeSemantics(
+          excluding: locked,
+          child: AnimatedBuilder(
+            animation: Listenable.merge(<Listenable>[_win, _retry]),
+            builder: (context, child) {
+              final double opacity;
+              if (won) {
+                opacity = _tl.chrome(_winMs);
+              } else if (retrying) {
+                opacity = _rt.playIn(_retryMs);
+              } else {
+                opacity = 1;
+              }
+              // Gone at rest: nothing of Play paints or ticks (the tutorial
+              // ghost loops) behind the result.
+              final gone = won && opacity == 0 && _winMs > 0;
+              return Offstage(
+                offstage: gone,
+                child: TickerMode(
+                  enabled: !gone,
+                  child: Opacity(opacity: opacity, child: child),
+                ),
+              );
+            },
+            child: play,
+          ),
+        ),
+      ),
     );
   }
 
-  /// Scrim → docked answer row → completion panel (`ui-design.md` §16.2).
-  Widget _buildWonLayers(BuildContext context, {required bool won}) {
-    final controller = widget.controller;
-    if (won) {
-      _pResult = controller.completion;
-      _pUnavailable = controller.ratingUnavailable;
-      _pWord = controller.targetWord;
-      _pMoves = controller.moveCount;
-    }
+  /// The single bloom at the row's board position (100–450, out by 720).
+  Widget _buildBloom() {
     final snap = _snap;
+    if (snap == null) return const SizedBox.shrink();
+    final layout = widget.layout;
+    final s = layout.s;
+    final g = layout.board;
+    final rowTop = _boardCell(snap.row, 0).top;
+    return Positioned(
+      left: layout.boardRect.left,
+      width: layout.boardRect.width,
+      top: rowTop - 22 * s,
+      height: g.tile + 44 * s,
+      child: AnimatedBuilder(
+        animation: _win,
+        builder: (context, _) {
+          final o = _tl.bloom(_winMs);
+          if (o <= 0) return const SizedBox.shrink();
+          return Opacity(opacity: o, child: const LimeGlow.bloom());
+        },
+      ),
+    );
+  }
+
+  Widget _buildResult(BuildContext context, {required bool won}) {
+    final c = widget.controller;
+    final snap = _snap;
+    if (snap == null) return const SizedBox.shrink();
+    final model = won ? _model() : _retryModel;
+    if (model == null) return const SizedBox.shrink();
     return Positioned.fill(
       child: AnimatedBuilder(
-        animation: Listenable.merge(<Listenable>[_timeline, _retire]),
+        animation: Listenable.merge(<Listenable>[_win, _retry]),
         builder: (context, _) {
-          final v = _timeline.value;
-          final fade = won ? 1.0 : 1.0 - _retire.value;
-          final metrics = _measure(context);
-          final dockP = _tl.dock(v);
-          final panelP = _tl.panel(v);
-          final atRest = _tl.atRest(v);
-
-          return Stack(
-            children: <Widget>[
-              // 40 % scrim — never before T0 + 600 ms.
-              IgnorePointer(
-                child: Opacity(
-                  opacity: (_tl.scrim(v) * fade).clamp(0.0, 1.0),
-                  child: const SizedBox.expand(
-                    child: ColoredBox(color: PlayTheme.sheetScrim),
-                  ),
-                ),
-              ),
-              // The docked answer row: home slot → dock, from T0 + 600 ms.
-              if (snap != null && metrics != null && _tl.dockStarted(v))
-                Positioned(
-                  left: metrics.rowLeft,
-                  top: _tl.reduceMotion
-                      ? metrics.geometry.dockTopLocal
-                      : metrics.homeTop +
-                            (metrics.geometry.dockTopLocal - metrics.homeTop) *
-                                dockP,
-                  child: Opacity(
-                    opacity: (_tl.reduceMotion ? dockP : 1.0) * fade,
-                    child: DockedAnswerRow(
-                      letters: snap.letters,
-                      statuses: snap.statuses,
-                      tile: metrics.tile,
-                      gap: metrics.gap,
-                      dockProgress: dockP,
-                      scale: metrics.geometry.dockScale,
-                    ),
-                  ),
-                ),
-              // The panel exists only from its own start (never before 600 ms).
-              if (_tl.panelStarted(v) || !won)
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  child: IgnorePointer(
-                    ignoring: !won || !atRest,
-                    child: _slide(
-                      progress: won ? panelP : 1.0,
-                      fade: fade,
-                      child: _WonPanelHost(
-                        maxHeight:
-                            metrics?.geometry.panelMaxHeight ?? double.infinity,
-                        builder: (density) => CompletionPanel(
-                          strings: widget.strings,
-                          rating: RatingStrings.of(controller.lang),
-                          result: _pResult,
-                          ratingUnavailable: _pUnavailable,
-                          bareWord: _pWord,
-                          bareMoves: _pMoves,
-                          onRetry: controller.retryFromCompletion,
-                          onClose: () => _popToCaller(context),
-                          onNextLevel: widget.onNextLevel,
-                          density: density,
-                          startReveal: atRest || !won,
-                          spineGlow: false,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-            ],
+          final ms = _winMs;
+          if (won && ms < _tl.resultMountMs) return const SizedBox.shrink();
+          return ResultView(
+            model: model,
+            letters: snap.letters,
+            strings: widget.strings,
+            rating: RatingStrings.of(c.lang),
+            layout: widget.layout,
+            motion: won
+                ? ResultMotion.win(_tl, ms)
+                : ResultMotion.retry(_rt, _retryMs),
+            slotKey: _slotKey,
+            interactive: won && _tl.atRest(ms),
+            onBack: () => _popToCaller(context),
+            onRetry: _onRetry,
+            onNext: widget.onNextLevel,
           );
         },
       ),
     );
   }
 
-  /// Regular: slide up from below the stack (clipped by it); reduced: fade.
-  Widget _slide({
-    required double progress,
-    required double fade,
-    required Widget child,
-  }) {
-    if (_tl.reduceMotion) {
-      return Opacity(opacity: (progress * fade).clamp(0.0, 1.0), child: child);
-    }
-    return Opacity(
-      opacity: fade.clamp(0.0, 1.0),
-      child: FractionalTranslation(
-        translation: Offset(0, 1 - progress),
-        child: child,
+  /// The answer row while it travels: filling lime on its board cells
+  /// (0–210), gliding to the result slot as one unit (600–840) — or, on
+  /// Retry, flying into the goal rail (0–300, held on the rail to rest).
+  Widget _buildTravellingRow({required bool won}) {
+    final snap = _snap;
+    if (snap == null) return const SizedBox.shrink();
+    final layout = widget.layout;
+    final s = layout.s;
+    final g = layout.board;
+    final n = snap.letters.length;
+    return Positioned.fill(
+      child: IgnorePointer(
+        child: RepaintBoundary(
+          child: AnimatedBuilder(
+            animation: Listenable.merge(<Listenable>[_win, _retry]),
+            builder: (context, _) {
+              if (won) {
+                final ms = _winMs;
+                if (!_tl.overlayRow(ms)) return const SizedBox.shrink();
+                final glide = _tl.glide(ms);
+                final to = glide > 0 ? _slotTiles() : null;
+                final t = to == null ? 0.0 : glide;
+                final tiles = <Widget>[
+                  for (var i = 0; i < n; i++)
+                    Positioned.fromRect(
+                      rect: Rect.lerp(
+                        _boardCell(snap.row, i),
+                        to?[i] ?? _boardCell(snap.row, i),
+                        t,
+                      )!,
+                      child: TravellingTile.win(
+                        letter: snap.letters[i],
+                        base: snap.faces[i],
+                        fill: _tl.fill(ms, i),
+                        width: _lerp(g.tile, TileFace.answerWidthRef * s, t),
+                        height: _lerp(g.tile, TileFace.answerHeightRef * s, t),
+                        radius: _lerp(
+                          g.tile * LoopRadii.tileFraction,
+                          TileFace.answerRadiusRef * s,
+                          t,
+                        ),
+                        glyph: _lerp(
+                          g.tile * 0.38,
+                          TileFace.answerGlyphRef * s,
+                          t,
+                        ),
+                      ),
+                    ),
+                ];
+                return Opacity(
+                  opacity: _tl.overlayRowOpacity(ms).clamp(0.0, 1.0),
+                  child: Stack(children: tiles),
+                );
+              }
+              final ms = _retryMs;
+              final from = _flightFrom;
+              if (!_rt.flying(ms) || from == null) {
+                return const SizedBox.shrink();
+              }
+              final t = _rt.flight(ms);
+              return Stack(
+                children: <Widget>[
+                  for (var i = 0; i < n; i++)
+                    Positioned.fromRect(
+                      rect: Rect.lerp(from[i], _railTile(i, n), t)!,
+                      child: TravellingTile.flight(
+                        letter: snap.letters[i],
+                        lime: _rt.flightLime(ms),
+                        width: _lerp(TileFace.answerWidthRef * s, 36 * s, t),
+                        height: _lerp(TileFace.answerHeightRef * s, 42 * s, t),
+                        radius: _lerp(TileFace.answerRadiusRef * s, 14 * s, t),
+                        glyph: _lerp(TileFace.answerGlyphRef * s, 16.5 * s, t),
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
+        ),
       ),
     );
   }
-}
 
-/// Hosts the completion panel and applies the §16.3 concessions: if its natural
-/// height exceeds [maxHeight] (`0.64 H`, or less under the D1 floor — see
-/// [WonGeometry]), step the density (compact → tight) on the next frame.
-/// Layout is measured after the fact, while the panel is still sliding in from
-/// below the stack, so the step is not visible.
-class _WonPanelHost extends StatefulWidget {
-  const _WonPanelHost({required this.maxHeight, required this.builder});
-
-  final double maxHeight;
-  final Widget Function(PanelDensity density) builder;
-
-  @override
-  State<_WonPanelHost> createState() => _WonPanelHostState();
-}
-
-class _WonPanelHostState extends State<_WonPanelHost> {
-  final GlobalKey _panelKey = GlobalKey(debugLabel: 'play.panel');
-  PanelDensity _density = PanelDensity.regular;
-
-  void _fit() {
-    if (!mounted || !widget.maxHeight.isFinite) return;
-    final box = _panelKey.currentContext?.findRenderObject();
-    if (box is! RenderBox || !box.hasSize) return;
-    if (box.size.height > widget.maxHeight + 0.5 &&
-        _density != PanelDensity.tight) {
-      setState(() {
-        _density = _density == PanelDensity.regular
-            ? PanelDensity.compact
-            : PanelDensity.tight;
-      });
-    } else if (box.size.height > widget.maxHeight + 0.5) {
-      debugPrint(
-        'play: completion panel ${box.size.height.toStringAsFixed(1)} pt '
-        'exceeds the ${widget.maxHeight.toStringAsFixed(1)} pt cap even at '
-        'tight density (ui-design §16.3 — Needs Tech Lead Clarification)',
-      );
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) => _fit());
-    return KeyedSubtree(key: _panelKey, child: widget.builder(_density));
-  }
+  static double _lerp(double a, double b, double t) => a + (b - a) * t;
 }
 
 /// Loading (§8, `D1-11`): the header with its level and the board card with 25

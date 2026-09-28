@@ -9,7 +9,7 @@ import 'package:looplet_app/persistence/repositories/active_session_repo.dart';
 import 'package:looplet_app/play/play_session_args.dart';
 import 'package:looplet_app/play/play_session_screen.dart';
 import 'package:looplet_app/play/widgets/puzzle_board.dart';
-import 'package:looplet_app/rating/completion_panel.dart';
+import 'package:looplet_app/play/widgets/result_view.dart';
 import 'package:looplet_engine/looplet_engine.dart';
 
 /// F03-QA-03 (`architecture.md` §12): an OS pointer cancel (app switch, system
@@ -53,7 +53,7 @@ Offset _row0Start(WidgetTester tester) {
 
 Future<void> _expectNoMove(WidgetTester tester, {int moves = 0}) async {
   expect(find.text('$moves'), findsOneWidget); // MOVES read-out
-  expect(find.byType(CompletionPanel), findsNothing);
+  expect(find.byType(ResultView), findsNothing);
 }
 
 /// The persisted resume snapshot's applied moves (`null` = no row).
@@ -99,7 +99,7 @@ void main() {
     // The board is idle again: an ordinary swipe now plays normally.
     await tester.dragFrom(_row0Start(tester), const Offset(220, 0));
     await tester.pumpAndSettle();
-    expect(find.byType(CompletionPanel), findsOneWidget);
+    expect(find.byType(ResultView), findsOneWidget);
   });
 
   testWidgets('a PointerCancel before the pan slop is crossed also aborts', (
@@ -115,7 +115,7 @@ void main() {
 
     await tester.dragFrom(_row0Start(tester), const Offset(220, 0));
     await tester.pumpAndSettle();
-    expect(find.byType(CompletionPanel), findsOneWidget);
+    expect(find.byType(ResultView), findsOneWidget);
   });
 
   testWidgets('a genuine release still resolves — inside the plate', (
@@ -129,7 +129,7 @@ void main() {
     await gesture.up();
     await tester.pumpAndSettle();
 
-    expect(find.byType(CompletionPanel), findsOneWidget); // the 1-move win
+    expect(find.byType(ResultView), findsOneWidget); // the 1-move win
   });
 
   testWidgets('a genuine release still resolves — outside the plate', (
@@ -147,7 +147,7 @@ void main() {
     await gesture.up();
     await tester.pumpAndSettle();
 
-    expect(find.byType(CompletionPanel), findsOneWidget);
+    expect(find.byType(ResultView), findsOneWidget);
   });
 
   testWidgets('a non-winning release still commits exactly one move and '
@@ -166,7 +166,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('1'), findsOneWidget);
-    expect(find.byType(CompletionPanel), findsNothing);
+    expect(find.byType(ResultView), findsNothing);
     expect(await _appliedMoves(tester, db), <String>['R1']);
   });
 }

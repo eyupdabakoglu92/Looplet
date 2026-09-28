@@ -262,6 +262,12 @@ class LoopNode extends StatelessWidget {
 
 /// A row of stars: earned = filled lime (no glow — one-glow rule), empty =
 /// outline. The group is announced as "N / 3 yıldız".
+///
+/// [revealMs] is the Result's star reveal (F03 `ui-design.md` §16.5,
+/// architecture §20.7 (6)): the time since the reveal began. Every star then
+/// starts as an outline, and earned star `i` pops in over
+/// `[i × popStagger, i × popStagger + popDuration]` — opacity 0 → 1 and scale
+/// 0.6 → 1.18 (at 60 %) → 1, ease-out on each segment. `null` = static.
 class StarRow extends StatelessWidget {
   const StarRow({
     required this.earned,
@@ -269,6 +275,7 @@ class StarRow extends StatelessWidget {
     this.size = 19,
     this.gap = 14,
     this.starWord = 'yıldız',
+    this.revealMs,
     super.key,
   });
 
@@ -277,10 +284,61 @@ class StarRow extends StatelessWidget {
   final double size;
   final double gap;
   final String starWord;
+  final double? revealMs;
+
+  static const Duration popDuration = Duration(milliseconds: 140);
+  static const Duration popStagger = Duration(milliseconds: 110);
+
+  /// The whole reveal of three earned stars: 2 × 110 + 140 = 360 ms.
+  static const Duration revealDuration = Duration(milliseconds: 360);
+
+  static const Color _outline = Color(0x8CF4F6FF);
+
+  /// Opacity and scale of one star's pop at [t] (0…1 of [popDuration]).
+  static ({double opacity, double scale}) pop(double t) {
+    final v = t.clamp(0.0, 1.0);
+    if (v <= 0) return (opacity: 0, scale: 0.6);
+    if (v < 0.6) {
+      final k = Curves.easeOut.transform(v / 0.6);
+      return (opacity: k, scale: 0.6 + (1.18 - 0.6) * k);
+    }
+    final k = Curves.easeOut.transform((v - 0.6) / 0.4);
+    return (opacity: 1, scale: 1.18 + (1 - 1.18) * k);
+  }
 
   @override
   Widget build(BuildContext context) {
     final s = LoopScale.of(context);
+    final reveal = revealMs;
+    Widget star(int i) {
+      final outline = LoopIconView(
+        LoopIcon.star,
+        color: _outline,
+        size: size * s,
+      );
+      if (i >= earned) return outline;
+      final filled = LoopIconView(
+        LoopIcon.star,
+        color: LoopColors.limeMid,
+        size: size * s,
+        filled: true,
+      );
+      if (reveal == null) return filled;
+      final start = i * popStagger.inMilliseconds;
+      final p = pop((reveal - start) / popDuration.inMilliseconds);
+      return Stack(
+        alignment: Alignment.center,
+        children: <Widget>[
+          outline,
+          if (p.opacity > 0)
+            Opacity(
+              opacity: p.opacity,
+              child: Transform.scale(scale: p.scale, child: filled),
+            ),
+        ],
+      );
+    }
+
     return Semantics(
       label: '$earned / $total $starWord',
       child: ExcludeSemantics(
@@ -289,14 +347,7 @@ class StarRow extends StatelessWidget {
           children: <Widget>[
             for (var i = 0; i < total; i++) ...<Widget>[
               if (i > 0) SizedBox(width: gap * s),
-              LoopIconView(
-                LoopIcon.star,
-                color: i < earned
-                    ? LoopColors.limeMid
-                    : const Color(0x8CF4F6FF),
-                size: size * s,
-                filled: i < earned,
-              ),
+              star(i),
             ],
           ],
         ),

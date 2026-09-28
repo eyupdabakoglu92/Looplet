@@ -20,8 +20,32 @@ class TileFace extends StatelessWidget {
     this.height,
     this.radius,
     this.iconScale = 1,
+    this.glyphSize,
     super.key,
   });
+
+  /// The Result's answer tile (F03 `ui-design.md` §16.5 / §16.7, architecture
+  /// §20.7 (6)): [TileState.winning] at 52.5 × 59·s, radius 24·s, glyph 22·s.
+  /// [scale] is the design scale `s`.
+  const TileFace.answer({
+    required String letter,
+    required double scale,
+    Key? key,
+  }) : this(
+         letter: letter,
+         size: answerWidthRef * scale,
+         height: answerHeightRef * scale,
+         radius: answerRadiusRef * scale,
+         glyphSize: answerGlyphRef * scale,
+         state: TileState.winning,
+         key: key,
+       );
+
+  /// The answer tile's geometry in reference units (× s).
+  static const double answerWidthRef = 52.5;
+  static const double answerHeightRef = 59;
+  static const double answerRadiusRef = 24;
+  static const double answerGlyphRef = 22;
 
   final String letter;
 
@@ -37,6 +61,10 @@ class TileFace extends StatelessWidget {
   /// shrinks the snowflake 1 → 0.6 while the frozen face fades out (F03
   /// `ui-design.md` §5).
   final double iconScale;
+
+  /// The glyph's font size; defaults to 38 % of [size] ([LoopText.tileGlyph]).
+  /// The answer tile sets 22·s, and the win glide interpolates between the two.
+  final double? glyphSize;
 
   @override
   Widget build(BuildContext context) {
@@ -116,7 +144,12 @@ class TileFace extends StatelessWidget {
           Center(
             child: Text(
               letter,
-              style: LoopText.tileGlyph(size, color: glyphColor),
+              style: glyphSize == null
+                  ? LoopText.tileGlyph(size, color: glyphColor)
+                  : LoopText.tileGlyph(
+                      size,
+                      color: glyphColor,
+                    ).copyWith(fontSize: glyphSize),
               textScaler: loopCappedTextScaler(context),
             ),
           ),

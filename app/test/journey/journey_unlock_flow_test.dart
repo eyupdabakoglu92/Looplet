@@ -18,7 +18,7 @@ import 'package:looplet_app/persistence/repositories/player_repo.dart';
 import 'package:looplet_app/play/play_session_args.dart';
 import 'package:looplet_app/play/play_session_screen.dart';
 import 'package:looplet_app/play/widgets/puzzle_board.dart';
-import 'package:looplet_app/rating/completion_panel.dart';
+import 'package:looplet_app/play/widgets/result_view.dart';
 import 'package:looplet_engine/looplet_engine.dart';
 
 Map<String, Object?> _levelJson(
@@ -125,7 +125,7 @@ void main() {
       expect(find.byType(PuzzleBoard), findsOneWidget);
 
       await _solveRow0(tester);
-      expect(find.byType(CompletionPanel), findsOneWidget);
+      expect(find.byType(ResultView), findsOneWidget);
 
       final guestId = await PlayerRepo(db).currentGuestId();
       final row = await JourneyProgressRepo(db).read(guestId);
@@ -145,14 +145,14 @@ void main() {
       await tester.pumpAndSettle();
 
       await _solveRow0(tester);
-      expect(find.byType(CompletionPanel), findsOneWidget);
+      expect(find.byType(ResultView), findsOneWidget);
 
-      await tester.tap(find.text('Yeniden'));
+      await tester.tap(find.text('Tekrar oyna'));
       await tester.pumpAndSettle();
-      expect(find.byType(CompletionPanel), findsNothing);
+      expect(find.byType(ResultView), findsNothing);
 
       await _solveRow0(tester);
-      expect(find.byType(CompletionPanel), findsOneWidget);
+      expect(find.byType(ResultView), findsOneWidget);
 
       final guestId = await PlayerRepo(db).currentGuestId();
       final row = await JourneyProgressRepo(db).read(guestId);

@@ -11,7 +11,7 @@ import 'package:looplet_app/play/play_session_args.dart';
 import 'package:looplet_app/play/play_session_providers.dart';
 import 'package:looplet_app/play/widgets/puzzle_board.dart';
 import 'package:looplet_app/play/widgets/target_rail.dart';
-import 'package:looplet_app/rating/completion_panel.dart';
+import 'package:looplet_app/play/widgets/result_view.dart';
 import 'package:looplet_app/persistence/app_database.dart';
 import 'package:drift/native.dart';
 import 'package:looplet_content/looplet_content.dart';
@@ -70,43 +70,39 @@ void main() {
     });
 
     testWidgets(
-      'a legal swipe that forms the target → F04 completion panel (AC2/AC8)',
+      'a legal swipe that forms the target → the full-screen result (AC2/AC8)',
       (tester) async {
         setDevice(tester, kIphone16);
         await bootPlay(tester, args: _smoke01);
 
         await _solveRow0(tester);
 
-        expect(find.byType(CompletionPanel), findsOneWidget);
-        expect(find.text('ÇÖZÜLDÜ'), findsOneWidget);
-        expect(find.text('Yeniden'), findsOneWidget);
-        expect(find.text('Kapat'), findsOneWidget);
+        expect(find.byType(ResultView), findsOneWidget);
+        expect(find.text('Döngü\ntamamlandı.'), findsOneWidget);
+        expect(find.text('Tekrar oyna'), findsOneWidget);
+        // No Close anywhere (architecture §20.3 (7)).
+        expect(find.text('Kapat'), findsNothing);
         // smoke-tr-01 is optimal 1, solved in 1 → Perfect + first clear.
         expect(find.text('HARİKA'), findsOneWidget);
-        expect(
-          find.descendant(
-            of: find.byType(CompletionPanel),
-            matching: find.text('MASAL'),
-          ),
-          findsOneWidget,
-        );
-        // The back control is hidden in the won state (§16).
+        expect(find.bySemanticsLabel('Cevap: MASAL'), findsOneWidget);
+        // Only the result's own back button is on screen at rest; the Play
+        // header, board and HUD are gone (§20.3 (4)).
         expect(find.byType(LoopBackButton), findsNothing);
+        expect(find.byType(PuzzleBoard), findsNothing);
+        expect(find.text('HAMLE'), findsNothing);
       },
     );
 
-    testWidgets('Retry from the completion panel resets the board (AC7)', (
-      tester,
-    ) async {
+    testWidgets('Retry from the result resets the board (AC7)', (tester) async {
       setDevice(tester, kIphone16);
       await bootPlay(tester, args: _smoke01);
       await _solveRow0(tester);
-      expect(find.byType(CompletionPanel), findsOneWidget);
+      expect(find.byType(ResultView), findsOneWidget);
 
-      await tester.tap(find.text('Yeniden'));
+      await tester.tap(find.text('Tekrar oyna'));
       await tester.pumpAndSettle();
 
-      expect(find.byType(CompletionPanel), findsNothing);
+      expect(find.byType(ResultView), findsNothing);
       expect(find.text('0'), findsOneWidget); // MOVES reset
       expect(find.byType(LoopBackButton), findsOneWidget); // back is back
     });
@@ -121,7 +117,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('0'), findsOneWidget);
-      expect(find.byType(CompletionPanel), findsNothing);
+      expect(find.byType(ResultView), findsNothing);
     });
   });
 

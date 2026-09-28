@@ -20,7 +20,7 @@ import 'package:looplet_app/play/play_session_args.dart';
 import 'package:looplet_app/play/play_session_screen.dart';
 import 'package:looplet_app/design/design.dart';
 import 'package:looplet_app/play/play_layout.dart';
-import 'package:looplet_app/rating/completion_panel.dart';
+import 'package:looplet_app/play/widgets/result_view.dart';
 import 'package:looplet_app/play/widgets/puzzle_board.dart';
 import 'package:looplet_engine/looplet_engine.dart';
 
@@ -88,8 +88,8 @@ void main() {
         await tester.dragFrom(_rowStart(tester, 0), const Offset(140, 0));
         await tester.pumpAndSettle();
 
-        expect(find.byType(CompletionPanel), findsOneWidget);
-        expect(find.text('ÇÖZÜLDÜ'), findsOneWidget);
+        expect(find.byType(ResultView), findsOneWidget);
+        expect(find.text('Döngü\ntamamlandı.'), findsOneWidget);
       });
 
       testWidgets('$label · a sub-threshold drag does not move (AC4)', (
@@ -106,7 +106,7 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(_moves(tester), 0);
-        expect(find.byType(CompletionPanel), findsNothing);
+        expect(find.byType(ResultView), findsNothing);
       });
 
       testWidgets(
@@ -123,7 +123,7 @@ void main() {
           await tester.pumpAndSettle();
 
           expect(_moves(tester), 0);
-          expect(find.byType(CompletionPanel), findsNothing);
+          expect(find.byType(ResultView), findsNothing);
         },
       );
     }

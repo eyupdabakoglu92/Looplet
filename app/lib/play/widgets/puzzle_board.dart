@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/widgets.dart';
 import 'package:looplet_core/looplet_core.dart'
     show MoveAxis, MoveDirection, TileStatus;
@@ -9,13 +7,14 @@ import '../../reduce_motion.dart';
 import '../play_layout.dart';
 import '../play_session_controller.dart';
 import '../play_theme.dart';
-import 'board_tile.dart';
 
 /// The hero (F03 `ui-design.md` §5–§9, Loop Glass, Phase D1): the 5×5 board in
 /// its [BoardCard] with cream [TileFace]s; the lifted active line (periwinkle
 /// rim + glow, [LineRail]s at the card edges, the rest of the board at 42 %);
-/// the wrap ghost; the rejected-move bounce; the thaw cross-fade; and — for the
-/// `won` moment only — the legacy amber row, seam and bloom (§16, until D2).
+/// the wrap ghost; the rejected-move bounce; and the thaw cross-fade. In `won`
+/// the winning row is drawn by the screen's win sequence (Phase D2, `ui-design`
+/// §16.5), so the board leaves it out ([hiddenRow]) and the screen dims and
+/// fades the rest.
 ///
 /// The [controller] is the state-machine authority; this widget owns only the
 /// `AnimationController`s and calls [PlaySessionController.commitShift] /
@@ -25,7 +24,7 @@ class PuzzleBoard extends StatefulWidget {
   const PuzzleBoard({
     required this.controller,
     required this.geometry,
-    this.rowVacated = false,
+    this.hiddenRow,
     this.appear,
     super.key,
   });
@@ -33,10 +32,10 @@ class PuzzleBoard extends StatefulWidget {
   final PlaySessionController controller;
   final BoardGeometry geometry;
 
-  /// F03 `ui-design.md` §16: while `won`, once the winning row has lifted off to
-  /// its dock, its home cells show a faint amber outline ("ghost") and the
-  /// board's own seam bar / bloom stop drawing (the docked overlay carries them).
-  final bool rowVacated;
+  /// A row the board does not draw: in `won` the screen's win sequence owns
+  /// the winning row — it fills lime in place, then glides to the result
+  /// (F03 `ui-design.md` §16.5, architecture §20.3 (1)).
+  final int? hiddenRow;
 
   /// 0 → 1 while the loaded tiles replace the loading skeleton (§5 "loading →
   /// loaded", 160 ms). `null` = fully shown.
@@ -78,10 +77,6 @@ class _PuzzleBoardState extends State<PuzzleBoard>
     vsync: this,
     duration: PlayTheme.bounceDuration,
     animationBehavior: AnimationBehavior.preserve,
-  );
-  late final AnimationController _win = AnimationController(
-    vsync: this,
-    duration: PlayTheme.winDuration,
   );
   late final AnimationController _lift = AnimationController(
     vsync: this,
@@ -128,7 +123,6 @@ class _PuzzleBoardState extends State<PuzzleBoard>
     _lift.addStatusListener((status) {
       if (status == AnimationStatus.dismissed) _liftLine = null;
     });
-    if (_c.phase == PlaySessionPhase.won) _win.value = 1;
   }
 
   @override
@@ -136,7 +130,6 @@ class _PuzzleBoardState extends State<PuzzleBoard>
     _c.removeListener(_onController);
     _shift.dispose();
     _bounce.dispose();
-    _win.dispose();
     _liftCurve.dispose();
     _lift.dispose();
     _thaw.dispose();
@@ -152,18 +145,11 @@ class _PuzzleBoardState extends State<PuzzleBoard>
     }
     if (phase != _lastPhase) {
       if (phase == PlaySessionPhase.won && _lastPhase != PlaySessionPhase.won) {
-        // The won moment (§16) takes over: no rim, rails or thaw on top of it.
+        // The win sequence (§16.5) takes over: no rim, rails or thaw on top
+        // of it; a thaw on the winning settle takes its thawed look at once.
         _lift.value = 0;
         _liftLine = null;
         _clearThaw();
-        // OS reduce-motion: the amber row + seam render static (no bloom).
-        if (reduceMotionRequested()) {
-          _win.value = 1;
-        } else {
-          _win.forward(from: 0);
-        }
-      } else if (phase != PlaySessionPhase.won && _win.value != 0) {
-        _win.value = 0;
       }
       _lastPhase = phase;
     }
@@ -258,11 +244,11 @@ class _PuzzleBoardState extends State<PuzzleBoard>
         _shiftFrom = delta;
         _shift.forward(from: 0).whenComplete(() {
           final before = _c.tileStatuses;
-          // The win choreography starts from the controller listener.
+          // The win sequence starts from the screen's controller listener.
           final won = _c.commitShift();
           _dragOffset = Offset.zero;
           _shiftFrom = Offset.zero;
-          // A thaw on the winning move gives way to §16 (no cross-fade).
+          // A thaw on the winning move takes its look at T0 (§16.5).
           if (!won) _startThaw(before, _c.tileStatuses);
           if (mounted) setState(() {});
         });
@@ -384,7 +370,6 @@ class _PuzzleBoardState extends State<PuzzleBoard>
       animation: Listenable.merge(<Listenable?>[
         _shift,
         _bounce,
-        _win,
         _lift,
         _thaw,
         widget.appear,
@@ -399,10 +384,10 @@ class _PuzzleBoardState extends State<PuzzleBoard>
     final line = _c.activeLine;
     final letters = _c.displayLetters;
     final statuses = _c.tileStatuses;
-    final wonRow = phase == PlaySessionPhase.won ? _c.wonRow : null;
-    final vacated = wonRow != null && widget.rowVacated;
+    final won = phase == PlaySessionPhase.won;
+    final hiddenRow = widget.hiddenRow;
     final lineMoving = line != null && _lineMoving(phase);
-    final lift = wonRow == null ? _liftCurve.value : 0.0;
+    final lift = won ? 0.0 : _liftCurve.value;
     final liftLine = lineMoving ? line : (lift > 0 ? _liftLine : null);
     final appear = widget.appear?.value ?? 1.0;
     final reduceMotion = reduceMotionRequested();
@@ -416,7 +401,7 @@ class _PuzzleBoardState extends State<PuzzleBoard>
     final statics = <Widget>[
       for (var r = 0; r < _size; r++)
         for (var c = 0; c < _size; c++)
-          if (!_inLine(liftLine, r, c))
+          if (!_inLine(liftLine, r, c) && r != hiddenRow)
             at(
               r,
               c,
@@ -429,14 +414,7 @@ class _PuzzleBoardState extends State<PuzzleBoard>
                     : 1.0,
                 duration: const Duration(milliseconds: 90),
                 curve: Curves.easeOut,
-                child: _staticCell(
-                  r,
-                  c,
-                  letters[r][c],
-                  statuses[r][c],
-                  wonRow: wonRow,
-                  vacated: vacated,
-                ),
+                child: _staticCell(r, c, letters[r][c], statuses[r][c]),
               ),
             ),
     ];
@@ -502,11 +480,6 @@ class _PuzzleBoardState extends State<PuzzleBoard>
                 ),
               // Rails at the card edges across the lifted line.
               if (liftLine != null && lift > 0) ..._buildRails(liftLine, lift),
-              // Winning seam bar (the docked overlay draws it once vacated).
-              if (wonRow != null && !vacated) _buildSeam(wonRow),
-              // Win bloom (finished by T0+600, i.e. before the dock).
-              if (wonRow != null && !vacated && _win.value > 0)
-                _buildBloom(wonRow),
             ],
           ),
         ),
@@ -515,33 +488,8 @@ class _PuzzleBoardState extends State<PuzzleBoard>
   }
 
   /// A cell outside the lifted line, in its current state.
-  Widget _staticCell(
-    int r,
-    int c,
-    String letter,
-    TileStatus status, {
-    required int? wonRow,
-    required bool vacated,
-  }) {
+  Widget _staticCell(int r, int c, String letter, TileStatus status) {
     final tile = _g.tile;
-    if (wonRow != null) {
-      // The won moment keeps its shipped look until D2 (§16): the amber
-      // winning row (or its ghost slot once docked) on a receded board.
-      if (r == wonRow) {
-        return vacated
-            ? _GhostCell(size: tile)
-            : BoardTile(
-                letter: letter,
-                size: tile,
-                status: status,
-                winning: true,
-              );
-      }
-      return _Receded(
-        radius: tile * LoopRadii.tileFraction,
-        child: TileFace(letter: letter, size: tile, state: _stateOf(status)),
-      );
-    }
     if (_thawing(r, c)) return _thawFace(letter);
     return TileFace(letter: letter, size: tile, state: _stateOf(status));
   }
@@ -683,54 +631,6 @@ class _PuzzleBoardState extends State<PuzzleBoard>
       rail(left, g.height - 2 * s, Axis.horizontal),
     ];
   }
-
-  Widget _buildSeam(int row) {
-    final g = _g;
-    final progress = _win.value == 0 && _c.phase == PlaySessionPhase.won
-        ? 1.0
-        : PlayTheme.shiftCurve.transform(_win.value);
-    final origin = g.cellOrigin(row, 0);
-    return Positioned(
-      left: origin.dx,
-      top: origin.dy + g.tile + 3,
-      height: 3,
-      width: g.rowWidth * progress,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: PlayTheme.amber,
-          borderRadius: BorderRadius.circular(2),
-          boxShadow: const <BoxShadow>[
-            BoxShadow(color: Color(0x66FFC24B), blurRadius: 8),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBloom(int row) {
-    final g = _g;
-    final v = _win.value;
-    final o = math.sin(math.pi * v) * 0.20;
-    final origin = g.cellOrigin(row, 0);
-    return Positioned(
-      left: origin.dx,
-      top: origin.dy - g.tile * 0.5,
-      width: g.rowWidth,
-      height: g.tile * 2,
-      child: IgnorePointer(
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: RadialGradient(
-              colors: <Color>[
-                PlayTheme.amber.withValues(alpha: o),
-                PlayTheme.amber.withValues(alpha: 0),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 }
 
 /// Clips the moving line to the card interior along its axis — the tile area
@@ -755,53 +655,4 @@ class _LineClip extends CustomClipper<Rect> {
   @override
   bool shouldReclip(_LineClip oldClipper) =>
       oldClipper.axis != axis || oldClipper.geometry.s != geometry.s;
-}
-
-/// The won moment's 12 % recede of the non-winning tiles (§16.2, dim only, no
-/// blur), over the Loop Glass tile.
-class _Receded extends StatelessWidget {
-  const _Receded({required this.radius, required this.child});
-
-  final double radius;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: <Widget>[
-        child,
-        Positioned.fill(
-          child: IgnorePointer(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: const Color(0x1F000000),
-                borderRadius: BorderRadius.circular(radius),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-/// The vacated slot of a docked winning row (`ui-design.md` §16.3): a 1 pt
-/// `amber` @ 25 % outline at the tile radius on the plate colour, no fill, so
-/// the board reads "this row left", not "broken".
-class _GhostCell extends StatelessWidget {
-  const _GhostCell({required this.size});
-
-  final double size;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(
-          size * PlayTheme.tileRadiusFraction,
-        ),
-        border: Border.all(color: PlayTheme.amber.withValues(alpha: 0.25)),
-      ),
-    );
-  }
 }

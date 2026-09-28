@@ -128,7 +128,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(captions(tester), <String>['Seviye 3']);
 
-    // Win panel → "Yeniden" on level 2 → a fresh level-2 session is persisted.
+    // Win result → "Tekrar oyna" on level 2 → a fresh level-2 session is persisted.
     await ActiveSessionRepo(db).save(snapshot('journey-tr-02'));
     await tester.pumpAndSettle();
 
