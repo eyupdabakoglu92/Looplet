@@ -10,16 +10,16 @@ Rework
 
 ## Current Owner
 
-Tech Lead
+Frontend/Mobile Developer
 
 ## Next Role
 
-Tech Lead
+Frontend/Mobile Developer
 
 ## Active Task Ledger
 
 - [x] Task ID: F03-UI-D2 | Assigned Role: UI Designer | Status: Done | Summary: DELIVERED 2026-09-28 — ui-design.md §16 rewritten as the D2 handoff (replaces F03-UI-WON; §1–§14 D1 unchanged apart from cross-references). The full-screen result as a flow column on the S-04 anchors (layout table for 393 / 390 / 440), all 10 variants (C-4 markers and badge precedence, CTA weighting, no-optimal, Next not wired, level 30), the win sequence re-timed on the D1 board with special tiles (C-11), the board → result and result → Play transitions with reduced paths. 58 renders in design/ (12 result, 6 text-scale incl. the 1.3× cap on three devices and AX5, 3 device variants, 37 motion stills) + 5 contact sheets; 5 executable prototypes (rows 0 / 2 / 4 from BFS-verified solutions, a synthetic frozen case, retry); a timeline self-test (rest 940 / reduced 660, first result pixel 685 ms, retry 360 / 160). D2 acceptance list §16.11.1; manifest §16.12b. NTLC §16.14: retry transition A vs B needs a selection record (non-blocking), the re-timed chrome fade, copy items, design-layer additions. No code | Depends On: -
-- [ ] Task ID: F03-FE-D2 | Assigned Role: Frontend/Mobile Developer | Status: Queued | Summary: Implement the D2 handoff from `app/lib/design` (the full-screen result replaces the F04 panel and the won composition; no Close; tests updated); `frontend.md` Visual Parity Evidence with screen recordings and frame timing (architecture §20.6) | Depends On: F03-UI-D2
+- [ ] Task ID: F03-FE-D2 | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: ACTIVATED 2026-09-28 (visual-gate checkpoint passed, gate Ready for Implementation). Implement the D2 handoff (ui-design.md §16, acceptance list §16.11.1) from `app/lib/design`, per architecture §20 and the §20.7 rulings (retry A; corrections C1–C3; allowed design-layer additions). The full-screen result replaces the F04 panel and the won composition; no Close; `docked_row.dart`, `CompletionPanel` and `PlayTheme` leave the won path; tests updated (§20.4 plus four F05 tests). `frontend.md` Visual Parity Evidence per §20.6 / §20.7, with screen recordings and the frame-timing table. See Current Brief | Depends On: F03-UI-D2
 - [ ] Task ID: F03-QA-D2 | Assigned Role: QA | Status: Queued | Summary: Final-stage independent visual QA of D2 (rubric ≥ 93 from runtime video; F04 AC1–AC10, F05 AC1 / AC12, F03 AC8 / AC11; lifecycle mid-sequence; D1 regression) (architecture §20.6) | Depends On: F03-FE-D2
 
 ## Open Tasks
@@ -32,7 +32,7 @@ None
 
 ## Delivery Review
 
-Pending
+Accepted
 
 ## QA Scope
 
@@ -64,7 +64,7 @@ ai-system/project-authority/design-foundation.md
 
 ## Visual Quality Gate
 
-Pending
+Ready for Implementation
 
 ## Visual Evidence
 
@@ -84,7 +84,7 @@ D2 handoff records (2026-09-28, UI Designer) are in ui-design.md §16.12b Visual
 * accessibility D2-10 (1.3× cap on three devices) and D2-10-AX5;
 * motion-prototype MP-D2 (design/src/D2-motion-prototype*.html), MP-D2-S (D2-M-* stills) and MP-D2-CHECK (design/src/timeline-check-d2.txt).
 
-The artefacts are in features/f03-puzzle-play-session/design/. The parity and QA records are pending (see Pending Evidence).
+The artefacts are in features/f03-puzzle-play-session/design/. Accepted at the Tech Lead's visual-gate checkpoint on 2026-09-28 (architecture §20.7): the retry transition A is the adopted design. The parity and QA records are pending (see Pending Evidence).
 
 ## QA Modules
 
@@ -115,7 +115,7 @@ allowed
   * Re-evaluation Trigger: F03-UI-D2 delivery
   * Blocks: Visual Quality Gate = Ready for Implementation; F03-FE-D2
   * Result: PASS
-  * Provenance / Note: 2026-09-28 UI Designer, HEAD 489606d + working tree. ui-design.md §16 (the D2 handoff; §1–§14 unchanged apart from cross-references). 58 PNG renders + 5 contact sheets in features/f03-puzzle-play-session/design/, from design/src/gen-d2.mjs + render-d1.sh (HTML/CSS → headless Chrome @2x, D1 tokens and geometry, F00 S-04 anchors); executable prototypes design/src/D2-motion-prototype(-row0|-row4|-frozen|-retry).html; timeline self-test design/src/timeline-check-d2.txt. Content: L4, L5, L26, L30 with BFS-verified optimal solutions replayed by the generator; the frozen-in-row case is synthetic (no shipped level can produce it). Covers the audit's D2 renders 11–18, rows 0 and 4, AX5. Generated design artefacts, not runtime; Android not rendered.
+  * Provenance / Note: 2026-09-28 UI Designer, HEAD 489606d + working tree. ui-design.md §16 (the D2 handoff; §1–§14 unchanged apart from cross-references). 58 PNG renders + 5 contact sheets in features/f03-puzzle-play-session/design/, from design/src/gen-d2.mjs + render-d1.sh (HTML/CSS → headless Chrome @2x, D1 tokens and geometry, F00 S-04 anchors); executable prototypes design/src/D2-motion-prototype(-row0|-row4|-frozen|-retry).html; timeline self-test design/src/timeline-check-d2.txt. Content: L4, L5, L26, L30 with BFS-verified optimal solutions replayed by the generator; the frozen-in-row case is synthetic (no shipped level can produce it). Covers the audit's D2 renders 11–18, rows 0 and 4, AX5. Generated design artefacts, not runtime; Android not rendered. **Accepted by the Tech Lead 2026-09-28** (architecture §20.7): the HTML regenerates byte-for-byte, the four solutions solve in the real engine at optimal, the self-test reproduces 7 / 7; its row-containment assertion is non-discriminating (negative control), so the row bound was verified by a displacement probe (0.00 px before 600) and C2 sets the parity measure.
 
 - Evidence ID: F03.D2-PARITY
   * Scenario: The runtime matches the D2 handoff on the canonical simulators — every variant beside its render; screen recordings of the full sequence (rows 0 and 4, a special-tile row), the retry transition and the reduced path, with frame timing (nothing outside the board before T0 + 600; rest ≤ T0 + 940; reduced ≈ 660); OS text large → AX5 on the result; Reduce Motion on and off; suites and integration_test green
@@ -149,38 +149,43 @@ None
 
 ## Next Action
 
-Run Tech Lead: the visual-gate checkpoint for F03-UI-D2.
-1. Verify ui-design.md §16 (the handoff-gate items; §16.12b manifest; §16.11.1 acceptance list), the renders in design/, the prototypes and the timeline self-test.
-2. Record the retry-transition selection (§16.14 (1): A — the answer returns to the goal rail, recommended; or B — the plain dip) and rule on §16.14 (2)–(6).
-3. Set Delivery Review and Visual Quality Gate (→ Ready for Implementation).
-4. Open F03-FE-D2 for the Frontend/Mobile Developer.
+Run Frontend/Mobile Developer on F03-FE-D2 (Current Brief below; architecture §20 and the §20.7 rulings; ui-design.md §16.11.1 acceptance list).
+
+Then return to the Tech Lead. That checkpoint is mandatory: the Tech Lead verifies the Visual Parity Evidence and the frame timing and sets Ready for QA before F03-QA-D2 starts.
 
 ## Last Decision
 
-2026-09-28 (D2 activation) — the Tech Lead reopened F03 as **Design Adoption Phase D2 — won moment + full-screen result** right after the D1 closure (§19.12).
+2026-09-28 (D2 visual-gate checkpoint) — the Tech Lead reconciled F03-UI-D2 (commit 6352a75) and accepted it.
 
-**Classified:** Visual Scope `motion-critical` (audit §6, §8); carrier F03 with the F04 amendments and the F05 wording resync in the same reopen (C-2); Foundation Selected; gate Pending.
+**Task coverage.** Every Current Brief item is present:
+* the result layout on 393 × 852 with the 390 × 844 / 440 × 956 table (§16.6);
+* all ten variants with the C-4 markers, badge precedence and CTA weighting (§16.8; renders D2-01…D2-09b);
+* the win sequence, board → result and result → Play motion with reduced paths, as five executable prototypes plus 37 timed stills (§16.5);
+* the renders for rows 0 / 2 / 4, a locked row (L26), a synthetic frozen row, the 1.3× cap on three devices and AX5;
+* copy proposals, accessibility, the §16.12a matrix, the §16.12b manifest and the §16.11.1 acceptance list.
 
-**Contract (architecture §20):**
-* the timeline — nothing outside the board before T0 + 600, rest ≤ T0 + 940, reduced 660 ms; input locked until rest;
-* system back honoured at any time in `won` (today's behaviour; the completion is persisted at `won`);
-* the full-screen layout with only its own back button at rest, and one glow;
-* C-4 markers (drop `3 / 3`, delta, `İLK`, "daha iyi"; `HARİKA` over `YENİ EN İYİ`) and the shipped CTA weighting;
-* no Close; Retry restarts in place; Next is F05's handler;
-* C-11 special tiles; C-9 on the result — fits without scroll up to the 1.3× cap, may scroll above it with a fixed back button;
-* interim copy; no behaviour, scoring, persistence or route change.
+**Evidence, checked independently** (architecture §20.7):
+* the generator reproduces all 70 HTML / job files byte-for-byte; 63 PNGs present; contrast 14 / 14;
+* the content matches `content/journey/tr`, and the four solutions solve in the real engine with the production dictionary at `optimalMoves`;
+* star rule and CTA weighting match the shipped code;
+* the timeline self-test reproduces 7 / 7;
+* negative controls: early headline and early radial caught; late CTA reported; an early row glide **not** caught by the containment check — a displacement probe shows the delivered rows hold still (0.00 px) before 600;
+* the delivery commit touches no code or authority file; the superseded §16 is archived.
+* manifest traceability: three `direction-render` pointer rows to the F00 exploration (named in §16.2) were added to §16.12b by the Tech Lead; the full state audit then passes.
 
-**Amended in place:** F03 §4, §10, §13; F04 `architecture.md` §7 / §8; F05 `prd.md` AC1 and `architecture.md` §8 (C-3 wording resync, no PO revision); the design-foundation §18 correction marked applied. F04 and F05 stay Done.
+**Rulings** (§20.7): retry transition A adopted (Assumption — the user may veto for B, no new round); chrome fade 600–720, "Yolculuğu tamamla", the no-optimal line and the authored headline break accepted; the design-layer additions allowed on the §19.8 (2) terms.
 
-**State:** Current Status Rework; F03-UI-D2 Open, F03-FE-D2 and F03-QA-D2 Queued; Delivery Review Pending; owner → UI Designer.
+**Corrections** (binding): C1 — stars and `HARİKA` never wait for the rating read; only `EN İYİ` and `YENİ EN İYİ` wait for `ratingResolved`. C2 — the row bound is measured as displacement from its board cell. C3 — the reduced win cross-fade is contracted.
 
-The terminal D1 orchestration is archived byte-for-byte as history/f03-puzzle-play-session-2026-09-28/orchestration-before-phase-d2.md.
+**State:** Delivery Review Accepted; Visual Quality Gate Ready for Implementation; F03-FE-D2 Open; owner → Frontend/Mobile Developer.
+
+The pre-checkpoint orchestration (D2 activation decision, F03-UI-D2 brief) is archived byte-for-byte as history/f03-puzzle-play-session-2026-09-28/orchestration-at-ui-d2-delivery.md.
 
 ## Last Update
 
-* Updated By: UI Designer
+* Updated By: Tech Lead
 * Timestamp: 2026-09-28
-* Summary: F03-UI-D2 delivered — the D2 handoff (ui-design.md §16), 58 renders, 5 prototypes, timeline self-test; F03.D2-HANDOFF PASS; Delivery Review = Pending; owner → Tech Lead (visual-gate checkpoint).
+* Summary: D2 visual-gate checkpoint — F03-UI-D2 accepted; Visual Quality Gate Ready for Implementation; architecture §20.7 rulings and corrections C1–C3; F03-FE-D2 activated for the Frontend/Mobile Developer.
 
 ## Context & Follow-ups
 
@@ -192,7 +197,8 @@ The terminal D1 orchestration is archived byte-for-byte as history/f03-puzzle-pl
 
 ## History & Evidence References
 
-* [QA report](qa.md) (D1R, 2026-09-28), [contract](architecture.md) (§12, §18, §19, §20), [UI design](ui-design.md) (§1–§14 D1; §16 won — superseded by D2), [frontend delivery](frontend.md).
+* [QA report](qa.md) (D1R, 2026-09-28), [contract](architecture.md) (§12, §18, §19, §20), [UI design](ui-design.md) (§1–§14 D1; §16 D2), [frontend delivery](frontend.md) (D1 / D1R).
+* [Orchestration at the F03-UI-D2 delivery](../../history/f03-puzzle-play-session-2026-09-28/orchestration-at-ui-d2-delivery.md); [ui-design.md before D2](../../history/f03-puzzle-play-session-2026-09-28/ui-design-before-phase-d2.md) (the superseded F03-UI-WON §16).
 * [Terminal D1 orchestration](../../history/f03-puzzle-play-session-2026-09-28/orchestration-before-phase-d2.md); the D1 working record in [history/f03-puzzle-play-session-2026-09-27/](../../history/f03-puzzle-play-session-2026-09-27/README.md); the [closure record of 2026-09-21](../../history/f03-closure-2026-09-21/orchestration.md) — historical only, not a run queue.
 * [Portfolio follow-ups](../../workflow-follow-ups.md); [Phase C audit](../f00-design-foundation/conformance-audit.md).
 * Canonical execution: role-execution-contract.md.
@@ -207,36 +213,48 @@ The terminal D1 orchestration is archived byte-for-byte as history/f03-puzzle-pl
 * 2026-09-28 — UI Designer: F03-UI-D2 delivered; task Done; F03.D2-HANDOFF PASS; Delivery Review = Pending; owner → Tech Lead.
   * **Handoff:** ui-design.md §16 (replaces F03-UI-WON); 58 renders + 5 prototypes + timeline self-test; acceptance list §16.11.1.
   * **NTLC:** §16.14 (1) retry transition A / B selection; (2) chrome fade re-timed within the bounds; (3)–(6) copy and design-layer items.
+* 2026-09-28 — Tech Lead: D2 visual-gate checkpoint.
+  * **Verified:** HTML regenerates byte-identical; solutions solve in the real engine; self-test 7 / 7; negative controls (the row-containment check is non-discriminating — displacement probe 0.00 px before 600).
+  * **Decided:** Delivery Review Accepted; Visual Quality Gate Ready for Implementation; architecture §20.7 rulings (retry A; items 2–6) and corrections C1–C3.
+  * **Next:** F03-FE-D2 Open; owner → Frontend/Mobile Developer.
 
 ## Current Brief
 
-**F03-UI-D2 — the D2 handoff: win sequence, transition and full-screen result** (contract: architecture.md §20; authority: design-foundation §18, F00 ui-design §4–§8, §11, §13)
+**F03-FE-D2 — implement the D2 win sequence, transition and full-screen result** (contract: architecture.md §20; rulings and corrections §20.7)
 
-**Deliver in F03 `ui-design.md`** — replace §16 (won composition) with the D2 sections. Keep §1–§14 (D1 Play) intact apart from cross-references.
+**User-visible symptom** (§20.1): after a solve the row turns amber, docks on the goal rail and a legacy bottom sheet (system font, amber glow, Close) rises over the dimmed board; at AX5 it covers the row and clips (A-2 result, NTLC-6). The user decided on a full-screen result with no board and no Close.
 
-**Must cover:**
-1. **Layout** of the full-screen result per F00 ui-design §6, measured on the D1 Play geometry's device set: 393 × 852 primary, 390 × 844 and 440 × 956 variants. Only the result's own back button is chrome at rest (§20.3 (4)).
-2. **Every variant** (§20.2), with the C-4 markers and badge rule and the CTA weighting (§20.3 (5–6)):
-   * Perfect; Perfect + new best (`HARİKA` wins);
-   * new best (2★); first clear; matched best; no improvement (1★, worse than best);
-   * the no-optimal fallback; Next not wired ("Sonraki bölüm · yakında");
-   * level 30 (Next → terminal; propose the label).
-3. **Motion**, each with its reduced path (§20.3 (1), (7), (8)):
-   * the win sequence on the D1 board: 30 ms stagger, bloom, dim; special tiles in the winning row turn lime and their icons fade (C-11);
-   * the board → result transition: the row glides and morphs from the D1 tile to the result tile; chrome fades;
-   * the result → Play transition for "Tekrar oyna" (≤ 400 ms).
-   * Deliver an **executable prototype re-timed on the D1 geometry**, plus timed frame stills. The bounds are T0 + 600 / rest ≤ T0 + 940 / reduced 660; state any deviation as Needs Tech Lead Clarification.
-4. **Renders:** every variant above; the winning row at rows 0 and 4; a locked / frozen tile in the winning row; an **AX5** result (container text capped, free text scaling, the scroll rule of §20.3 (9)); transition frames.
-5. **Copy proposals** (interim, §20.3 (10)): the data-driven subtitle, the level-30 label, the back button's semantics "Ana ekrana dön". Turkish casing authored.
-6. **Accessibility:** targets ≥ 44 pt; contrast of every label on its surface; the star count and badges in `Semantics`; non-colour cues for the win and earned stars.
-7. **Screen / State / Viewport matrix, Visual Evidence Manifest, and a D2 acceptance list** that Frontend and QA can test item by item.
+**Affected journey and entry paths** (§20.2): a settled solving move (T0) on any Journey level or debug / non-Journey source → win sequence → transition → result → Next / Retry / back button / system back. Also: a solve with the F05 tutorial visible (L4–6), a thaw on the winning settle, locked tiles in the winning row (L26, L30), level 30, and the app backgrounded or killed mid-sequence.
 
-**The visible exit:** the back button (F00 ui-design §17 proposal 1) is the Tech Lead's accepted default. The user may still veto it; if the design needs another exit, raise it as Needs Tech Lead Clarification rather than changing it silently.
+**Authority:**
+* `ui-design.md` §16 — the §16.5 motion tables, the §16.6 layout table, the §16.8 variant table, the §16.11 handoff (must-not-break / flexible / do-not-cheapen, implementation map, strings, semantics) and the **§16.11.1 acceptance list**;
+* the renders `design/D2-*` and the prototypes `design/src/D2-motion-prototype(-row0|-row4|-frozen|-retry).html` (`?rm=1`, `?t=<ms>`, `?check=1`);
+* architecture §20.3 and the §20.7 rulings, which override §16 where they differ (C1 on the rating read).
 
-**Non-goals:** no engine, scoring, persistence, route or lifecycle change; Home (D3); audio / haptics (F11, intent only); no code.
+**Fix scope:**
+1. **Win sequence** on the D1 board: `TileFace(state: winning)` filling over each tile's face (30 ms stagger, 90 ms per tile), icons and frozen dashes fading with the fill (C-11); one bloom; board and chrome dim to 50 %. Delete `docked_row.dart` and the amber seam.
+2. **Board → result transition:** a `won` orchestrator driving the §16.5 windows — chrome and board out by 720, the row glides as one layer 600–840 morphing size and radius to the **laid-out** result slot (GlobalKey, scroll offset 0), result content 700–940, stars pop 940–1300. Transforms on layers; no `Opacity` over a repainting board; no blur.
+3. **Full-screen `ResultView`** (in-screen state of `/play`, no new route): fixed back button, reserved badge row, capped display headline on two authored lines, free subtitle, the answer row, `StarRow` + reveal, `StatCard` (`SEN` · `OPTİMAL` · `EN İYİ`), `LimePill(glow: false)`, `TextLink` (disabled "· yakında"); the no-optimal line; scroll above the 1.3× cap under the fixed band (`ClampingScrollPhysics`), never at or below it.
+4. **Variants and markers** exactly as §16.8 (badge precedence, CTA weighting, "Sonraki bölüm · yakında", "Yolculuğu tamamla" on level 30). Remove `CompletionPanel`, `_GapConnective`, `PanelDensity` and every legacy marker.
+5. **Rating read (C1):** stars and `HARİKA` from the synchronous result; `EN İYİ` `—` and no `YENİ EN İYİ` until `ratingResolved`; a late badge fades into the reserved row with no layout shift; write failure → `—`, no badge.
+6. **Exits:** back button and system back → `_popToCaller` → `/` at any time in `won`; "Tekrar oyna" → `retryFromCompletion()` wrapped by the **retry transition A** (row flies into the rail 0–300, Play in 160–360; reduced: 160 ms dip); "Sonraki bölüm" → `_nextLevelHandler()`. No Close anywhere.
+7. **Input and lifecycle:** input locked T0 → rest (940 / reduced 660; retry 360 / 160); taps dropped, not queued; background mid-sequence → rest on resume; persistence and controller timing unchanged (§20.3 (2–3)).
+8. **Reduced motion** (`reduceMotionRequested()`) for all three motions, exactly per §16.5.
+9. **Design layer** (§20.7 (6)): the `StarRow` reveal option, the scroll band, the result-size `TileFace.winning`, each with component tests; no token value or dependency change.
+10. **Strings / semantics** per §16.11 through `PlayStrings` / `RatingStrings` (TR and the existing EN table).
 
-**Exit:** the handoff with renders and prototype, F03.D2-HANDOFF recorded, Delivery Review Pending, owner → Tech Lead (visual-gate checkpoint).
+**Tests:**
+* **Update** the tests that reference the removed strings or widgets — §20.4's list (`completion_panel_test`, `won_composition_test`, `play_session_screen_test`, `play_session_runtime_test`, `integration_test/play_session_test`) **plus** `completion_cta_weighting_test`, `journey_home_live_test`, `journey_unlock_flow_test` and `journey_next_level_test` (F05; found at the checkpoint). Every F04 AC1–AC10 and F05 AC1 / AC12 keeps a passing test.
+* **Add tests for:** nothing outside the board before T0 + 600 and the row's displacement from its board cell ≤ 0.5 pt before 600 (C2); rest at 940 / 660 and taps dropped before rest; the retry transition at 360 / 160 and moves 0, undo 3 after it; system back at T0 + 300 → `/` with the completion persisted; the variant table (badge, stars, stats, CTA) including level 30 and no Next handler; the layout anchors at 1.0× (±2 pt) and no scroll up to the 1.3× cap on 390 / 393 / 440 widths; AX5 scroll with the back button fixed and landing at offset 0; the C1 late-read path; semantics order and labels.
+* **Suites:** `melos run analyze`, `dart format --set-exit-if-changed` (app / packages / tools) and `melos run test` green; `flutter test integration_test` on the iPhone 16 simulator green.
+
+**Evidence** — `frontend.md` § Visual Parity Evidence, gate schema (§20.6, §20.7 "Evidence expected from Frontend"): runtime screenshots and parity composites for every §16.12a result row; screen recordings of rows 0 / 2 / 4 (row 4 also on the 16e), the retry and both reduced paths, with the frame-timing table (C2 displacement, first result pixel, chrome at 0 by 720, rest, retry rest); OS text default / 1.3× / AX5 on the result; Reduce Motion on and off. Record revision, device, time and owner; state Android as a limit. Before rewriting `frontend.md`, archive the current D1 / D1R file byte-for-byte as `history/f03-puzzle-play-session-2026-09-28/frontend-before-phase-d2.md`.
+
+**Non-goals:** engine, scoring, star bounds, persistence, snapshot, lifecycle or route changes; the Next route transition (shipped one stays); Home and the app shell (D3); F11 audio / haptics (intent only); F03-MULTITOUCH-FIRST-POINTER; token changes and new dependencies.
+
+**Exit:** F03-FE-D2 Done with `frontend.md`; F03.D2-PARITY PASS with provenance; Delivery Review = Pending. Hand back to the Tech Lead (mandatory checkpoint → Ready for QA) before F03-QA-D2. Any deviation from §16 / §20.7 beyond the §16.11 "Flexible" list goes to Needs Tech Lead Clarification.
 
 ## Earlier briefs
 
+* F03-UI-D2 (UI Designer, done 2026-09-28) — archived byte-for-byte in history/f03-puzzle-play-session-2026-09-28/orchestration-at-ui-d2-delivery.md.
 * D1 briefs (F03-UI-D1, F03-FE-D1, F03-QA-D1, F03-FE-D1R, F03-QA-D1R) — archived byte-for-byte in history/f03-puzzle-play-session-2026-09-27/.

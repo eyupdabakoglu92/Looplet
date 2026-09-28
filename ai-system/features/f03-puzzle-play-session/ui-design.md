@@ -524,6 +524,8 @@ Advisory and provisional — the independent QA scores the runtime.
 > **Supersedes:** the F03-UI-WON `Won composition` (dock + bottom sheet, 2026-09-20; git `489606d`), and F04 `ui-design.md` for the result. F04 AC1–AC10 stay the acceptance for the content.
 >
 > **Unchanged:** engine, scoring and star bounds, persistence (`completed` + `clearActiveSession()`, `personal_best`, the F05 unlock — all at `won`), routes, lifecycle. Presentation only.
+>
+> *Tech Lead checkpoint (2026-09-28, `architecture.md` §20.7):* handoff accepted; gate Ready for Implementation. §16.14 ruled — retry transition **A adopted** (user may veto for B), items (2)–(6) accepted. Binding corrections: **C1** — stars and `HARİKA` never wait for the rating read; only `EN İYİ` (`—`) and `YENİ EN İYİ` wait for `ratingResolved` (corrects §16.4 (6) and the last §16.8 row); **C2** — "row on the board before 600" is measured as displacement from its board cell, not containment in the card; **C3** — the reduced win cross-fade is contracted, not a double exposure. The superseded F03-UI-WON §16 is archived in `history/f03-puzzle-play-session-2026-09-28/ui-design-before-phase-d2.md`.
 
 ### 16.1 Feature Summary (D2)
 
@@ -894,6 +896,9 @@ Advisory and provisional — the independent QA scores the runtime from video.
 
 | Evidence ID | Kind | Screen / State | Viewport / Device | Artifact | Source Revision | Captured By | Captured At | Result / Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| DR-A-04/08…10 | direction-render | Exploration Gate (F00): Direction A won moment + stills (rejected) | 393×852 | features/f00-design-foundation/design/A-04-won-perfect.png, A-08-motion-t0-hold.png, A-09-motion-t600-glide.png, A-10-motion-t760-panel.png | 1d1ae14 + working tree | UI Designer | 2026-09-21 | pointer added by the Tech Lead at the D2 checkpoint (§16.2 names it; record in design-foundation.md) |
+| DR-B-04/08…10 | direction-render | Exploration Gate (F00): Direction B won moment + stills (rejected) | 393×852 | features/f00-design-foundation/design/B-04-won-perfect.png, B-08-motion-t0-hold.png, B-09-motion-t600-glide.png, B-10-motion-t760-panel.png | 1d1ae14 + working tree | UI Designer | 2026-09-21 | pointer added by the Tech Lead at the D2 checkpoint |
+| DR-C-04/04b/08…10 | direction-render | Exploration Gate (F00): Direction C sheet `C-04` vs full-screen `C-04b` (user-selected, decision 2) + stills | 393×852 | features/f00-design-foundation/design/C-04-won-perfect.png, C-04b-won-full-screen-reference-composition.png, C-08-motion-t0-hold.png, C-09-motion-t600-glide.png, C-10-motion-t760-panel.png | 8b1a3d5 + working tree | UI Designer | 2026-09-21 | pointer added by the Tech Lead at the D2 checkpoint; selection F00.FOUNDATION-SELECTION |
 | SS-04/05 | selected-source | result perfect / new best / 2★ | 393×852 | features/f00-design-foundation/design/S-04-result-perfect.png, S-04b-result-new-best.png, S-05-result-two-star.png | cc7fe3f + working tree | UI Designer | 2026-09-21 | anchors kept; D2 corrections in §16.2 |
 | SS-08…16 | selected-source | transition frames + reduced | 393×852 | features/f00-design-foundation/design/S-08 … S-16, src/S-transition-prototype.html | cc7fe3f + working tree | UI Designer | 2026-09-21 | re-timed on the D1 board (§16.5) |
 | D2-01…09b | selected-source | result · 10 variants | 393×852 | features/f03-puzzle-play-session/design/D2-01-result-perfect.png … D2-09b-result-level30-2star.png | 489606d + working tree | UI Designer | 2026-09-28 | audit D2 renders 11–16 |

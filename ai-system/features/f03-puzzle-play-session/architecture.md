@@ -640,3 +640,54 @@ The payoff moment still has the pre-Foundation look. After a solving move the ro
   * lifecycle mid-sequence (background, kill, system back);
   * Android stated as a limit.
 * **Exit:** Visual Quality Gate Passed; final QA Approved or Approved with Notes; Delivery Review Accepted. F03 then returns to Done and D3 is activated.
+
+### 20.7 Visual-gate checkpoint rulings (Tech Lead, 2026-09-28)
+
+The F03-UI-D2 handoff (`ui-design.md` §16, 58 renders, 5 contact sheets, 5 executable prototypes, the timeline self-test; commit `6352a75`) is **accepted**. The Visual Quality Gate is **Ready for Implementation**, and F03-FE-D2 is open.
+
+**Verified independently at the checkpoint:**
+* **Scope:** the delivery commit touches only F03 `design/`, `orchestration.md` and `ui-design.md` — no `app/`, contract, board or state file. In `ui-design.md` §1–§14 only five cross-reference lines changed. The superseded F03-UI-WON §16 is archived byte-for-byte from `489606d` as `history/f03-puzzle-play-session-2026-09-28/ui-design-before-phase-d2.md`.
+* **Handoff-gate items** (`visual-quality-gate.md` §2) are all present: the matrix §16.12a; component, typography, colour, asset and interaction decisions §16.5–§16.8; the motion spec with every reduced path §16.5; the manifest §16.12b; the selection record §16.2; the acceptance list §16.11.1.
+* **Artefacts:** every render and prototype named in §16 exists (63 PNG). `node gen-d2.mjs` regenerates all 70 HTML / job files byte-for-byte, so every PNG traces to committed source. The contrast table (§16.5) reproduces 14 / 14.
+* **Content:** the L4, L5, L26 and L30 grids, targets, locked / frozen cells and optimal counts in the generator equal `content/journey/tr`. Each solution was replayed with the real engine and the production dictionary (`looplet_authoring playtest`): each solves on its last move, at `optimalMoves` (3 / 5 / 4 / 5). The frozen-in-row case is synthetic and labelled.
+* **Shipped semantics:** the generator's star rule and CTA weighting match the app (`starsForResult`; `nextIsPrimary = isPerfect && canNext` in `completion_panel.dart`), as do F04 AC1–AC3.
+* **Timeline self-test:** re-run in headless Chrome — 7 / 7 results identical to `timeline-check-d2.txt` (rest 940, reduced 660, first result pixel 685 ms, retry 360 / 160).
+* **Negative controls** (scratch copies of the check page, each with one rule broken):
+  * headline entrance moved to 500 ms — caught (first result pixel 505, opacity 0.78 before 600);
+  * radial moved to 560 ms — caught (opacity 0.18 before 600);
+  * CTA entrance moved to 900 ms — reported (rest 1020);
+  * the row glide started at 450 ms — **not caught**: `rowInsideBoardBefore600` stays true, because the result slot lies inside the board card's rectangle for rows 0, 2 and 4, so a row moving early never leaves it. A displacement probe (the row's rect against its own T0 rect) measures **0.00 px before 600 for rows 0, 2 and 4** in the delivered prototypes and **135.7 px** in the broken copy. The prototypes meet the bound; the self-test's containment assertion does not prove it (ruling C2).
+  * The reduced check's `rowOnSlotAtRestPx` 137.95 measures the board-row layer, which by design fades in place and does not travel. Not applicable, not a defect.
+* **Manifest correction (traceability, no new design):** §16.2 cites the F00 exploration of this surface (Directions A / B / C, `C-04` vs `C-04b`), but the §16.12b manifest had no `direction-render` record, so the full workflow audit failed on the motion-critical exploration rule. The Tech Lead added three pointer rows to the existing F00 renders (all 13 files present; records already in `design-foundation.md`), labelled as checkpoint additions. The audit then passes.
+* **Renders read:** the five contact sheets (variants; row 2; rows 0 / 4 and special tiles; text scale and devices; reduced, retry and frozen) and `D2-10c` (AX5, scrolled to the end: the back button stays clear of the scrolled text).
+
+**Rulings on `ui-design.md` §16.14:**
+1. **Retry transition: A ("the answer returns to the goal") is adopted as the handoff design.**
+   * This is not an Exploration Gate selection. The direction is Selected (decision 2), and §20.3 (7) left this transition's design to the UI Designer within its bounds. A meets them: rest 360 ≤ 400, input locked, a 160 ms dip under reduced motion.
+   * **Assumption (hybrid decision):** the user may veto A in favour of B. B is already specified — it is A's reduced path — so a veto needs no new design round; the Frontend then plays the dip for both settings.
+2. **Chrome fade 600–720: accepted.** It stays inside the §20.3 (1) bounds and removes the double exposure of `S-11`. §16.11 "Do not cheapen" binds it.
+3. **Level-30 label "Yolculuğu tamamla": accepted as interim copy** through the strings. F05 AC12 behaviour is unchanged: the action is still F05's Next handler, routing to the terminal Home. Final copy is with PO / localization (F10-UI-LOCALIZATION), like the rest of §20.3 (10).
+4. **No-optimal fallback: accepted.** The line "Bu bölüm puanlanamadı." replaces "Puan yok"; `—` for `OPTİMAL` and `EN İYİ`. Dev-only in practice (§6).
+5. **Authored headline break: accepted.** `Döngü\ntamamlandı.` (EN `Loop\ncomplete.`) is the string value, and the §16.6 anchors are asserted with the two-line headline. If localization later rejects embedded breaks, the 250·s max-width alternative is pre-agreed (same TR result); no new handoff round.
+6. **Design-layer additions: in D2 scope**, as a cross-feature item on the §19.8 (2) terms. F00 stays Done.
+   * **Allowed in `app/lib/design`:** a star-reveal option on `StarRow` (or a wrapper); the scroll-band widget; a result-size variant of `TileFace.winning` (52.5 × 59·s, r 24·s).
+   * **Requirements:** component tests for each; the F00 design tests stay green.
+   * **Not allowed:** token value changes or new dependencies.
+7. **Self-review 94:** provisional and not used. Runtime scoring is QA's (F03.D2-VISUAL-QA).
+
+**Tech Lead corrections to the handoff** (binding for Frontend and QA; `ui-design.md` §16 carries a pointer):
+* **C1 — the rating read (§16.4 (6) and the last §16.8 row).** The handoff says the stars stay in outline until `CompletionResult` resolves. That does not match the controller: at `won` it builds the result synchronously with `stars` and `isPerfect`. Only the personal-best read-back resolves later (`ratingResolved`; until then `personalBestMoves` is the sentinel 0 and `bestOutcome` is `firstClear`). Therefore:
+  * the stars, their reveal and `HARİKA` never wait for the read;
+  * `EN İYİ` shows `—` (and no ★) until `ratingResolved`, as today's sentinel does;
+  * `YENİ EN İYİ` is shown only once resolved. If that happens after the badge row has entered, the badge fades in inside the reserved row — no layout shift;
+  * if the write fails (`ratingPersisted` false), `EN İYİ` stays `—` and no best badge is shown;
+  * no spinner and no wait beyond today (§20.3 (3)).
+* **C2 — timing evidence for the row.** "The row stays on the board before T0 + 600" is proven by the row's **displacement from its own board cell** — ≤ 0.5 pt in position and size on every frame before T0 + 600 — not by containment in the board card, which cannot fail (above). The Frontend's frame-timing evidence (§20.6) and QA both use this measure.
+* **C3 — the reduced win path is a cross-fade.** Between 300 and 460 ms the result row fades in over the board's upper rows while the board fades out (`D2-M-r2-reduced-t0380`). That is the contracted 160 ms cross-fade (§20.3 (1)), not a double-exposure finding. The "no double exposure" rule applies to the full-motion paths and to the retry dip.
+
+**Evidence expected from Frontend** (`frontend.md` § Visual Parity Evidence, gate schema), extending §20.6:
+* `runtime-screenshot` for every §16.12a result row on the iPhone 16, and the perfect, 1★ and 1.3× rows on the 16e and Pro Max;
+* `parity-comparison` composites against the `D2-*` renders with a deviation list (±2 pt at 1.0×; the §16.6 anchors);
+* `runtime-video` of the row-0 (L26, locked tiles), row-2 (L5) and row-4 (L4, on the 16e too) sequences, the retry, and both reduced paths — with a frame-timing table: the C2 displacement before 600, the first result pixel, the chrome at 0 by 720, rest ≤ 940 (reduced ≈ 660), retry ≤ 400 (reduced ≈ 160);
+* `accessibility` records for OS text default, the 1.3× cap and AX5 (offset 0 and scrolled) on the result, and Reduce Motion on and off;
+* the C1 late-read path shown by a widget test that delays the read-back (no badge, `—`, then the badge fades in with no layout shift).

@@ -40,11 +40,11 @@ features/f03-puzzle-play-session/orchestration.md
 
 ## Current Phase
 
-Design Adoption Phase D2 — won moment + full-screen result (F03 carrier; UI handoff F03-UI-D2)
+Design Adoption Phase D2 — won moment + full-screen result (F03 carrier; implementation F03-FE-D2)
 
 ## Current Role
 
-UI Designer
+Frontend/Mobile Developer
 
 ## Current Reason
 
@@ -56,29 +56,29 @@ D2 — the won moment + full-screen result (F03 carrier, `motion-critical`, cont
 * it rules the audit's D2 points: C-4 markers, C-11 special tiles, C-9 on the result (scroll allowed only above the 1.3× cap), and the C-3 F05 wording resync;
 * F04 §7 / §8 and F05 AC1 / §8 are amended in place; F04 and F05 stay Done.
 
-The UI Designer's handoff (F03-UI-D2) is the first step; the gate is Pending.
+The UI Designer's handoff (F03-UI-D2) was accepted at the Tech Lead's visual-gate checkpoint on 2026-09-28 (F03 `architecture.md` §20.7); the gate is **Ready for Implementation** and F03-FE-D2 is with the Frontend/Mobile Developer.
 
 ## Last Completed Action
 
-Tech Lead on 2026-09-28 — **D1 closure, then D2 activation**.
-* **D1 closure** (F03 `architecture.md` §19.12): F03-QA-D1R accepted after independent verification (fingerprint `88f1dca3…` unchanged; QA's measurement log reproduced 253 / 253; two synthetic negatives caught; app 472 passed). Visual Quality Gate Passed; F03 Done.
-* **D2 activation** (F03 `architecture.md` §20): F03 reopened as the carrier of the won moment + full-screen result (`motion-critical`); contract and rulings written; F03 §4 / §10 / §13, F04 §7 / §8 and F05 AC1 / §8 amended in place; F03-UI-D2 Open, F03-FE-D2 and F03-QA-D2 Queued; the terminal D1 orchestration archived as history/f03-puzzle-play-session-2026-09-28/orchestration-before-phase-d2.md.
+Tech Lead on 2026-09-28 — **D2 visual-gate checkpoint** (F03 `architecture.md` §20.7).
+* F03-UI-D2 (commit 6352a75; `ui-design.md` §16, 58 renders, 5 prototypes) accepted; Delivery Review Accepted; Visual Quality Gate Ready for Implementation.
+* Verified independently: the generator reproduces all 70 HTML / job files byte-for-byte; the four level solutions solve in the real engine with the production dictionary at optimal; star rule and CTA weighting match the app; the timeline self-test reproduces 7 / 7. Negative controls: early headline / radial caught; an early row glide is **not** caught by the self-test's containment check (the result slot lies inside the board card) — a displacement probe shows the delivered rows hold still before 600 (0.00 px), and ruling C2 makes displacement the parity measure.
+* Rulings: retry transition A adopted (the user may veto for B, no new design round); chrome fade, level-30 label, no-optimal line, headline break and three design-layer additions accepted. Correction C1: the stars never wait for the rating read — only `EN İYİ` / `YENİ EN İYİ` do.
+* F03-FE-D2 Open. Archived: the pre-checkpoint orchestration and the superseded F03-UI-WON `ui-design.md` (history/f03-puzzle-play-session-2026-09-28/).
 
 ## Next Expected Action
 
-Run UI Designer on F03-UI-D2 (Current Brief in the F03 orchestration): the D2 handoff in F03 `ui-design.md` — the full-screen result in every variant, the win sequence and the transitions as an executable prototype re-timed on the D1 board, the audit's D2 renders incl. AX5, and a D2 acceptance list.
+Run Frontend/Mobile Developer on F03-FE-D2 (Current Brief in the F03 orchestration): implement the D2 handoff from `app/lib/design` with the §20.7 rulings, update the tests (the §20.4 list plus four F05 tests), and record the Visual Parity Evidence with screen recordings and the frame-timing table.
 
 Then:
-* the Tech Lead's visual-gate checkpoint (Ready for Implementation);
-* F03-FE-D2, a Tech Lead checkpoint, and F03-QA-D2;
+* the Tech Lead's parity checkpoint (Ready for QA) — mandatory;
+* F03-QA-D2 (final, independent runtime rubric ≥ 93);
 * D3 (home + shell, F05 carrier) after D2 closes. F08 local evidence follows the design adoption.
-
-**Commit:** the D1 rework, its QA / closure records and the D2 activation are uncommitted; commit them together so the closed D1 revision matches the verified fingerprint.
 
 ## Portfolio Summary
 
 * F01, F02, F04, F06: historical scoped Done retained.
-* F03: Rework — the active feature, reopened 2026-09-28 as Design Adoption Phase D2 (won moment + full-screen result, `motion-critical`, architecture §20); F03-UI-D2 with the UI Designer. D1 (Play) closed the same day: final QA Approved with Notes, 93 / 100, gate Passed (§19.12).
+* F03: Rework — the active feature, reopened 2026-09-28 as Design Adoption Phase D2 (won moment + full-screen result, `motion-critical`, architecture §20); handoff accepted (§20.7, gate Ready for Implementation); F03-FE-D2 with the Frontend/Mobile Developer. D1 (Play) closed the same day: final QA Approved with Notes, 93 / 100, gate Passed (§19.12).
 * F00: Done again (2026-09-27) — Phase C is complete (the conformance audit was accepted). Its design-system layer closed 2026-09-26: Foundation Selected (Direction C), 90/100, Visual Quality Gate Passed via the scoped exception F00.VISUAL-93-THRESHOLD.
 * F05: Done (2026-09-27) — final QA Approved with Notes after the F05-FE3 rework. Its tutorial overlay was re-skinned in D1 under F03 (behaviour unchanged; passed at runtime in F03-QA-D1 and F03-QA-D1R; D1 closed 2026-09-28). Its home is re-composed in D3 (F05 carrier), where N1 needs a product decision.
 * F04: Done — the panel is being replaced by the full-screen result in D2 (F03 carrier; F04 §7 / §8 amended 2026-09-28; ACs unchanged).
@@ -107,7 +107,8 @@ F08.DEPLOY-AUTHORIZATION is OPEN with Blocking Scope = release. The old deferral
 * F08 cold-boot fix evidence exists in prior delivery/Tech Lead reports; QA must review applicable provenance, not invent an approval.
 * Daily content, first distribution, Android CI and other unresolved follow-ons remain OPEN in workflow-follow-ups.md.
 * No billing change or deployment has been executed. F03-QA-D1R ran on the iOS simulators (2026-09-28). The D1 closure turn re-ran the app suite (472 passed), QA's measurement tool and two synthetic negatives on the host; it made no simulator run and no QA claim. After QA's `integration_test` run the app is not installed on the iPhone 16 simulator; the next device run reinstalls it.
-* **Uncommitted work:** the D1 rework, its QA / closure records and the D2 activation are in the working tree; the D1 closure binds to `git diff 5798c70 -- app` = `88f1dca3…`.
+* **Commits:** the D1 rework, its closure and the D2 activation are in 489606d — its tracked `app/` diff from 5798c70 hashes to QA's `88f1dca3…` and the two changed sources match QA's SHA-1s (re-verified at the D2 checkpoint); the F03-UI-D2 handoff is in 6352a75. This checkpoint's document changes are uncommitted.
+* **D2 prototype self-test limit:** its `rowInsideBoardBefore600` assertion cannot fail (the result slot is inside the board card); the row bound is proven by displacement from the board cell (F03 §20.7 C2) in Frontend and QA evidence.
 
 ## Contract Version
 
