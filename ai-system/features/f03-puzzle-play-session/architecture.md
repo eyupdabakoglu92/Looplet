@@ -749,3 +749,36 @@ The F03-FE-D2 delivery (commit `67d9ecb`; `frontend.md`) is **accepted**. The Vi
 * F04 AC1–AC10 on the result, F05 AC1 / AC12, F03 AC8 / AC11;
 * lifecycle mid-sequence, the text sweep to AX5, Reduce Motion on and off;
 * D1 Play regression. Android is stated as a limit.
+
+### 20.9 QA-verdict rulings (Tech Lead, 2026-09-28)
+
+F03-QA-D2 (`qa.md`, HEAD 86c7318, `app/` tree `f5641d2f…`) is **Rejected**: an independent rubric of 92 / 100, lowest Accessibility and Inclusive Quality 8, no fail condition, and §16.11.1 (12) failed at runtime. F03.D2-VISUAL-QA is FAIL. The verdict is **accepted**; F03 goes to **Rework**. The handoff, §20.3 and the §20.7 / §20.8 rulings stay in force.
+
+**Verified independently:**
+* **Revision:** HEAD `f28aedb` (the QA commit) still has `app/` tree `f5641d2f…`; the QA commit touches only `ai-system/`. The verdict covers exactly the F03-FE-D2 delivery.
+* **Captures read:** `QA-16-A11Y-back-to-large.jpg` shows the result at offset 0 after the shrink with the band still drawn — the `HARİKA` badge is barely visible and the back button is dimmed. The control `QA-16-A11Y-ax5-top-then-large.jpg` (shrink from offset 0) shows both clear. Same layout, same device.
+* **Cause confirmed in the code.** `ResultView` (`app/lib/play/widgets/result_view.dart`) keeps the band opacity in `_band` and updates it only from the `ScrollController` listener (`_onScroll`). When the content shrinks, Flutter's `ScrollPosition.applyContentDimensions` clamps the offset through `correctForNewDimensions` → `correctPixels`, which does not notify listeners; only a `ScrollMetricsNotification` is dispatched. `_band` therefore keeps its pre-shrink value. QA's hypothesis stands.
+
+**Rulings:**
+1. **F03-QA-D2-01 — the ScrollBand stays visible after the content stops being scrolled: accepted as an implementation defect.**
+   * **Rule (testable):** at every frame, the band's visibility equals `clamp(pixels / ResultView.bandFadeDistance, 0, 1)` for the column's current scroll position — including after any change of scroll metrics (OS text size up or down, content extent change). When the column cannot scroll (max extent 0), the band is 0.
+   * **Fix scope:** the band state in `ResultView` only. Recompute it when the scroll metrics change (e.g. a `ScrollMetricsNotification` listener, or a read of the position after layout), not only on scroll. `ScrollBand` itself (the §20.7 (6) addition) is not in scope unless the fix needs it; if it does, it stays inside the §20.7 (6) allowance.
+   * **Nothing else changes:** layout, timeline, copy, input lock, lifecycle, persistence, routes and the F00 components.
+2. **Rubric at 92: not re-graded here.** The Tech Lead does not score in QA's place (`visual-quality-gate.md` §3). F03-QA-D2-01 is the only blocking item; the re-QA re-scores the whole rubric.
+3. **Non-blocking notes (qa.md §6):**
+   * **N1 — the iOS app-switcher snapshot taken mid-sequence shows the stars mid-reveal.** The live frame on return is correct, so §20.3 (2) holds. Not in the rework, to keep it narrow. Logged as **RESULT-APP-SWITCHER-SNAPSHOT** (`workflow-follow-ups.md`).
+   * **N2 — debug-build frame pacing** (three single dropped frames in the iPhone 16 row-4 glide, one 125 ms gap at the reduced rest, a settle-frame gap on a cold first win). The 16e warm run meets §16.11.1 (18). Debug simulator video is the accepted evidence class for §20.3 (11) (§20.8 (3)); release-build pacing belongs to the device-feel smoke in FIRST-APP-DISTRIBUTION. No task.
+   * **N3 — F00 component deviations and a slightly fainter subtitle.** The first two are RESULT-F00-COMPONENT-ALIGN (§20.8 (2)). The subtitle is noted for the re-QA parity read; no task, because the Frontend's parity composites put it inside tolerance.
+   * **N4 — Home at AX5:** A-2 home, D3 scope.
+   * **N5 — limits:** VoiceOver and the focus ring rest on the automated class (§19.9 (4), §20.8 (3)); Android not run (ANDROID-CI-EVIDENCE); D2-07 widget-tested; debug builds only.
+4. **Rework (F03-FE-D2R, Frontend/Mobile Developer):**
+   * a widget test that lays out the result at AX5, scrolls to the end, then drops the text scale (to 1.0 and to the 1.3× cap) and asserts band visibility 0 and the badge / back button unobscured; a second case where the shrunk content still scrolls asserts the band equals the rule's value for the clamped offset;
+   * a **negative run:** with the fix removed, the new test fails (recorded in `frontend.md`);
+   * suites green (`melos run analyze`, `flutter test` in `app/`, format);
+   * runtime: QA's E-T5 steps on the iPhone 16, 16e and Pro Max (AX5 → scroll to the end → xxxL, and → `large`) plus the offset-0 control, with captures; one full-motion win + retry smoke on the iPhone 16 with video, to show the timeline is unchanged; restore the simulator settings;
+   * `frontend.md`: append an F03-FE-D2R section; the D2 delivery text stays.
+5. **Re-QA (F03-QA-D2R, queued):**
+   * final stage, client-only; modules core, client-ui, visual-quality, stateful-flow; Regression Depth **full** (final stage) with Evidence Reuse **allowed**;
+   * QA's F03-QA-D2 evidence (`app/` `f5641d2f…`) stays valid for every surface and state the rework's `app/` diff does not render differently — QA confirms that from `git diff` against `67d9ecb`;
+   * invalidated and re-run: every result capture above the 1.3× cap and the text-size change paths (E-T1 … E-T5) on the three devices; a win + retry smoke with video on the iPhone 16; the app suite; and a **full rubric re-score** (≥ 93, every dimension ≥ 8, no fail condition);
+   * if the diff reaches beyond the band state, QA widens the re-run to what it touches.

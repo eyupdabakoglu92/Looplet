@@ -13,3 +13,6 @@
 * **`qa-at-d1r-verdict.md`** — `features/f03-puzzle-play-session/qa.md` at the F03-QA-D1R verdict (Approved with Notes, 93 / 100, 2026-09-28), byte for byte (moved by QA at F03-QA-D2, 2026-09-28).
   * Moved rather than appended to because `tools/workflow-flow-audit.mjs` reads the first `Final Score` / `Lowest Dimension` in `qa.md` (`architecture.md` §19.12 (3)).
   * The live `qa.md` carries the F03-QA-D2 report and links here.
+* **`orchestration-at-qa-d2-verdict.md`** — the F03 orchestration at the F03-QA-D2 verdict (2026-09-28, commit `f28aedb`), byte for byte.
+  * Contents: the F03-QA-D2 brief (Current Brief), the delivered QA task line (Rejected, 92 / 100), F03.D2-VISUAL-QA FAIL, and the D2 parity-checkpoint decision (Last Decision).
+  * Taken right before the Tech Lead's QA-verdict reconciliation on 2026-09-28. That reconciliation accepted F03-QA-D2-01 as an implementation defect, recorded the rulings in `architecture.md` §20.9 and opened F03-FE-D2R.
