@@ -691,3 +691,61 @@ The F03-UI-D2 handoff (`ui-design.md` §16, 58 renders, 5 contact sheets, 5 exec
 * `runtime-video` of the row-0 (L26, locked tiles), row-2 (L5) and row-4 (L4, on the 16e too) sequences, the retry, and both reduced paths — with a frame-timing table: the C2 displacement before 600, the first result pixel, the chrome at 0 by 720, rest ≤ 940 (reduced ≈ 660), retry ≤ 400 (reduced ≈ 160);
 * `accessibility` records for OS text default, the 1.3× cap and AX5 (offset 0 and scrolled) on the result, and Reduce Motion on and off;
 * the C1 late-read path shown by a widget test that delays the read-back (no badge, `—`, then the badge fades in with no layout shift).
+
+### 20.8 Frontend checkpoint rulings (Tech Lead, 2026-09-28)
+
+The F03-FE-D2 delivery (commit `67d9ecb`; `frontend.md`) is **accepted**. The Visual Quality Gate is **Ready for QA**, and F03-QA-D2 is open.
+
+**Verified independently at the checkpoint** (HEAD `67d9ecb`, `app/` tree `f5641d2f…`):
+* **Scope:** the commit touches only the D2 won path (`app/lib/play`, `app/lib/rating`), the three allowed design-layer additions (`TileFace.answer` + `glyphSize`, `StarRow.revealMs`, `ScrollBand`), the tests, the F03 evidence and the Frontend's own records.
+  * No token value, dependency, `feature-board.md`, `system-state.md`, `architecture.md` or `ui-design.md` changed. `play_theme.dart` only loses the won-only members.
+  * No `PopScope` / `WillPopScope` in `app/lib`, so system back is not intercepted in `won`. No Material `Icons.*`, blur, or `PlayTheme` on the won path. No legacy won string or widget is left in `lib` or `integration_test`.
+* **Suites re-run:** `melos run analyze` SUCCESS; `dart format --set-exit-if-changed app packages tools` 0 changed; `flutter test` in `app/` **503 passed**. `integration_test` was not re-run (the Frontend's 13 / 13 on the iPhone 16 stands as its record; QA runs it).
+* **Negative runs:** seven rules the Frontend did not break were broken on purpose. Each time the named suites were run and the file restored from a byte copy (the tree is clean afterwards). All seven were caught:
+  * NA — result controls interactive before rest (§20.3 (2)): 6 tests fail;
+  * NB — no jump to rest when backgrounded mid-sequence (§20.3 (2)): 1 fails;
+  * NC — `HARİKA` waits for the rating read (C1): 1 fails;
+  * ND — reduced rest 660 → 700: 6 fail;
+  * NE — retry rest 360 → 420 (> 400, §20.3 (7)): 2 fail;
+  * NF — CTA weighting ignores a missing Next handler: 7 fail;
+  * NG — C-11 icons stay under the full lime face: 4 fail.
+* **Frame timing re-measured** from the committed videos (`video-d2` and `parity-d2` compiled from `design/src`; `timing-d2.py` with `PX_PER_PT=2`):
+  * rows 0 / 2 / 4 on the 16 and row 4 on the 16e reproduce the table within 1–3 ms: the row is at 0.00 pt from its cells through 595–599, first moves at 613–632, first result pixel 712–716, `HAMLE` final 730–733, pill at rest 947–950, stars done 1282–1286;
+  * the 16e row-4 run has no frame gap > 30 ms in 600–1400 (§16.11.1 (18));
+  * reduced: static through 278, first result pixel 442, rest 627; retry on the 16e at rest by 350; retry on the 16 at rest by 248;
+  * **two table cells do not reproduce from the committed re-encodes.** On the 16e row-4 run the HUD region settles at +1186, not +719. On the iPhone 16 retry, board and HUD are final at +248, not +265. Neither changes a verdict:
+    * the 16e frame at T0 + 1066 shows no Play chrome — the late value is background luma in the HUD measurement region, and the contracted "chrome at 0 by 720" is carried by `HAMLE` at 732 and that frame;
+    * the retry difference is one capture frame inside the ≤ 400 bound.
+  * The note in `frontend.md` under the timing table records this correction.
+* **Parity:** `parity-d2.sh` re-run on all 18 pairs reproduces `runtime-d2/parity-measurements.txt` and every composite byte for byte (then restored from git). Composites PC-D2-03 (new best 2★) and PC-D2-10b (AX5, offset 0) were inspected: no clipping, the back button fixed, words broken only between words.
+
+**Rulings on the Frontend's clarifications (`frontend.md` §16):**
+1. **NTLC-D2-1 — result mounted at T0 + 450 (reduced + 150): accepted.**
+   * §20.3 (1) bounds what is *visible*, and every result opacity stays 0 until 600 (reduced: 300). `won_sequence_test` asserts the result absent before 450 and at opacity 0 and not interactive to 599, every 10 ms.
+   * The change removed a measured 153 ms settle-frame gap (`RV-16-r2-L5-before-mount-fix.mp4`).
+   * `ui-design.md` §16.4 "built at T0" is read as "laid out before the glide".
+2. **NTLC-D2-2 — two F00-component deviations: accepted as shipped for D2**, and logged as RESULT-F00-COMPONENT-ALIGN in `workflow-follow-ups.md`:
+   * the `EN İYİ` ★ sits 4.3–6.0 pt above the render's superscript;
+   * the pressed `LimePill` scales to 0.98 without the −5 % brightness of D2-12.
+   * **Why:** both are shipped F00 components (`StatCell`, `LimePill` / `_Pressable`) outside the §20.7 (6) allowance. The ★ is not a §16.6 anchor, and the ±2 pt rule applies to those anchors. Changing F00 press behaviour for one surface would split the component's behaviour across screens.
+   * QA scores the runtime as it is and may raise either item as a finding.
+3. **NTLC-D2-3 — evidence limits: accepted as the Frontend's evidence class. They are QA's runtime scope, not waivers:**
+   * **D2-07 (no-optimal):** not reachable at runtime — dev-only (§20.7 (4)). Widget tests on the screen and on `ResultView` stand.
+   * **Focus ring (D2-11):** same ruling as §19.9 (4). QA checks it at runtime if its environment can send hardware keys; otherwise it stays a stated limit on the F00 Tab-trigger widget-test class.
+   * **Lifecycle mid-sequence and system back mid-sequence:** §20.6 makes these QA runtime items (background, kill, system back / edge swipe at ≈ T0 + 300).
+   * **VoiceOver:** QA runtime if available; otherwise a stated limit on the widget-test semantics.
+   * **Debug builds only; Android not run:** stated limits (ANDROID-CI-EVIDENCE). The §20.3 (11) performance observation is made on debug simulator video, as in D1.
+4. **Reconciliation items (`frontend.md` §4): accepted as implemented.**
+   * The retry flight holds on the rail as the rail's face 300–360 (§16.11 "Flexible").
+   * The win clock is anchored to the settle frame's timestamp, so rest is T0 + 940 on the frame clock.
+   * The D2-04 / D2-06 captures use 5 / 7 moves instead of 4 / 8: waste moves come in pairs, so the solution stays BFS-verified. Layout and markers are identical.
+5. **Informational — no F03 action:**
+   * the 16e 1★ subtitle wraps at xxxL and moves the column 29 pt down, with still no scroll — permitted free-text reflow (§20.3 (9));
+   * `ResultNext.terminal` is taken from the Journey length (30), matching F05's handler.
+
+**QA focus for F03-QA-D2** (the brief is in the orchestration's Current Brief):
+* the §16.11.1 acceptance list at runtime on the iPhone 16, 16e and Pro Max;
+* an independent rubric ≥ 93 from runtime video, every dimension ≥ 8, no fail condition;
+* F04 AC1–AC10 on the result, F05 AC1 / AC12, F03 AC8 / AC11;
+* lifecycle mid-sequence, the text sweep to AX5, Reduce Motion on and off;
+* D1 Play regression. Android is stated as a limit.

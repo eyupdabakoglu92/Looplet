@@ -7,3 +7,6 @@
 * **`orchestration-at-ui-d2-delivery.md`** — the F03 orchestration at the F03-UI-D2 delivery (2026-09-28, commit `6352a75`), byte for byte: the D2 activation decision and the F03-UI-D2 brief. Taken right before the Tech Lead's D2 visual-gate checkpoint (`architecture.md` §20.7).
 * **`ui-design-before-phase-d2.md`** — the whole F03 `ui-design.md` at `489606d`, byte for byte. Its §16 is the superseded F03-UI-WON won composition (dock + bottom sheet, 2026-09-20, with the §19.9 (1) D1 amendment note); D2 replaced it with the full-screen result (§16, F03-UI-D2).
 * **`frontend-before-phase-d2.md`** — the whole F03 `frontend.md` (the D1 delivery F03-FE-D1 and its rework F03-FE-D1R), byte for byte (SHA-1 `c1338d45…`). Taken by the Frontend/Mobile Developer right before `frontend.md` was rewritten for F03-FE-D2 (2026-09-28).
+* **`orchestration-at-fe-d2-delivery.md`** — the F03 orchestration at the F03-FE-D2 delivery (2026-09-28, commit `67d9ecb`), byte for byte.
+  * Contents: the F03-FE-D2 brief (Current Brief), the delivered task line, F03.D2-PARITY PASS, Delivery Review Pending, and the D2 visual-gate decision (Last Decision).
+  * Taken right before the Tech Lead's D2 parity checkpoint on 2026-09-28. That checkpoint accepted the delivery, set the gate to Ready for QA, recorded the rulings in `architecture.md` §20.8 and opened F03-QA-D2.

@@ -203,6 +203,8 @@ Reading the table: the row holds its cells (0.00 pt, the C2 measure) on every ca
 
 **Frame gaps:** every gap > 30 ms after T0 falls at the fill start (T0 + 17 … 87, the first `won` frame of the debug build) or at the result mount (T0 + 430 … 520, a static hold where nothing moves). The row-4 16e run — the longest glide, §16.11.1 (18) — has none in 600–1400. All runs are **debug (JIT) builds**, the only mode the simulator runs; release frame pacing is not measured here.
 
+> **Tech Lead checkpoint note (2026-09-28, architecture §20.8):** re-run from the committed re-encodes, two cells above do not reproduce. RV-16e-r4 `HUD` reaches its final value at +1186, not +719: background luma in the HUD region, since the frame at T0 + 1066 shows no Play chrome, and `HAMLE` is final at 732. RV-16-retry board / HUD are final at +248, not +265: one capture frame. All other cells reproduce within 1–3 ms. No verdict changes.
+
 **Deviation list (runtime vs renders):**
 1. The ★ beside `EN İYİ` sits 4.3–6.0 pt higher than the render's superscript — F00 `StatCell` (NTLC-D2-2).
 2. The pressed pill has no −5 % brightness — F00 `LimePill` (NTLC-D2-2).
