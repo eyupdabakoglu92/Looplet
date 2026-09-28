@@ -10,21 +10,21 @@ In QA
 
 ## Current Owner
 
-QA
+Tech Lead
 
 ## Next Role
 
-QA
+Tech Lead
 
 ## Active Task Ledger
 
 - [x] Task ID: F03-UI-D2 | Assigned Role: UI Designer | Status: Done | Summary: DELIVERED 2026-09-28 — ui-design.md §16 rewritten as the D2 handoff (replaces F03-UI-WON; §1–§14 D1 unchanged apart from cross-references). The full-screen result as a flow column on the S-04 anchors (layout table for 393 / 390 / 440), all 10 variants (C-4 markers and badge precedence, CTA weighting, no-optimal, Next not wired, level 30), the win sequence re-timed on the D1 board with special tiles (C-11), the board → result and result → Play transitions with reduced paths. 58 renders in design/ (12 result, 6 text-scale incl. the 1.3× cap on three devices and AX5, 3 device variants, 37 motion stills) + 5 contact sheets; 5 executable prototypes (rows 0 / 2 / 4 from BFS-verified solutions, a synthetic frozen case, retry); a timeline self-test (rest 940 / reduced 660, first result pixel 685 ms, retry 360 / 160). D2 acceptance list §16.11.1; manifest §16.12b. NTLC §16.14: retry transition A vs B needs a selection record (non-blocking), the re-timed chrome fade, copy items, design-layer additions. No code | Depends On: -
 - [x] Task ID: F03-FE-D2 | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: DELIVERED 2026-09-28 (commit 67d9ecb) — the D2 win sequence, board → result transition, full-screen `ResultView` and retry transition A implemented from `app/lib/design` per architecture §20 / §20.7 (C1–C3); `docked_row.dart`, `board_tile.dart`, `won_composition.dart` and `CompletionPanel` deleted; design-layer additions `TileFace.answer`, `StarRow.revealMs`, `ScrollBand` with component tests; tests updated (§20.4 + four F05) and added (`won_sequence_test`, `result_view_test`, `result_components_test`); app suite 503 passed, analyze / format clean, integration_test 13 / 13 on the iPhone 16. `frontend.md` Visual Parity Evidence: runtime screenshots, parity composites, 10 recordings with the frame-timing table, the text sweep and Reduce Motion on the three simulators. NTLC-D2-1 … 3 ruled in architecture §20.8. Accepted at the Tech Lead's parity checkpoint 2026-09-28 | Depends On: F03-UI-D2
-- [ ] Task ID: F03-QA-D2 | Assigned Role: QA | Status: Open | Summary: Final-stage independent visual QA of D2 (rubric ≥ 93 from runtime video; the §16.11.1 acceptance list; F04 AC1–AC10, F05 AC1 / AC12, F03 AC8 / AC11; lifecycle mid-sequence; text sweep; Reduce Motion; D1 Play regression) (architecture §20.6, §20.8; Current Brief) | Depends On: F03-FE-D2
+- [x] Task ID: F03-QA-D2 | Assigned Role: QA | Status: Done | Summary: DONE 2026-09-28 — verdict **Rejected** (qa.md, final, client-only, HEAD 86c7318; app/ = f5641d2f…, the brief's fingerprint). Independent runtime rubric **92 / 100** (lowest Accessibility and Inclusive Quality 8; no fail condition). Blocking F03-QA-D2-01: after a live OS text-size reduction while the result is scrolled at AX5, the ScrollBand stays visible at offset 0 and dims the `HARİKA` badge and the back button (§16.11.1 (12)). Everything else passed at runtime on the iPhone 16 / 16e / Pro Max: the other 17 §16.11.1 items (C2 measured with QA's own tools, first moved frame +616…+619), F04 AC1–AC10 (AC9 automated), F05 AC1 / AC12, F03 AC8 / AC11, lifecycle mid-sequence (system back, background, kill), Reduce Motion on / off, D1 regression | Depends On: F03-FE-D2
 
 ## Open Tasks
 
-* F03-QA-D2 (QA) — the Current Brief below.
+None
 
 ## Handoff Plan
 
@@ -44,7 +44,7 @@ final
 
 ## QA Result
 
-None
+Rejected
 
 ## Release Scope
 
@@ -142,10 +142,10 @@ allowed
   * Target / Environment: iOS Simulator 18.6, iPhone 16 / 16e / Pro Max; Android stated as a limit (ANDROID-CI-EVIDENCE)
   * Owner Role: QA
   * Prerequisite / External Decision: F03.D2-PARITY accepted (gate Ready for QA) — met 2026-09-28
-  * Re-evaluation Trigger: F03-QA-D2 delivery
+  * Re-evaluation Trigger: the F03-QA-D2-01 fix and a re-QA activation
   * Blocks: Visual Quality Gate = Passed; F03 Done; D3 activation
-  * Result: PENDING
-  * Provenance / Note: -
+  * Result: FAIL
+  * Provenance / Note: 2026-09-28 QA, HEAD 86c7318 (app/ f5641d2f…), debug build on iOS Simulator 18.6 — iPhone 16 D0011CE7, 16e 6DBDFD97, Pro Max 02FDE776. Independent rubric **92 / 100**, lowest Accessibility and Inclusive Quality 8, no fail condition. Blocking F03-QA-D2-01 (ScrollBand stays visible after the OS text size shrinks while the result is scrolled at AX5; §16.11.1 (12) fails). Everything else passed at runtime: the other 17 §16.11.1 items, the ten F04 variants, F05 AC1 / AC12, F03 AC8 / AC11, system back at ≈ T0 + 220 and at the settle, background ≈ T0 + 535, kill ≈ T0 + 400, Reduce Motion win and retry dip, the 1.3× cap with no scroll on three devices, AX5, D1 regression. C2 and T0 were measured with QA's own tools (qa/d2/src). VoiceOver and the focus ring rest on the automated class (host limit); Android not run (ANDROID-CI-EVIDENCE); debug builds only. Records: qa.md; artefacts in qa/d2/.
 
 ## Open Decision Gates
 
@@ -157,7 +157,7 @@ None
 
 ## Next Action
 
-Run QA on F03-QA-D2 (Current Brief): independent final-stage visual QA of the D2 won moment, transition and full-screen result at runtime on the three simulators; then hand back to the Tech Lead.
+Run Tech Lead to reconcile F03-QA-D2 (qa.md, 2026-09-28): QA Result **Rejected**; F03.D2-VISUAL-QA FAIL (rubric 92 / 100, lowest Accessibility 8, no fail condition); blocking F03-QA-D2-01 (ScrollBand stuck after a text-size reduction while scrolled at AX5).
 
 ## Last Decision
 
@@ -184,9 +184,9 @@ The pre-checkpoint orchestration (F03-FE-D2 brief, the D2 visual-gate decision) 
 
 ## Last Update
 
-* Updated By: Tech Lead
+* Updated By: QA
 * Timestamp: 2026-09-28
-* Summary: D2 parity checkpoint — F03-FE-D2 accepted (architecture §20.8); Visual Quality Gate Ready for QA; F03-QA-D2 Open; owner → QA.
+* Summary: F03-QA-D2 final-stage visual QA — Rejected. Rubric 92 / 100 (lowest Accessibility 8, no fail condition). Blocking F03-QA-D2-01 (ScrollBand stuck after a text-size reduction while scrolled at AX5, §16.11.1 (12)); non-blocking N1–N5. F03.D2-VISUAL-QA FAIL; owner → Tech Lead.
 
 ## Context & Follow-ups
 
@@ -217,6 +217,7 @@ The pre-checkpoint orchestration (F03-FE-D2 brief, the D2 visual-gate decision) 
   * **Verified:** suites (503 passed); 7 / 7 new negative runs caught; parity byte-identical; frame timing within 1–3 ms (two cells corrected in `frontend.md`).
   * **Decided:** Delivery Review Accepted; Visual Quality Gate Ready for QA; architecture §20.8 rulings; RESULT-F00-COMPONENT-ALIGN logged.
   * **Next:** F03-QA-D2 Open; owner → QA.
+* 2026-09-28 — QA: F03-QA-D2 done — **Rejected** (92 / 100, lowest Accessibility 8); blocking F03-QA-D2-01; F03.D2-VISUAL-QA FAIL; the D1R qa.md moved to history/f03-puzzle-play-session-2026-09-28/qa-at-d1r-verdict.md; owner → Tech Lead.
 
 ## Current Brief
 

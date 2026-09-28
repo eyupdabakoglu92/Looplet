@@ -1,192 +1,222 @@
-# F03 — puzzle-play-session: QA Raporu (F03-QA-D1R — Loop Glass Play, metin ölçeği rework'ü sonrası final re-QA)
+# F03 — puzzle-play-session: QA Raporu (F03-QA-D2 — kazanma anı, board → sonuç geçişi ve tam ekran sonuç)
 
-QA turu: 2026-09-28 · Görev: F03-QA-D1R · QA Stage: final · QA Scope: client-only · Release Scope: none · Visual Scope: existing-parity
-Doğrulanan revizyon: HEAD `97c700e` + F03-FE-D1R çalışma ağacı (commit edilmemiş).
-* `git diff 5798c70 -- app` yalnız `info.dart`, `play_session_screen.dart`, `play_test_support.dart`; izlenmeyen yeni dosyalar yalnız testler (`moves_card_ink_test.dart`, `text_ink_support.dart`, `load_error_headline_test.dart`).
-* Diff SHA-1 `88f1dca3…`; `info.dart` `84f79b2c…`, `play_session_screen.dart` `7d903cc0…`.
-* `packages/`, `tools/`, `pubspec.lock`, `melos.yaml`, `app/pubspec.yaml`, `app/ios` değişmedi (`git diff --stat 5798c70` boş).
+QA turu: 2026-09-28 · Görev: F03-QA-D2 · QA Stage: final · QA Scope: client-only · Release Scope: none · Visual Scope: motion-critical
+Doğrulanan revizyon: HEAD `86c7318` (F03-FE-D2 teslimi `67d9ecb` + Tech Lead checkpoint belgeleri). `app/` ağacı `f5641d2f9b84d6597f1c86897a54027e9b1483a2` — brief'teki evidence-reuse fingerprint'i ile birebir aynı. `git status --short app` boş.
+Derleme: `flutter build ios --simulator --debug` (Flutter 3.32.8), `App.framework/App` SHA-1 `6c9243bd6ed7…`. Üç simulator'a bu build kuruldu.
 
-Önceki tur F03-QA-D1 (Rejected, 87 / 100) byte-for-byte arşivde: [history/f03-puzzle-play-session-2026-09-27/qa-at-d1-verdict.md](../../history/f03-puzzle-play-session-2026-09-27/qa-at-d1-verdict.md). D1 kanıtı yerinde duruyor: [qa/d1/](qa/d1/).
-Bu turun kanıt klasörü: [qa/d1r/](qa/d1r/):
-* ekran görüntüleri `QA-*`, videolar `QV-*`, ölçüm kaydı `QM-d1r-measurements.txt`, büyütmeler `crops/`;
-* QA'ya ait araçlar `qa/d1r/src/` (`qa-d1r.swift`, `qa-sweep.sh`, `qa-asset.sh`).
+Önceki rapor (F03-QA-D1R, Approved with Notes, 93 / 100) byte-for-byte arşivde: [history/f03-puzzle-play-session-2026-09-28/qa-at-d1r-verdict.md](../../history/f03-puzzle-play-session-2026-09-28/qa-at-d1r-verdict.md) (SHA-1 `07357c0a…`).
+Bu turun kanıt klasörü [qa/d2/](qa/d2/):
+* ekran görüntüleri `QA-*.jpg`;
+* videolar `QV-*.mp4` (2 px/pt);
+* kare kontak sayfaları `QS-*.jpg`;
+* QA'ya ait araçlar `qa/d2/src/` (`qa-probe-d2.swift`, `qa-t0-fit.py`, `qa-timing-d2.py`).
+
+> Bağımsızlık notu: bu oturumda QA'dan önce Tech Lead checkpoint'i (architecture §20.8) de çalıştırıldı. QA verdict'i o kabule dayanmıyor. Zamanlama ve C2 ölçümleri QA'nın kendi araçlarıyla yeni runtime kayıtlarından üretildi. Frontend'in `timing-d2.py` / `video-d2` araçları yalnız çapraz kontrol olarak kullanıldı (E-X1).
 
 ---
 
 ## 0. QA Execution Plan
 
-* **Stage / Scope:** final / client-only; release scope yok (architecture §17).
-* **Modüller + tetikleyici:**
-  * `core` — her tur;
-  * `client-ui` — `/play` header'ı (`MovesCard`) ve load-error ekranı değişti;
-  * `visual-quality` — Visual Scope `existing-parity`, gate Ready for QA, rubric yeniden skorlanıyor;
-  * `stateful-flow` — metin boyutunun canlı / arka planda değişmesi, AX5'te resume, kill/relaunch.
-* **Regression Depth: full** (Tech Lead planı; final gate). Diff dar: shared design-layer `MovesCard` (tüketicileri Play + debug galerisi) ve `_LoadErrorView`. Değişen yüzey her boyutta ve üç cihazda yeniden çalıştırıldı. Değişmeyen yüzeyin D1 kanıtı fingerprint ile yeniden kullanıldı (§5).
-* **Evidence Reuse: allowed** (§19.10 (5), §19.11). Diff'ten doğrulandı:
-  * `MovesCard` `large`'da birebir 60 × 63·s (`grow = 0`; runtime'da R17);
-  * gesture, zamanlama, persistence, route, tutorial ve won kodu değişmedi.
-  * Geçersiz sayılanlar: `large` üstündeki her Play yakalaması, her boyutta load error, rubric.
-* **Canonical target / runtime sınıfı:** iOS Simulator 18.6 — iPhone 16 `D0011CE7` (birincil), 16e `6DBDFD97`, 16 Pro Max `02FDE776`.
-  * QA build: `flutter build ios --simulator --debug`, üç cihaza kuruldu (`App` SHA-1 `90c8db85…`).
-  * State'e gerçek uygulama yoluyla gidildi: `design/src/seed-sim.sh` + Home DEVAM ET.
-  * Metin boyutu `simctl ui content_size` ile **canlı** değiştirildi; ayrıca soğuk açılış ve arka planda değişim de denendi.
-  * Kanıt sınıfları: runtime-screenshot, runtime-video (`simctl io recordVideo`), piksel ölçümü, sqlite okuması.
-* **Bağımsızlık:** ölçümler QA'nın kendi aracıyla yapıldı (`qa-d1r.swift`).
-  * Frontend'in `measure-d1r` aracı kartı PlayLayout sabitlerinden alıyordu. QA aracı ise kart dış hattını ve köşe yarıçapını her yakalamadan tarıyor / fit ediyor.
-  * Araç önce negatif kontrollerle doğrulandı (R05).
-* **Fail-fast checkpoint:** suite'ler + build (R01, R04) yeşil olunca runtime'a geçildi. Integration (R02) runtime turundan sonra çalıştı.
+* **Stage / Scope:** final · client-only · Release Scope none.
+* **Modüller:**
+  * `core`;
+  * `client-ui` (sonuç ekranı, geri / Next / Retry navigasyonu, varyant state'leri);
+  * `visual-quality` (Visual Scope `motion-critical`);
+  * `stateful-flow` (`won`'da kalıcılık, yaşam döngüsü ortasında arka plan / kill / sistem geri, retry state'i).
+* **Regression Depth: full.** Won yolu tamamen değişti; F04 sonucu ve F05 Next / unlock çapraz feature; ortak tasarım katmanı (`TileFace`, `StarRow`, `ScrollBand`) ve Play host'u (`play_session_screen.dart`, `puzzle_board.dart`) değişti.
+* **Evidence Reuse: allowed.** Fingerprint `app/` `f5641d2f…` eşleşiyor. Frontend'in `integration_test` 13 / 13 (iPhone 16) kaydı REUSED. Analyze ve app suite bu turda yeniden çalıştırıldı (E-A1). Frontend'in runtime kayıtları ve Tech Lead ölçümleri yalnız karşılaştırma girdisi. Bütün runtime puanlaması QA'nın kendi kayıtlarından.
+* **Canonical target:** iOS Simulator 18.6, debug build — iPhone 16 `D0011CE7` (birincil), 16e `6DBDFD97`, 16 Pro Max `02FDE776`. Required class: runtime + video.
+* **Yöntem:**
+  * `design/src/capture-d2.sh seed` / `seed-sim.sh` ile level N'i BFS-doğrulanmış çözümünden bir hamle önceye getirme; Home DEVAM ET;
+  * kazanan hamle simulator touch-path ile;
+  * `simctl io recordVideo` (değişken kare hızı, kare yalnız ekran değişince yazılır);
+  * `simctl ui content_size`; `defaults write com.apple.Accessibility ReduceMotionEnabled`.
+  * Simulator ayarları sonunda geri alındı: üç cihazda `large`, Reduce Motion 0.
+* **Bağımsız T0 yöntemi (`qa-t0-fit.py`):** T0, hedef raydaki chrome kararmasının başlangıcıdır (0–200 ms, `Curves.easeOut`). Her karenin luma'sından geriye çözülür; medyan ve saçılım raporlanır. Reduced yolda kararma bir basamaktır; T0 son kararmamış ve ilk kararmış kare arasında braketlenir, içerik fade'inin doğrusal fit'i ile daraltılır.
+* **C2 (§20.7):** satırın lime bounding box'ı kendi board hücrelerinin dışına > 1 pt taşıyor mu? Örnekleme 2 px ızgara, @3x'te 0.67 pt.
+* **Fail-fast checkpoint:** build + kurulum + ilk kritik yolculuk (J1). Geçti.
 
 ## 1. Evidence Ledger
 
-Aksi belirtilmedikçe her satır **EXECUTED THIS RUN**: QA, 2026-09-28, yukarıdaki build ve üç simülatör. Ham sayılar `qa/d1r/QM-d1r-measurements.txt` içinde.
+Hepsi EXECUTED THIS RUN, 2026-09-28 18:55–19:29, QA; aksi yazılmadıkça iPhone 16, revizyon `86c7318` / `app/` `f5641d2f…`, debug build.
 
 | Evidence ID | Claim / Scenario | Class | Command / Action | Target | Result / Counts | Provenance / Fingerprint | Isolation |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| R01 | Statik analiz + unit/widget + format | automated | `melos run analyze`; `melos run test`; `dart format --output=none --set-exit-if-changed app packages tools` | host, Flutter 3.32.8 / Dart 3.8.1 | analyze exit 0; test exit 0 — app **472 passed / 0 failed / 0 skipped**, engine 83, dictionary 32, authoring 25, solver 23, core 22, content 17; format 0 changed | WT diff `88f1dca3…`; 09:3x UTC | test dosyalarındaki override'lar; `moves_card_ink_test` gerçek glifleri rasterize ediyor |
-| R02 | Cihazda integration: gesture, 0 çift sayım, resume + tampered cache, lifecycle | repeatable integration | `flutter test integration_test -d D0011CE7…` | iPhone 16 | **13 / 13 passed**, exit 0 | aynı WT | harness her testte in-memory DB açıyor (drift "created multiple times" debug uyarısı; test yapısı) |
-| R03 | Fingerprint / kapsam | static | `git diff --stat 5798c70 -- app packages tools pubspec.lock melos.yaml` + dosya hash'leri | repo | yalnız 3 izlenen dosya + 3 yeni test dosyası; bağımlılık / config değişikliği yok | HEAD 97c700e + WT | — |
-| R04 | QA build + kurulum | build | `flutter build ios --simulator --debug`; `simctl install` ×3 | 3 sim | exit 0; üçü kuruldu | App `90c8db85…` | — |
-| R05 | QA ölçüm aracının negatif kontrolü | static (runtime yakalaması üzerinde) | `qa-d1r card` ve `headline`, D1'in rework öncesi yakalamaları | QA-16-16, QA-16-28 | kart: etiket inset **−3.80 pt**, 118 mürekkep pikseli dış hat dışında → yakalandı; başlık: 3 satır, "." **PUNCTUATION-ONLY** → yakalandı | qa/d1 (5798c70 build) | — |
-| R06 | F03-QA-D1-01 re-test — `HAMLE` kartı, L26, large → AX5 (canlı) | runtime + ölçüm | Home DEVAM → L26; `qa-sweep.sh`; `qa-d1r card` | iPhone 16 | 5 boyutun hepsinde dış hat dışında **0** mürekkep pikseli (luma > 120 ve > 100). Etiket inset 3.00 / 3.69 / 3.67 / 3.41 / 3.41 pt; rakam ≥ 12.0 pt. Kart sol 300.0–300.3, üst **82.0** (sabit), genişlik 66.0–66.7 (60·s = 65.9); yükseklik 69.7 → 75.0 → 80.7 → 85.3 → 85.3 (yalnız aşağı). Yarıçap fit 24.4–24.6 (22·s = 24.15). `HEDEF DÖNGÜ`'ye boşluk ≥ **40.3 pt** | `QA-16-L26-*.png`, `crops/hamle-16-ax5.png` | — |
-| R07 | Aynı, 16e | runtime + ölçüm | aynı | 16e | dışarıda 0 piksel; etiket inset ≥ **3.07 pt**; üst 81.3 sabit, genişlik 65.3–65.7; yükseklik 69.0 → 85.3; boşluk ≥ 39.3 pt | `QA-16e-L26-*.png` | — |
-| R08 | Aynı, Pro Max | runtime + ölçüm | aynı | Pro Max | dışarıda 0 piksel; etiket inset ≥ **3.62 pt**; üst 92.0 sabit, genişlik 74.0; yükseklik 77.7 → 94.7; boşluk ≥ 46.7 pt | `QA-pm-L26-*.png` | — |
-| R09 | AX5'te soğuk açılış + resume + iki haneli rakam | runtime + sqlite | content size AX5 → seed L5 (12 hamle, undo 2) → launch → DEVAM | iPhone 16 | birebir resume: `HAMLE 12`, iki lime nokta + bir sönük. "12" inset **11.45 pt**, etiket 3.41 pt, dışarıda 0 | `QA-16-L5-resume12-ax5-coldlaunch.png` | seed = gerçek F08 snapshot şekli |
-| R10 | Kritik omurga AX5'te (AC2/3/5/6/7): satır, sütun, undo, restart | runtime-video + sqlite | satır 2 sağ; kilit sırasında gönderilen sütun; sütun 3 aşağı; undo; restart | iPhone 16 | R2 → 13; kilit sırasında gelen sütun **düşürüldü, kuyruğa alınmadı** (snapshot +0); D3 → 14; undo → 13, kota 1; restart → `[]`, 0 hamle, kota 3, restartCount 1, diyalog yok. Kart her adımda aynı (dışarıda 0) | `QV-16-ax5-spine-move-undo-restart.mp4`, `QA-16-L5-ax5-after-{R2-D3,undo}.jpg`, `QA-16-L5-ax5-after-restart.png` | — |
-| R11 | Metin boyutu arka plandayken değişti + kill/relaunch | runtime + sqlite | L0; HOME; AX5 → xL; öne getir; terminate + launch → DEVAM | iPhone 16 | öne gelince kart xL yüksekliğine döndü (85.3 → 75.0 pt, inset 3.69). Kill sonrası birebir resume: `["L0"]`, 1 hamle, kota 3, restartCount 1, elapsed 270162 ms | `QA-16-L5-xl-after-bg-change.png`, `QA-16-L5-resume-after-kill.jpg` | — |
-| R12 | Tutorial (F05) büyütülmüş kartla, xxL → AX5 | runtime + ölçüm | L4 ack yok; canlı tarama; 16e / Pro Max AX5'te | 3 sim | pill boşluğu (board / undo): 16 xxL **8.0 / 8.0**, AX5 **7.0 / 7.0**; 16e AX5 **6.3 / 6.3**; Pro Max AX5 **8.7 / 8.3** pt (≥ 4). Kart ile pill ayrı bölgelerde, çarpışma yok | `QA-*-L4-tutorial-*.png` | — |
-| R13 | AX5'te lift, rail'ler ve thaw | runtime-video | L23 `["R1","D3","U4"]`; sütun 4 yukarı; satır / sütun basılı tut ve geri götür | iPhone 16 | thaw `["2,1"]`, buz → krem **cross-fade**, kar tanesi solarak küçülüyor. Satır lift: rim + yan ray'ler + %42 geri kalan + wrap ghost. Sütun: üst / alt ray'ler. Header değişmedi. Geri götürülen iki sürükleme **hamle üretmedi** (net eşik altı) | `QV-16-ax5-thaw-row-column-lift.mp4`, `QA-16-L23-ax5-*.jpg`, `crops/thaw-16-ax5-mid.png`, `crops/*-lift-16-ax5.png` | — |
-| R14 | Reduce Motion açık + AX5 | runtime-video + kare ölçümü | `ReduceMotionEnabled 1`, relaunch; L23 thaw | iPhone 16 | tile (2,1) ortalama luma: 188 → **tek karede** 91 (anında lift) → settle karesinde 204 (**anında thaw**, ara kare yok) | `QV-16-ax5-reduced-motion-thaw.mp4`, QM | sonra 0'a geri alındı |
-| R15 | F03-QA-D1-02 re-test — load-error başlığı, large → AX5, 3 cihaz | runtime + ölçüm | kurulu bundle'da `journey-tr-07.json` bozuldu (`qa-asset.sh`); L7 DEVAM; tarama; `qa-d1r headline` | 3 sim | **15 / 15** yakalamada 2 satır "Bu bulmaca" / "yüklenemedi.", 3 kelime; noktalama-only satır yok; kelime içi kırılma yok. Sağ kenar payı ≥ **55.7 pt** (16e AX5), sol ≈ 30–35 pt. Varsayılan boyut: D1-07 render'ı ve D1 runtime RT-16-07 ile satır kutuları ≤ 1 pt | `QA-{16,16e,pm}-L07-error-*.png` | bozulma yalnız simülatör bundle'ında; üçü geri yüklendi, SHA-1 `2fef993c…` = repo |
-| R16 | Load error AX5 → pill → Home | runtime | pill'e dokunuş | iPhone 16 | pill iki satıra akıyor ve Home'a (`/`) dönüyor; crash yok | `QA-16-L07-error-ax5-pill-home.jpg` | — |
-| R17 | Varsayılan boyut paritesi | runtime + ölçüm | `design/src/measure-d1.swift` D1-05 render ↔ `QA-16-L26-large.png` | iPhone 16 | 16 özellik **max 0.67 pt**. `HAMLE` kartı üst / sol +0.33; token ΔE ≤ 1.48; tek sapma bilinen zemin ışığı ΔE 3.35 → D1 ile aynı | QM | — |
-| R18 | Won, AX5'te (gözlem) | runtime-screenshot | debug L01, R0 | iPhone 16 | chevron gizli. `HAMLE` kartı scrim altında (authority'de yalnız geri butonu `won`'da gizleniyor; D1 E23 ile aynı davranış). Legacy panel AX5'te taşıyor ve satırı örtüyor → NTLC-6, D2 kapsamı; won kodu diff'te yok | `QA-16-L01-won-ax5-rest.jpg`, `QV-16-ax5-won-L01.mp4` | yalnız destekleyici; won zamanlaması E23'ten REUSED |
-| D1-E05…E14, E16–E19, E22–E24, E27–E30 | Varsayılan boyutta Play state'leri, AC1–AC11, F05 AC4 / AC11, bounce, loading, won §16, RM, multi-touch, kontrast, legacy yok | runtime | — | 3 sim | PASS (D1'de) | **REUSED — fingerprint valid**: 5798c70 build; bu yüzeylerin kodu diff dışında; `MovesCard` `large`'da birebir (R17) | qa/d1 |
-| D1-E31 / E32 | VoiceOver semantiği / odak halkası | automated | R01 içinde yeniden çalıştı | widget | geçti | REUSED sınıf: automated (host sınırı, §19.9 (4)) | test harness |
+| E-A1 | Statik analiz + app suite | automated | `melos run analyze`; `cd app && flutter test` | host macOS | analyze SUCCESS (exit 0); app **503 passed**, 0 fail, 0 skip (exit 0) | 19:28, `86c7318`, `f5641d2f…` | widget testleri in-memory Drift + fake time |
+| E-A2 | `integration_test` | repeatable integration | Frontend koşusu | iPhone 16 | 13 / 13, exit 0 | **REUSED** — Frontend 2026-09-28 18:34, `app/` fingerprint aynı | — |
+| E-J1 | Satır 2, L5 (`D0 D1` + `D1`), Perfect ilk çözüm | runtime-video | seed → DEVAM ET → sütun 1 aşağı | 393×852 | QA T0 = 2.2506 s (6 kare, saçılım 5.2 ms). Satır hücrelerinde **+599'a kadar**, ilk hareket **+618**. Board dışında lime 0 px (T0 … +748). Başlık bölgesi luma'sı +700'e kadar düz (23.51–23.57), ilk değişim **+717**. Yıldızlar +1100'de 2, +1320'de 3. | `QV-16-r2-L5.mp4`, `QS-16-r2-L5-frames.jpg`, `QA-16-D2-01-L5-perfect.jpg` | — |
+| E-J2 | Satır 0, L26 (`L0 D1 R4 R4` + `D4`), kilitli T ve R kazanan satırda (C-11) | runtime-video | aynı yöntem | 393×852 | T0 = 2.2572 s (saçılım 4.1). Hücrelerde +599, ilk hareket +618. Erken doldurma kareleri **yakalandı**: kilit ikonları +87…+137'de dolumla sönüyor, **+170'te yok** (≤ 210). Kilitli karolar komşularıyla lime. | `QV-16-r0-L26.mp4`, `QS-16-r0-L26-C11-frames.jpg`, `QA-16-L26-*.jpg` | — |
+| E-J3a | Satır 4, L4 (`D0 U3 R3` + `D4`), en uzun kayma | runtime-video | aynı yöntem | 393×852 | T0 = 2.2769 s (saçılım 24.5). Hücrelerde +600, ilk hareket +616. Kare boşlukları: +451 (85 ms, sonuç mount'u, statik bekleme); kayma sırasında +766 / +801 / +835 (33–35 ms, her biri tek kare). | `QV-16-r4-L4.mp4`, `QA-16-L4-result-perfect.jpg` | debug build |
+| E-J3b | Satır 4, L4 — iPhone 16e, ısınmış koşu (Retry + elle 4 hamle) | runtime-video | aynı | 390×844 | T0 = 2.3314 s (saçılım 3.9). Hücrelerde +597, ilk hareket +617. **600–1400 arasında > 30 ms kare boşluğu yok** (§16.11.1 (18)). Sonuç eşitlenen en iyi (Perfect, `HARİKA`). | `QV-16e-r4-L4-warm.mp4`, `QA-16e-L4-result-matched.jpg` | debug build |
+| E-J3c | Satır 4, L4 — iPhone 16e, soğuk ilk koşu | runtime-video | aynı | 390×844 | Settle ve ilk ~130 ms doldurma **120 ms'lik tek yakalama boşluğuna** düştü; T0 bu kayıttan ±30 ms'den iyi sabitlenemiyor. Kayma penceresinde (≈ +600…+1400) tek 33 ms boşluk. C2 için kullanılmadı. | `QV-16e-r4-L4.mp4`, `QA-16e-L4-result-perfect.jpg` | debug, soğuk ilk kazanma |
+| E-X1 | Çapraz kontrol: Frontend'in `timing-d2.py`'si QA'nın kendi videolarında | runtime-video | `VIDEO_D2=… timing-d2.py win …` | QA videoları | r2 596 / 615, ilk sonuç pikseli 713, pill rest 948, yıldızlar 1285. r4 (16) 567 / 601, 717, 951, 1286. 16e ısınmış 599 / 619, 718, 954, 1284. QA ölçümüyle tutarlı. | QA videoları | Frontend aracı |
+| E-V1…V9 | F04 varyantları (§16.8) ve render karşılaştırması | runtime-screenshot | seed + çöz | 393×852 | Aşağıdaki satırlar | `QA-16-D2-0*.jpg`, `QS-render-vs-runtime.jpg` | — |
+| E-V1 | Perfect ilk çözüm (L5, 3) | runtime | E-J1 | 16 | `HARİKA`, iki satır başlık, "Hedef üç hamlede…", 3★, `3 · 3 · 3★`, Next birincil, Retry bağlantı | `QA-16-D2-01-L5-perfect.jpg` | — |
+| E-V2 | Perfect + yeni en iyi (önceki 5) | runtime | seed best 5 | 16 | Yalnız `HARİKA` (C-4 önceliği). `EN İYİ 3★`; DB `journey-tr-05 3 / 3★ perfect`; seviye 6 açık (F05 AC1). | `QA-16-D2-02-perfect-new-best.jpg` | — |
+| E-V3 | Yeni en iyi 2★ (önceki 6, 5 hamle) | runtime | seed `D0 R3 L3 D1` + `D1` | 16 | `YENİ EN İYİ`, 2★, `5 · 3 · 5`, Retry birincil, "Sonraki bölüm" bağlantı | `QA-16-D2-03-new-best-2star.jpg` | — |
+| E-V4 | İlk çözüm 2★ (5 hamle) | runtime | aynı, önceki yok | 16 | Rozet yok; rozet satırı ayrılmış, cevap satırı V3 ile aynı y'de | `QA-16-D2-04-first-clear-2star.jpg` | — |
+| E-V5 | Eşitlenen en iyi (önceki 5, 5 hamle) | runtime | aynı, önceki 5 | 16 | Rozet yok, `5 · 3 · 5` | `QA-16-D2-05-matched-best.jpg` | — |
+| E-V6 | 1★ gelişme yok (7 hamle, önceki 4) | runtime | `D0 R3 L3 R4 L4 D1` + `D1` | 16 | 1★, `7 · 3 · 4`, "yedi hamlede", en iyi 4 korunuyor (F04 AC5) | `QA-16-D2-06-1star-no-improvement.jpg` | — |
+| E-V7 | Next bağlı değil (debug L01, `ASALM` → `MASAL`, 1 hamle) | runtime | Home debug L01 | 16 | Perfect ama Retry birincil; "Sonraki bölüm · yakında" soluk; dokununca etkisiz; `1 · 1 · 1★` | `QA-16-D2-08-next-not-wired.jpg` | debug kaynak |
+| E-V8 | Seviye 30 Perfect (`U1 R4 U2 U2` + `D3`) | runtime | seed 30 | 16 | "Yolculuğu tamamla" birincil; ZEMİN, kilitli Z ve N lime | `QA-16-D2-09-level30-perfect.jpg` | — |
+| E-V9 | Seviye 30 2★ (7 hamle) | runtime | + `R3 L3` | 16 | Retry birincil, "Yolculuğu tamamla" bağlantı, `7 · 5 · 7` | `QA-16-D2-09b-level30-2star.jpg` | — |
+| E-V10 | Cihaz varyantları | runtime | seed + çöz | 16e, Pro Max | 16e Perfect ve eşitlenen en iyi (L4); Pro Max Perfect (L5). Bantlar render ile uyumlu. | `QA-16e-L4-*.jpg`, `QA-pm-D2-01-perfect.jpg` | — |
+| E-R1 | Retry A, 2★ sonuçtan; **çift dokunuş** | runtime-video | "Tekrar oyna" pill'e iki hızlı dokunuş | 16 | Satır raya uçuyor, sonuç 0–80 ms'de sönüyor, Play yeniden grid'de. Board son değerinde **+290** (QA luma) / +293 (E-X1); ≤ 400. Sonra `HAMLE 0`, undo devre dışı, 3 nokta. Snapshot `restartCount 1`, hamle 0, undo 3 (çift dokunuş tek eylem). En iyi 5 / 2★ korunuyor. | `QV-16-retry-L5.mp4`, `QS-16-retry-L5-frames.jpg`, `QA-16-D2-13-after-retry.jpg` | — |
+| E-N1 | "Sonraki bölüm" (1★ sonuçtan) | runtime | bağlantıya dokun | 16 | L6 açıldı (`SEVİYE 06`, `HAMLE 0`); ilerleme 6, L5 tamam, en iyi 4 | `QA-16-D2-14-next-L6.jpg` | — |
+| E-N2 | "Yolculuğu tamamla" (seviye 30); ardından ikinci dokunuş | runtime | pill'e iki dokunuş | 16 | Terminal Home `TAMAMLANDI 30 / 30`; ilerleme 31, en iyi 5 / 3★, aktif oturum yok; çift navigasyon yok (F05 AC12) | `QA-16-D2-14-level30-terminal-home.jpg` | — |
+| E-B1 | Rest'te geri butonu | runtime | (48, 82)'ye dokun | 16 | Home | `QA-16-D2-14-back-home.jpg` | — |
+| E-B2 | Sistem geri / kenar kaydırması **≈ T0 + 220** | runtime-video | kazanan hamle + 0.35 s + sol kenardan kaydırma | 16 | T0 = 2.301 s (dim fit). Sayfa +220 civarında kaymaya başlıyor, Home geliyor. DB: L5 tamam, 6 açık, en iyi 3 / 3★, aktif oturum yok. | `QV-16-sysback-mid.mp4`, `QS-16-sysback-mid-frames.jpg`, `QA-16-D2-14-sysback-mid-home.jpg` | — |
+| E-B3 | Sistem geri **settle anında** (≈ T0 − 100 … T0) — ek, daha sert durum | runtime-video | kazanan hamleden hemen sonra kenar kaydırması | 16 | Kazanma pop geçişi sırasında settle etti. Home; tamamlanma yazılmış; çökme yok. | `QV-16-sysback-at-settle.mp4`, `QS-16-sysback-at-settle-frames.jpg` | — |
+| E-L1 | Arka plana alma **≈ T0 + 535** → dönüş | runtime-video | HOME tuşu, 3 s sonra `simctl launch` | 16 | T0 = 2.266 s. Dönüşte ilk canlı kare rest durumu (3★), ara pop karesi yok, tekrar oynatma yok. Zoom sırasında görünen 1★ iOS'un arka plan snapshot'ı (Not N1). | `QV-16-background-mid.mp4`, `QS-16-background-*-frames.jpg`, `QA-16-D2-16-background-resume.jpg` | — |
+| E-L2 | Kill **≈ T0 + 400…485** → yeniden açılış | runtime-video | `simctl terminate`, sonra `launch` | 16 | T0 = 2.306 s; son uygulama karesi +401, springboard +486. Kill sonrası DB: L5 tamam, 6 açık, en iyi 3, aktif oturum yok. Yeniden açılış: Home "Seviye 6". | `QV-16-kill-mid.mp4`, `QA-16-D2-16-kill-relaunch.jpg` | — |
+| E-M1 | Rest öncesi dokunuşlar düşürülüyor | runtime-video | L01 kazanımından hemen sonra pill ve geri butonuna dokunuş | 16 | Sonuç ekranı yerinde kaldı; Retry tetiklenmedi, Home'a dönülmedi. Rest sonrası düşselerdi işlenirlerdi; sonradan kuyruktan da işlenmediler. | `QV-16-L01-early-taps.mp4` | dokunuş zamanı videoda görünmez; sonuçtan çıkarım |
+| E-M2 | Tutorial görünürken çözme (L5, ack 0) | runtime-video | seed ack 0 + kazanan sütun hamlesi | 16 | Pill sürükleme sırasında görünüyor; kazanan sütun hamlesi ack'i yazıyor ve pill'i söndürüyor (+200'de yok). Sonucun arkasında ipucu yok. C2: +585 / +619. | `QV-16-tutorial-win-L5.mp4`, `QS-16-tutorial-win-L5-frames.jpg` | — |
+| E-RM1 | Reduce Motion AÇIK — kazanma | runtime-video | RM 1 + L5 | 16 | T0 braketi (2.2633, 2.3100]; içerik fade fit'i 2.279 ± 0.002. Satır T0'da lime ve statik, board %50. Çapraz geçiş +303'te başlamamış, +319'da %12. Board minimumu +466. İçerik +467 → +634'te %87; son %13 125 ms'lik tek kare boşluğuyla atlıyor. Uçuş / kayma yok. | `QV-16-reduced-win-retry.mp4`, `QA-16-D2-RM-result.jpg` | debug build |
+| E-RM2 | Reduce Motion AÇIK — retry dip | runtime-video | aynı video, "Tekrar oyna" | 16 | Sonuç ≤ +50…67'de gidiyor, sonra Play yükseliyor (sıralı, çift pozlama yok); rest ≈ +152…168 | aynı, `QA-16-D2-RM-after-retry.jpg` | — |
+| E-T1 | Metin ölçeği AX5, **offset 0'a iniş** | runtime | AX5 iken kazan | 16 | Geri + rozet üstte, başlık 1.3×'te sınırlı, alt başlık 3 satır (kelime arası), pill etiketi büyüyor | `QA-16-A11Y-ax5-offset0.jpg` | — |
+| E-T2 | AX5 sona kaydırma / geri yukarı | runtime | yukarı / aşağı kaydır | 16 | Sonda geri butonu sabit, bant arkasında, "Tekrar oyna" home indicator'ın üstünde. Geri yukarı kaydırınca bant temizleniyor. | `QA-16-A11Y-ax5-scrolled-end.jpg`, `QA-16-A11Y-ax5-scrolled-back-top.jpg` | — |
+| E-T3 | 1.3× sınırda (xxxL) kaydırma yok, üç cihaz | runtime | xxxL + kaydırma denemesi + piksel farkı | 16, 16e, Pro Max | Durum-bar altı piksel farkı: 16 `0 / 1 401 840`, 16e `0 / 1 375 920`, Pro Max `0 / 1 760 880` | `QA-16-A11Y-cap-xxxL.jpg`, `QA-16e-A11Y-cap-xxxL.jpg`, `QA-pm-A11Y-cap-xxxL.jpg` | — |
+| E-T4 | 16e AX5 | runtime | canlı AX5 | 16e | Kelime arası kırılım, geri sabit | `QA-16e-A11Y-ax5.jpg` | — |
+| **E-T5** | **AX5'te kaydırılmışken metin boyutu küçülünce ScrollBand takılı kalıyor** (F03-QA-D2-01) | runtime | AX5 → sona kaydır → xxxL (ve `large`) | 16 | İçerik offset ≈ 0'a dönüyor, ama bant görünür kalıyor. `HARİKA` rozeti ve geri butonu kararıyor; `large`'da rozet neredeyse görünmez. Kaydırma denemesi hiçbir şeyi değiştirmiyor (0 px). Kontrol: offset 0'dan küçülmede sorun yok (E-T2). | `QA-16-A11Y-cap-xxxL.jpg`, `QA-16-A11Y-back-to-large.jpg`, `QA-16-A11Y-ax5-top-then-large.jpg` | — |
+| E-D1 | D1 Play regresyonu | runtime | L23 çözülme (`R1 D3 U4` + sütun 4 yukarı); undo; restart; L01 sütun (reddedilir); tutorial; satır / sütun sürükleme; chevron; seed'li DEVAM ET ile resume | 16 | Çözülme ✓ (`SAAT`, `HAMLE 4`). Undo `HAMLE 3`, donma geri, bir nokta harcanmış (AC6). Restart `HAMLE 0`, noktalar dolu, diyalog yok (AC7). Reddedilen hamle `HAMLE 0`. Wrap-ghost sürüklemede görünür. Resume snapshot'ları doğru açıldı (AC10). | `QA-16-D1R-*.jpg`, `QV-16-D1R-*.mp4` | — |
+| E-P1 | Render ↔ runtime | parity-comparison | D2-01 / 03 / 08 yan yana | 16 | Yerleşim, rozet, CTA ağırlığı, tipografi örtüşüyor. `EN İYİ` ★ render'dan yüksek; stat etiketleri ~1–3 pt aşağıda (Frontend'in bildirdiği sapmalar). Alt başlık runtime'da render'dan hafif daha soluk. | `QS-render-vs-runtime.jpg` | — |
 
 ## 2. Acceptance & Critical Journey Coverage
 
 | AC / Journey | Expected | Evidence IDs | Result |
 | --- | --- | --- | --- |
-| F03-QA-D1-01 re-test (§19.10 (1) kuralı) | her boyutta (default → AX5), 390 / 393 / 440'ta rakam ve etiket mürekkebi yuvarlak dikdörtgenin içinde, yaylar dahil, inset ≥ 2 pt; genişlik ve sol-üst sabit; yalnız aşağı büyüme; `HEDEF DÖNGÜ`'ye ≥ 8 pt; default'ta 60 × 63·s | R06, R07, R08, R09, R17, R05 | **PASS** — min inset 3.00 pt; boşluk ≥ 39.3 pt |
-| F03-QA-D1-02 re-test (§19.10 (2) kuralı) | her boyutta yalnız kelime sınırında kırılma, noktalama-only satır yok, kırpma yok; pill akıyor ve `/`'e gidiyor; default D1-07 görünümü | R15, R16, R05 | **PASS** |
-| Diğer Play state'lerinde header, xxL → AX5 | tutorial pill ≥ 4 pt; lift / thaw / kilitli / donmuş / HUD'da yeni çakışma yok; won §16 (+ §19.9 (1)) | R06, R12, R13, R14, R18 | PASS |
-| AC1–AC11 omurgası (bağımsız, bu tur) | hamle, kilit sırasında girdi düşer, undo, restart, kill arası resume | R10, R11, R02 | PASS |
-| AC1–AC11 tam matris, F05 AC4 / AC11 | D1'deki gibi | D1 E05–E24 (REUSED), R02 | PASS |
-| Misuse: metin boyutu Play açıkken canlı değişti | yeniden yerleşim, çakışma yok | R06, R07, R08, R12 | PASS |
-| Misuse: metin boyutu arka plandayken değişti | öne gelince doğru yerleşim | R11 | PASS |
-| Misuse: AX5'te resume edilmiş oturum | birebir durum, kart doğru | R09 | PASS |
-| Misuse: AX5'te load error → Home | tek çıkış, crash yok | R16 | PASS |
-| Misuse: AX5'te Reduce Motion | anında lift / thaw | R14 | PASS |
-| Misuse: kilit sırasında ikinci swipe | düşer, kuyruk yok | R10 | PASS |
-| Misuse: basılı tut + başlangıca geri getir | hamle yok | R13 | PASS |
-| Misuse: multi-touch | yalnız ilk parmak | D1 E27 | Bilinen sapma F03-MULTITOUCH-FIRST-POINTER (D1 dışı, §19.10 (3)) |
+| §16.11.1 (1) T0 … 599 yalnız board | Satır doldurma, bloom, dim; sonuç pikseli yok | E-J1, E-J2, E-J3a/b, E-X1 | PASS |
+| §16.11.1 (2) C-11 | Kilitli karolar lime, ikonlar ≤ +210 | E-J2 | PASS (+170) |
+| §16.11.1 (3) Kayma 600–840, yuvaya iniş | Tek birim, boyut / radius morph | E-J1 (+640 / +760 / +840 kareleri), E-J3 | PASS |
+| §16.11.1 (4) Chrome +720'de 0 | Header, `HAMLE`, ray, HUD, board | E-J1 kareleri, E-X1 (`HAMLE` +730–736) | PASS (+720'den sonraki ilk karede) |
+| §16.11.1 (5) Rest ≤ 940; yıldızlar ≤ 1300 | — | E-X1 (pill 947–954, yıldızlar 1284–1286), E-J1 kareleri | PASS (± bir yakalama karesi) |
+| §16.11.1 (6) Reduced yol | Statik lime, çapraz geçiş 300–460, içerik 460–660 | E-RM1 | PASS |
+| §16.11.1 (7) Rest öncesi input düşer; sistem geri her an | — | E-M1, E-B2, E-B3 | PASS |
+| §16.11.1 (8) 1.0× yerleşim, ayrılmış rozet satırı, iki satır başlık | Üç cihaz | E-V1…V10, E-P1 | PASS |
+| §16.11.1 (9) Varyant tablosu | Rozet önceliği, CTA ağırlığı, "· yakında", "Yolculuğu tamamla", eski işaretler yok | E-V1…V9 | PASS |
+| §16.11.1 (10) F04 AC7 içeriği | Kelime, hamle, optimal, yıldız, en iyi, Retry, Next | E-V1…V9 | PASS |
+| §16.11.1 (11) Tek parlama | Yalnız cevap satırı + radial | E-V*, E-P1 | PASS |
+| §16.11.1 (12) Metin ölçeği | Sınıra kadar kaydırma yok; AX5 kaydırma, geri sabit, **bant yalnız kaydırılmışken**, offset 0'a iniş | E-T1…E-T4, **E-T5** | **FAIL** — F03-QA-D2-01 |
+| §16.11.1 (13) Retry | ≤ 400, `HAMLE 0`, undo devre dışı, 3 nokta; reduced 160 | E-R1, E-RM2 | PASS |
+| §16.11.1 (14) Next / geri; Close yok | — | E-N1, E-N2, E-B1…B3 | PASS |
+| §16.11.1 (15) Erişilebilirlik | ≥ 44 pt hedefler, kontrast, semantics, odak halkası | E-V*, E-A1 (semantics testleri) | PASS görsel; VoiceOver ve odak halkası runtime'da sürülemedi (belirtilen sınır) |
+| §16.11.1 (16) Yaşam döngüsü | Arka plan → rest; kill → Home, yazılmış | E-L1, E-L2 | PASS |
+| §16.11.1 (17) Won yolunda eski öğe yok | — | E-V*, E-A1 | PASS |
+| §16.11.1 (18) 16e satır 4'te görünür takılma yok | — | E-J3b | PASS (600–1400'de boşluk yok) |
+| F04 AC1–AC3 (3 / 2 / 1★) | Perfect 3★ kayıtlı; 2★; 1★ | E-V1, E-V3, E-V9, E-V6 | PASS |
+| F04 AC4 (yıldız ≥ 1) | Hiçbir varyantta 0★ yok | E-V*, E-A1 | PASS |
+| F04 AC5 / AC6 (en iyi korunur / güncellenir, Perfect set) | — | E-V6 (4 korunur), E-V2 (5 → 3, perfect) + DB | PASS |
+| F04 AC7 (içerik: kelime, hamle, optimal, yıldız, en iyi, Retry, Next) | — | E-V*, E-R1, E-N1 | PASS |
+| F04 AC8 (ilk çözümde en iyi = sonuç) | — | E-V1, E-V4 | PASS |
+| F04 AC9 / AC10 (opt+3 → 2★, opt+4 → 1★) | Sınırlar | AC10: E-V6 (7 = 3+4 → 1★) runtime; AC9: E-A1 (`star_rating_test`) — runtime'da tam opt+3 koşulmadı | PASS (AC9 automated sınıfta) |
+| F05 AC1 (unlock Next / geri / sistem geri ile) | — | E-V2, E-N1, E-B2, E-L2 | PASS |
+| F05 AC12 (30 → terminal Home) | — | E-N2 | PASS |
+| F03 AC8 / AC11 (kazanma → kilit + sekans + sonuç; geçici kelime kazandırmaz) | — | E-J*, E-A1 | PASS |
+| Misuse: çift Retry / çift Next | Tek eylem | E-R1, E-N2 | PASS |
+| Misuse: devre dışı bağlantıya dokunuş | Etkisiz | E-V7 | PASS |
+| Misuse: tutorial görünürken çözme | Sonucun arkasında ipucu yok | E-M2 | PASS |
+| D1 Play regresyonu | Çözülme, undo, restart, reddedilen hamle, resume | E-D1 | PASS |
 
 ## Client & UI Compliance
 
-| Kontrol | Evidence | Sonuç |
+| Kontrol | Evidence IDs | Result |
 | --- | --- | --- |
-| Header: chevron + `SEVİYE NN`; `HAMLE` kartı AX5'e kadar kabında, rakam 1–2 hane | R06–R09 | PASS |
-| Load error: kart + `loopBreak` + başlık + `Ana ekrana dön` (tek aksiyon, `/`), her boyutta | R15, R16 | PASS |
-| Controller → görünür UI: `HAMLE` settle'da (12 → 13 → 14 → 13 → 0), kota noktaları | R09, R10 | PASS |
-| F05 overlay: pill HUD üstünde, kontroller açık, büyütülmüş kartla etkileşim yok | R12 | PASS |
-| Metin ölçeği davranışı (§19.3 (1), §19.9 (3), §19.10) | R06–R08, R15 | PASS |
-| `MovesCard` ikinci tüketicisi (debug galerisi) | R01 (`components_test`, `moves_card_ink_test`) | PASS — automated; oyuncu yüzeyi değil |
+| Screen goal ve kritik yolculuk (çöz → sonuç → Next / Retry / geri) | E-J1, E-N1, E-R1, E-B1 | PASS |
+| Route / geri / dismiss: sonuç `/play`'in state'i; geri butonu ve sistem geri → `/`; Close yok | E-B1…B3, E-V* | PASS |
+| State'ler: 10 varyant, devre dışı bağlantı, rest öncesi kilit | E-V1…V10, E-M1 | PASS |
+| Duplicate action koruması | E-R1, E-N2 | PASS |
+| Controller → view-model → görünür UI (yıldız, en iyi, rozet) | E-V2…V6 + DB | PASS |
+| Handoff CTA hiyerarşisi ve interaction intent (§16.8, §16.11) | E-V*, E-P1 | PASS; basılı pill yalnız ölçekleniyor, kararmıyor (NTLC-D2-2) |
+| Metin ölçeği / ScrollBand | E-T1…T5 | FAIL — F03-QA-D2-01 |
 
 ## Stateful Flow & Integration
 
 | Boundary / Transition | Actor / Start State | Expected | Evidence IDs | Result |
 | --- | --- | --- | --- | --- |
-| OS metin boyutu değişimi (Play önde) | OS / idle | anında yeniden yerleşim, snapshot'a dokunmaz | R06, R12 | PASS |
-| OS metin boyutu değişimi (arka planda) → foreground | OS / inProgress | doğru boyutta yerleşim, durum korunur | R11 | PASS |
-| AX5'te soğuk açılış → CONTINUE | oyuncu / inProgress (12 hamle, kota 2) | birebir resume | R09 | PASS |
-| settle / undo / restart → snapshot | oyuncu / idle | write-through | R10 | PASS |
-| OS kill → relaunch → CONTINUE | OS / inProgress | birebir (restartCount, elapsed dahil) | R11, R02 | PASS |
-| settle sırasında gelen girdi | oyuncu / animating | düşer | R10, R02 | PASS |
-| bozuk asset → error → Home (AX5) | içerik / L7 | tek çıkış | R16 | PASS |
-| paused mid-drag / mid-animation, tampered cache | OS / tracking, animating | yırtık hamle yok / yeniden türetilir | R02 | PASS |
+| `won` anında kalıcılık | Oyuncu, çözen hamle | `completed` + en iyi + unlock `won`'da yazılır | E-V2, E-B2, E-L2 (DB) | PASS |
+| Sistem geri ≈ T0 + 220 | Sekans ortası | `/`; tamamlanma kalıcı | E-B2 | PASS |
+| Sistem geri settle anında | T0 sınırı | `/`; tamamlanma kalıcı; çökme yok | E-B3 | PASS |
+| Arka plan ≈ T0 + 535 → dönüş | Sekans ortası | Rest, tekrar oynatma yok, kilit takılmıyor | E-L1 | PASS |
+| Kill ≈ T0 + 400 → yeniden açılış | Sekans ortası | Home, aktif oturum yok, en iyi + unlock yazılmış | E-L2 | PASS |
+| Retry → yeniden çözme | Sonuç 2★ | Hamle 0, undo 3, restart +1; en iyi korunur | E-R1 | PASS |
+| Next → N+1 / terminal | Sonuç | `pushReplacement` N+1; 30 → terminal | E-N1, E-N2 | PASS |
+| Tutorial ack | L5, ack 0 | Kazanan sütun hamlesi ack'i yazar | E-M2 | PASS |
+| Resume snapshot → Play | Home DEVAM ET | Seed'li hamlelerle doğru state | tüm seed'li koşular | PASS |
 
 ## Visual Quality Verdict
 
-Bağımsız runtime skoru; Frontend self-score'u kullanılmadı. Kapsam: `won` dışındaki Play state'leri, load error ve F05 overlay, üç cihazda large → AX5. Won moment yalnız §16 (+ §19.9 (1)) kurallarıyla değerlendirildi (E23 REUSED, R18) ve puana katılmadı.
-
 | Rubric Dimension | Score / 10 | Runtime Evidence | Notes |
 | --- | --- | --- | --- |
-| Experience Fit | 9 | R06, R13, D1-E05 | Loop Glass dili çekirdek döngüde sakin ve bilinçli; hybrid dönem (legacy Home / won) kabul edilmiş |
-| Visual Hierarchy | 10 | R06, R13, R12 | her state'te tek odak (board, kaldırılan hat, eriyen taş, ipucu). AX5'te uzayan kart üçüncül kalıyor, hedefle yarışmıyor |
-| Layout, Rhythm and Responsiveness | 9 | R06–R08, R12, R17 | geometri her boyutta sabit; kart yalnız aşağı büyüyor, `HEDEF DÖNGÜ`'ye ≥ 39 pt; tutorial ≥ 6.3 pt; default ≤ 0.67 pt. Eksi: cap'te kartın iç ritmi hafif alt ağırlıklı (rakam üstü ≈ 12 pt, etiket altı ≈ 17 pt) ve kart uzun bir hap formuna dönüşüyor |
-| Typography and Content Craft | 9 | R06, R15, R17 | etiket ≥ 3 pt içeride; başlık her boyutta kelime sınırında; `tnum` iki hanede temiz. Eksi: AX5'te error ekranında pill etiketi (serbest metin) 1.3× cap'li başlıktan büyük — §19.9 (3) ile kabul edilmiş hiyerarşi tersine dönmesi; sayaç satır yüksekliği (MOVESCARD-COUNTER-LINE-HEIGHT, loglu) |
-| Color, Surface and Asset System | 10 | R17, D1-E14, D1-E29 | token ΔE ≤ 1.48, anlam başına tek vurgu, çizilmiş ikonlar; zemin ışığı ΔE 3.35 kabul edilmiş gradient yaklaşımı |
-| Interaction, State and Feedback | 9 | R10, R13, R15, R16, D1-E09/E10/E13 | her state ayırt edilebilir; kilitte girdi düşüyor. Eksi: multi-touch sapması (D1 öncesi, loglu) |
-| Motion and Sensory Quality | 9 | R13, R14, D1-E06/E13/E16/E17 | thaw cross-fade AX5'te de aynı; RM yolları AX5'te anında. Audio / haptic yalnız niyet (F11 planlı değil) |
-| Originality and Product Identity | 9 | R13, R15 | wrap ghost + kenar ray'leri, `loopBreak` glifi; navy-glass tarifi kategoride yaygın |
-| Accessibility and Inclusive Quality | 9 | R06–R09, R12, R14, R15, D1-E29, E31, E32 | Play ve error'da AX5'e kadar kırpma / örtüşme / kelime içi kırılma yok (3 cihaz); RM + AX5 temiz; kontrast 5.1 : 1; 44 pt. Eksi: VoiceOver ve odak halkası yalnız automated (host sınırı) |
-| Implementation Fidelity and Polish | 10 | R17, R06–R08, R15 | default'ta render'lara ≤ 0.67 pt, yarıçap 24.5 ↔ 24.15, satır kırılımları D1-07 ile ≤ 1 pt. Cap'teki kart yüksekliği D1-10'dan farklı, ama bu §19.10 (1) ile yetkili ve açıklanmış bir sapma: D1-10 render'ında etiket yayların üstüne biniyordu, runtime bunu düzeltiyor. frontend.md düzeltme notları runtime ile uyuşuyor |
+| Experience Fit | 10 | E-J1, E-R1, E-V* | Kazanan satır ödülün kahramanı oluyor. Board'dan sonuca kayıyor; retry'da "cevap hedefe dönüyor". Sakin, bulmacaya uygun bir ödül anı. |
+| Visual Hierarchy | 10 | E-V1…V9 | Her varyantta tek odak ve tek birincil eylem. Rozet satırı ayrılmış, cevap satırı sabit yerde. Yıldızlar rest'ten sonra geliyor. |
+| Layout, Rhythm and Responsiveness | 9 | E-V10, E-T1…T5 | Üç cihazda ritim tutarlı; sınıra kadar kaydırma yok; AX5'te düzgün kaydırma. Canlı metin boyutu küçülmesinde bant takılıyor (F03-QA-D2-01). |
+| Typography and Content Craft | 9 | E-V*, E-T1, E-P1 | Authored iki satır başlık, harfle yazılmış sayılar, doğru Türkçe büyük harf (İ). Alt başlık render'dan hafif soluk. AX5'te pill etiketi iki satıra kırılıyor (kabul edilebilir). |
+| Color, Surface and Asset System | 10 | E-V*, E-P1 | Tek parlama kuralı tam uygulanmış. Lime cevap satırı + radial, cam stat kartı, çizilmiş ikonlar; pill ve yıldızlar düz. |
+| Interaction, State and Feedback | 9 | E-M1, E-R1, E-V7, E-N2 | Kilit, çift dokunuş, devre dışı bağlantı doğru. Basılı pill yalnız ölçekleniyor (NTLC-D2-2). Geç rozet fade'i runtime'da tetiklenemedi (widget testi, E-A1). |
+| Motion and Sensory Quality | 9 | E-J1…J3, E-R1, E-RM1/2 | Zamanlama sözleşmeye milisaniye düzeyinde uyuyor; reduced yollar doğru. Debug build'de iPhone 16 satır 4 kaymasında üç tek kare kaçırma, reduced rest sonunda bir 125 ms boşluk. Release pacing ölçülmedi. Ses / haptik F11. |
+| Originality and Product Identity | 9 | E-J1, E-R1 | Satırın board'dan sonuca ve geri raya yolculuğu ürüne özgü bir imza; Loop Glass dili tutarlı. |
+| Accessibility and Inclusive Quality | 8 | E-T1…T5, E-RM1/2 | 1.3× sınır, AX5 kaydırma, reduced motion ve ≥ 44 pt hedefler iyi. F03-QA-D2-01 rozeti ve geri butonunu karartıyor. VoiceOver ve odak halkası runtime'da doğrulanamadı. |
+| Implementation Fidelity and Polish | 9 | E-P1, E-V10, E-X1 | Render ile yakın parity. `EN İYİ` ★ yüksekliği, stat etiketleri ve bant hatası bilinen sapmalar. |
 
-Final Score: 93 / 100
+Final Score: 92 / 100
 
-Lowest Dimension: Experience Fit — 9 / 10 (sekiz boyut 9, iki boyut 10)
+Lowest Dimension: Accessibility and Inclusive Quality — 8 / 10
 
-Fail Conditions: None
+Fail Conditions: None (premium-ui-rubric fail listesinden hiçbiri; F03-QA-D2-01 bir acceptance-list ihlali, kritik kontrast / focus / hedef / reduced-motion ihlali değil)
 
 Runtime Evidence Complete: Yes (VoiceOver ve odak halkası belirtilen automated sınıfta; Android kapsam dışı sınır)
 
-Result: PASS
-
-Skor notu: 93 geçiş bandının alt sınırı. D1'in 87'sinden farkın tamamı, iki bulgunun düşürdüğü dört boyuttan geliyor (Layout 8 → 9, Typography 8 → 9, Accessibility 7 → 9, Fidelity 8 → 10). Diğer altı boyut D1 kalibrasyonuyla aynı tutuldu.
+Result: FAIL (92 < 93; §16.11.1 (12) runtime'da başarısız)
 
 ## 3. Findings
 
-Yeni bulgu yok.
-
-* F03-QA-D1-01 ve F03-QA-D1-02 **kapandı** (R06–R09, R15, R16).
-* F03-QA-D1-03 D1 dışında follow-up olarak duruyor: F03-MULTITOUCH-FIRST-POINTER.
-
-## 4. Pending Evidence
-
-* Scenario: Android görünümü ve `disableAnimations` runtime davranışı.
-  * Required class: runtime; target: Android emülatör / cihaz; owner: DevOps/Release Engineer (ANDROID-CI-EVIDENCE).
-  * Re-evaluation trigger: Android CI / emülatör hazır olduğunda.
-  * Bu gate'i durdurmaz (brief'te belirtilmiş sınır).
+**F03-QA-D2-01 — AX5'te kaydırılmışken OS metin boyutu küçülünce ScrollBand görünür kalıyor ve rozeti / geri butonunu karartıyor**
+* **Severity / Type:** Medium · UI defect (accessibility yolu) · acceptance-list ihlali.
+* **İlgili:** `ui-design.md` §16.11.1 (12) ("the scroll band appears only when scrolled"); architecture §20.3 (9) (C-9); task F03-FE-D2 brief madde 3; modül client-ui / visual-quality.
+* **Expected:** içerik offset 0'a döndüğünde bant görünmez; rozet ve geri butonu tam görünür (offset 0 durumunda olduğu gibi, E-T1 / E-T2).
+* **Actual:** sonuç ekranında AX5'te sona kaydırılıp OS metin boyutu canlı olarak xxxL'ye ya da `large`'a düşürülünce içerik offset ≈ 0'a dönüyor, ama bant tam görünür kalıyor. `HARİKA` rozeti ve geri butonu bandın altında kararıyor; `large`'da rozet neredeyse görünmez. Kaydırma artık mümkün değil (extent 0), bu yüzden kullanıcı bandı temizleyemiyor. Durum sonuç ekranından çıkana kadar sürüyor.
+* **Adımlar (iPhone 16, `86c7318`):**
+  1. `capture-d2.sh seed <udid> 5 '["D0","D1"]'`;
+  2. `simctl ui <udid> content_size accessibility-extra-extra-extra-large`;
+  3. DEVAM ET, sütun 1 aşağı (kazan);
+  4. sonucu sona kaydır;
+  5. `simctl ui <udid> content_size extra-extra-extra-large` (ya da `large`).
+  * Kontrol: 4. adımda geri yukarı kaydırılıp sonra küçültülürse sorun yok.
+  * Kanıt: E-T5 (`QA-16-A11Y-cap-xxxL.jpg`, `QA-16-A11Y-back-to-large.jpg`), kontrol E-T2 / `QA-16-A11Y-ax5-top-then-large.jpg`.
+* **Kök neden hipotezi (yalnız hipotez, source destekli):** `result_view.dart` `_onScroll` bandı yalnız `ScrollController` dinleyicisinden günceller (satır 218–221). İçerik boyutu küçülünce `ScrollPosition` offset'i dinleyicileri bildirmeden düzeltiyor, `_band` eski değerde kalıyor.
+* **Öneri (Frontend/Mobile Developer):**
+  * bant görünürlüğünü scroll metrics değişiminde de yeniden hesapla (ör. `ScrollMetricsNotification` ya da layout sonrası kontrol);
+  * AX5 → sona kaydır → metin ölçeği 1.0 → bant 0 olmalı diyen bir widget testi ekle;
+  * negatif çalıştırma: düzeltme kaldırılınca test kırılmalı.
 
 ## 5. Regression & Evidence Reuse
 
-* **Etkilenen yüzey / derinlik: full.**
-  * Diff: `MovesCard` (Play header'ı her state'te + debug galerisi) ve `_LoadErrorView`.
-  * Runtime'da yeniden çalıştırılanlar: her Play header state'i large → AX5 (idle, tutorial, lift, thaw, won gözlemi), üç cihaz; load error üç cihazda beş boyut.
-  * AC omurgası AX5'te bağımsız çalıştırıldı; suite'ler ve integration yeniden çalıştı.
-* **REUSED — fingerprint valid:** D1 E05–E14, E16–E19, E22–E24, E27–E30 (default boyutta Play, AC matrisi, F05, bounce, loading, won, RM, kontrast).
-  * Gerekçe 1: bu yüzeylerin kodu diff dışında.
-  * Gerekçe 2: `MovesCard` `large`'da `grow = 0` ile birebir 60 × 63·s. Kaynakta doğrulandı; runtime'da R17 (kart üst / sol +0.33 pt) ve R06 (yükseklik 69.7 ≈ 63·s + AA).
-  * Ek: E31 / E32 automated sınıfı R01'de yeniden çalıştı.
-* **INVALIDATED — rerun required (yapıldı):** D1 E15, E20, E21, E25 / E26'nın AX5 kısımları ve rubric. Yerlerine R06–R08, R12, R15 ve yeni skor geçti.
+* **Etkilenen yüzey:** won yolu tümüyle (win sekansı, geçiş, sonuç, retry), F04 sonucu, F05 Next / unlock / terminal, ortak tasarım katmanı, Play host'u. Depth full — hepsi runtime'da yürütüldü (E-J*, E-V*, E-R1, E-N*, E-B*, E-L*, E-D1).
+* **REUSED — fingerprint geçerli:** E-A2 (`integration_test` 13 / 13, `app/` `f5641d2f…`). Widget testlerindeki semantics / VoiceOver sırası, D2-07 no-optimal ve geç rating okuma (C1) E-A1 içinde bu turda yeniden çalıştırıldı (503 geçti). Bunlar automated sınıfta sayıldı, runtime olarak değil.
+* **INVALIDATED:** D1 Play runtime kanıtı (F03.D1-EVIDENCE) değişen `play_session_screen.dart` / `puzzle_board.dart` için doğrudan kullanılmadı; D1 yolculukları yeniden yürütüldü (E-D1).
 * **Bağımsız QA probe'ları:**
-  * QA aracı `qa-d1r` negatif kontrolle doğrulandı (R05). Frontend'in PlayLayout tabanlı aracından farklı olarak dış hattı ölçüyor.
-  * AX5'te omurga, canlı / arka plan boyut değişimi, soğuk açılış resume'u (R09–R11), RM + AX5 (R14).
-* **Regression risk:** header'daki büyüme board, rail ve HUD geometrisini etkilemiyor (üst sabit, board ve tutorial bantları değişmedi). Won katmanında kart scrim altında kalıyor (R18). Yeni regresyon gözlenmedi.
+  * C2 ve T0 QA'nın kendi aracıyla, dört koşuda (satır 0 / 2 / 4, 16 ve 16e): ilk hareketli kare +616…+619. En katı yorumla, yani T0 = son kararmamış kare alınsa bile, ≥ T0 + 600.2;
+  * yeniden kodlanmış `.mp4`'ler ham kayıtları 1–2 ms içinde üretiyor (r2: 599 / 618 → 600 / 618; 16e: 597 / 617 → 599 / 619).
+* **Frontend kanıtıyla fark:** Frontend'in tablosuyla çelişen bir ölçüm yok. Tech Lead'in §20.8'de düzelttiği iki hücre bu turda yeniden ölçülmedi, çünkü QA kendi videolarını kullandı.
 
 ## 6. Final Verdict
 
-* `QA Result: Approved with Notes`
-* Blocking Issues: None
-* Required Fixes: None
-* Non-blocking Notes:
-  * Rubric 93 / 100, geçiş bandının alt sınırında; en düşük boyutlar 9.
-  * F03-MULTITOUCH-FIRST-POINTER ve MOVESCARD-COUNTER-LINE-HEIGHT loglu, D1 dışında.
-  * AX5'te error ekranında pill etiketi başlıktan büyük görünüyor (§19.9 (3) kabulü). Karar D3 / F10 tipografi turuna bırakılabilir.
-  * Legacy Home (AUD-A11Y-04 → D3) ve won paneli (NTLC-6 → D2) AX5'te taşıyor; D1 dışında, bu turda değişmedi.
-  * Android, VoiceOver runtime ve donanım odak halkası belirtilen sınırlar.
+* `QA Result: Rejected`
+* **Blocking Issues:** F03-QA-D2-01. §16.11.1 (12) runtime'da başarısız, görsel rubric 92 / 100 < 93. Başka bir blocker yok: kalan 17 acceptance maddesi, F04 AC1–AC10 (AC9 automated sınıfta), F05 AC1 / AC12, F03 AC8 / AC11, yaşam döngüsü ve D1 regresyonu geçti.
+* **Required Fixes:**
+  1. F03-QA-D2-01 — bant görünürlüğünü scroll metrics değişimiyle senkron tut; widget testi + negatif çalıştırma; AX5 → sona kaydır → küçült yolunun runtime yakalaması.
+* **Non-blocking Notes:**
+  * **N1:** iOS app-switcher snapshot'ı sekans ortasında alınırsa sonucu yıldız reveal'inin ortasında (1★) gösteriyor (E-L1). Rest'e atlama `paused`'da yapılıyor ve iOS snapshot'ı ondan önceki son kareden alıyor. Dönüşteki canlı kare doğru. Opsiyonel iyileştirme.
+  * **N2:** Debug build kare pacing'i: iPhone 16 satır 4 kaymasında üç tek kare (33–35 ms); reduced rest sonunda 125 ms; soğuk ilk kazanmada settle karesinde 85–120 ms (sonuç mount'u ya da yakalama). 16e ısınmış koşu temiz. Release pacing ölçülmedi.
+  * **N3:** F00 bileşen sapmaları runtime'da görüldü ve puanlandı: `EN İYİ` ★ yüksekliği, basılı pill'in kararmaması (RESULT-F00-COMPONENT-ALIGN). Alt başlık render'dan hafif soluk.
+  * **N4:** Home AX5'te taşıyor (A-2 home, D3 kapsamı), D2 bulgusu değil.
+  * **N5:** Sınırlar: VoiceOver ve odak halkası bu host'ta runtime'da sürülemedi (automated sınıf); Android koşulmadı (ANDROID-CI-EVIDENCE); D2-07 runtime'da ulaşılamaz (widget testi); yalnız debug build.
 
 ## 7. Tech Lead Note
 
-* **Kök neden alanı / rol:** yok; iki D1 bulgusu Frontend rework'ü ile kapandı.
-* **Routing / depth:** değişiklik yok. Gate'in Passed'e geçişi ve F03 Done / D2 aktivasyonu Tech Lead kararı.
-* **Workflow notları:**
-  * **Brief ifadesi:** Current Brief (3) "the card hides in `won`" diyor. Authority'de (ui-design §6 / §7, architecture §19.4) yalnız geri butonu `won`'da gizleniyor. Runtime authority ile ve D1 E23 ile uyumlu: kart scrim altında kalıyor. Bulgu açılmadı; brief ifadesinin düzeltilmesi önerilir.
-  * **qa.md yapısı:** brief D1R'nin eklenmesini istiyordu. `workflow-flow-audit.mjs` ise `qa.md` içindeki **ilk** `Final Score` / `Lowest Dimension` eşleşmesini okuyor. D1 raporu (87, en düşük 7) önde kalsaydı gate Passed'e geçerken denetim hata verirdi. Bu yüzden D1 raporu, D1'deki QA emsaliyle byte-for-byte `history/f03-puzzle-play-session-2026-09-27/qa-at-d1-verdict.md`'ye taşındı (SHA-1 `276ec217…`, `cmp` birebir) ve buradan link verildi.
-  * **Rework commit edilmemiş:** rework hâlâ çalışma ağacında. Commit sonrası fingerprint için `git diff 5798c70 -- app` SHA-1 `88f1dca3…` karşılaştırılabilir.
-* **Simülatör durumu geri yüklendi:** üç cihazda content size `large`, Reduce Motion 0, `journey-tr-07.json` repo hash'inde (`2fef993c…`).
-  * iPhone 16'da son kurulu build, integration koşusunun build'i.
-  * Seed'ler simülatör DB'lerinde kaldı (yalnız test verisi).
+* **Kök neden alanı:** Frontend/Mobile Developer, `app/lib/play/widgets/result_view.dart` (bant durumu). Contract veya handoff değişikliği gerekmiyor; §16.11.1 (12) net.
+* **Routing önerisi:** dar bir FE rework (F03-QA-D2-01), ardından Tech Lead checkpoint'i, ardından hedefli re-QA. Değişiklik `result_view.dart` ve testleriyle sınırlı kalırsa bu turun runtime kanıtı (E-J*, E-V*, E-R1, E-N*, E-B*, E-L*, E-RM*, E-D1) yeniden kullanılabilir. Re-QA yalnız metin ölçeği yollarını (E-T1…T5, üç cihaz) ve bir kazanma / retry smoke'unu yeniden yürütmeli; görsel rubric yeniden puanlanmalı.
+* **Workflow notu:** Release scope yok; ürün kararı gerekmiyor.
 
 ## Sonraki Komut
 
