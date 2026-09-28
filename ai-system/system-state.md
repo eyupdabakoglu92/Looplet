@@ -24,7 +24,7 @@ project-authority/release.md — unchanged; explicit release approval remains re
 
 ## Product Authority
 
-product/product-prd.md — unchanged. The user's recorded content decisions are retained; no new product criterion was invented.
+product/product-prd.md — revised 2026-09-29 by PO-REV-2026-09-29-F05-CONTINUE (F05 CONTINUE precedence after 30 / 30; the user's N1 decision), resynced by the Tech Lead the same day. The user's recorded content decisions are retained; no other product criterion changed.
 
 ## Source of Truth
 
@@ -40,50 +40,48 @@ features/f05-journey-progression/orchestration.md
 
 ## Current Phase
 
-Design Adoption Phase D3 — Home + app shell (F05 carrier, `new-surface`); Blocked on a Product Owner revision (N1)
+Design Adoption Phase D3 — Home + app shell (F05 carrier, `new-surface`); D3 handoff F05-UI-D3
 
 ## Current Role
 
-Tech Lead
+UI Designer
 
 ## Current Reason
 
-**Phase D2 closed on 2026-09-29** (F03 Done, gate Passed, 94 / 100; F03 `architecture.md` §20.11), and **D3 — Home + app shell — was activated the same day** with F05 as the carrier (`new-surface`; contract F05 `architecture.md` §18). It is the last Phase D slice.
+**Phase D3 — Home + app shell — is active** (F05 carrier, `new-surface`; contract F05 `architecture.md` §18). It is the last Phase D slice; D1 and D2 closed on 2026-09-28 and 2026-09-29.
 
 D3 re-composes Home on `S-06b` (`Looplet`, the glass card with `YOLCULUK · N / 30` and a new loop-track component, the lime "Devam et" CTA). It also fixes the shell:
 * the native launch and splash, with no white frame (A-4);
-* the F08 `StoreErrorScreen`, in Turkish with no raw exception (A-3; F08 contract amended);
+* the F08 `StoreErrorScreen`, in Turkish with no raw exception (A-3);
 * AX5 on Home (A-2 home).
 
-**The user decided N1 on 2026-09-29:** after all 30 levels are complete, an in-progress replay is surfaced — CONTINUE resumes it (decision F05.D3-N1-REPLAY-PRECEDENCE, RESOLVED). This makes AC7 take precedence over AC9 in their overlap, which is a product AC change. F05 is therefore **Blocked** until the Product Owner records it in `product-prd.md` and the Tech Lead resyncs.
+**N1 is settled:** after all 30 levels are complete, an in-progress replay is surfaced and CONTINUE resumes it (the user's decision, 2026-09-29). The Product Owner recorded it as PO-REV-2026-09-29-F05-CONTINUE, and the Tech Lead resynced F05's PRD and contract the same day. F05 is in Rework, and the UI Designer handoff F05-UI-D3 is open.
 
 ## Last Completed Action
 
-Tech Lead on 2026-09-29 — **D2 closure, then D3 activation.**
-* **D2 closure** (F03 `architecture.md` §20.11): F03-QA-D2R accepted (Approved with Notes, 94 / 100). Verified independently: `app/` fingerprint unchanged; QA's measurement log 48 / 48; smoke probes byte for byte; a synthetic faint band caught; app 512 passed. F03 Done, gate Passed; the pre-closure orchestration archived (history/f03-puzzle-play-session-2026-09-28/orchestration-at-qa-d2r-verdict.md).
-* **D3 activation** (F05 `architecture.md` §18):
-  * F05 reopened, Visual Scope `new-surface`, gate Pending;
-  * the contract: composition, loop track and windowing, copy, C-9, error screen, launch / splash, startup impact, non-goals, evidence;
-  * F05 §8 / §10 and F08 App Init step 1 amended in place;
-  * N1 asked to the user in chat and answered (A); the decision gate is recorded RESOLVED;
-  * F05-UI-D3, F05-FE-D3 and F05-QA-D3 Queued; the UI brief is written.
-  * Archived: the terminal F05 orchestration (history/f05-journey-progression-2026-09-29/orchestration-before-phase-d3.md).
+Tech Lead on 2026-09-29 — **PO revision resync** (PO-REV-2026-09-29-F05-CONTINUE).
+* **Verified:** the revision touches only `product-prd.md` (§6.1 F05 ACs, one edge case, a Revision Log entry) and the board's revision flags, and matches the user's decision exactly.
+* **Resynced:** F05 `prd.md` AC7 / AC9 and one edge case; F05 `architecture.md` §8 terminal precedence lapsed, §6 and §15 amended in place, §18.3 (2) / §18.4 effective.
+* **Impact:** F05 only. F10's CONTINUE AC is consistent; F03, F04, F08 and F09 are unchanged; no Done feature reopened. The shipped terminal-precedence tests stay until F05-FE-D3 replaces them.
+* **State:** Pending Product Revision cleared; F05 Rework; F05-UI-D3 Open; owner → UI Designer.
+* Archived: the Blocked orchestration (history/f05-journey-progression-2026-09-29/orchestration-at-po-revision.md).
 
 ## Next Expected Action
 
-`Run Product Owner. Revise:` the F05 CONTINUE precedence after all 30 levels are complete (the exact command text is in `feature-board.md` → Current Routing and in the F05 orchestration's Next Action).
+Run UI Designer on F05-UI-D3 — the D3 handoff (Current Brief in the F05 orchestration; contract F05 `architecture.md` §18):
+* Home in every state, including the terminal state with a replay in progress (§18.3 (2));
+* the loop track with its windowing rendered at 0 / 4 / 12 / 25 / 30 of 30;
+* the store-error screen, the native launch and splash, AX5;
+* a D3 acceptance list and the Visual Evidence Manifest.
 
-Then:
-* **Run Tech Lead** — resync F05 `prd.md` AC9 and §8 (F05 architecture §18.4), clear the blocker, open F05-UI-D3 (owner → UI Designer);
-* the D3 flow: F05-UI-D3 → visual-gate checkpoint → F05-FE-D3 → parity checkpoint → F05-QA-D3 → closure;
-* F08 local evidence after Phase D.
+Then the Tech Lead's visual-gate checkpoint → F05-FE-D3 → F05-QA-D3 → closure. F08 local evidence follows Phase D.
 
 ## Portfolio Summary
 
 * F01, F02, F04, F06: historical scoped Done retained.
 * F03: Done (2026-09-29) — Design Adoption Phase D2 (won moment + full-screen result, `motion-critical`, architecture §20) closed: F03-QA-D2R Approved with Notes, 94 / 100, gate Passed (§20.11), after one rework (F03-QA-D2-01, the scroll band). D1 (Play) closed 2026-09-28: Approved with Notes, 93 / 100, gate Passed (§19.12).
 * F00: Done again (2026-09-27) — Phase C is complete (the conformance audit was accepted). Its design-system layer closed 2026-09-26: Foundation Selected (Direction C), 90/100, Visual Quality Gate Passed via the scoped exception F00.VISUAL-93-THRESHOLD.
-* F05: **Blocked — the active feature**, reopened 2026-09-29 as Design Adoption Phase D3 (Home + app shell, `new-surface`, architecture §18). N1 decided by the user (surface the replay); waiting on the Product Owner revision. Previously Done 2026-09-27 (F05-QA-STRICT2 Approved with Notes); its tutorial overlay was re-skinned in D1 and its AC1 / §8 wording resynced at D2.
+* F05: **Rework — the active feature**, reopened 2026-09-29 as Design Adoption Phase D3 (Home + app shell, `new-surface`, architecture §18). N1 decided by the user (surface the replay), recorded as PO-REV-2026-09-29-F05-CONTINUE and resynced; F05-UI-D3 with the UI Designer. Previously Done 2026-09-27 (F05-QA-STRICT2 Approved with Notes); its tutorial overlay was re-skinned in D1 and its AC1 / §8 wording resynced at D2.
 * F04: Done — the panel is now the full-screen result (D2, F03 carrier, closed 2026-09-29; F04 §7 / §8 amended 2026-09-28; ACs unchanged and passed on the result).
 * F08: In Progress, queued behind the design adoption (Phase C/D); independent local/emulator validation pending, release task Blocked, release/final acceptance pending.
 * F07, F09–F13: Not Started. Pending follow-ons are in workflow-follow-ups.md.
@@ -114,7 +112,7 @@ F08.DEPLOY-AUTHORIZATION is OPEN with Blocking Scope = release. The old deferral
   * RESULT-APP-SWITCHER-SNAPSHOT — the iOS app-switcher snapshot taken mid-sequence shows a mid-reveal star count;
   * RESULT-F00-COMPONENT-ALIGN — the `EN İYİ` ★ offset and the pressed-pill brightness.
   * Release-build pacing was not measured (debug video only); it belongs to FIRST-APP-DISTRIBUTION.
-* **Commits:** the D1 rework, its closure and the D2 activation are in 489606d — its tracked `app/` diff from 5798c70 hashes to QA's `88f1dca3…` and the two changed sources match QA's SHA-1s (re-verified at the D2 checkpoint); the F03-UI-D2 handoff is in 6352a75; the F03-FE-D2 delivery is in 67d9ecb (`app/` tree `f5641d2f…`, QA's evidence-reuse fingerprint); the F03-QA-D2 verdict is in f28aedb; the reconciliation in 3cd4a3b; the F03-FE-D2R rework in 77c33b9 (`app/` tree `5298c81a…`, the re-QA fingerprint); the F03-QA-D2R verdict in 5677471. The D2 closure and the D3 activation are uncommitted (documents only).
+* **Commits:** the D1 rework, its closure and the D2 activation are in 489606d — its tracked `app/` diff from 5798c70 hashes to QA's `88f1dca3…` and the two changed sources match QA's SHA-1s (re-verified at the D2 checkpoint); the F03-UI-D2 handoff is in 6352a75; the F03-FE-D2 delivery is in 67d9ecb (`app/` tree `f5641d2f…`, QA's evidence-reuse fingerprint); the F03-QA-D2 verdict is in f28aedb; the reconciliation in 3cd4a3b; the F03-FE-D2R rework in 77c33b9 (`app/` tree `5298c81a…`, the re-QA fingerprint); the F03-QA-D2R verdict in 5677471. The D2 closure and the D3 activation are in 171f0c1; the PO revision and its resync are uncommitted (documents only).
 
 ## Contract Version
 

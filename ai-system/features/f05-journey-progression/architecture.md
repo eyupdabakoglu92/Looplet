@@ -7,7 +7,7 @@
 
 **Amended 2026-09-27 (Tech Lead — F05 closure):** §8 + §6 now state terminal precedence explicitly. When all 30 levels are complete, the terminal variant wins over an in-progress replay; this matches AC9, ui-design and the shipped behaviour (QA note N1). To be revisited in Design Adoption Phase D.
 
-**Amended 2026-09-29 (Tech Lead — Design Adoption Phase D3 activation):** §18 added (Home + app shell, `new-surface`). The user decided N1: surface an in-progress replay after 30 / 30 (§18.3 (2)); it replaces the §8 terminal precedence once the Product Owner revision is resynced. §10 and §17 are superseded for the visual by §18.
+**Amended 2026-09-29 (Tech Lead — Design Adoption Phase D3 activation):** §18 added (Home + app shell, `new-surface`). The user decided N1: surface an in-progress replay after 30 / 30 (§18.3 (2)); it replaces the §8 terminal precedence. **Effective 2026-09-29:** the Product Owner revision PO-REV-2026-09-29-F05-CONTINUE was resynced the same day (feature PRD AC7 / AC9). §10 and §17 are superseded for the visual by §18.
 
 Contract authority for F05. Execution state is in `orchestration.md`.
 
@@ -156,7 +156,7 @@ Derived from `journey_progress` + the persisted active-session snapshot, **both 
   * `unlockedIncomplete` ⇔ `n <= highestUnlockedLevel && n ∉ completedLevels`;
   * `inProgress` ⇔ an F08 snapshot exists with `puzzleSource == journey && status == inProgress && parseJourneyLevel(puzzleId) == n` (at most one).
     * This **includes a replay of an already-completed level**: for that level the in-progress state takes precedence over `completed`, and `progressCount` is unaffected.
-    * CONTINUE therefore resumes the replay (product AC7: "Given an in-progress level … that level resumes") — except in the terminal state, where §8's terminal precedence applies.
+    * CONTINUE therefore resumes the replay (product AC7: "Given an in-progress level … that level resumes") — also after all 30 levels are complete *[amended 2026-09-29, PO-REV-2026-09-29-F05-CONTINUE; the 2026-09-27 terminal-precedence exception lapsed, §8 / §18.3 (2)]*.
     * These semantics are unchanged; clarified 2026-09-26.
 * `currentLevel` (for CONTINUE) = the `inProgress` level if any, else `min({n : unlockedIncomplete})`, else `null` (all 30 done → terminal).
 * `progressCount` = `|completedLevels ∩ {1..30}|` (clamp — ignore strays).
@@ -187,7 +187,7 @@ Derived from `journey_progress` + the persisted active-session snapshot, **both 
     * That replay is not surfaced; starting another level supersedes its save.
     * This is an accepted edge with low impact: it only affects post-completion personal-best replays. It is the shipped and QA-verified behaviour.
     * To be revisited when the home is redesigned in Design Adoption Phase D.
-    * **[Superseded, 2026-09-29 — §18.3 (2), the user's N1 decision]:** an in-progress replay is surfaced; the terminal variant ⇔ `continueTarget == null`. Effective once the Product Owner revision of the AC7 / AC9 precedence is resynced; until then this paragraph describes the shipped behaviour.
+    * **[Superseded, effective 2026-09-29 — §18.3 (2), the user's N1 decision, PO-REV-2026-09-29-F05-CONTINUE resynced]:** an in-progress replay is surfaced; the terminal variant ⇔ `currentLevel == null` (`continueTarget == null`), which is the plain rule of the first bullet above. The paragraph above is kept as the record of the shipped behaviour until F05-FE-D3 replaces it.
 * **`Next Level`** (fills F04's `CompletionPanel.onNextLevel`): let `n = <this session's journeyLevel>`. If `n != null && n < 30 && manifest has n+1` → `context.pushReplacement('/play', extra: PlaySessionArgs(source: journey, journeyLevel: n + 1))`. Else → `context.go('/')` (home → terminal variant). **`pushReplacement`** so the back stack never accumulates `/play` frames.
 * **Back:** unchanged from F03 — chevron hidden in `won`; `Close` / system / gesture back → `_popToCaller` *[amended 2026-09-28, F03 §20.3 (7): no `Close`; the result's back button and system / gesture back]*, which **must resolve to `/`** (add a `context.go('/')` fallback when `!canPop`, e.g. a deep-link entry). From any Journey level, back lands on `/`.
 * **Route graph:** `/` ⇄ `/play` only. Every `/play` exit → `/`. No 30-deep stack. No wrong-route, no empty stack.
@@ -265,7 +265,7 @@ F05-FE adds `journey_col_tutorial_ack` here; any future `kv` key is added to thi
 ## 15. QA Focus [LOCKED]
 
 * **Progression (`automated functional`):** unlock N→N+1 at 1★ **and** 3★ (AC1/AC13 — the unlock write is star-agnostic, so an end-to-end 1★ solve is a *bonus*, not a gate; the required evidence is that `_resolveJourneyUnlock` fires irrespective of the star result and the CTA weighting enables `Next Level` at 1–2★); **AC2 — no F05 navigation path resolves to a `locked` level** (asserted across new / mid / in-progress / terminal + the last-available boundary; see §12 — the explicit locked *affordance* is `[DEFERRED — F10]`, no direct-entry guard on the hot path); replay a completed level → no re-lock / no progress change; `markCompleted` idempotency against the **real F08 `JourneyProgressRepo`** + an in-memory DB.
-* **CONTINUE / resume:** in-progress → resumes at the exact saved state (kill/relaunch — via the F08 restore path; an ad-hoc device pass folds into the eventual first-app-distribution smoke) (AC7); no in-progress → lowest unlocked incomplete (AC8); all 30 → terminal, no crash (AC9).
+* **CONTINUE / resume:** in-progress → resumes at the exact saved state (kill/relaunch — via the F08 restore path; an ad-hoc device pass folds into the eventual first-app-distribution smoke) (AC7); no in-progress → lowest unlocked incomplete (AC8); all 30 and no session in progress → terminal, no crash (AC9); all 30 with a replay in progress → CONTINUE resumes it, warm and cold (AC7) *[amended 2026-09-29, PO-REV-2026-09-29-F05-CONTINUE]*.
 * **Warm path (`automated functional`) [amended 2026-09-26, F05-QA-STRICT-3].** With the home mounted, `/play` may write, change or clear the active-session snapshot. Cases:
   * a frontier level is started;
   * a completed level is replayed;
@@ -358,7 +358,7 @@ The shell carries three player-visible defects:
    * With 30 / 30 complete and no session in progress, the terminal variant is unchanged: AC9's graceful state, and the CTA replays level 1.
    * The CTA never discards a session in progress. A secondary action that would start another level while a replay is in progress is not part of this contract. If the UI Designer proposes one, it needs a Tech Lead ruling.
    * In model terms: the terminal variant ⇔ `continueTarget == null` (`JourneyProgressModel`, §6). The §6 derivation is unchanged; only the §8 override is removed.
-   * **Product precedence (AC7 over AC9 in their overlap) changes a product acceptance criterion.** It takes effect only after the Product Owner revision records it in `product/product-prd.md` and the Tech Lead resyncs F05 `prd.md` (role-execution-contract §4, "Product authority"). Until then, no F05 delivery task runs.
+   * **Product precedence (AC7 over AC9 in their overlap) changes a product acceptance criterion.** It was recorded by the Product Owner as **PO-REV-2026-09-29-F05-CONTINUE** (`product/product-prd.md`) and resynced by the Tech Lead into F05 `prd.md` AC7 / AC9 on 2026-09-29. **Effective.**
 3. **The loop track (new design-layer component).**
    * Rounded-square numbered nodes joined by a lime → periwinkle line along a rising curve, with the decorative swirl arcs of `S-06b`. Done = lime; current = periwinkle with the 76 pt halo; locked = the UI Designer's treatment, never colour-only.
    * **30-level windowing:** the card shows a window of the Journey, not all 30 nodes. The UI Designer proposes the rule, and it is rendered at 0 / 30, 4 / 30, 12 / 30, 25 / 30 and 30 / 30. Required: the current node is always inside the window; nodes never overlap each other or sit under another element; the window reads as a place in a longer journey.
@@ -387,7 +387,9 @@ The shell carries three player-visible defects:
 
 ### 18.4 Contract amendments
 
-* **§8 CONTINUE / terminal:** the 2026-09-27 terminal-precedence paragraph lapses and is replaced by §18.3 (2) **once the Product Owner revision is resynced**. Until then the shipped behaviour stands.
+* **§8 CONTINUE / terminal:** the 2026-09-27 terminal-precedence paragraph **has lapsed** and is replaced by §18.3 (2) (PO-REV-2026-09-29-F05-CONTINUE resynced 2026-09-29). The shipped app keeps the old behaviour until F05-FE-D3 lands.
+* **§6 read-model:** the replay bullet's terminal exception is removed (amended in place). The derivation itself is unchanged.
+* **§15 QA focus:** "all 30 → terminal" now reads "all 30 and no session in progress → terminal; all 30 with a replay in progress → CONTINUE resumes it", warm and cold.
 * **§10 Home Surface:** "LOOPLET wordmark" becomes `Looplet`; the ring-style indicator becomes the loop track (§18.3 (3)); the terminal variant is rendered with copy (§18.3 (4)). AC10 is met by `YOLCULUK · N / 30` together with the track.
 * **§17 Open Items:** the `[PENDING — UI]` home item is superseded by the D3 handoff.
 * **F05 `ui-design.md`:** its home sections (Direction A, `PlayTheme` tokens) are superseded by the D3 handoff. The micro-tutorial overlay sections were already superseded by F03 D1 (§9).

@@ -1,6 +1,8 @@
 # F05 — journey-progression: Feature PRD
 
 > Derived from `product/product-prd.md` → "journey-progression (F05)" + the F05 row in §6.1 + §5.1/§5.2 (user flows) + §15 (`JourneyProgress`) + §41 KPIs. Scope-specific; the product PRD remains the source of truth.
+>
+> **Resynced 2026-09-29 (Tech Lead) to PO-REV-2026-09-29-F05-CONTINUE:** AC7, AC9 and one edge case (CONTINUE precedence after all 30 levels are complete; the user's decision F05.D3-N1-REPLAY-PRECEDENCE).
 
 ---
 
@@ -31,9 +33,9 @@ F05 does **not** own: the play mechanic (F03), the star rating / completion pane
 * **AC4** — Given the player **first** enters the **4–6** band, When the level loads, Then a short column-shift micro-tutorial is shown and column shifts become available.
 * **AC5** — Given levels **7–10**, When played, Then rows and columns are both available with optimal 4–6.
 * **AC6** — Given levels **11–15 / 16–20 / 21–25 / 26–30**, When played, Then respectively: heavier temporary-displacement / locked tiles / frozen tiles / locked+frozen combos, matching the difficulty curve.
-* **AC7** — Given an in-progress level, When **CONTINUE** is tapped, Then that level resumes at its **saved state** (grid, moves, undo history, thawed tiles, elapsed time — via the F08 restore path).
+* **AC7** — Given an in-progress level, When **CONTINUE** is tapped, Then that level resumes at its **saved state** (grid, moves, undo history, thawed tiles, elapsed time — via the F08 restore path). This includes a replay of an already-completed level, and it applies even when all 30 levels are complete. *[Resynced 2026-09-29 — PO-REV-2026-09-29-F05-CONTINUE.]*
 * **AC8** — Given no in-progress level, When **CONTINUE** is tapped, Then the player lands on their **lowest un-completed unlocked level** (Level 1 for a brand-new player, subject to F09 — see §5).
-* **AC9** — Given all 30 levels are complete, When CONTINUE is tapped, Then a graceful "**all levels complete**" state is shown with no crash.
+* **AC9** — Given all 30 levels are complete **and no Journey level is in progress**, When CONTINUE is tapped, Then a graceful "**all levels complete**" state is shown with no crash. *[Resynced 2026-09-29 — PO-REV-2026-09-29-F05-CONTINUE: an in-progress replay takes precedence (AC7).]*
 * **AC10** — Given the Journey, When shown, Then a **progress indicator** (e.g. "12 / 30" + completed/unlocked state) is visible and accurate.
 * **AC11** — Given the player force-quits during the 4–6 column micro-tutorial, When they return, Then it **re-shows** until acknowledged.
 * **AC12** — Given `Next Level` on the F04 completion panel of level N (N < 30), When tapped, Then the player navigates to level N+1's play session; Given N == 30, Then it routes to the "all levels complete" state.
@@ -46,6 +48,7 @@ F05 does **not** own: the play mechanic (F03), the star rating / completion pane
 
 * **Stars never gate progression** — 1★ still unlocks the next level (AC13).
 * **Replaying a completed level** cannot re-lock it or reduce progress (`JourneyProgressRepo.markCompleted` is idempotent for progress).
+* **All 30 complete and a replay left unfinished** → CONTINUE resumes the replay (AC7); progress still reads 30 / 30. CONTINUE never silently discards a level in progress. *[Added 2026-09-29 — PO-REV-2026-09-29-F05-CONTINUE.]*
 * **Corrupt or missing level asset** → skip with a logged error; the rest of the Journey stays playable (do not crash the whole campaign).
 * **Fewer than 30 levels present in a build** → caught by a build gate (content-manifest check, extends F06's `check`); runtime still shows accurate progress against whatever is present.
 * **Player at level 30, not complete** → `Next Level` on level 29's panel goes to 30; level 30's `Next Level` → the "all complete" state.

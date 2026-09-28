@@ -6,19 +6,19 @@ F05
 
 ## Current Status
 
-Rework
+Blocked
 
 ## Current Owner
 
-UI Designer
+Tech Lead
 
 ## Next Role
 
-UI Designer
+Tech Lead
 
 ## Active Task Ledger
 
-- [ ] Task ID: F05-UI-D3 | Assigned Role: UI Designer | Status: Open | Summary: The D3 handoff in F05 `ui-design.md` (replacing the Direction A home sections): Home in every §18.2 state incl. the N1 terminal-with-replay state, the loop track and its 30-level windowing (0 / 4 / 12 / 25 / 30), the store-error screen, the native launch + splash (iOS; Android light / dark), AX5, copy proposals, a D3 acceptance list and the Visual Evidence Manifest. Contract architecture §18. Brief: Current Brief | Depends On: -
+- [ ] Task ID: F05-UI-D3 | Assigned Role: UI Designer | Status: Queued | Summary: The D3 handoff in F05 `ui-design.md` (replacing the Direction A home sections): Home in every §18.2 state incl. the N1 terminal-with-replay state, the loop track and its 30-level windowing (0 / 4 / 12 / 25 / 30), the store-error screen, the native launch + splash (iOS; Android light / dark), AX5, copy proposals, a D3 acceptance list and the Visual Evidence Manifest. Contract architecture §18. Brief: Current Brief | Depends On: -
 - [ ] Task ID: F05-FE-D3 | Assigned Role: Frontend/Mobile Developer | Status: Queued | Summary: Implement the D3 handoff from `app/lib/design` (Home, the loop-track addition, splash, `StoreErrorScreen`, native launch assets, `MaterialApp` ground) and the §18.3 (2) CONTINUE rule; tests updated (§18.4); `frontend.md` Visual Parity Evidence with a cold-start recording and the production-shaped cold boot (architecture §18.6) | Depends On: F05-UI-D3
 - [ ] Task ID: F05-QA-D3 | Assigned Role: QA | Status: Queued | Summary: Final-stage independent visual QA of D3 (rubric ≥ 93 from runtime; F05 AC7–AC10 / AC12 incl. the N1 replay rule warm and cold; error screen + Retry; cold start with no white frame; D1 / D2 regression over Home ⇄ `/play`) (architecture §18.6) | Depends On: F05-FE-D3
 
@@ -104,7 +104,7 @@ The D1 / D2 surfaces that Home opens into and returns from (gate Passed 2026-09-
   * Required Class: static inspection of rendered artefacts (+ an executable prototype if Home motion is proposed)
   * Target / Environment: features/f05-journey-progression/ui-design.md and its render files (393 × 852, plus 390 × 844 and 440 × 956)
   * Owner Role: UI Designer
-  * Prerequisite / External Decision: the N1 Product Owner revision resynced — met 2026-09-29 (PO-REV-2026-09-29-F05-CONTINUE)
+  * Prerequisite / External Decision: the N1 Product Owner revision resynced (Blockers)
   * Re-evaluation Trigger: F05-UI-D3 delivery
   * Blocks: Visual Quality Gate = Ready for Implementation; F05-FE-D3
   * Result: PENDING
@@ -138,42 +138,55 @@ The D1 / D2 surfaces that Home opens into and returns from (gate Passed 2026-09-
   * Blocks: F05-UI-D3 (the terminal-with-replay state) and F05-FE-D3 (the CONTINUE rule)
   * Blocking Scope: feature
   * Status: RESOLVED
-  * Resolution: (A) resume the replay — chosen by the user in chat, 2026-09-29 (asked in Turkish; option "Yarım kalanı sürdür"). Recorded in architecture §18.3 (2). It changes the AC7 / AC9 precedence, so a Product Owner revision was routed before any F05 delivery: PO-REV-2026-09-29-F05-CONTINUE, resynced by the Tech Lead on 2026-09-29 (feature PRD AC7 / AC9; architecture §18.3 (2) effective).
+  * Resolution: (A) resume the replay — chosen by the user in chat, 2026-09-29 (asked in Turkish; option "Yarım kalanı sürdür"). Recorded in architecture §18.3 (2). It changes the AC7 / AC9 precedence, so a Product Owner revision is routed (Blockers) before any F05 delivery.
   * Resolved At: 2026-09-29
 
 ## Blockers
 
-None
+* **Product Owner revision pending (N1).** The user's decision F05.D3-N1-REPLAY-PRECEDENCE (A) makes AC7 take precedence over AC9 when all 30 levels are complete and a replay is in progress. `product/product-prd.md` is Product Owner authority, so the precedence clause must be written there first. Then the Tech Lead resyncs F05 `prd.md` AC9 and §8 (architecture §18.4), opens F05-UI-D3 and sets the feature executable. Command: `Run Product Owner. Revise: ...` (Next Action).
 
 ## Next Action
 
-Run UI Designer on F05-UI-D3 — the D3 handoff (Current Brief; architecture §18).
+Waiting on the Product Owner revision. Next command:
+
+`Run Product Owner. Revise: F05 journey-progression — CONTINUE precedence after all 30 levels are complete (user decision 2026-09-29, F05.D3-N1-REPLAY-PRECEDENCE, option A). When all 30 Journey levels are complete and a replay of a completed level is in progress, CONTINUE resumes that replay at its saved state (AC7); the graceful "all levels complete" state (AC9) applies only when no Journey level is in progress. Progress stays 30 / 30. Affected feature: F05.`
+
+Then Run Tech Lead: resync F05 `prd.md` AC9, apply §8 per architecture §18.4, clear the blocker, open F05-UI-D3 (owner → UI Designer).
 
 ## Last Decision
 
-2026-09-29 (PO revision resync) — the Tech Lead resynced **PO-REV-2026-09-29-F05-CONTINUE** and unblocked D3.
+2026-09-29 (D3 activation) — the Tech Lead reopened F05 as **Design Adoption Phase D3 — Home + app shell**, right after the D2 closure (F03 `architecture.md` §20.11).
 
-**Verified:** the revision changes only `product/product-prd.md` (§6.1 F05: the in-progress AC, the all-complete AC, one edge case, and a Revision Log entry) and the feature-board revision flags. Its text matches the user's decision F05.D3-N1-REPLAY-PRECEDENCE (A) exactly. No feature, dependency, priority, MVP scope, metric or domain object changed.
+**Classified:** Visual Scope `new-surface` (audit §3, §8); carrier F05, with the native launch, the Flutter splash, the `MaterialApp` ground and the F08 `StoreErrorScreen` as cross-feature shell items (C-2, C-6, C-7); Foundation Selected; gate Pending.
 
-**Impact reviewed:**
-* **F05 (the only affected feature):** feature PRD AC7 / AC9 and one edge case resynced; `architecture.md` §8 terminal precedence lapsed, §6 replay bullet and §15 QA focus amended in place; §18.3 (2) and §18.4 now effective.
-* **F05 evidence:** the 2026-09-27 terminal-precedence behaviour and its tests stay the record of the shipped app until F05-FE-D3 replaces them. The new rule is proven in D3 (F05.D3-PARITY, F05.D3-VISUAL-QA; architecture §18.6).
-* **Other features:** F10's CONTINUE AC ("current or next Journey level") is consistent — a replay in progress is the current level. F03 / F04 (Next Level on level 30 → `/`; the snapshot is cleared at `won`, so Home shows the terminal state), F08 (snapshot restore) and F09 (new-player routing) are unchanged. No Done feature is reopened.
+**Decided with the user:** N1 (C-1) → surface an in-progress replay after 30 / 30 (decision F05.D3-N1-REPLAY-PRECEDENCE, RESOLVED). Because it changes the AC7 / AC9 precedence, a Product Owner revision is routed first; F05 is Blocked until it is resynced.
 
-**State:** Rework; blocker cleared; F05-UI-D3 Open, F05-FE-D3 and F05-QA-D3 Queued; Delivery Review Pending; Visual Quality Gate Pending; owner → UI Designer. Pending Product Revision cleared on the board.
+**Contract (architecture §18):**
+* composition `S-06b`; the future-scope items are not built;
+* the loop track as a new design-layer component, with a windowing rule rendered at 0 / 4 / 12 / 25 / 30;
+* interim copy (`Looplet`, `YOLCULUK · N / 30`, "Sıradaki döngüyü çöz.", "Devam et");
+* C-9 on Home and the error screen: fits without scroll up to the 1.3× cap, may scroll above it;
+* the error screen: Foundation pattern, Turkish copy, no raw exception outside debug;
+* launch and splash: the ground colour everywhere, no white frame;
+* startup impact yes → production-shaped cold boot required;
+* no route, read-model, unlock or persistence change.
 
-The pre-resync orchestration (the D3 activation decision) is archived byte-for-byte as history/f05-journey-progression-2026-09-29/orchestration-at-po-revision.md.
+**Amended in place:** F05 `architecture.md` header, §8 (superseded note, effective after the resync), §10; F08 `architecture.md` App Init Sequence step 1 (C-6). F08 stays In Progress, unchanged.
+
+**State:** Current Status Blocked (Product Owner revision); F05-UI-D3, F05-FE-D3 and F05-QA-D3 Queued; Delivery Review Pending; owner Tech Lead.
+
+The terminal F05 orchestration (closure 2026-09-27) is archived byte-for-byte as history/f05-journey-progression-2026-09-29/orchestration-before-phase-d3.md.
 
 ## Last Update
 
 * Updated By: Tech Lead
 * Timestamp: 2026-09-29
-* Summary: PO revision resync — PO-REV-2026-09-29-F05-CONTINUE resynced (feature PRD AC7 / AC9; §8 / §6 / §15 amended; §18.3 (2) effective); blocker cleared; F05-UI-D3 Open; owner → UI Designer.
+* Summary: D3 activation — F05 reopened (`new-surface`, architecture §18); N1 decided by the user (surface the replay); Blocked on the Product Owner revision; F05-UI-D3 Queued.
 
 ## Context & Follow-ups
 
 * **Phase D:** D1 (Play) closed 2026-09-28; D2 (won moment + result) closed 2026-09-29; **D3 (Home + shell) active** — the last slice.
-* **D3 inputs:** PO-REV-2026-09-29-F05-CONTINUE (resynced); DESIGN-ADOPTION-CONTRACT-AMENDMENTS (D3 items C-1, C-6, C-7); the audit's D3 renders 19–26; A-2 home at AX5 (also F03-QA-D2R N5), A-3, A-4; the error-surface text-scale note (F03 §19.12 (6), OPTIONAL-QUALITY-NOTES).
+* **D3 inputs:** DESIGN-ADOPTION-CONTRACT-AMENDMENTS (D3 items C-1, C-6, C-7); the audit's D3 renders 19–26; A-2 home at AX5 (also F03-QA-D2R N5), A-3, A-4; the error-surface text-scale note (F03 §19.12 (6), OPTIONAL-QUALITY-NOTES).
 * **May be taken if D3 touches the component:** MOVESCARD-COUNTER-LINE-HEIGHT, RESULT-F00-COMPONENT-ALIGN (architecture §18.5).
 * **Carried F05 notes (closure 2026-09-27):**
   * N2 — the label-band table is duplicated (`journeyLabelBand` and `_expectedBands`);
@@ -185,7 +198,7 @@ The pre-resync orchestration (the D3 activation decision) is archived byte-for-b
 
 ## History & Evidence References
 
-* [Terminal orchestration before the D3 reopen](../../history/f05-journey-progression-2026-09-29/orchestration-before-phase-d3.md) (the 2026-09-27 closure, its full evidence and change log); [orchestration at the PO revision](../../history/f05-journey-progression-2026-09-29/orchestration-at-po-revision.md) (the D3 activation decision, Blocked).
+* [Terminal orchestration before the D3 reopen](../../history/f05-journey-progression-2026-09-29/orchestration-before-phase-d3.md) (the 2026-09-27 closure, its full evidence and change log).
 * Earlier snapshots: [at the F05-QA-STRICT verdict](../../history/f05-journey-progression-2026-09-26/orchestration-at-qa-strict-verdict.md); [at the F05-FE3 delivery](../../history/f05-journey-progression-2026-09-27/orchestration-at-fe3-delivery.md); [before closure](../../history/f05-journey-progression-2026-09-27/orchestration-before-closure.md); [original orchestration](../../history/core-sync-2026-09-18/features/f05-journey-progression/orchestration.md) — historical only, not a run queue.
 * Reports: [QA report](qa.md), [delivery report](frontend.md), [UI design](ui-design.md) (Direction A home — superseded by D3), [contract](architecture.md) (§18 D3).
 * [Portfolio follow-ups](../../workflow-follow-ups.md) (Design Adoption Route); [Phase C audit](../f00-design-foundation/conformance-audit.md).
@@ -199,14 +212,10 @@ The pre-resync orchestration (the D3 activation decision) is archived byte-for-b
   * **Decided:** architecture §18 (contract and rulings); Visual Scope `new-surface`; gate Pending; F08 §App Init step 1 amended (C-6).
   * **With the user:** N1 → surface the replay (F05.D3-N1-REPLAY-PRECEDENCE RESOLVED).
   * **Next:** Blocked on the Product Owner revision (AC7 / AC9 precedence); then the Tech Lead resync opens F05-UI-D3.
-* 2026-09-29 — Product Owner: PO-REV-2026-09-29-F05-CONTINUE (product PRD F05 AC7 / AC9 precedence; affected F05).
-* 2026-09-29 — Tech Lead: PO revision resync.
-  * **Decided:** feature PRD AC7 / AC9 resynced; §8 terminal precedence lapsed; §6 / §15 amended; §18.3 (2) effective; revision flag cleared.
-  * **Next:** Rework; F05-UI-D3 Open; owner → UI Designer.
 
 ## Current Brief
 
-**F05-UI-D3 — the D3 handoff: Home + app shell** (contract: architecture.md §18; authority: design-foundation §18, F00 ui-design §6–§8, §10, §13; selected source `S-06b`). **Open since 2026-09-29** (PO-REV-2026-09-29-F05-CONTINUE resynced; the N1 rule of §18.3 (2) is in force).
+**F05-UI-D3 — the D3 handoff: Home + app shell** (contract: architecture.md §18; authority: design-foundation §18, F00 ui-design §6–§8, §10, §13; selected source `S-06b`). **Queued — it runs after the Product Owner revision is resynced.**
 
 **Deliver in F05 `ui-design.md`** — replace the Direction A home sections with the D3 sections. Move the superseded text byte-for-byte to `history/f05-journey-progression-2026-09-29/ui-design-before-phase-d3.md` first. The micro-tutorial sections point to F03 D1 (already superseded).
 
