@@ -106,6 +106,8 @@ F03's `PlaySessionController.commitShift()` (or `_finishShift()`) currently, on 
 
 ## 7. Completion Panel [LOCKED contract; `[PENDING — UI]` visual handoff]
 
+> **[Amended 2026-09-28 — F03 `architecture.md` §20 (Design Adoption Phase D2)]:** the panel becomes a **full-screen result** (no board behind, no Close). The content (AC7) and the variants below stay; the markers and badges follow F03 §20.3 (5), the CTA weighting §20.3 (6). The Direction A visual notes below are superseded by the F03 D2 handoff. F04 AC1–AC10 are unchanged.
+
 Replaces `app/lib/play/widgets/completion_sheet.dart` (F03's minimal seam). Rises over F03's dimmed + recede board and the amber seam bar (F03 `ui-design.md` Direction A) — **chrome / atmosphere parity with F03**: the same raised dark panel family, the same scrim, the same amber accent language.
 
 **Content (AC7 — all required):**
@@ -135,7 +137,7 @@ Replaces `app/lib/play/widgets/completion_sheet.dart` (F03's minimal seam). Rise
 * F04 adds **no route**. The panel is an overlay on F03's `/play` screen (as F03's minimal sheet already is).
 * `Retry` → `PlaySessionController.retryFromCompletion()` (F03) — restart in place, panel dismisses.
 * `Next Level` → a callback the `/play` screen provides. In F04's scope it is inert/disabled (`[PENDING — F05]`). F05 supplies the real handler (advance the Journey, route to the next level's `/play`, respect unlock).
-* `Close` / system back from the panel → pop to the caller (F03's chevron behaviour is hidden in `won`; the panel owns exit via its CTAs). Keep F03's `_popToCaller` fallback.
+* `Close` / system back from the panel → pop to the caller (F03's chevron behaviour is hidden in `won`; the panel owns exit via its CTAs). Keep F03's `_popToCaller` fallback. **[Amended 2026-09-28, F03 §20.3 (7)]:** there is no `Close`; the result's back button ("Ana ekrana dön") and system back → `_popToCaller` → `/`.
 
 ---
 

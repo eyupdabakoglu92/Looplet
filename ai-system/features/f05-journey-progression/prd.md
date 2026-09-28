@@ -25,7 +25,7 @@ F05 does **not** own: the play mechanic (F03), the star rating / completion pane
 
 ## 3. Acceptance Criteria
 
-* **AC1** — Given level N is completed with **any** star count, When the completion panel closes (via `Next Level` or `Close`), Then level N+1 is unlocked.
+* **AC1** — Given level N is completed with **any** star count, When the completion panel closes (via `Next Level`, the back button or system back), Then level N+1 is unlocked. *[Wording resynced 2026-09-28 by the Tech Lead — F03 `architecture.md` §20.4, audit C-3: the result has no `Close` (the user's decision 2); the unlock is written at `won`, so the semantics are unchanged.]*
 * **AC2** — Given level N is not completed, When the player attempts to open level N+1, Then it is unavailable (no navigation, a clear locked affordance).
 * **AC3** — Given levels **1–3**, When played, Then column moves are disabled and only row shifts are available; optimal is 2 moves. *(Resynced 2026-09-26 by the Tech Lead to the authoritative `product-prd.md` AC, which was corrected 2026-09-13 on the user's decision — `3–4` is unachievable for a rows-only 5×5 with a 5-letter target; see §6 below and `architecture.md §5.4`. Derived-copy sync only; no semantic change.)*
 * **AC4** — Given the player **first** enters the **4–6** band, When the level loads, Then a short column-shift micro-tutorial is shown and column shifts become available.

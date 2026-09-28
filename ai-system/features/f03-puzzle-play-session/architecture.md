@@ -49,7 +49,7 @@ Define the play-session screen's interaction contract: how a swipe becomes an en
 
 ### Exit / completion paths
 
-* **Win:** target word forms on a settled move → input locks → win highlight → success animation → completion panel → the panel's actions: **Retry** (`engine.restart()` in place) or **Close** (pop to the caller / menu). On entering the completion panel, F03 writes a `status: completed` snapshot then calls `ActiveSessionRepo.clearActiveSession()` — a subsequent entry to the same puzzle starts fresh.
+* **Win:** target word forms on a settled move → input locks → win highlight → success animation → completion panel → the panel's actions: **Retry** (`engine.restart()` in place) or **Close** (pop to the caller / menu). **[Amended 2026-09-28, §20]:** the panel becomes a full-screen result; its exits are Next, Retry, the back button and system back — no Close. On entering the completion panel, F03 writes a `status: completed` snapshot then calls `ActiveSessionRepo.clearActiveSession()` — a subsequent entry to the same puzzle starts fresh.
 * **Back / leave mid-puzzle:** pop to the caller. The active-session snapshot is **kept** with `status: inProgress` so CONTINUE (F05/F10) and cold-relaunch resume work. No confirmation dialog.
 * **App backgrounded:** F08's session-level lifecycle owns the `paused` flush + drain; F03 guarantees the snapshot it has written always reflects a **settled** state.
 
@@ -158,6 +158,7 @@ Coordinate orientation follows F02 (`GridCoord`, row/col conventions, L→R win 
 4. Open the completion panel.
    * **F04 owns the real panel** (target word, player moves, optimal, stars, "Perfect", personal best, Retry, Next Level).
    * **F03 ships a minimal functional panel** as a seam: target word, player move count, **Retry** (`engine.restart()` in place, back to `idle`), **Close** (pop to caller). No stars, no best, no "Next". F04 replaces this panel; F03's version must not encode any rating logic.
+   * **[Amended 2026-09-28, §20]:** the step becomes the board → full-screen result transition (timeline §20.3 (1)); no Close.
 5. On panel open: `status: completed` snapshot → `clearActiveSession()`.
 
 ---
@@ -187,7 +188,7 @@ Coordinate orientation follows F02 (`GridCoord`, row/col conventions, L→R win 
 * **Portrait-locked** for the whole screen lifetime.
 * Header / chrome: a minimal back affordance that pops to the caller; no mandated title bar. Exact chrome is `[PENDING — UI]` and must follow `design-doctrine.md`. If a shared header standard emerges across screens later, this section is amended. **[Amended 2026-09-27, §19]:** the back affordance becomes the drawn back chevron with the `SEVİYE NN` level label, plus the `HAMLE` card top-right; the behaviour is unchanged.
 * Back mid-puzzle keeps the resumable `inProgress` snapshot (§9). Back is confirm-less.
-* No forward navigation from F03 except the completion panel's Close/Retry and (later) F04's "Next Level".
+* No forward navigation from F03 except the completion panel's Close/Retry and (later) F04's "Next Level". **[Amended 2026-09-28, §20.3 (7)]:** the result's exits are Next, Retry, the back button and system back.
 
 ---
 
@@ -482,3 +483,160 @@ The Tech Lead re-measured both blocking findings from QA's stored captures (same
    * Final stage; modules core, client-ui, visual-quality, stateful-flow; Regression Depth full with Evidence Reuse allowed.
    * QA's F03-QA-D1 evidence stays valid for every surface the rework's `app/` diff does not touch. QA confirms that from the diff.
    * The text sweep (large → AX5) on the three devices, the two reworked surfaces and a full rubric re-score are required.
+
+### 19.11 Rework checkpoint rulings (Tech Lead, 2026-09-28)
+
+The F03-FE-D1R delivery (working tree on `97c700e`; `frontend.md` § F03-FE-D1R) is **accepted**. The Visual Quality Gate is **Ready for QA**, and F03-QA-D1R is open.
+
+**Verified independently at the checkpoint:**
+* **Scope:** the `app/` diff touches only `MovesCard` (`app/lib/design/components/info.dart`, inside the §19.10 (1) allowance), the `_LoadErrorView` headline (`app/lib/play/play_session_screen.dart`, the `ConstrainedBox(maxWidth: 230 * s)` removed, the cap kept) and tests. No token value, `LoopText` role, font, tracking, dependency, route, gesture, timing or persistence change. `MovesCard` has two consumers — Play and the debug gallery — as §19.10 (1) states. `feature-board.md`, `system-state.md`, `architecture.md` and `ui-design.md` were not touched by the delivery.
+* **Suites re-run:** `melos run analyze` clean; `flutter test` (app) 472 passed; `dart format` 0 changed in `app`, `packages`, `tools`. `integration_test` 13 / 13 on the iPhone 16 is the Frontend's record (not re-run here — the diff has no behaviour path it exercises).
+* **Tests read:** `moves_card_ink_test.dart` rasterises the real glyphs (bundled fonts, app Material theme) and measures them against the card's rounded rect, arcs included — not a layout box. `load_error_headline_test.dart` reads the laid-out lines and flags punctuation-only lines and mid-word breaks; the checker has its own negative unit test.
+* **Negative runs** — each rule broken on purpose, the tests run, the file restored (SHA-1 verified):
+  * N1 `capGrowth = 0` (no growth) — 33 fail;
+  * N1b `capGrowth = 9` (too little) — 26 fail;
+  * N3 full growth at the default size — 7 fail (the 60 × 63·s default-size checks, incl. `components_test`);
+  * N2 the HEAD `play_session_screen.dart` (230·s limit) — 12 fail;
+  * N2c the headline uncapped — 9 fail.
+  * A 245·s limit passes, correctly: the test checks the word-break rule, not a width.
+* **Runtime measurements:** `design/src/measure-d1r.swift` re-run on all 30 captures in `design/runtime-d1r/` reproduces `measurements-d1r.txt` line for line (165 / 165). On QA's pre-rework captures the same tool reads −4.76 pt (QA-16-16) and flags the "." line (QA-16-28). Label inset after the fix: ≥ 2.98 pt (16), ≥ 3.22 (16e), ≥ 3.27 (Pro Max); the headline is two lines at every size. Composites PC-D1R-hamle-ax5 and PC-D1R-error-ax5 and the 16e AX5 capture were inspected.
+
+**Rulings on the Frontend's clarifications (`frontend.md` § F03-FE-D1R §16):**
+1. **NTLC-D1R-1:** MOVESCARD-CAP-MARGIN is **closed** in `workflow-follow-ups.md` (superseded by §19.10 (1), fixed and verified here).
+2. **NTLC-D1R-2 — the counter inherits the ambient line height: accepted as is for D1; logged.** The Play look is the accepted one, the tests pin the app's Material context, and the rect rule still holds in another context because the growth only adds room. Changing `LoopText.counter` is outside §19.10 (1). Logged as **MOVESCARD-COUNTER-LINE-HEIGHT** (`workflow-follow-ups.md`) for the next design-layer touch (D3 or F10's global theme).
+3. **§19.10 (4) evidence correction: done** — A11Y-16-text and NTLC-3 carry "Corrected" notes; the original D1 text is kept.
+
+**Evidence reuse for F03-QA-D1R (§19.10 (5)):** QA's F03-QA-D1 evidence (HEAD 5798c70, `app/` = b8b5f60) stays valid for every surface and state the rework does not render differently — QA confirms from `git diff 5798c70 -- app/`. Invalidated and re-run: every Play capture at an OS size above `large` (the `HAMLE` card is in every Play header, the tutorial included), the load-error state at every size, and the rubric score, which is re-scored in full. Default-size Play captures stay valid where the diff leaves the card at exactly 60 × 63·s.
+
+### 19.12 D1 closure rulings (Tech Lead, 2026-09-28)
+
+F03-QA-D1R (`qa.md`; HEAD 97c700e + the F03-FE-D1R working tree) returned **Approved with Notes**. The independent rubric is **93 / 100**, every dimension ≥ 9, with no fail condition and complete runtime evidence. F03.D1R-VISUAL-QA is PASS. The verdict is **accepted**; the Visual Quality Gate is **Passed**, and D1 closes (F03 Done).
+
+**Verified independently at the closure:**
+* **Revision:** `git diff 5798c70 -- app` still hashes to QA's value (`88f1dca3…`), and the three new test files and both changed sources match QA's SHA-1s. The verdict covers exactly the delivered rework.
+  * The rework, the rework checkpoint and the QA run are uncommitted. The closure binds to that fingerprint; the next commit must contain it unchanged.
+* **Measurements:** QA's own tool (`qa/d1r/src/qa-d1r.swift`, SHA-1 `fa328093…`) was recompiled and re-run on every capture. It reproduces `qa/d1r/QM-d1r-measurements.txt` line for line (253 / 253).
+* **The tool catches violations** — negative checks not run by QA:
+  * a label-coloured 1-pt patch painted outside the card's bottom-left arc: 4 pixels flagged outside, inset −6.49 pt;
+  * the same patch 1 pt inside the arc: inset 0.46 pt, below the ≥ 2 pt rule;
+  * QA's own negatives on the D1 captures (−3.80 pt; the "." line) reproduce.
+  * Caveat: a bright patch inside the corner scan region nudges the radius fit (label inset 3.41 → 3.66 pt on that capture). The violation is still flagged. A future reuse of the tool should keep a negative control beside every run.
+* **Suite:** `flutter test` (app) re-run — 472 passed.
+* **Captures read:** the 16e L26 and the Pro Max load error, both at AX5. Label inside its card, headline on two lines between words, pill reflowed.
+* **Simulators:** the 16e and Pro Max are at `large`, Reduce Motion 0, and `journey-tr-07.json` equals the repo (`2fef993c…`), as QA recorded.
+
+**Rulings:**
+1. **Score at the threshold: accepted.** The change from 87 to 93 sits entirely in the four dimensions D1 lowered only for F03-QA-D1-01 / -02: Layout, Typography, Accessibility and Fidelity. The other six keep the D1 calibration.
+   * Fidelity 10 relies on the cap-size card height deviating from D1-10. That deviation is required by §19.10 (1), and D1-10 itself showed the label on the arcs. It is explained, not a fail condition.
+   * The score was not re-scored here; the Tech Lead does not grade in QA's place (visual-quality-gate.md §3).
+2. **Brief correction — the `HAMLE` card in `won`.** The F03-QA-D1R brief said "the card hides in `won`". That is wrong.
+   * The authority hides only the back chevron in `won` (§19.4; ui-design §6 / §7). The card stays under the scrim, as runtime shows and as F03-QA-D1 E23 accepted.
+   * QA was right to follow the authority and open no finding. D2 replaces the moment, and its contract must state the result screen's chrome explicitly.
+3. **`qa.md` layout: accepted.** QA moved the D1 report byte-for-byte to `history/f03-puzzle-play-session-2026-09-27/qa-at-d1-verdict.md` instead of appending the D1R report under it.
+   * Reason: the flow audit reads the first `Final Score` / `Lowest Dimension` in `qa.md`. This follows QA's own D1 precedent (`qa-before-phase-d1.md`).
+4. **F03.D1-VISUAL-QA re-evaluated as superseded: accepted.** QA owns the record. The scenario is re-met by F03.D1R-VISUAL-QA on the reworked revision.
+   * The D1 run's FAIL text is kept verbatim in the record and in the archive.
+   * Same pattern as F00's consolidated superseded records.
+5. **QA environment note corrected.** `qa.md` §7 says the iPhone 16 holds the integration build. In fact the app is not installed there: the `integration_test` run uninstalls it, and the seeded database went with it.
+   * No evidence depends on that state; later runs reinstall and reseed (`design/src/seed-sim.sh` handles a fresh install).
+6. **Non-blocking notes routed:**
+   * **Error screen at AX5 — the pill label outgrows the capped headline.** The `LimePill` follows the OS scale (§19.9 (3)); the headline stays at 1.3×. Accepted for D1. Logged in `workflow-follow-ups.md` (OPTIONAL-QUALITY-NOTES) for D3, which sets the shared text-scale treatment of error surfaces (C-6, C-9).
+   * **Won moment / panel at AX5 overflows and covers the row.** Known as NTLC-6 and A-2 (result). It is D2 scope, and D2 must meet C-9 up to AX5.
+   * **Legacy Home at AX5:** AUD-A11Y-04, D3.
+   * **Still open:** F03-MULTITOUCH-FIRST-POINTER, MOVESCARD-COUNTER-LINE-HEIGHT, ANDROID-CI-EVIDENCE; VoiceOver and the hardware focus ring rest on the automated class (§19.9 (4)).
+
+**Closure:** every D1 task is Done, Delivery Review is Accepted and QA is final Approved with Notes. There is no release scope. Every Pending Evidence record is PASS, and there is no blocker or open decision. F03 returns to **Done**. The resume point is **Phase D2 — won moment + full-screen result**, carried by F03 with F04 amendments (`motion-critical`; Design Adoption Route). It is activated by the next Tech Lead turn, which writes the D2 contract (§20) and opens the UI Designer task.
+
+## 20. Design Adoption Phase D2 — won moment + full-screen result [LOCKED 2026-09-28]
+
+> **Added by:** the Tech Lead on 2026-09-28, at the D2 activation right after the D1 closure (§19.12). It reopens F03 as visual rework under rework control; F03 is the carrier (audit C-2), with the F04 amendments and the F05 wording resync applied in the same reopen.
+>
+> **Authority:**
+> * `project-authority/design-foundation.md` — Direction C "Loop Glass"; the user's decisions in §18, in particular decision 2 (**full-screen result, no board behind, no Close button**) and decision 3 (third stat = `EN İYİ`), and consequences 1–3.
+> * `features/f00-design-foundation/ui-design.md` — §4 entry/exit, §5 flow, §6 Result layout, §7 components, §8 Result states, §11 motion spec, §13 accessibility.
+> * The selected-source renders `S-04`, `S-04b`, `S-05`, the frames `S-08 … S-16` and the executable prototype `design/src/S-transition-prototype.html` (F00); the device variants `S-v-*`.
+> * The audit: `conformance-audit.md` §6, §9 items 1, 2, 6, 7, 9, 14, §10 renders 11–18; rulings C-3, C-4, C-9 and C-11.
+> * The D1 surface (§19) is the starting frame of the transition.
+
+### 20.1 User-visible symptom
+
+The payoff moment still has the pre-Foundation look. After a solving move the row turns amber, docks on the goal rail, and a bottom sheet with the system font, amber glow and three luminous elements rises over the dimmed Loop Glass board. The user decided on 2026-09-21 that the solved screen is a full-screen result with no board and no Close button. At AX5 the sheet grows to ≈ 84 % H, covers the answer row, and clips its labels (A-2 result; NTLC-6).
+
+### 20.2 Scope
+
+* **Affected journey:** a settled solving move (T0) → win sequence → transition → full-screen result → Next / Retry / back.
+* **Surfaces and states** (`/play` in `won`, plus the transition out of it):
+  * the win sequence on the D1 board, including locked / frozen tiles in the winning row (C-11);
+  * the board → result transition and its reduced-motion path;
+  * the full-screen result in every F04 variant: `firstClear`, `newBest`, `matchedBest`, `noImprovement`, Perfect (alone and with a new best), the defensive no-optimal fallback, Next not wired (non-Journey), and the level-30 result (Next → terminal, F05 AC12);
+  * the exit from the result: Retry back into Play, Next, the back button, system back.
+* **Visual Scope `motion-critical`:** the composition is new and driven by a specified transition, so video / frame-sequence evidence is required at every gate.
+
+### 20.3 Decisions (Tech Lead)
+
+1. **Timeline — the §18 (2026-09-20) intent is kept, the composition is replaced.** Times are ms from T0.
+   * **0–600: win sequence on the board.** The winning row fills lime left → right with a 30 ms stagger (90 ms per tile); one bloom; board and chrome dim. **Nothing outside the board may appear before T0 + 600** (the purpose of the old T0 + 600 panel rule).
+   * **600–940: transition.** The answer row glides from its board position to its result position, morphing tile size and radius (from the D1 board tile to the result tile). Board, target rail, HUD and the Play header (back label, `HAMLE` card) fade to 0. Result content fades and rises in.
+   * **Rest ≤ T0 + 940.** The stars then fill one by one (≈ 940–1300, rest-state reveal; F04 "≤ ~800 ms" reveal bound).
+   * **Reduced motion** (the shared `reduceMotionRequested()`): the row is lime and static from T0; hold 300 ms; 160 ms cross-fade to the result; content fades in; stars static; **total 660 ms**.
+   * The exact curves and per-element windows are the UI Designer's (F00 ui-design §11 is the starting point, re-timed on the D1 board geometry). Any change to the bounds above needs a Tech Lead ruling.
+2. **Input and lifecycle.**
+   * Input to the board and every result control is locked from T0 until rest (reduced path included). Taps before rest are dropped, not queued.
+   * **System back / edge swipe is honoured at any time in `won`**: it pops to the caller and resolves to `/` (`_popToCaller`, F05 §8). This is today's behaviour and it is safe: the completion is persisted at `won` (item 3).
+   * App backgrounded mid-sequence → on return the sequence resolves deterministically to the rest state (§12 rule). OS kill mid-sequence → relaunch lands on Home with no active session; best and unlock already written.
+3. **Persistence / controller semantics unchanged.** The `completed` snapshot + `clearActiveSession()`, F04's `personal_best` write, F05's unlock and `controller.completion` stay triggered at `won`. Only presentation changes. The result must not wait on a slow rating read longer than today (`ratingUnavailable` path unchanged).
+4. **Result layout (F00 ui-design §6), full screen, no board.** Top to bottom: back button; badge (when present); display headline; subtitle; the answer tiles (the row that won, with the ghost slot / lime radial per the design); stars; stats card (`SEN` · `OPTİMAL` · `EN İYİ`, decision 3); primary pill; secondary text link.
+   * **Chrome at rest (§19.12 (2)):** the result shows **only** its own back button. The Play header (back label, `HAMLE` card), target rail, board and HUD are gone at rest.
+   * **One glow:** the lime answer row (+ bloom) is the only luminous element; the primary pill and stars carry no glow (design-foundation §18 consequence 3).
+5. **Result markers and badges (C-4, confirmed here; F04 ui-design decisions, PRD unaffected):**
+   * dropped: the `3 / 3` line, the `+N` / `=` delta, `İLK`, "daha iyi";
+   * badge `HARİKA` iff Perfect (it wins over a new best); badge `YENİ EN İYİ` iff `newBest` and not Perfect; no badge otherwise;
+   * the star count stays announced non-visually (`Semantics` "N / 3 yıldız", plus "Harika" / "Yeni en iyi" when shown).
+6. **CTA weighting (F04 §7 as shipped):** Perfect → primary "Sonraki bölüm", link "Tekrar oyna"; every other variant → primary "Tekrar oyna", link "Sonraki bölüm". Non-Journey sessions (no Next handler) → the link is disabled as "Sonraki bölüm · yakında". **Level 30:** Next routes to the terminal home (F05 AC12); the UI Designer proposes its label (copy → PO / localization).
+7. **Exits.**
+   * **Back button** (top-left, `GlassIconButton` with the drawn back icon, ≥ 44 pt, `Semantics` "Ana ekrana dön") and system back → `_popToCaller` → `/`. **There is no Close button** (decision 2).
+   * **"Tekrar oyna"** → `retryFromCompletion()`: restart the same level in place (unchanged semantics: moves 0, undo 3, restart count as today). The result → Play transition is designed by the UI Designer: bounded (≤ 400 ms), input locked during it, instant / cross-fade under reduced motion.
+   * **"Sonraki bölüm"** → F05's `_nextLevelHandler()` (unchanged: `pushReplacement` to N+1, or `/` → terminal).
+8. **Special tiles in the winning row (C-11):** the whole answer row turns lime at T0; lock and snowflake icons fade out with the fill (instant under reduced motion). Rendered in the handoff.
+9. **Text scale (C-9) on the result.**
+   * Container text (answer tiles, stat values and labels, badge, display headline) uses `loopCappedTextScaler` (1.3×).
+   * Free text (subtitle, CTA labels, link) follows the OS scale up to AX5 with no clipping, overlap or mid-word break.
+   * **Scrolling (the C-9 open point):** at every OS size up to the 1.3× cap the result fits without scrolling on 390 × 844 to 440 × 956. Above the cap the content column **may** scroll; the back button stays fixed and reachable, and the transition always lands at scroll offset 0. Play itself never scrolls (§19.3 (1)).
+10. **Copy (interim, through `PlayStrings` / the rating strings; final with PO / localization, F10-UI-LOCALIZATION):** headline "Döngü tamamlandı."; a data-driven subtitle (the UI Designer proposes it, e.g. "Hedef N hamlede yerine oturdu."); "Sonraki bölüm", "Tekrar oyna"; badges `HARİKA`, `YENİ EN İYİ`; stat labels `SEN`, `OPTİMAL`, `EN İYİ`. Turkish casing authored or `tr`-aware only.
+11. **Performance:** no backdrop blur; the mid-tier frame budget from §18 (2026-09-06) stays; the transition must not drop frames visibly on the iPhone 16e simulator (QA observes it on video).
+
+### 20.4 Contract amendments
+
+* **F03 §4 exit, §10 (4), §13:** "completion panel → Retry / Close" becomes "full-screen result → Next / Retry / back button / system back" (§20.3 (6–7)); no Close.
+* **F03 §18 won-sequence authority (2026-09-20):** its sequencing, persistence and input rules stand as restated in §20.3 (1–3). Its geometry requirement (row visible above the panel) and the §19.9 (1) dock amendments lapse when D2 ships; the full-screen rule in §20.3 (4) and (9) replaces them.
+* **F03 `ui-design.md` §16 (won composition):** superseded by the D2 handoff.
+* **F04 `architecture.md` §7 / §8:** the panel becomes the full-screen result (content per AC7, variants per §20.3 (5–6)); `Close` is removed, back = the result's back button + system back. F04 `ui-design.md` (Direction A panel) is superseded for the result by the D2 handoff. **F04 AC1–AC10 are unchanged** and stay the acceptance for the content; F04 stays Done (precedent: the 2026-09-20 F03 rework).
+* **F05 PRD AC1 and `architecture.md` §8 (C-3):** the wording "(via `Next Level` or `Close`)" becomes "(via `Next Level`, the back button or system back)". The unlock is written at `won`, so the product semantics are unchanged; the product PRD says only "when the completion panel closes". Tech Lead resync of the feature-level text; no Product Owner revision. F05 stays Done.
+* **Tests:** the strings `Kapat`, `Yeniden`, `SONRAKİ`, `ÇÖZÜLDÜ`, `YENİ REKOR` in `app/test` and `app/integration_test` change with the rework (`completion_panel_test`, `won_composition_test`, `play_session_screen_test`, `play_session_runtime_test`, `integration_test/play_session_test`). Every F04 AC keeps a passing test.
+
+### 20.5 Non-goals
+
+* No engine, scoring, star-boundary, persistence, snapshot, lifecycle or route change; no new route (the result stays an in-screen state of `/play`).
+* Home and the app shell (D3). F09 onboarding, F11 audio / haptics (intent only), F12 analytics, F07 Daily result copy, aggregate stars (decision 4).
+* F03-MULTITOUCH-FIRST-POINTER stays a separate behaviour follow-up.
+
+### 20.6 Evidence and exit criteria
+
+* **UI Designer (F03-UI-D2)** — the D2 handoff in F03 `ui-design.md` (replacing §16), per the handoff gate in `visual-quality-gate.md`:
+  * the result layout on 393 × 852 and the 390 × 844 / 440 × 956 variants;
+  * components, states, interaction and copy proposals (§20.3 (5–7), (10));
+  * **motion:** the win sequence, the board → result transition and the result → Play retry transition, each with its reduced path, as an **executable prototype re-timed on the D1 board geometry** plus timed frame stills;
+  * **renders:** every §20.2 variant, including the audit's D2 list (1★, matched best, first clear, Perfect + new best, level 30, Next not wired, a locked / frozen tile in the winning row, AX5), the winning row at rows 0 and 4, and the transition frames;
+  * a Screen / State / Viewport matrix, a Visual Evidence Manifest and a **D2 acceptance list**;
+  * gate → Ready for Implementation at the Tech Lead checkpoint.
+* **Frontend/Mobile Developer (F03-FE-D2)** — implement from `app/lib/design`; drop `PlayTheme` from the won path; update the tests (§20.4). `frontend.md` Visual Parity Evidence:
+  * runtime screenshots of every variant on the iPhone 16, and of the main variants on the 16e and Pro Max, beside the renders;
+  * **screen recordings** of the full sequence (rows 0 and 4, a special-tile row), the retry transition, and the reduced path, with frame-timing measurements: nothing outside the board before T0 + 600, rest ≤ T0 + 940, reduced total ≈ 660;
+  * an OS text sweep large → AX5 on the result; Reduce Motion on and off;
+  * `melos run analyze` / `test` green; `integration_test` green on the simulator.
+* **QA (F03-QA-D2)** — final stage, client-only; modules core + client-ui + visual-quality + stateful-flow; regression full:
+  * an independent runtime rubric ≥ 93, every dimension ≥ 8, no fail condition, from video for the motion;
+  * F04 AC1–AC10 on the result, F05 AC1 / AC12, F03 AC8 / AC11, and the D1 Play surface regression;
+  * lifecycle mid-sequence (background, kill, system back);
+  * Android stated as a limit.
+* **Exit:** Visual Quality Gate Passed; final QA Approved or Approved with Notes; Delivery Review Accepted. F03 then returns to Done and D3 is activated.

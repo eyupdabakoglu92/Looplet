@@ -1,0 +1,337 @@
+# F03-QA-D1R measurements — qa/d1r/src/qa-d1r.swift (QA-owned; outline + corner radius scanned/fitted from each capture, no PlayLayout constants)
+# Build: flutter build ios --simulator --debug, HEAD 97c700e + F03-FE-D1R working tree (git diff 5798c70 -- app | shasum = 88f1dca3…; App binary SHA-1 90c8db85…), 2026-09-28, iOS Simulator 18.6
+# Content size changed LIVE with xcrun simctl ui <udid> content_size (qa/d1r/src/qa-sweep.sh) unless noted
+
+## NEGATIVE CONTROLS (pre-rework QA captures, must fail)
+=== qa/d1/QA-16-16-L26-text-ax5.png (W 393)
+card outline (scanned) l 300.00 t 82.00 r 366.33 b 153.00  w 66.33 h 71.00  bottom radius fit 22.20 (rms 1.57 pt)
+  luma > 120 numeral: x 324.67–341.67 y 94.00–116.67  min inset 12.00 pt
+  luma > 120 label: x 304.67–361.67 y 138.67–150.00  min inset -3.80 pt
+  luma > 120 glyph pixels outside the outline: 118 (worst 3.57 pt)
+  luma > 100 numeral: x 324.67–341.67 y 94.00–117.00  min inset 12.00 pt
+  luma > 100 label: x 304.67–361.67 y 138.67–150.00  min inset -3.80 pt
+  luma > 100 glyph pixels outside the outline: 146 (worst 3.57 pt)
+  next ink below the card at 207.67  gap 54.67 pt
+=== qa/d1/QA-16-28-load-error-ax5.png (W 393)
+headline lines: 3
+  y 374.00–402.00  x 58.33–279.00  words 2 [45.67, 158.67] gaps [16.33]  card border x 27.33–365.67  margins 30.67 / 86.33
+  y 420.00–455.67  x 59.33–298.33  words 1 [239.00] gaps []  card border x 27.33–366.00  margins 31.67 / 67.33
+  y 488.00–494.00  x 58.67–65.00  words 1 [6.33] gaps []  card border x 27.33–366.00  margins 31.00 / 300.67  <- PUNCTUATION-ONLY LINE
+words total 4 (expected 3: Bu · bulmaca · yüklenemedi.)
+
+## HAMLE card (L26 via Home CONTINUE; L5 resumed 12 moves; tutorial L4)
+=== QA-16-L26-large.png (W 393)
+card outline (scanned) l 300.33 t 82.00 r 366.33 b 151.67  w 66.00 h 69.67  bottom radius fit 24.50 (rms 0.22 pt)
+  luma > 120 numeral: x 326.67–339.67 y 98.33–116.00  min inset 16.33 pt
+  luma > 120 label: x 310.67–356.00 y 134.67–143.33  min inset 3.00 pt
+  luma > 120 glyph pixels outside the outline: 0
+  luma > 100 numeral: x 326.67–339.67 y 98.33–116.00  min inset 16.33 pt
+  luma > 100 label: x 310.67–356.00 y 134.67–143.33  min inset 3.00 pt
+  luma > 100 glyph pixels outside the outline: 0
+  next ink below the card at 208.00  gap 56.33 pt
+=== QA-16-L26-extra-large.png (W 393)
+card outline (scanned) l 300.00 t 82.00 r 366.67 b 157.00  w 66.67 h 75.00  bottom radius fit 24.40 (rms 0.32 pt)
+  luma > 120 numeral: x 326.00–340.33 y 96.67–116.33  min inset 14.67 pt
+  luma > 120 label: x 308.33–358.33 y 136.00–145.67  min inset 3.69 pt
+  luma > 120 glyph pixels outside the outline: 0
+  luma > 100 numeral: x 326.00–340.67 y 96.67–116.33  min inset 14.67 pt
+  luma > 100 label: x 308.33–358.33 y 136.00–145.67  min inset 3.69 pt
+  luma > 100 glyph pixels outside the outline: 0
+  next ink below the card at 208.67  gap 51.67 pt
+=== QA-16-L26-extra-extra-large.png (W 393)
+card outline (scanned) l 300.00 t 82.00 r 366.67 b 162.67  w 66.67 h 80.67  bottom radius fit 24.60 (rms 0.31 pt)
+  luma > 120 numeral: x 325.33–341.33 y 94.67–116.33  min inset 12.67 pt
+  luma > 120 label: x 306.00–360.67 y 137.00–147.67  min inset 3.67 pt
+  luma > 120 glyph pixels outside the outline: 0
+  luma > 100 numeral: x 325.00–341.33 y 94.67–116.33  min inset 12.67 pt
+  luma > 100 label: x 306.00–360.67 y 137.00–147.67  min inset 3.67 pt
+  luma > 100 glyph pixels outside the outline: 0
+  next ink below the card at 208.00  gap 45.33 pt
+=== QA-16-L26-extra-extra-extra-large.png (W 393)
+card outline (scanned) l 300.00 t 82.00 r 366.33 b 167.33  w 66.33 h 85.33  bottom radius fit 24.50 (rms 0.17 pt)
+  luma > 120 numeral: x 324.67–341.67 y 94.00–116.67  min inset 12.00 pt
+  luma > 120 label: x 304.67–361.67 y 138.67–150.00  min inset 3.41 pt
+  luma > 120 glyph pixels outside the outline: 0
+  luma > 100 numeral: x 324.67–341.67 y 94.00–117.00  min inset 12.00 pt
+  luma > 100 label: x 304.67–361.67 y 138.67–150.00  min inset 3.41 pt
+  luma > 100 glyph pixels outside the outline: 0
+  next ink below the card at 207.67  gap 40.33 pt
+=== QA-16-L26-accessibility-extra-extra-extra-large.png (W 393)
+card outline (scanned) l 300.00 t 82.00 r 366.33 b 167.33  w 66.33 h 85.33  bottom radius fit 24.50 (rms 0.17 pt)
+  luma > 120 numeral: x 324.67–341.67 y 94.00–116.67  min inset 12.00 pt
+  luma > 120 label: x 304.67–361.67 y 138.67–150.00  min inset 3.41 pt
+  luma > 120 glyph pixels outside the outline: 0
+  luma > 100 numeral: x 324.67–341.67 y 94.00–117.00  min inset 12.00 pt
+  luma > 100 label: x 304.67–361.67 y 138.67–150.00  min inset 3.41 pt
+  luma > 100 glyph pixels outside the outline: 0
+  next ink below the card at 207.67  gap 40.33 pt
+=== QA-16e-L26-large.png (W 390)
+card outline (scanned) l 298.00 t 81.33 r 363.33 b 150.33  w 65.33 h 69.00  bottom radius fit 23.70 (rms 0.12 pt)
+  luma > 120 numeral: x 324.33–337.00 y 97.33–114.67  min inset 16.00 pt
+  luma > 120 label: x 308.33–353.33 y 133.00–141.67  min inset 3.36 pt
+  luma > 120 glyph pixels outside the outline: 0
+  luma > 100 numeral: x 324.00–337.00 y 97.00–114.67  min inset 15.67 pt
+  luma > 100 label: x 308.33–353.33 y 133.00–141.67  min inset 3.36 pt
+  luma > 100 glyph pixels outside the outline: 0
+  next ink below the card at 206.00  gap 55.67 pt
+=== QA-16e-L26-extra-large.png (W 390)
+card outline (scanned) l 297.67 t 81.33 r 363.33 b 156.00  w 65.67 h 74.67  bottom radius fit 24.40 (rms 0.17 pt)
+  luma > 120 numeral: x 323.33–338.00 y 95.67–115.00  min inset 14.33 pt
+  luma > 120 label: x 306.00–355.67 y 134.67–144.33  min inset 3.37 pt
+  luma > 120 glyph pixels outside the outline: 0
+  luma > 100 numeral: x 323.33–338.00 y 95.33–115.00  min inset 14.00 pt
+  luma > 100 label: x 306.00–355.67 y 134.67–144.33  min inset 3.37 pt
+  luma > 100 glyph pixels outside the outline: 0
+  next ink below the card at 205.33  gap 49.33 pt
+=== QA-16e-L26-extra-extra-large.png (W 390)
+card outline (scanned) l 297.67 t 81.33 r 363.33 b 161.67  w 65.67 h 80.33  bottom radius fit 24.70 (rms 0.25 pt)
+  luma > 120 numeral: x 322.67–338.67 y 93.67–115.00  min inset 12.33 pt
+  luma > 120 label: x 303.67–357.67 y 135.67–146.33  min inset 3.49 pt
+  luma > 120 glyph pixels outside the outline: 0
+  luma > 100 numeral: x 322.67–338.67 y 93.33–115.00  min inset 12.00 pt
+  luma > 100 label: x 303.67–358.00 y 135.67–146.33  min inset 3.19 pt
+  luma > 100 glyph pixels outside the outline: 0
+  next ink below the card at 206.00  gap 44.33 pt
+=== QA-16e-L26-extra-extra-extra-large.png (W 390)
+card outline (scanned) l 297.67 t 81.33 r 363.33 b 166.67  w 65.67 h 85.33  bottom radius fit 24.60 (rms 0.25 pt)
+  luma > 120 numeral: x 322.33–339.00 y 93.33–116.00  min inset 12.00 pt
+  luma > 120 label: x 302.67–359.00 y 138.33–149.33  min inset 3.07 pt
+  luma > 120 glyph pixels outside the outline: 0
+  luma > 100 numeral: x 322.33–339.00 y 93.33–116.00  min inset 12.00 pt
+  luma > 100 label: x 302.33–359.00 y 138.00–149.33  min inset 3.07 pt
+  luma > 100 glyph pixels outside the outline: 0
+  next ink below the card at 206.00  gap 39.33 pt
+=== QA-16e-L26-accessibility-extra-extra-extra-large.png (W 390)
+card outline (scanned) l 297.67 t 81.33 r 363.33 b 166.67  w 65.67 h 85.33  bottom radius fit 24.60 (rms 0.25 pt)
+  luma > 120 numeral: x 322.33–339.00 y 93.33–116.00  min inset 12.00 pt
+  luma > 120 label: x 302.67–359.00 y 138.33–149.33  min inset 3.07 pt
+  luma > 120 glyph pixels outside the outline: 0
+  luma > 100 numeral: x 322.33–339.00 y 93.33–116.00  min inset 12.00 pt
+  luma > 100 label: x 302.33–359.00 y 138.00–149.33  min inset 3.07 pt
+  luma > 100 glyph pixels outside the outline: 0
+  next ink below the card at 206.00  gap 39.33 pt
+=== QA-pm-L26-large.png (W 440)
+card outline (scanned) l 336.00 t 92.00 r 410.00 b 169.67  w 74.00 h 77.67  bottom radius fit 27.20 (rms 0.11 pt)
+  luma > 120 numeral: x 365.67–380.33 y 109.67–129.33  min inset 17.67 pt
+  luma > 120 label: x 347.67–398.67 y 150.00–159.67  min inset 3.80 pt
+  luma > 120 glyph pixels outside the outline: 0
+  luma > 100 numeral: x 365.67–380.33 y 109.67–129.33  min inset 17.67 pt
+  luma > 100 label: x 347.67–398.67 y 150.00–159.67  min inset 3.80 pt
+  luma > 100 glyph pixels outside the outline: 0
+  next ink below the card at 234.00  gap 64.33 pt
+=== QA-pm-L26-extra-large.png (W 440)
+card outline (scanned) l 336.00 t 92.00 r 410.00 b 176.00  w 74.00 h 84.00  bottom radius fit 27.40 (rms 0.14 pt)
+  luma > 120 numeral: x 365.00–381.00 y 108.00–130.00  min inset 16.00 pt
+  luma > 120 label: x 345.33–401.00 y 151.67–162.33  min inset 4.44 pt
+  luma > 120 glyph pixels outside the outline: 0
+  luma > 100 numeral: x 365.00–381.33 y 108.00–130.00  min inset 16.00 pt
+  luma > 100 label: x 345.00–401.33 y 151.33–162.33  min inset 4.17 pt
+  luma > 100 glyph pixels outside the outline: 0
+  next ink below the card at 233.00  gap 57.00 pt
+=== QA-pm-L26-extra-extra-large.png (W 440)
+card outline (scanned) l 336.00 t 92.00 r 410.00 b 182.33  w 74.00 h 90.33  bottom radius fit 27.60 (rms 0.19 pt)
+  luma > 120 numeral: x 364.00–382.00 y 105.00–129.33  min inset 13.00 pt
+  luma > 120 label: x 342.67–403.67 y 153.67–165.67  min inset 3.69 pt
+  luma > 120 glyph pixels outside the outline: 0
+  luma > 100 numeral: x 364.00–382.00 y 105.00–129.67  min inset 13.00 pt
+  luma > 100 label: x 342.67–403.67 y 153.67–165.67  min inset 3.69 pt
+  luma > 100 glyph pixels outside the outline: 0
+  next ink below the card at 233.67  gap 51.33 pt
+=== QA-pm-L26-extra-extra-extra-large.png (W 440)
+card outline (scanned) l 336.00 t 92.00 r 410.00 b 186.67  w 74.00 h 94.67  bottom radius fit 26.90 (rms 0.16 pt)
+  luma > 120 numeral: x 363.67–382.33 y 105.33–131.00  min inset 13.33 pt
+  luma > 120 label: x 341.33–405.00 y 155.00–167.67  min inset 3.62 pt
+  luma > 120 glyph pixels outside the outline: 0
+  luma > 100 numeral: x 363.67–382.33 y 105.33–131.00  min inset 13.33 pt
+  luma > 100 label: x 341.33–405.00 y 155.00–167.67  min inset 3.62 pt
+  luma > 100 glyph pixels outside the outline: 0
+  next ink below the card at 233.33  gap 46.67 pt
+=== QA-pm-L26-accessibility-extra-extra-extra-large.png (W 440)
+card outline (scanned) l 336.00 t 92.00 r 410.00 b 186.67  w 74.00 h 94.67  bottom radius fit 26.90 (rms 0.16 pt)
+  luma > 120 numeral: x 363.67–382.33 y 105.33–131.00  min inset 13.33 pt
+  luma > 120 label: x 341.33–405.00 y 155.00–167.67  min inset 3.62 pt
+  luma > 120 glyph pixels outside the outline: 0
+  luma > 100 numeral: x 363.67–382.33 y 105.33–131.00  min inset 13.33 pt
+  luma > 100 label: x 341.33–405.00 y 155.00–167.67  min inset 3.62 pt
+  luma > 100 glyph pixels outside the outline: 0
+  next ink below the card at 233.33  gap 46.67 pt
+=== QA-16-L5-resume12-ax5-coldlaunch.png (W 393)
+card outline (scanned) l 300.00 t 82.00 r 366.33 b 167.33  w 66.33 h 85.33  bottom radius fit 24.50 (rms 0.17 pt)
+  luma > 120 numeral: x 315.67–351.00 y 94.00–116.33  min inset 11.45 pt
+  luma > 120 label: x 304.67–361.67 y 138.67–150.00  min inset 3.41 pt
+  luma > 120 glyph pixels outside the outline: 0
+  luma > 100 numeral: x 315.67–351.00 y 94.00–116.33  min inset 11.41 pt
+  luma > 100 label: x 304.67–361.67 y 138.67–150.00  min inset 3.41 pt
+  luma > 100 glyph pixels outside the outline: 0
+  next ink below the card at 207.67  gap 40.33 pt
+=== QA-16-L5-ax5-after-restart.png (W 393)
+card outline (scanned) l 300.00 t 82.00 r 366.33 b 167.33  w 66.33 h 85.33  bottom radius fit 24.50 (rms 0.17 pt)
+  luma > 120 numeral: x 324.67–341.67 y 94.00–116.67  min inset 12.00 pt
+  luma > 120 label: x 304.67–361.67 y 138.67–150.00  min inset 3.41 pt
+  luma > 120 glyph pixels outside the outline: 0
+  luma > 100 numeral: x 324.67–341.67 y 94.00–117.00  min inset 12.00 pt
+  luma > 100 label: x 304.67–361.67 y 138.67–150.00  min inset 3.41 pt
+  luma > 100 glyph pixels outside the outline: 0
+  next ink below the card at 207.67  gap 40.33 pt
+=== QA-16-L5-xl-after-bg-change.png (W 393)
+card outline (scanned) l 300.00 t 82.00 r 366.67 b 157.00  w 66.67 h 75.00  bottom radius fit 24.40 (rms 0.32 pt)
+  luma > 120 numeral: x 326.67–340.33 y 97.00–116.00  min inset 15.00 pt
+  luma > 120 label: x 308.33–358.33 y 136.00–145.67  min inset 3.69 pt
+  luma > 120 glyph pixels outside the outline: 0
+  luma > 100 numeral: x 326.67–340.33 y 97.00–116.00  min inset 15.00 pt
+  luma > 100 label: x 308.33–358.33 y 136.00–145.67  min inset 3.69 pt
+  luma > 100 glyph pixels outside the outline: 0
+  next ink below the card at 208.67  gap 51.67 pt
+=== QA-16-L4-tutorial-extra-extra-large.png (W 393)
+card outline (scanned) l 300.00 t 82.00 r 366.67 b 162.67  w 66.67 h 80.67  bottom radius fit 24.60 (rms 0.31 pt)
+  luma > 120 numeral: x 325.33–341.33 y 94.67–116.33  min inset 12.67 pt
+  luma > 120 label: x 306.00–360.67 y 137.00–147.67  min inset 3.67 pt
+  luma > 120 glyph pixels outside the outline: 0
+  luma > 100 numeral: x 325.00–341.33 y 94.67–116.33  min inset 12.67 pt
+  luma > 100 label: x 306.00–360.67 y 137.00–147.67  min inset 3.67 pt
+  luma > 100 glyph pixels outside the outline: 0
+  next ink below the card at 208.00  gap 45.33 pt
+=== QA-16-L4-tutorial-accessibility-extra-extra-extra-large.png (W 393)
+card outline (scanned) l 300.00 t 82.00 r 366.33 b 167.33  w 66.33 h 85.33  bottom radius fit 24.50 (rms 0.17 pt)
+  luma > 120 numeral: x 324.67–341.67 y 94.00–116.67  min inset 12.00 pt
+  luma > 120 label: x 304.67–361.67 y 138.67–150.00  min inset 3.41 pt
+  luma > 120 glyph pixels outside the outline: 0
+  luma > 100 numeral: x 324.67–341.67 y 94.00–117.00  min inset 12.00 pt
+  luma > 100 label: x 304.67–361.67 y 138.67–150.00  min inset 3.41 pt
+  luma > 100 glyph pixels outside the outline: 0
+  next ink below the card at 207.67  gap 40.33 pt
+=== QA-16e-L4-tutorial-accessibility-extra-extra-extra-large.png (W 390)
+card outline (scanned) l 297.67 t 81.33 r 363.33 b 166.67  w 65.67 h 85.33  bottom radius fit 24.60 (rms 0.25 pt)
+  luma > 120 numeral: x 322.33–339.00 y 93.33–116.00  min inset 12.00 pt
+  luma > 120 label: x 302.67–359.00 y 138.33–149.33  min inset 3.07 pt
+  luma > 120 glyph pixels outside the outline: 0
+  luma > 100 numeral: x 322.33–339.00 y 93.33–116.00  min inset 12.00 pt
+  luma > 100 label: x 302.33–359.00 y 138.00–149.33  min inset 3.07 pt
+  luma > 100 glyph pixels outside the outline: 0
+  next ink below the card at 206.00  gap 39.33 pt
+=== QA-pm-L4-tutorial-accessibility-extra-extra-extra-large.png (W 440)
+card outline (scanned) l 336.00 t 92.00 r 410.00 b 186.67  w 74.00 h 94.67  bottom radius fit 26.90 (rms 0.16 pt)
+  luma > 120 numeral: x 363.67–382.33 y 105.33–131.00  min inset 13.33 pt
+  luma > 120 label: x 341.33–405.00 y 155.00–167.67  min inset 3.62 pt
+  luma > 120 glyph pixels outside the outline: 0
+  luma > 100 numeral: x 363.67–382.33 y 105.33–131.00  min inset 13.33 pt
+  luma > 100 label: x 341.33–405.00 y 155.00–167.67  min inset 3.62 pt
+  luma > 100 glyph pixels outside the outline: 0
+  next ink below the card at 233.33  gap 46.67 pt
+
+## Load-error headline (L07, journey-tr-07.json corrupted in the installed bundle only; restored, SHA-1 2fef993c… = repo)
+=== QA-16-L07-error-large.png (W 393)
+headline lines: 2
+  y 435.67–457.33  x 58.00–227.33  words 2 [35.00, 122.00] gaps [12.33]  card border x 27.00–366.00  margins 30.67 / 138.33
+  y 471.67–499.00  x 58.67–250.33  words 1 [191.67] gaps []  card border x 27.33–365.67  margins 31.00 / 115.00
+words total 3 (expected 3: Bu · bulmaca · yüklenemedi.)
+=== QA-16-L07-error-extra-large.png (W 393)
+headline lines: 2
+  y 433.00–457.33  x 58.00–247.67  words 2 [39.33, 136.33] gaps [14.00]  card border x 27.00–366.00  margins 30.67 / 118.00
+  y 473.00–503.67  x 59.00–273.67  words 1 [214.67] gaps []  card border x 27.33–366.00  margins 31.33 / 92.00
+words total 3 (expected 3: Bu · bulmaca · yüklenemedi.)
+=== QA-16-L07-error-extra-extra-large.png (W 393)
+headline lines: 2
+  y 429.67–456.33  x 58.33–268.00  words 2 [43.33, 151.00] gaps [15.33]  card border x 27.33–366.00  margins 30.67 / 97.67
+  y 473.67–507.33  x 59.33–296.67  words 1 [237.33] gaps []  card border x 27.00–365.67  margins 32.00 / 68.67
+words total 3 (expected 3: Bu · bulmaca · yüklenemedi.)
+=== QA-16-L07-error-extra-extra-extra-large.png (W 393)
+headline lines: 2
+  y 428.33–456.33  x 58.33–279.00  words 2 [45.67, 158.67] gaps [16.33]  card border x 27.00–365.67  margins 31.00 / 86.33
+  y 474.33–510.00  x 59.33–309.33  words 1 [250.00] gaps []  card border x 27.33–365.67  margins 31.67 / 56.00
+words total 3 (expected 3: Bu · bulmaca · yüklenemedi.)
+=== QA-16-L07-error-accessibility-extra-extra-extra-large.png (W 393)
+headline lines: 2
+  y 397.00–425.00  x 58.33–279.00  words 2 [45.67, 158.67] gaps [16.33]  card border x 27.33–366.00  margins 30.67 / 86.67
+  y 443.00–478.67  x 59.33–309.33  words 1 [250.00] gaps []  card border x 27.00–366.00  margins 32.00 / 56.33
+words total 3 (expected 3: Bu · bulmaca · yüklenemedi.)
+=== QA-16e-L07-error-large.png (W 390)
+headline lines: 2
+  y 432.33–454.00  x 57.33–225.67  words 2 [35.00, 121.00] gaps [12.33]  card border x 27.33–362.67  margins 29.67 / 136.67
+  y 467.33–494.67  x 58.33–248.67  words 1 [190.33] gaps []  card border x 26.67–363.00  margins 31.33 / 114.00
+words total 3 (expected 3: Bu · bulmaca · yüklenemedi.)
+=== QA-16e-L07-error-extra-large.png (W 390)
+headline lines: 2
+  y 429.00–453.00  x 57.67–245.67  words 2 [39.00, 135.33] gaps [13.67]  card border x 26.67–363.00  margins 30.67 / 117.00
+  y 469.00–499.33  x 58.33–271.33  words 1 [213.00] gaps []  card border x 27.33–362.67  margins 30.67 / 91.00
+words total 3 (expected 3: Bu · bulmaca · yüklenemedi.)
+=== QA-16e-L07-error-extra-extra-large.png (W 390)
+headline lines: 2
+  y 425.33–452.00  x 57.67–265.67  words 2 [43.33, 149.33] gaps [15.33]  card border x 27.33–362.67  margins 30.00 / 96.67
+  y 469.33–503.00  x 58.67–294.33  words 1 [235.67] gaps []  card border x 26.67–363.00  margins 31.67 / 68.33
+words total 3 (expected 3: Bu · bulmaca · yüklenemedi.)
+=== QA-16e-L07-error-extra-extra-extra-large.png (W 390)
+headline lines: 2
+  y 424.00–452.00  x 58.00–277.00  words 2 [45.33, 157.67] gaps [16.00]  card border x 26.67–363.33  margins 31.00 / 86.00
+  y 470.00–505.33  x 59.00–307.00  words 1 [248.00] gaps []  card border x 26.67–363.00  margins 32.00 / 55.67
+words total 3 (expected 3: Bu · bulmaca · yüklenemedi.)
+=== QA-16e-L07-error-accessibility-extra-extra-extra-large.png (W 390)
+headline lines: 2
+  y 393.33–421.33  x 58.00–277.00  words 2 [45.33, 157.67] gaps [16.00]  card border x 26.67–363.33  margins 31.00 / 86.00
+  y 439.33–474.67  x 59.00–307.00  words 1 [248.00] gaps []  card border x 27.00–363.00  margins 31.67 / 55.67
+words total 3 (expected 3: Bu · bulmaca · yüklenemedi.)
+=== QA-pm-L07-error-large.png (W 440)
+headline lines: 2
+  y 489.67–514.00  x 64.67–254.33  words 2 [39.33, 136.33] gaps [14.00]  card border x 30.33–409.33  margins 34.00 / 154.67
+  y 529.67–560.33  x 65.67–280.33  words 1 [214.67] gaps []  card border x 30.67–409.67  margins 34.67 / 129.00
+words total 3 (expected 3: Bu · bulmaca · yüklenemedi.)
+=== QA-pm-L07-error-extra-large.png (W 440)
+headline lines: 2
+  y 486.00–513.00  x 65.00–277.00  words 2 [44.00, 152.67] gaps [15.33]  card border x 30.67–409.67  margins 34.00 / 132.33
+  y 531.00–565.33  x 66.00–306.00  words 1 [240.00] gaps []  card border x 30.33–409.33  margins 35.33 / 103.00
+words total 3 (expected 3: Bu · bulmaca · yüklenemedi.)
+=== QA-pm-L07-error-extra-extra-large.png (W 440)
+headline lines: 2
+  y 482.00–512.00  x 65.00–299.67  words 2 [48.67, 168.67] gaps [17.33]  card border x 30.67–409.67  margins 34.00 / 109.67
+  y 531.00–569.00  x 66.33–332.00  words 1 [265.67] gaps []  card border x 30.67–409.67  margins 35.33 / 77.33
+words total 3 (expected 3: Bu · bulmaca · yüklenemedi.)
+=== QA-pm-L07-error-extra-extra-extra-large.png (W 440)
+headline lines: 2
+  y 479.33–511.00  x 65.33–312.33  words 2 [51.00, 177.67] gaps [18.33]  card border x 30.33–409.33  margins 34.67 / 96.67
+  y 531.33–571.33  x 66.33–346.00  words 1 [279.67] gaps []  card border x 30.67–409.67  margins 35.33 / 63.33
+words total 3 (expected 3: Bu · bulmaca · yüklenemedi.)
+=== QA-pm-L07-error-accessibility-extra-extra-extra-large.png (W 440)
+headline lines: 2
+  y 444.67–476.33  x 65.33–312.33  words 2 [51.00, 177.67] gaps [18.33]  card border x 30.33–409.33  margins 34.67 / 96.67
+  y 496.67–536.67  x 66.33–346.00  words 1 [279.67] gaps []  card border x 30.67–409.67  margins 35.33 / 63.33
+words total 3 (expected 3: Bu · bulmaca · yüklenemedi.)
+=== reference: design/D1-07-play-load-error.png (render @2x)
+headline lines: 2
+  y 435.50–458.00  x 57.50–227.50  words 2 [36.00, 122.50] gaps [11.50]  card border x 27.50–366.00  margins 29.50 / 138.00
+  y 471.00–499.00  x 58.50–251.00  words 1 [192.50] gaps []  card border x 27.00–365.50  margins 31.00 / 114.00
+words total 3 (expected 3: Bu · bulmaca · yüklenemedi.)
+
+## Default-size parity: design/src/measure-d1.swift D1-05 render vs QA-16-L26-large.png
+HAMLE card top (y) | 82.00 | 82.33 | +0.33
+HAMLE card left (x) | 302.00 | 302.33 | +0.33
+undo pill top (y) | 715.50 | 715.00 | -0.50
+undo pill left (x) | 31.50 | 31.67 | +0.17
+restart square left (x) | 317.00 | 317.00 | +0.00
+restart square top (y) | 720.50 | 720.67 | +0.17
+back chevron apex (x) | 34.00 | 33.67 | -0.33
+tile (0,0) left (x) | 39.00 | 39.00 | +0.00
+tile (0,0) top (y) | 318.50 | 318.33 | -0.17
+tile (0,4) right (x) | 353.00 | 353.00 | +0.00
+tile (4,0) bottom (y) | 632.50 | 632.33 | -0.17
+tile (2,2) left (x) | 167.50 | 167.67 | +0.17
+max |Δ| 0.67 pt
+patch | render RGB | runtime RGB | ΔE2000
+ground, left middle (teal spill) | 11,31,49 | 12,32,50 | 0.29
+ground, top right (light) | 42,51,97 | 33,41,83 | 3.35
+ground, bottom | 5,10,30 | 6,11,31 | 0.29
+rail tile body | 36,36,75 | 36,36,75 | 0.03
+HAMLE card fill | 55,64,112 | 51,60,106 | 1.48
+undo pill fill | 15,20,40 | 17,22,42 | 0.62
+board card, bottom margin | 7,10,31 | 7,12,31 | 0.20
+tile (1,0) body | 252,249,242 | 252,249,242 | 0.05
+tile (3,4) body | 243,236,225 | 242,236,225 | 0.16
+max ΔE2000 3.35
+
+## Tutorial hint-pill clearance (edge scan, qa/d1/src/qa-pixels col; board-card outer edge → pill top border; pill bottom border → undo-pill top)
+16 xxL (x=100): board 644.3 → pill 652.3 = 8.0 pt; pill 707.3 → undo 715.3 = 8.0 pt
+16 AX5 (x=100): board 644.3 → pill 651.3 = 7.0 pt; pill 708.3 → undo 715.3 = 7.0 pt
+16e AX5 (x=100): board 638.7 → pill 645.0 = 6.3 pt; pill 702.0 → undo 708.3 = 6.3 pt
+Pro Max AX5 (x=110): board 721.7 → pill 730.3 = 8.7 pt; pill 794.7 → undo 803.0 = 8.3 pt
+
+## Reduce Motion ON at AX5 (L23, column 4 up): mean luma of tile (2,1) per recorded frame
+0–3902 ms 188 (frozen, idle) → 3960 ms 91 (inactive dim, one frame: instant lift) → … 4322 ms 91 → 4343 ms 204 (cream: instant thaw at the settle, no intermediate frame); thawedFrozenCells ["2,1"]

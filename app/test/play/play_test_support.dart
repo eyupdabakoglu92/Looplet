@@ -23,6 +23,24 @@ const Size kIphone16 = Size(393, 852);
 const Size kIphone16e = Size(390, 844);
 const Size kIphone16ProMax = Size(440, 956);
 
+/// The three canonical Play widths (390 / 393 / 440 pt).
+const List<Size> kPlayDevices = <Size>[kIphone16e, kIphone16, kIphone16ProMax];
+
+/// iOS content sizes as Flutter text scales — large (default), xL, xxL, the
+/// 1.3× cap, xxxL, AX1, AX5 — plus two Android-style in-between steps
+/// (F03-FE-D1R text sweep).
+const List<double> kOsTextScales = <double>[
+  1.0,
+  1.059,
+  1.118,
+  1.176,
+  1.235,
+  1.3,
+  1.353,
+  1.647,
+  3.118,
+];
+
 /// Loads the bundled Space Grotesk / Manrope so text metrics are real (widget
 /// tests otherwise render the wide Ahem test font).
 Future<void> loadAppFonts() async {

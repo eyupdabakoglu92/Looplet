@@ -1,0 +1,246 @@
+# F03-FE-D1R runtime measurements — design/src/measure-d1r.swift (card mode), 2026-09-28 12:25, debug build of HEAD 97c700e + the F03-FE-D1R working tree, iOS Simulator 18.6, L26 via Home CONTINUE
+=== RT-16-L26-large.png (W 393)
+card l 300.24 t 82.33 r 366.10 b 151.67 (scanned)  h 69.33 = 63.16·s  radius 24.15
+  luma > 90 numeral: ink x 326.67–339.67 y 98.33–116.00  inset 16.00 pt
+  luma > 90 label: ink x 310.67–356.00 y 134.67–143.33  inset 3.00 pt
+  luma > 120 numeral: ink x 326.67–339.67 y 98.33–116.00  inset 16.00 pt
+  luma > 120 label: ink x 310.67–356.00 y 134.67–143.33  inset 3.00 pt
+  HEDEF DÖNGÜ ink top 208.00  gap from card bottom 56.33 pt
+=== RT-16-L26-extra-large.png (W 393)
+card l 300.24 t 82.33 r 366.10 b 157.00 (scanned)  h 74.67 = 68.02·s  radius 24.15
+  luma > 90 numeral: ink x 326.00–340.67 y 96.67–116.33  inset 14.33 pt
+  luma > 90 label: ink x 308.33–358.33 y 136.00–145.67  inset 3.35 pt
+  luma > 120 numeral: ink x 326.00–340.33 y 96.67–116.33  inset 14.33 pt
+  luma > 120 label: ink x 308.33–358.33 y 136.00–145.67  inset 3.35 pt
+  HEDEF DÖNGÜ ink top 208.67  gap from card bottom 51.67 pt
+=== RT-16-L26-extra-extra-large.png (W 393)
+card l 300.24 t 82.33 r 366.10 b 162.67 (scanned)  h 80.33 = 73.18·s  radius 24.15
+  luma > 90 numeral: ink x 325.00–341.33 y 94.67–116.33  inset 12.33 pt
+  luma > 90 label: ink x 306.00–360.67 y 137.00–147.67  inset 3.32 pt
+  luma > 120 numeral: ink x 325.33–341.33 y 94.67–116.33  inset 12.33 pt
+  luma > 120 label: ink x 306.00–360.67 y 137.00–147.67  inset 3.32 pt
+  HEDEF DÖNGÜ ink top 208.00  gap from card bottom 45.33 pt
+=== RT-16-L26-extra-extra-extra-large.png (W 393)
+card l 300.24 t 82.33 r 366.10 b 167.33 (scanned)  h 85.00 = 77.43·s  radius 24.15
+  luma > 90 numeral: ink x 324.67–341.67 y 93.67–117.00  inset 11.33 pt
+  luma > 90 label: ink x 304.67–362.00 y 138.67–150.00  inset 2.98 pt
+  luma > 120 numeral: ink x 324.67–341.67 y 94.00–116.67  inset 11.67 pt
+  luma > 120 label: ink x 304.67–361.67 y 138.67–150.00  inset 3.28 pt
+  HEDEF DÖNGÜ ink top 207.67  gap from card bottom 40.33 pt
+=== RT-16-L26-accessibility-extra-extra-extra-large.png (W 393)
+card l 300.24 t 82.33 r 366.10 b 167.33 (scanned)  h 85.00 = 77.43·s  radius 24.15
+  luma > 90 numeral: ink x 324.67–341.67 y 93.67–117.00  inset 11.33 pt
+  luma > 90 label: ink x 304.67–362.00 y 138.67–150.00  inset 2.98 pt
+  luma > 120 numeral: ink x 324.67–341.67 y 94.00–116.67  inset 11.67 pt
+  luma > 120 label: ink x 304.67–361.67 y 138.67–150.00  inset 3.28 pt
+  HEDEF DÖNGÜ ink top 207.67  gap from card bottom 40.33 pt
+=== RT-16e-L26-large.png (W 390)
+card l 297.95 t 81.70 r 363.31 b 150.33 (scanned)  h 68.63 = 63.00·s  radius 23.97
+  luma > 90 numeral: ink x 324.00–337.00 y 97.00–114.67  inset 15.30 pt
+  luma > 90 label: ink x 308.00–353.33 y 133.00–141.67  inset 3.23 pt
+  luma > 120 numeral: ink x 324.33–337.00 y 97.33–114.67  inset 15.63 pt
+  luma > 120 label: ink x 308.33–353.33 y 133.00–141.67  inset 3.23 pt
+  HEDEF DÖNGÜ ink top 206.00  gap from card bottom 55.67 pt
+=== RT-16e-L26-extra-large.png (W 390)
+card l 297.95 t 81.70 r 363.31 b 156.00 (scanned)  h 74.30 = 68.20·s  radius 23.97
+  luma > 90 numeral: ink x 323.33–338.00 y 95.33–115.00  inset 13.63 pt
+  luma > 90 label: ink x 306.00–355.67 y 134.67–144.33  inset 3.53 pt
+  luma > 120 numeral: ink x 323.33–338.00 y 95.67–115.00  inset 13.96 pt
+  luma > 120 label: ink x 306.00–355.67 y 134.67–144.33  inset 3.53 pt
+  HEDEF DÖNGÜ ink top 205.33  gap from card bottom 49.33 pt
+=== RT-16e-L26-extra-extra-large.png (W 390)
+card l 297.95 t 81.70 r 363.31 b 161.67 (scanned)  h 79.96 = 73.40·s  radius 23.97
+  luma > 90 numeral: ink x 322.67–338.67 y 93.33–115.00  inset 11.63 pt
+  luma > 90 label: ink x 303.67–358.00 y 135.67–146.33  inset 3.41 pt
+  luma > 120 numeral: ink x 322.67–338.67 y 93.67–115.00  inset 11.96 pt
+  luma > 120 label: ink x 303.67–357.67 y 135.67–146.33  inset 3.71 pt
+  HEDEF DÖNGÜ ink top 206.00  gap from card bottom 44.33 pt
+=== RT-16e-L26-extra-extra-extra-large.png (W 390)
+card l 297.95 t 81.70 r 363.31 b 166.67 (scanned)  h 84.96 = 77.99·s  radius 23.97
+  luma > 90 numeral: ink x 322.33–339.00 y 93.33–116.33  inset 11.63 pt
+  luma > 90 label: ink x 302.33–359.00 y 138.00–149.33  inset 3.22 pt
+  luma > 120 numeral: ink x 322.33–339.00 y 93.33–116.00  inset 11.63 pt
+  luma > 120 label: ink x 302.67–359.00 y 138.33–149.33  inset 3.22 pt
+  HEDEF DÖNGÜ ink top 206.00  gap from card bottom 39.33 pt
+=== RT-16e-L26-accessibility-extra-extra-extra-large.png (W 390)
+card l 297.95 t 81.70 r 363.31 b 166.67 (scanned)  h 84.96 = 77.99·s  radius 23.97
+  luma > 90 numeral: ink x 322.33–339.00 y 93.33–116.33  inset 11.63 pt
+  luma > 90 label: ink x 302.33–359.00 y 138.00–149.33  inset 3.22 pt
+  luma > 120 numeral: ink x 322.33–339.00 y 93.33–116.00  inset 11.63 pt
+  luma > 120 label: ink x 302.67–359.00 y 138.33–149.33  inset 3.22 pt
+  HEDEF DÖNGÜ ink top 206.00  gap from card bottom 39.33 pt
+=== RT-pm-L26-large.png (W 440)
+card l 336.15 t 92.18 r 409.89 b 169.67 (scanned)  h 77.49 = 63.05·s  radius 27.04
+  luma > 90 numeral: ink x 365.67–380.33 y 109.67–129.33  inset 17.49 pt
+  luma > 90 label: ink x 347.67–398.67 y 150.00–159.67  inset 3.79 pt
+  luma > 120 numeral: ink x 365.67–380.33 y 109.67–129.33  inset 17.49 pt
+  luma > 120 label: ink x 347.67–398.67 y 150.00–159.67  inset 3.79 pt
+  HEDEF DÖNGÜ ink top 234.00  gap from card bottom 64.33 pt
+=== RT-pm-L26-extra-large.png (W 440)
+card l 336.15 t 92.18 r 409.89 b 176.00 (scanned)  h 83.82 = 68.20·s  radius 27.04
+  luma > 90 numeral: ink x 365.00–381.33 y 108.00–130.33  inset 15.82 pt
+  luma > 90 label: ink x 345.00–401.33 y 151.33–162.33  inset 4.22 pt
+  luma > 120 numeral: ink x 365.00–381.00 y 108.00–130.00  inset 15.82 pt
+  luma > 120 label: ink x 345.33–401.00 y 151.67–162.33  inset 4.49 pt
+  HEDEF DÖNGÜ ink top 233.00  gap from card bottom 57.00 pt
+=== RT-pm-L26-extra-extra-large.png (W 440)
+card l 336.15 t 92.18 r 409.89 b 182.33 (scanned)  h 90.15 = 73.35·s  radius 27.04
+  luma > 90 numeral: ink x 364.00–382.00 y 105.00–129.67  inset 12.82 pt
+  luma > 90 label: ink x 342.67–403.67 y 153.67–165.67  inset 3.78 pt
+  luma > 120 numeral: ink x 364.00–382.00 y 105.00–129.33  inset 12.82 pt
+  luma > 120 label: ink x 342.67–403.67 y 153.67–165.67  inset 3.78 pt
+  HEDEF DÖNGÜ ink top 233.67  gap from card bottom 51.33 pt
+=== RT-pm-L26-extra-extra-extra-large.png (W 440)
+card l 336.15 t 92.18 r 409.89 b 187.00 (scanned)  h 94.82 = 77.15·s  radius 27.04
+  luma > 90 numeral: ink x 363.33–382.67 y 105.00–131.00  inset 12.82 pt
+  luma > 90 label: ink x 341.33–405.33 y 155.00–167.67  inset 3.27 pt
+  luma > 120 numeral: ink x 363.67–382.33 y 105.33–131.00  inset 13.15 pt
+  luma > 120 label: ink x 341.33–405.00 y 155.00–167.67  inset 3.59 pt
+  HEDEF DÖNGÜ ink top 233.33  gap from card bottom 46.33 pt
+=== RT-pm-L26-accessibility-extra-extra-extra-large.png (W 440)
+card l 336.15 t 92.18 r 409.89 b 187.00 (scanned)  h 94.82 = 77.15·s  radius 27.04
+  luma > 90 numeral: ink x 363.33–382.67 y 105.00–131.00  inset 12.82 pt
+  luma > 90 label: ink x 341.33–405.33 y 155.00–167.67  inset 3.27 pt
+  luma > 120 numeral: ink x 363.67–382.33 y 105.33–131.00  inset 13.15 pt
+  luma > 120 label: ink x 341.33–405.00 y 155.00–167.67  inset 3.59 pt
+  HEDEF DÖNGÜ ink top 233.33  gap from card bottom 46.33 pt
+
+# Load-error headline (headline mode), L07 asset corrupted in the installed bundle (restored after)
+=== RT-16-L07-error-large.png (W 393)
+headline lines: 2  (inner column x 55.44–337.56)
+  y 435.67–457.33  x 58.00–227.33  width 169.33
+  y 471.67–499.00  x 58.67–250.67  width 192.00
+=== RT-16-L07-error-extra-large.png (W 393)
+headline lines: 2  (inner column x 55.44–337.56)
+  y 433.00–457.33  x 58.00–247.67  width 189.67
+  y 473.00–503.67  x 59.00–273.67  width 214.67
+=== RT-16-L07-error-extra-extra-large.png (W 393)
+headline lines: 2  (inner column x 55.44–337.56)
+  y 429.67–456.33  x 58.33–268.00  width 209.67
+  y 473.67–507.33  x 59.33–296.67  width 237.33
+=== RT-16-L07-error-extra-extra-extra-large.png (W 393)
+headline lines: 2  (inner column x 55.44–337.56)
+  y 428.33–456.33  x 58.33–279.00  width 220.67
+  y 474.33–510.00  x 59.33–309.33  width 250.00
+=== RT-16-L07-error-accessibility-extra-extra-extra-large.png (W 393)
+headline lines: 2  (inner column x 55.44–337.56)
+  y 397.00–425.00  x 58.33–279.00  width 220.67
+  y 443.00–478.67  x 59.33–309.33  width 250.00
+=== RT-16e-L07-error-large.png (W 390)
+headline lines: 2  (inner column x 55.01–334.99)
+  y 432.33–454.00  x 57.33–225.67  width 168.33
+  y 467.33–494.67  x 58.33–248.67  width 190.33
+=== RT-16e-L07-error-extra-large.png (W 390)
+headline lines: 2  (inner column x 55.01–334.99)
+  y 429.00–453.00  x 57.67–245.67  width 188.00
+  y 469.00–499.33  x 58.33–271.33  width 213.00
+=== RT-16e-L07-error-extra-extra-large.png (W 390)
+headline lines: 2  (inner column x 55.01–334.99)
+  y 425.33–452.00  x 57.67–265.67  width 208.00
+  y 469.33–503.00  x 58.67–294.33  width 235.67
+=== RT-16e-L07-error-extra-extra-extra-large.png (W 390)
+headline lines: 2  (inner column x 55.01–334.99)
+  y 424.00–452.00  x 58.00–277.00  width 219.00
+  y 470.00–505.33  x 59.00–307.00  width 248.00
+=== RT-16e-L07-error-accessibility-extra-extra-extra-large.png (W 390)
+headline lines: 2  (inner column x 55.01–334.99)
+  y 393.33–421.33  x 58.00–277.00  width 219.00
+  y 439.33–474.67  x 59.00–307.00  width 248.00
+=== RT-pm-L07-error-large.png (W 440)
+headline lines: 2  (inner column x 62.07–377.93)
+  y 489.67–514.00  x 64.67–254.33  width 189.67
+  y 529.67–560.33  x 65.67–280.33  width 214.67
+=== RT-pm-L07-error-extra-large.png (W 440)
+headline lines: 2  (inner column x 62.07–377.93)
+  y 486.00–513.00  x 65.00–277.00  width 212.00
+  y 531.00–565.33  x 66.00–306.00  width 240.00
+=== RT-pm-L07-error-extra-extra-large.png (W 440)
+headline lines: 2  (inner column x 62.07–377.93)
+  y 482.00–512.00  x 65.00–299.67  width 234.67
+  y 531.00–569.00  x 66.33–332.00  width 265.67
+=== RT-pm-L07-error-extra-extra-extra-large.png (W 440)
+headline lines: 2  (inner column x 62.07–377.93)
+  y 479.33–511.00  x 65.33–312.33  width 247.00
+  y 531.33–571.33  x 66.33–346.00  width 279.67
+=== RT-pm-L07-error-accessibility-extra-extra-extra-large.png (W 440)
+headline lines: 2  (inner column x 62.07–377.93)
+  y 444.67–476.33  x 65.33–312.33  width 247.00
+  y 496.67–536.67  x 66.33–346.00  width 279.67
+
+# Reference: QA's F03-QA-D1 capture before the rework
+=== qa/d1/QA-16-28-load-error-ax5.png (W 393)
+headline lines: 3  (inner column x 55.44–337.56)
+  y 374.00–402.00  x 58.33–279.00  width 220.67
+  y 420.00–455.67  x 59.33–298.33  width 239.00
+  y 488.00–494.00  x 58.67–65.00  width 6.33  <- punctuation-only line
+=== qa/d1/QA-16-16-L26-text-ax5.png (W 393, card mode)
+card l 300.24 t 82.33 r 366.10 b 153.00 (scanned)  h 70.67 = 64.37·s  radius 24.15
+  luma > 90 numeral: ink x 324.67–341.67 y 93.67–117.00  inset 11.33 pt
+  luma > 90 label: ink x 304.67–362.00 y 138.67–150.00  inset -4.76 pt
+  luma > 120 numeral: ink x 324.67–341.67 y 94.00–116.67  inset 11.67 pt
+  luma > 120 label: ink x 304.67–361.67 y 138.67–150.00  inset -4.76 pt
+  HEDEF DÖNGÜ ink top 207.67  gap from card bottom 54.67 pt
+
+# Default-size parity vs the D1 renders (design/src/measure-d1.swift, same method as runtime-d1/parity-measurements.txt)
+=== PC-D1R-05: D1-05-play-locked-frozen-L26.png ↔ RT-16-L26-large.png
+geometry W 393 H 852  s 1.0978  e 64.90
+feature | render pt | runtime pt | Δ pt
+board card top light line (y) | 306.50 | 306.33 | -0.17
+rail tile 2 top (y) | 235.00 | 235.67 | +0.67
+rail tile 2 bottom (y) | 282.00 | 281.67 | -0.33
+rail tile 0 left (x) | 80.00 | 80.00 | +0.00
+HAMLE card top (y) | 82.00 | 82.33 | +0.33
+HAMLE card left (x) | 302.00 | 302.33 | +0.33
+undo pill top (y) | 715.50 | 715.00 | -0.50
+undo pill left (x) | 31.50 | 31.67 | +0.17
+restart square left (x) | 317.00 | 317.00 | +0.00
+restart square top (y) | 720.50 | 720.67 | +0.17
+back chevron apex (x) | 34.00 | 33.67 | -0.33
+tile (0,0) left (x) | 39.00 | 39.00 | +0.00
+tile (0,0) top (y) | 318.50 | 318.33 | -0.17
+tile (0,4) right (x) | 353.00 | 353.00 | +0.00
+tile (4,0) bottom (y) | 632.50 | 632.33 | -0.17
+tile (2,2) left (x) | 167.50 | 167.67 | +0.17
+max |Δ| 0.67 pt
+patch | render RGB | runtime RGB | ΔE2000
+ground, left middle (teal spill) | 11,31,49 | 12,32,50 | 0.29
+ground, top right (light) | 42,51,97 | 33,41,83 | 3.35
+ground, bottom | 5,10,30 | 6,11,31 | 0.29
+rail tile body | 36,36,75 | 36,36,75 | 0.03
+HAMLE card fill | 55,64,112 | 51,60,106 | 1.48
+undo pill fill | 15,20,40 | 17,22,42 | 0.62
+board card, bottom margin | 7,10,31 | 7,12,31 | 0.20
+tile (1,0) body | 252,249,242 | 252,249,242 | 0.05
+tile (3,4) body | 243,236,225 | 242,236,225 | 0.16
+max ΔE2000 3.35
+=== PC-D1R-10: D1-10-play-text-ax5-capped.png ↔ RT-16-L26-accessibility-extra-extra-extra-large.png
+geometry W 393 H 852  s 1.0978  e 64.90
+feature | render pt | runtime pt | Δ pt
+board card top light line (y) | 306.50 | 306.33 | -0.17
+rail tile 2 top (y) | 235.00 | 235.67 | +0.67
+rail tile 2 bottom (y) | 282.00 | 281.67 | -0.33
+rail tile 0 left (x) | 80.00 | 80.00 | +0.00
+HAMLE card top (y) | 82.00 | 82.33 | +0.33
+HAMLE card left (x) | 302.50 | 300.00 | -2.50
+undo pill top (y) | 715.00 | 715.00 | +0.00
+undo pill left (x) | 31.50 | 31.67 | +0.17
+restart square left (x) | 317.00 | 317.00 | +0.00
+restart square top (y) | 720.50 | 720.67 | +0.17
+back chevron apex (x) | 34.00 | 33.67 | -0.33
+tile (0,0) left (x) | 39.00 | 39.00 | +0.00
+tile (0,0) top (y) | 318.50 | 318.33 | -0.17
+tile (0,4) right (x) | 353.00 | 353.00 | +0.00
+tile (4,0) bottom (y) | 632.50 | 632.33 | -0.17
+tile (2,2) left (x) | 167.50 | 167.67 | +0.17
+max |Δ| 2.50 pt
+patch | render RGB | runtime RGB | ΔE2000
+ground, left middle (teal spill) | 11,31,49 | 12,32,50 | 0.29
+ground, top right (light) | 42,51,97 | 33,41,83 | 3.35
+ground, bottom | 5,10,30 | 6,11,31 | 0.29
+rail tile body | 36,36,75 | 36,36,75 | 0.03
+HAMLE card fill | 55,65,113 | 52,61,107 | 1.28
+undo pill fill | 24,28,48 | 17,22,42 | 1.89
+board card, bottom margin | 7,10,31 | 7,12,31 | 0.20
+tile (1,0) body | 252,249,242 | 252,249,242 | 0.05
+tile (3,4) body | 243,236,225 | 242,236,225 | 0.16
+max ΔE2000 3.35

@@ -57,21 +57,44 @@ class LoopBadge extends StatelessWidget {
 /// floor; real font hinting doesn't match a widget test closely enough to
 /// trust a hand-picked ceiling for the last pixel. At the default OS text
 /// size this renders at exactly 60 × 63, identical to the old fixed size.
+///
+/// Above the default text size the card also grows *below* the label, by up
+/// to [capGrowth]·s at the 1.3× cap (F03 architecture §19.10 (1),
+/// F03-QA-D1-01). At the cap the label is almost as wide as the card, so it
+/// must sit well clear of the 22·s bottom corner arcs, not just of the bottom
+/// edge: without the growth its outer letters crossed the arcs from OS size
+/// xxL up. The counter and label keep the positions they would have without
+/// the growth and the card keeps its width, so it only lengthens downward.
+/// Its glyph ink stays ≥ 2 pt inside the rounded rect at every OS size, in the
+/// app's Material text context, where the counter inherits the theme's line
+/// height (`moves_card_ink_test.dart`).
 class MovesCard extends StatelessWidget {
   const MovesCard({required this.moves, this.label = 'HAMLE', super.key});
 
   final int moves;
   final String label;
 
+  /// Extra height below the label at the 1.3× text cap, in design units (·s);
+  /// proportional to the label's text scale in between, 0 at 1.0×.
+  static const double capGrowth = 13;
+
   @override
   Widget build(BuildContext context) {
     final s = LoopScale.of(context);
+    final capped = loopCappedTextScaler(context);
+    // The label is the widest line, so its (possibly non-linear) scale sets
+    // the growth.
+    final labelSize = LoopText.label(s).fontSize!;
+    final t = capped.scale(labelSize) / labelSize;
+    final grow = capGrowth * s * ((t - 1) / 0.3).clamp(0.0, 1.0);
     return Semantics(
       label: '$label $moves',
       excludeSemantics: true,
       child: Container(
         width: 60 * s,
-        constraints: BoxConstraints(minHeight: 63 * s),
+        constraints: BoxConstraints(minHeight: 63 * s + grow),
+        // The growth is all below the column, which lays out as without it.
+        padding: EdgeInsets.only(bottom: grow),
         decoration: BoxDecoration(
           gradient: LoopGradients.moves,
           borderRadius: BorderRadius.circular(22 * s),
@@ -81,17 +104,9 @@ class MovesCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-              '$moves',
-              style: LoopText.counter(s),
-              textScaler: loopCappedTextScaler(context),
-            ),
+            Text('$moves', style: LoopText.counter(s), textScaler: capped),
             SizedBox(height: 7 * s),
-            Text(
-              label,
-              style: LoopText.label(s),
-              textScaler: loopCappedTextScaler(context),
-            ),
+            Text(label, style: LoopText.label(s), textScaler: capped),
           ],
         ),
       ),

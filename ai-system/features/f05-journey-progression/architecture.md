@@ -186,7 +186,7 @@ Derived from `journey_progress` + the persisted active-session snapshot, **both 
     * This is an accepted edge with low impact: it only affects post-completion personal-best replays. It is the shipped and QA-verified behaviour.
     * To be revisited when the home is redesigned in Design Adoption Phase D.
 * **`Next Level`** (fills F04's `CompletionPanel.onNextLevel`): let `n = <this session's journeyLevel>`. If `n != null && n < 30 && manifest has n+1` → `context.pushReplacement('/play', extra: PlaySessionArgs(source: journey, journeyLevel: n + 1))`. Else → `context.go('/')` (home → terminal variant). **`pushReplacement`** so the back stack never accumulates `/play` frames.
-* **Back:** unchanged from F03 — chevron hidden in `won`; `Close` / system / gesture back → `_popToCaller`, which **must resolve to `/`** (add a `context.go('/')` fallback when `!canPop`, e.g. a deep-link entry). From any Journey level, back lands on `/`.
+* **Back:** unchanged from F03 — chevron hidden in `won`; `Close` / system / gesture back → `_popToCaller` *[amended 2026-09-28, F03 §20.3 (7): no `Close`; the result's back button and system / gesture back]*, which **must resolve to `/`** (add a `context.go('/')` fallback when `!canPop`, e.g. a deep-link entry). From any Journey level, back lands on `/`.
 * **Route graph:** `/` ⇄ `/play` only. Every `/play` exit → `/`. No 30-deep stack. No wrong-route, no empty stack.
 * **`Next Level` on the last available interim level (5) or level 30** → terminal state (a valid action, never a dead no-op).
 

@@ -6,6 +6,8 @@
 >
 > **Source revision of this delivery:** HEAD `991584c` + working tree (the harness commits it after this turn).
 >
+> **Rework F03-FE-D1R (2026-09-28):** see [§ F03-FE-D1R — D1 text-scale rework](#f03-fe-d1r--d1-text-scale-rework) at the end. The F03-FE-D1 text below stays as delivered, except the two records §19.10 (4) asked to correct (A11Y-16-text and NTLC-3, marked "Corrected").
+>
 > **History:** the pre-D1 F03 frontend reports (the original F03-FE, F03-FE9, F03-FE-WON / F03-FE-INTEG, F03-FE-CANCEL / F03-FE-REDUCEMOTION) are archived byte-for-byte in `history/f03-puzzle-play-session-2026-09-27/frontend-before-phase-d1.md`.
 
 ---
@@ -192,7 +194,7 @@ Every non-`won` Play state now renders on the Selected Foundation (Direction C, 
 | RV-16-thaw | runtime-video | thaw L23 (the U4 that forms "SAAT") | 393×852 iPhone 16 | design/runtime-d1/RV-16-thaw.mp4 | 991584c + WT | Frontend/Mobile Developer | 2026-09-28 00:07 | 180 ms cross-fade after the settle; the visible change ends ≈ T0 + 130 ms (the curve front-loads), last pixel change at T0 + 168 ms |
 | RV-16-tutorial | runtime-video | tutorial ghost loop → touch-down hides it → row move → returns after idle → column move → pill + ghost fade out | 393×852 iPhone 16 | design/runtime-d1/RV-16-tutorial-ghost.mp4 | 991584c + WT | Frontend/Mobile Developer | 2026-09-28 00:02 | the ghost never plays under the finger (A-6); undo stays visible and usable |
 | RV-16-rm | runtime-video | Reduce Motion ON: row lift, then the thawing column move | 393×852 iPhone 16 | design/runtime-d1/RV-16-reduced-motion-lift-thaw.mp4 (+ RT-16-rm-*.jpg frames) | 991584c + WT | Frontend/Mobile Developer | 2026-09-28 00:12 | the rest dims to 42 % and back in one frame; the thaw is complete in the settle frame; the shift keeps its 190 ms ease-out |
-| A11Y-16-text | accessibility | OS text default / xxxLarge / AX5 on L26 | 393×852 iPhone 16 | design/runtime-d1/RT-16-05-play-locked-frozen-L26.png, RT-16-10-a11y-xxxl-L26.jpg, RT-16-10-a11y-ax5-L26.png | 991584c + WT | Frontend/Mobile Developer | 2026-09-27 23:58 | every Play text at the 1.3× cap from xxxL up; no clipping or overlap; the `HAMLE` label sits ≈ 1.7 pt inside the card's bottom border at the cap (as in D1-10; F00 `MovesCard`, NTLC-3); vs D1-10 (PC-10) |
+| A11Y-16-text | accessibility | OS text default / xxxLarge / AX5 on L26 | 393×852 iPhone 16 | design/runtime-d1/RT-16-05-play-locked-frozen-L26.png, RT-16-10-a11y-xxxl-L26.jpg, RT-16-10-a11y-ax5-L26.png | 991584c + WT | Frontend/Mobile Developer | 2026-09-27 23:58 | every Play text at the 1.3× cap from xxxL up; no clipping or overlap; the `HAMLE` label sits ≈ 1.7 pt inside the card's bottom border at the cap (as in D1-10; F00 `MovesCard`, NTLC-3); vs D1-10 (PC-10). **Corrected 2026-09-28 (F03-FE-D1R, §19.10 (4)):** "no clipping or overlap" held only at the card's centre line. From xxL up the label's outer letters crossed the card's bottom corner arcs by up to 4.76 pt on the device (F03-QA-D1-01), and the load-error headline broke off its full stop from xxxL (F03-QA-D1-02). Both fixed and re-measured in RT-D1R-* / A11Y-D1R-* |
 | A11Y-tutorial-ax5 | accessibility | Tutorial at AX5 (1.3× cap, fallback on) | 393×852 iPhone 16; 390×844 iPhone 16e | design/runtime-d1/RT-16-10b-a11y-ax5-tutorial.png, RT-16e-10b-a11y-ax5-tutorial.png | 991584c + WT | Frontend/Mobile Developer | 2026-09-28 00:27 | two lines, sparkle hidden; clearance 7.23 / 6.99 pt (16) and 6.27 / 6.37 pt (16e) — before the fallback the 16e measured 3.93 / 4.04 pt; vs D1-10b and D1-v-16e-tutorial-text-ax5-capped (PC-10b, PC-v16e-10b) |
 | A11Y-rm | accessibility | Reduce Motion on and off | 393×852 iPhone 16 | RV-16-rm (on); RV-16-lift, RV-16-thaw, RV-16-tutorial (off) | 991584c + WT | Frontend/Mobile Developer | 2026-09-28 00:02–00:12 | set with `simctl spawn … defaults write com.apple.Accessibility ReduceMotionEnabled`, app relaunched; restored to 0 afterwards |
 | A11Y-focus | accessibility | Keyboard focus ring (D1-12) | — | test/design/components_test.dart "QA-03: focus ring …" | 991584c + WT | Frontend/Mobile Developer | 2026-09-28 | **not captured at runtime:** this host cannot inject hardware Tab keys into the simulator (pasted `\t` and System Events keystrokes did not reach it). Covered by the widget test; runtime check left to QA |
@@ -261,6 +263,7 @@ Every non-`won` Play state now renders on the Selected Foundation (Direction C, 
    * `TileFace.iconScale` — the §5 thaw shrinks the snowflake 1 → 0.6;
    * `UndoPill`'s spent dot as an `AnimatedContainer` — §5 "the spent quota dot dims over 120 ms".
 3. **NTLC-3 (informational) — `HAMLE` label at the 1.3× cap** sits ≈ 1.7 pt inside the card's bottom border on the device. There is no clipping or overlap, and it matches D1-10. `MovesCard` keeps its values per ui-design §13. A 2–3 pt larger minimum height at the cap would add margin if you want it.
+   * **Corrected 2026-09-28 (F03-FE-D1R, §19.10 (4)):** the 1.7 pt was measured only at the card's bottom centre. The label is almost as wide as the card, and its outer letters crossed the 22·s corner arcs by 4.76 pt at AX5 (−5.07 pt in the real-font widget test), so there *was* clipping / overlap. A 2–3 pt taller card would not have been enough: the fix needed 13·s. Fixed under the §19.10 (1) allowance (see the F03-FE-D1R section).
 4. **NTLC-4 (informational) — the repo-wide `melos run format:check` fails** on a pre-existing QA artefact, `ai-system/features/f00-design-foundation/qa/src/qa_probe_main.dart` (unchanged since 3647cef, outside `app/`). `app/`, `packages/` and `tools/` are formatted (0 changed). Not touched here.
 5. **NTLC-5 (informational) — the "existing 120 ms grid swap"** of ui-design §5 does not exist in the shipped code, so undo / restart still swap instantly.
 6. **NTLC-6 (informational) — the legacy won moment / F04 panel at AX5** overflows and covers the screen exactly as in the Phase C audit capture (pre-existing A-2, D2 scope). The §16.5 (6) scope (1.0 and 1.3×) holds.
@@ -327,6 +330,181 @@ Every non-`won` Play state now renders on the Selected Foundation (Direction C, 
 ---
 
 ## 19. Sonraki Komut
+
+```text
+Run Tech Lead
+```
+
+---
+
+# F03-FE-D1R — D1 text-scale rework
+
+> **Task:** F03-FE-D1R (Frontend/Mobile Developer, 2026-09-28). **Contract:** `architecture.md` §19.10 (rulings on F03-QA-D1); §19.3, §19.8 and §19.9 still apply.
+>
+> **Source revision:** HEAD `97c700e` + working tree (the harness commits it after this turn).
+
+## 1. Feature Summary
+
+The two blocking F03-QA-D1 findings are fixed; no behaviour changed.
+
+* **F03-QA-D1-01 — `HAMLE` label over the card's corners.** `MovesCard` now grows **below** its label above the default text size, by up to 13·s at the 1.3× cap. The counter and the label keep their positions, and the card keeps its width and its (273.5, 75)·s anchor. On the device the label ink is now **≥ 2.98 pt inside the rounded card, corner arcs included**, at every OS size from large to AX5 on all three phones. Before the fix it was −4.76 pt at AX5 on the 16.
+* **F03-QA-D1-02 — the load-error headline's orphaned full stop.** The headline no longer has the render's 230·s column limit and uses the card's inner width (257·s). At the 1.3× cap it now breaks as "Bu bulmaca" / "yüklenemedi." — two lines, only between words, on all three phones up to AX5.
+* **Default size unchanged:** at `large` the card is still 60 × 63·s and every glyph is where it was. The error headline is pixel-identical to the accepted D1 capture RT-16-07, and the `HAMLE` label matches QA's `large` capture to the pixel.
+* **Records corrected** (§19.10 (4)): A11Y-16-text and NTLC-3 above.
+
+**Why QA saw more than my F03-FE-D1 measurement:** the counter's style has no line height of its own. Under the app's Material 3 theme it inherits the ambient `DefaultTextStyle` height (1.43), which puts the label ≈ 4 pt lower than in a bare widget tree. The D1 checks measured the label's layout box at the card centre, not its glyph ink against the corner arcs. The new tests measure glyph ink, in the app's theme, against the rounded rect, and they reproduce QA's device capture to within 0.5 pt (−5.07 pt vs −4.76 pt at AX5 on the 393).
+
+## 2. Impacted Files
+
+**Updated**
+* `app/lib/design/components/info.dart` — `MovesCard` (design-layer allowance §19.10 (1); F00 stays Done).
+* `app/lib/play/play_session_screen.dart` — `_LoadErrorView` headline.
+* `app/test/play/play_test_support.dart` — shared `kPlayDevices` and `kOsTextScales`.
+* `ai-system/features/f03-puzzle-play-session/frontend.md` — this section; the A11Y-16-text and NTLC-3 corrections.
+
+**Created**
+* `app/test/design/text_ink_support.dart` — glyph-ink and line-break probes (helpers, not a suite).
+* `app/test/design/moves_card_ink_test.dart` — 39 tests.
+* `app/test/play/load_error_headline_test.dart` — 28 tests.
+* `ai-system/features/f03-puzzle-play-session/design/src/sweep-d1r.sh` — OS text-size sweep + capture.
+* `ai-system/features/f03-puzzle-play-session/design/src/measure-d1r.swift` — card-ink and headline-line measurement on screenshots.
+* `ai-system/features/f03-puzzle-play-session/design/src/compose-d1r.swift` — before / after composites.
+* `ai-system/features/f03-puzzle-play-session/design/runtime-d1r/` — 30 runtime screenshots, 3 composites, `measurements-d1r.txt`.
+
+No token value, `LoopText` role, font, tracking, dependency, route, gesture, timing or persistence change.
+
+## 3. Task-to-Code Traceability
+
+**F03-FE-D1R — Complete.**
+
+| # | Brief item | Code | Behaviour |
+| --- | --- | --- | --- |
+| 1 | `MovesCard` rect rule (§19.10 (1)) | `info.dart` → `MovesCard.capGrowth = 13`; `build` reads the label's capped scale `t` (non-linear scalers included) and adds `grow = 13·s · clamp((t − 1) / 0.3, 0, 1)` both to `minHeight` and as bottom padding | The column lays out exactly as before in the top part; the card lengthens below the label only. 0 at 1.0×, 13·s at ≥ 1.3×. Width 60·s, anchor unchanged. Card height on the 16: 69.3 → 74.7 → 80.3 → 85.0 pt (large → xL → xxL → xxxL / AX5) |
+| 2 | Headline word-boundary rule (§19.10 (2)) | `play_session_screen.dart` → `_LoadErrorView`: the `ConstrainedBox(maxWidth: 230 * s)` around the headline is removed; the `Text` keeps `LoopText.headline` + `loopCappedTextScaler` | The headline fills the card's inner column (257·s); the 1.3× cap stays (§19.9 (3)) |
+| 3 | `frontend.md` corrections (§19.10 (4)) | A11Y-16-text row and NTLC-3 above, marked "Corrected" | — |
+
+## 9. Contract Compliance Check
+
+| Area | Status | Note |
+| --- | --- | --- |
+| Screen / route contract (§13) | Preserved | no route, arg or navigation change |
+| Backend response / event mapping | Not Applicable | client-only |
+| Error mapping | Preserved | same trigger, copy and single action; only the headline's width changed |
+| UI state / store state consistency | Preserved | display-only layout change |
+| Navigation / back / header behaviour | Preserved | the header row is untouched; the card only lengthens downward (≥ 39 pt clear of `HEDEF DÖNGÜ` at the cap on the device) |
+| Async authority / lifecycle / boundaries | Preserved | no controller or lifecycle code touched |
+| §19.10 (1) limits | Preserved | width 60·s, anchor (273.5, 75)·s, downward growth only, ≥ 8 pt above the caption, no token / role / font / tracking change |
+| §19.6 non-goals | Preserved | no behaviour change; multi-touch (F03-MULTITOUCH-FIRST-POINTER) untouched; won moment / F04 panel untouched |
+
+## 10. Behavior Preserved
+
+* **Default size (D1-00 / D1-05 / D1-07):** the widget tests assert the card is exactly 60 × 63·s at 1.0× on all three widths. On the device the `HAMLE` label ink at `large` (x 310.67–356.00, y 134.67–143.33 pt) equals QA's `QA-16-17-L26-text-large` measurement. The error headline ink at `large` equals RT-16-07 to the pixel on both lines. The parity probe vs D1-05 is unchanged: max 0.67 pt, `HAMLE` card top / left +0.33 pt.
+* **Other `MovesCard` consumers:** only Play and the debug gallery (§19.10 (1)); the gallery gets the same growth at large OS text.
+* **Error screen below the headline:** the pill and scroll behaviour are unchanged. At the cap the card is one line shorter, so the pill moves up (e.g. 619.5 → 596.5 pt on the 393); it still reflows to two lines at AX5.
+* **Everything else in D1** (board, rail, HUD, tutorial, won moment, motion) is outside the diff. The full suite and integration_test are green.
+
+## 11. UX Decisions
+
+* **Grow below, not re-centre.** Centring the content in a taller card would have moved the numeral and needed about twice the growth, because the label only gains half of it. Keeping the column where it is leaves the top of the card unchanged, which keeps the header's rhythm with `SEVİYE NN` intact. The bottom margin grows exactly where the wide label needs clearance from the arcs.
+* **Growth tracks the label's own scale** (`capped.scale(labelSize) / labelSize`), so Android's non-linear font scaling gets the growth its label actually needs.
+* **13·s is measured, not guessed:** 9·s left 1.05 pt at the cap in the app's text context; 13·s gives ≥ 2.83 pt in the widget test and ≥ 2.98 pt on the device.
+* **Headline:** the full inner width is the smallest change that keeps the cap (§19.9 (3)) and the role size. At the cap the longest line is 250 pt of the 282-pt column on the 393 (279.7 of 309 on the Pro Max).
+* **Premium-rubric self-check (advisory):** the two fail-condition items are gone at runtime. At AX5 the taller card reads as a deliberate container, not a stretched one (composite PC-D1R-hamle-sweep-16). The independent score is QA's.
+
+## Visual Parity Evidence
+
+**Common provenance:** iOS Simulator 18.6 — iPhone 16 `D0011CE7-6E50-4367-93FA-B323E81270BE` (393×852 @3x), iPhone 16e `6DBDFD97-7BF7-4051-914C-76609DDF8697` (390×844 @3x), iPhone 16 Pro Max `02FDE776-C263-4DAB-A16A-76902AC18189` (440×956 @3x).
+* **Build:** `flutter build ios --simulator --debug` of HEAD `97c700e` + the F03-FE-D1R working tree ("97c700e + WT"), installed on all three; captured by the Frontend/Mobile Developer on 2026-09-28, 12:21–12:27.
+* **Reaching the states:** `design/src/seed-sim.sh <udid> 26 - 1` → Home DEVAM ET for L26. For the error, `journey-tr-07.json` in each installed bundle was overwritten with invalid JSON (backed up first), then `seed-sim.sh <udid> 7 - 1` → DEVAM ET.
+* **Sweep:** `design/src/sweep-d1r.sh` sets `xcrun simctl ui <udid> content_size` to large / extra-large / extra-extra-large / extra-extra-extra-large / accessibility-extra-extra-extra-large and takes `xcrun simctl io … screenshot` 2 s after each change (live Dynamic Type update, no relaunch).
+* **Measurement:** `design/src/measure-d1r.swift` (log `design/runtime-d1r/measurements-d1r.txt`):
+  * **Card:** scans the card's bottom edge. Every pixel above luma 90 / 120 inside the card counts as glyph ink, excluding the dim 1-pt border ring. It reports each glyph group's smallest inset from the rounded rect of radius 22·s, arcs included, as a signed distance.
+  * **Headline:** white ink (luma > 200, blue > 180) split into lines by empty rows; a line narrower than 12 pt is flagged as punctuation-only.
+  * **Negative check of the tool:** QA's pre-rework captures give −4.76 pt for the label (QA-16-16) and 3 lines with a flagged 6.33-pt "." line (QA-16-28).
+* **Restored afterwards:** the three `journey-tr-07.json` copies (SHA-1 `2fef993c2391…` = repo, verified) and content size `large` on all three simulators. The simulators keep seeded test progress.
+
+| Evidence ID | Kind | Screen / State | Viewport / Device | Artifact | Source Revision | Captured By | Captured At | Result / Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| RT-D1R-16-L26 | runtime-screenshot | Play L26 at large / xL / xxL / xxxL / AX5 | 393×852 iPhone 16 | design/runtime-d1r/RT-16-L26-{large,extra-large,extra-extra-large,extra-extra-extra-large,accessibility-extra-extra-extra-large}.png | 97c700e + WT | Frontend/Mobile Developer | 2026-09-28 12:22 | label ink inset **3.00 / 3.35 / 3.32 / 2.98 / 2.98 pt** (luma > 90); numeral ≥ 11.33 pt; card 69.3 → 85.0 pt; `HEDEF DÖNGÜ` ≥ 40.3 pt below the card |
+| RT-D1R-16e-L26 | runtime-screenshot | same | 390×844 iPhone 16e | design/runtime-d1r/RT-16e-L26-*.png | 97c700e + WT | Frontend/Mobile Developer | 2026-09-28 12:24 | label **3.23 / 3.53 / 3.41 / 3.22 / 3.22 pt**; numeral ≥ 11.63; caption gap ≥ 39.3 pt |
+| RT-D1R-pm-L26 | runtime-screenshot | same | 440×956 iPhone 16 Pro Max | design/runtime-d1r/RT-pm-L26-*.png | 97c700e + WT | Frontend/Mobile Developer | 2026-09-28 12:24 | label **3.79 / 4.22 / 3.78 / 3.27 / 3.27 pt**; numeral ≥ 12.82; caption gap ≥ 46.3 pt |
+| RT-D1R-16-err | runtime-screenshot | Load error L07 at large … AX5 | 393×852 iPhone 16 | design/runtime-d1r/RT-16-L07-error-*.png | 97c700e + WT | Frontend/Mobile Developer | 2026-09-28 12:26 | **2 lines at every size**, no punctuation-only line; widest line 250.0 pt of the 282.1-pt inner column (x 55.4–337.6) |
+| RT-D1R-16e-err | runtime-screenshot | same | 390×844 iPhone 16e | design/runtime-d1r/RT-16e-L07-error-*.png | 97c700e + WT | Frontend/Mobile Developer | 2026-09-28 12:26 | 2 lines at every size; widest 248.0 pt |
+| RT-D1R-pm-err | runtime-screenshot | same | 440×956 iPhone 16 Pro Max | design/runtime-d1r/RT-pm-L07-error-*.png | 97c700e + WT | Frontend/Mobile Developer | 2026-09-28 12:27 | 2 lines at every size; widest 279.7 pt |
+| PC-D1R-hamle | parity-comparison | `HAMLE` card at AX5, before (QA-16-16) \| after; plus the large → AX5 sweep on the 16 | 393×852 | design/runtime-d1r/PC-D1R-hamle-ax5-before-after.jpg, PC-D1R-hamle-sweep-16.jpg | 97c700e + WT | Frontend/Mobile Developer | 2026-09-28 12:30 | label glyphs unchanged in place (x 304.67–361.67, y 138.67–150.00 before and after); the card now extends 14.3 pt further below them |
+| PC-D1R-error | parity-comparison | load error at AX5, before (QA-16-28) \| after | 393×852 | design/runtime-d1r/PC-D1R-error-ax5-before-after.jpg | 97c700e + WT | Frontend/Mobile Developer | 2026-09-28 12:30 | "yüklenemedi" / "." → "yüklenemedi." |
+| PC-D1R-default | parity-comparison | default size vs D1-05 (L26) and vs the accepted D1 capture of D1-07 | 393×852 | design/runtime-d1r/measurements-d1r.txt (measure-d1 section); RT-16-L07-error-large.png vs design/runtime-d1/RT-16-07-play-load-error.png | 97c700e + WT | Frontend/Mobile Developer | 2026-09-28 12:31 | vs D1-05: max 0.67 pt, `HAMLE` card top / left +0.33 pt (same as PC-05). Error headline ink identical to RT-16-07 (both lines, to the pixel), so D1-07 parity carries over. measure-d1's Play probes do not apply to the error screen, so that pair is left out of the log |
+| A11Y-D1R-text | accessibility | the text sweep above (content sizes large → AX5) | 3 devices | RT-D1R-* | 97c700e + WT | Frontend/Mobile Developer | 2026-09-28 12:22–12:27 | both §19.10 rules hold at every size on every device. Informational: the D1-10 probe "HAMLE card left" reads −2.50 pt at AX5 (was −0.83) because the probe's row now meets the straight side instead of the arc; the card's left edge is 300.24 pt = 273.5·s |
+| AND | accessibility | Android | — | — | — | — | — | not run — stated limit (ANDROID-CI-EVIDENCE); the growth follows Android's non-linear scaler by construction (§11) |
+
+## 12. Implemented Files
+
+* **`app/lib/design/components/info.dart`** — `MovesCard`: new `static const double capGrowth = 13`; `build` computes `t` from `loopCappedTextScaler(context).scale(labelSize) / labelSize`, then `grow`, and applies `minHeight: 63·s + grow` and `padding: EdgeInsets.only(bottom: grow)`; one `capped` scaler shared by both texts. The doc comment records §19.10 (1) and the inherited line height.
+* **`app/lib/play/play_session_screen.dart`** — `_LoadErrorView`: the headline `Text` is no longer wrapped in `ConstrainedBox(maxWidth: 230 * s)`; a comment gives the reason.
+* **`app/test/design/text_ink_support.dart`** (new):
+  * `inkPixels` repaints a laid-out `RenderParagraph` through a `TextPainter` with the same text, scaler and constraints. It asserts the same height, rasterises at 4 px / pt, and returns every non-zero-alpha pixel in global coordinates.
+  * `inkInset` gives the largest deflation of an `RRect` that still contains every ink pixel, all four corners of each (binary search to 0.01 pt).
+  * `inkOutside`, `inkBounds`.
+  * `lineTexts` assigns each character to a line via `getBoxesForSelection`.
+  * `lineBreakFaults` flags word-less lines and breaks not at a space.
+* **`app/test/design/moves_card_ink_test.dart`** (new) — see §17.
+* **`app/test/play/load_error_headline_test.dart`** (new) — see §17.
+* **`app/test/play/play_test_support.dart`** — `kPlayDevices`, `kOsTextScales` (large, 1.059, xL, 1.176, xxL, 1.3, xxxL, AX1, AX5).
+
+## 16. Needs Tech Lead Clarification
+
+1. **NTLC-D1R-1 (informational) — MOVESCARD-CAP-MARGIN.** §19.10 (1) says it closes with this rework. `workflow-follow-ups.md` is not in a delivery role's write scope, so the entry is left for the Tech Lead to close.
+2. **NTLC-D1R-2 (informational) — `MovesCard` takes its counter line height from the ambient theme.** `LoopText.counter` sets no `height`, so the card's inner layout depends on the surrounding `DefaultTextStyle`: Material 3 body 1.43 on Play, nothing in a bare tree. The Play look is the accepted one, and changing the role is outside §19.10 (1), so it is left as is. The new tests pin the Play context, and the doc comment says so. If the gallery or another host renders the card under a different text theme, its inner spacing differs, though the rect rule still holds there because the growth only adds room. Worth a look at the next design-layer touch or F10's global theme.
+
+## 17. Test Evidence by Task
+
+**Gates on the final tree** (2026-09-28, macOS host, Flutter 3.32.8):
+
+| Command | Target | Result |
+| --- | --- | --- |
+| `melos run analyze` | all packages + `flutter analyze` (app) | SUCCESS — "No issues found!" |
+| `dart format --output=none --set-exit-if-changed app packages tools` | Dart code | 175 files, 0 changed, exit 0 |
+| `melos run test` | packages + app | SUCCESS — app **472** passed (405 + 39 + 28 new); core 22, content 17, dictionary 32, authoring 25, engine 83, solver 23 |
+| `flutter test integration_test -d D0011CE7-6E50-4367-93FA-B323E81270BE` | iPhone 16 simulator, iOS 18.6 | **13 / 13 passed** (12:20) |
+
+**Failing first** — each new suite was run against the HEAD version of the file it covers (`git show HEAD:<file> > <file>`, run, working copy restored; `git diff --stat` confirmed the restore):
+
+| Suite | Against HEAD `info.dart` / `play_session_screen.dart` | Against the fix |
+| --- | --- | --- |
+| `moves_card_ink_test.dart` (39) | **33 failed**: every scale above 1.0 on the three widths (27 component + 6 Play). The 6 default-size cases pass, as they should. Label inset at the cap −4.98 / −5.07 / −5.88 pt (390 / 393 / 440); at AX5 on the 393 the label ink is x 304.6–362.1, y 138.5–150.0 pt, QA's device box to within 0.5 pt | 39 passed |
+| `load_error_headline_test.dart` (28) | **12 failed**: 1.3 / 1.353 / 1.647 / 3.118 on the three widths, lines "Bu bulmaca " / "yüklenemedi" / "."; 1.0–1.235 passed (QA: xxL fine) | 28 passed |
+
+| Task / behaviour | Test (file → name) | Type | Proves |
+| --- | --- | --- | --- |
+| §19.10 (1) rect rule, component | `moves_card_ink_test.dart` → "MovesCard glyph ink at every OS text size (§19.10 (1)) {390, 393, 440} pt, OS text {1.0 … 3.118}x: …" (27) | widget, real fonts, app theme (`MaterialApp` + `Scaffold`, Material 3 as in `main.dart`) | for labels `HAMLE` / `MOVES` × moves 0 / 8 / 48 / 99 / 188: numeral and label ink ≥ 2 pt inside the rounded rect, arcs included; top-left = `PlayLayout.movesCard`; width 60·s; height ≥ 63·s, exactly 63·s at 1.0; `captionTop − bottom ≥ 8` |
+| §19.10 (1) on Play | same file → "MovesCard on the Play screen (§19.10 (1)) {390, 393, 440} pt, OS text {1.0, 1.235, 1.3, 3.118}x: …" (12) | widget, real fonts, real Play screen (`bootPlay`) | anchor, width, 63·s at 1.0, ≥ 8 pt above the `HEDEF DÖNGÜ` text box, ink ≥ 2 pt inside |
+| §19.10 (2) word breaks | `load_error_headline_test.dart` → "{390, 393, 440} pt, OS text {1.0 … 3.118}x: … breaks only between words, capped at 1.3×" (27) | widget, real fonts, Play screen in its error state (setup throws `FormatException`, Journey L07) | no exception; scaler = min(scale, 1.3); the lines rebuild the text; no word-less line, every break at a space; ink inside the card's inner column (±1 pt) |
+| The rule check itself | same file → "the rule check itself: a punctuation-only line and a split word are faults; breaks at spaces are not" | unit | the checker rejects "yüklenemedi" / "." (2 faults) and "yük" / "lenemedi." (1), accepts real breaks |
+| No regression | the existing 405 app tests, incl. `components_test` "MovesCard: 60 x 63 at the reference …", `play_session_screen_test` layout / text-cap / error groups | widget | unchanged and green |
+| Runtime | Visual Parity Evidence above; integration 13 / 13 | runtime | both rules on 3 devices × 5 sizes; the tool's own negative check on QA's captures |
+
+**Isolation:** widget tests use in-memory Drift and the overridden setup provider (as in D1); ink is rasterised by the test engine, and the on-device probe (below) showed its glyph metrics match iOS CoreText to within 0.25 pt for these roles. The runtime captures run the real app with the real asset pipeline (one deliberately corrupted asset for the error state).
+
+## 18. Test Notes
+
+* **Entry-path matrix (retro bugfix):**
+  * **`HAMLE` card:** every `/play` entry — Home CONTINUE (L26 seeded), resume after a kill (same widget), Result Retry / Next (same screen) — renders the one `MovesCard` at `PlayLayout.movesCard`. There is no state or persistence in the fix: it is a pure function of the OS text scale and `s`. It was verified live across Dynamic Type changes without a relaunch (the sweep).
+  * **Load error:** reached only through the setup provider's error branch. Tests use a throwing setup for Journey L07; the device uses a corrupted bundled asset. The daily-source path (`unsupported source`) shares `_LoadErrorView` and its existing tests stay green.
+* **On-device check of the test metrics:** during the investigation a throwaway `integration_test` probe ran the ink measurement on the iPhone 16 simulator. Its insets matched the widget test within 0.25 pt for the same widget tree, which ruled out a font-metric gap. The real gap was the inherited Material line height (NTLC-D1R-2). The probe was deleted and is not part of the suite.
+* **Not proven here:** Android (stated limit); a physical device.
+
+---
+
+# WORKFLOW HANDOFF SUGGESTION (NON-AUTHORITATIVE) — F03-FE-D1R
+
+* **Completed Tasks:** F03-FE-D1R — the `MovesCard` rect rule and the error-headline word-boundary rule, failing-first tests (39 + 28), the frontend.md corrections, runtime text sweep on the iPhone 16 / 16e / Pro Max (F03.D1R-PARITY).
+* **Remaining Tasks:** the Tech Lead checkpoint (negative run per rule; gate → Ready for QA), then F03-QA-D1R.
+* **Blockers:** none. NTLC-D1R-1 / -2 are informational.
+* **Status Suggestion:** Needs Tech Lead Review.
+
+---
+
+## 19. Sonraki Komut (F03-FE-D1R)
 
 ```text
 Run Tech Lead

@@ -990,13 +990,14 @@ class _LoadErrorView extends StatelessWidget {
                             ],
                           ),
                           SizedBox(height: 18 * s),
-                          ConstrainedBox(
-                            constraints: BoxConstraints(maxWidth: 230 * s),
-                            child: Text(
-                              strings.loadFailed,
-                              style: LoopText.headline(s),
-                              textScaler: capped,
-                            ),
+                          // The card's full inner width (257·s): at the 1.3×
+                          // cap the last word needs more than the render's
+                          // 230·s column, which broke off its full stop
+                          // (F03 architecture §19.10 (2), F03-QA-D1-02).
+                          Text(
+                            strings.loadFailed,
+                            style: LoopText.headline(s),
+                            textScaler: capped,
                           ),
                         ],
                       ),
