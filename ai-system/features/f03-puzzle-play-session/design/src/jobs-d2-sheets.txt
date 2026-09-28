@@ -1,0 +1,5 @@
+D2-sheet-variants 1296 1137 1
+D2-sheet-text-and-devices 1296 1137 1
+D2-sheet-win-row2 1296 1137 1
+D2-sheet-win-rows-0-4-special 1296 1137 1
+D2-sheet-reduced-retry-frozen 1296 2257 1

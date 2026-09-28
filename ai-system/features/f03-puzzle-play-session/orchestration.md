@@ -10,15 +10,15 @@ Rework
 
 ## Current Owner
 
-UI Designer
+Tech Lead
 
 ## Next Role
 
-UI Designer
+Tech Lead
 
 ## Active Task Ledger
 
-- [ ] Task ID: F03-UI-D2 | Assigned Role: UI Designer | Status: Open | Summary: The D2 handoff in F03 `ui-design.md` (replacing §16): the full-screen result in every F04 variant, the win sequence on the D1 board incl. special tiles in the winning row (C-11), the board → result and result → Play transitions with reduced paths as an executable prototype re-timed on the D1 geometry, the audit's D2 renders, AX5, a D2 acceptance list and the Visual Evidence Manifest. Contract architecture §20. Brief: Current Brief | Depends On: -
+- [x] Task ID: F03-UI-D2 | Assigned Role: UI Designer | Status: Done | Summary: DELIVERED 2026-09-28 — ui-design.md §16 rewritten as the D2 handoff (replaces F03-UI-WON; §1–§14 D1 unchanged apart from cross-references). The full-screen result as a flow column on the S-04 anchors (layout table for 393 / 390 / 440), all 10 variants (C-4 markers and badge precedence, CTA weighting, no-optimal, Next not wired, level 30), the win sequence re-timed on the D1 board with special tiles (C-11), the board → result and result → Play transitions with reduced paths. 58 renders in design/ (12 result, 6 text-scale incl. the 1.3× cap on three devices and AX5, 3 device variants, 37 motion stills) + 5 contact sheets; 5 executable prototypes (rows 0 / 2 / 4 from BFS-verified solutions, a synthetic frozen case, retry); a timeline self-test (rest 940 / reduced 660, first result pixel 685 ms, retry 360 / 160). D2 acceptance list §16.11.1; manifest §16.12b. NTLC §16.14: retry transition A vs B needs a selection record (non-blocking), the re-timed chrome fade, copy items, design-layer additions. No code | Depends On: -
 - [ ] Task ID: F03-FE-D2 | Assigned Role: Frontend/Mobile Developer | Status: Queued | Summary: Implement the D2 handoff from `app/lib/design` (the full-screen result replaces the F04 panel and the won composition; no Close; tests updated); `frontend.md` Visual Parity Evidence with screen recordings and frame timing (architecture §20.6) | Depends On: F03-UI-D2
 - [ ] Task ID: F03-QA-D2 | Assigned Role: QA | Status: Queued | Summary: Final-stage independent visual QA of D2 (rubric ≥ 93 from runtime video; F04 AC1–AC10, F05 AC1 / AC12, F03 AC8 / AC11; lifecycle mid-sequence; D1 regression) (architecture §20.6) | Depends On: F03-FE-D2
 
@@ -79,6 +79,13 @@ The shipped baseline is conformance-audit.md §6 and §12 (`design/audit/cur-won
 
 D1 records (the Play surface this transition starts from; gate Passed 2026-09-28) are listed in the archived orchestration history/f03-puzzle-play-session-2026-09-28/orchestration-before-phase-d2.md.
 
+D2 handoff records (2026-09-28, UI Designer) are in ui-design.md §16.12b Visual Evidence Manifest:
+* selected-source D2-01…D2-09b, D2-11, D2-12 and the D2-V device variants;
+* accessibility D2-10 (1.3× cap on three devices) and D2-10-AX5;
+* motion-prototype MP-D2 (design/src/D2-motion-prototype*.html), MP-D2-S (D2-M-* stills) and MP-D2-CHECK (design/src/timeline-check-d2.txt).
+
+The artefacts are in features/f03-puzzle-play-session/design/. The parity and QA records are pending (see Pending Evidence).
+
 ## QA Modules
 
 core, client-ui, visual-quality, stateful-flow
@@ -107,8 +114,8 @@ allowed
   * Prerequisite / External Decision: None (rulings architecture §20.3)
   * Re-evaluation Trigger: F03-UI-D2 delivery
   * Blocks: Visual Quality Gate = Ready for Implementation; F03-FE-D2
-  * Result: PENDING
-  * Provenance / Note: -
+  * Result: PASS
+  * Provenance / Note: 2026-09-28 UI Designer, HEAD 489606d + working tree. ui-design.md §16 (the D2 handoff; §1–§14 unchanged apart from cross-references). 58 PNG renders + 5 contact sheets in features/f03-puzzle-play-session/design/, from design/src/gen-d2.mjs + render-d1.sh (HTML/CSS → headless Chrome @2x, D1 tokens and geometry, F00 S-04 anchors); executable prototypes design/src/D2-motion-prototype(-row0|-row4|-frozen|-retry).html; timeline self-test design/src/timeline-check-d2.txt. Content: L4, L5, L26, L30 with BFS-verified optimal solutions replayed by the generator; the frozen-in-row case is synthetic (no shipped level can produce it). Covers the audit's D2 renders 11–18, rows 0 and 4, AX5. Generated design artefacts, not runtime; Android not rendered.
 
 - Evidence ID: F03.D2-PARITY
   * Scenario: The runtime matches the D2 handoff on the canonical simulators — every variant beside its render; screen recordings of the full sequence (rows 0 and 4, a special-tile row), the retry transition and the reduced path, with frame timing (nothing outside the board before T0 + 600; rest ≤ T0 + 940; reduced ≈ 660); OS text large → AX5 on the result; Reduce Motion on and off; suites and integration_test green
@@ -142,7 +149,11 @@ None
 
 ## Next Action
 
-Run UI Designer on F03-UI-D2 — the D2 handoff (Current Brief; architecture §20).
+Run Tech Lead: the visual-gate checkpoint for F03-UI-D2.
+1. Verify ui-design.md §16 (the handoff-gate items; §16.12b manifest; §16.11.1 acceptance list), the renders in design/, the prototypes and the timeline self-test.
+2. Record the retry-transition selection (§16.14 (1): A — the answer returns to the goal rail, recommended; or B — the plain dip) and rule on §16.14 (2)–(6).
+3. Set Delivery Review and Visual Quality Gate (→ Ready for Implementation).
+4. Open F03-FE-D2 for the Frontend/Mobile Developer.
 
 ## Last Decision
 
@@ -167,9 +178,9 @@ The terminal D1 orchestration is archived byte-for-byte as history/f03-puzzle-pl
 
 ## Last Update
 
-* Updated By: Tech Lead
+* Updated By: UI Designer
 * Timestamp: 2026-09-28
-* Summary: D2 activation — F03 reopened (`motion-critical`, architecture §20); F03-UI-D2 Open; owner → UI Designer.
+* Summary: F03-UI-D2 delivered — the D2 handoff (ui-design.md §16), 58 renders, 5 prototypes, timeline self-test; F03.D2-HANDOFF PASS; Delivery Review = Pending; owner → Tech Lead (visual-gate checkpoint).
 
 ## Context & Follow-ups
 
@@ -193,6 +204,9 @@ The terminal D1 orchestration is archived byte-for-byte as history/f03-puzzle-pl
 * 2026-09-28 — Tech Lead: D2 activation.
   * **Decided:** architecture §20 (contract and rulings); in-place amendments in F03 / F04 / F05; Visual Scope `motion-critical`; gate Pending.
   * **Next:** F03-UI-D2 Open; owner → UI Designer.
+* 2026-09-28 — UI Designer: F03-UI-D2 delivered; task Done; F03.D2-HANDOFF PASS; Delivery Review = Pending; owner → Tech Lead.
+  * **Handoff:** ui-design.md §16 (replaces F03-UI-WON); 58 renders + 5 prototypes + timeline self-test; acceptance list §16.11.1.
+  * **NTLC:** §16.14 (1) retry transition A / B selection; (2) chrome fade re-timed within the bounds; (3)–(6) copy and design-layer items.
 
 ## Current Brief
 

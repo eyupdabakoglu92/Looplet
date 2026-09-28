@@ -1,0 +1,7 @@
+D2-check-retry               {"kind":"retry","reduced":false,"restMs":360,"endWithStarsMs":360}
+D2-check-win-r0              {"kind":"win","reduced":false,"restMs":940,"endWithStarsMs":1300,"firstResultVisibleMs":685,"maxResultOpacityBefore600":0,"rowInsideBoardBefore600":true,"rowOnSlotAtRestPx":0.52}
+D2-check-win-r2-reduced      {"kind":"win","reduced":true,"restMs":660,"endWithStarsMs":660,"firstResultVisibleMs":305,"maxResultOpacityBefore600":1,"rowInsideBoardBefore600":true,"rowOnSlotAtRestPx":137.95}
+D2-check-win-r2              {"kind":"win","reduced":false,"restMs":940,"endWithStarsMs":1300,"firstResultVisibleMs":685,"maxResultOpacityBefore600":0,"rowInsideBoardBefore600":true,"rowOnSlotAtRestPx":0.52}
+D2-check-win-r4-16e          {"kind":"win","reduced":false,"restMs":940,"endWithStarsMs":1300,"firstResultVisibleMs":685,"maxResultOpacityBefore600":0,"rowInsideBoardBefore600":true,"rowOnSlotAtRestPx":0.53}
+D2-check-win-r4              {"kind":"win","reduced":false,"restMs":940,"endWithStarsMs":1300,"firstResultVisibleMs":685,"maxResultOpacityBefore600":0,"rowInsideBoardBefore600":true,"rowOnSlotAtRestPx":0.52}
+D2-check-retry-reduced       {"kind":"retry","reduced":true,"restMs":160,"endWithStarsMs":160}
