@@ -1,0 +1,60 @@
+# qa-band-d2r / qa-diff-d2r — F03-QA-D2R, 2026-09-29, HEAD d0ae8f1, app/ 5298c81a, App SHA-1 d7a7c0af, iOS Simulator 18.6
+## iPhone 16 (393 pt)
+control QA-16-T1-ax5-offset0.png: strip luma 42.10, badge lime px 2237, back max luma 246.4, tiles top 508.3 pt
+QA-16-M1-up-at-offset0-ax5.png: strip luma 42.10 → band alpha 0.000; badge lime px 2237 (100 % of control); back max luma 246.4 (Δ 0.0); content lift 0.0 pt → expected alpha 0.000
+QA-16-M2c-partial-small-ax5.png: strip luma 30.63 → band alpha 0.514; badge lime px 0 (0 % of control); back max luma 246.4 (Δ 0.0); content lift 6.3 pt → expected alpha 0.528
+QA-16-M2-partial-scroll-ax5.png: strip luma 19.78 → band alpha 1.001; badge lime px 0 (0 % of control); back max luma 246.4 (Δ 0.0); content lift 18.3 pt → expected alpha 1.000
+QA-16-M2b-scrolled-back-top-ax5.png: strip luma 42.10 → band alpha 0.000; badge lime px 2237 (100 % of control); back max luma 246.4 (Δ 0.0); content lift 0.0 pt → expected alpha 0.000
+QA-16-T2-ax5-scrolled-end.png: strip luma 19.78 → band alpha 1.001; badge lime px 0 (0 % of control); back max luma 246.4 (Δ 0.0); content lift 158.0 pt → expected alpha 1.000
+QA-16-T2b-ax5-scrolled-end-2.png: strip luma 19.78 → band alpha 1.001; badge lime px 0 (0 % of control); back max luma 246.4 (Δ 0.0); content lift 158.0 pt → expected alpha 1.000
+control QA-16-C1-control-top-then-xxxL.png: strip luma 42.10, badge lime px 2237, back max luma 246.4, tiles top 341.3 pt
+QA-16-T5-shrunk-xxxL.png: strip luma 42.10 → band alpha 0.000; badge lime px 2237 (100 % of control); back max luma 246.4 (Δ 0.0); content lift 0.0 pt → expected alpha 0.000
+QA-16-M3-after-fling-shrink-xxxL.png: strip luma 42.10 → band alpha 0.000; badge lime px 2237 (100 % of control); back max luma 246.4 (Δ 0.0); content lift 0.0 pt → expected alpha 0.000
+QA-16-M3b-after-drag-shrink-xxxL.png: strip luma 42.10 → band alpha 0.000; badge lime px 2237 (100 % of control); back max luma 246.4 (Δ 0.0); content lift 0.0 pt → expected alpha 0.000
+QA-16-M4c-shrunk-xxxL-before-next.png: strip luma 42.10 → band alpha 0.000; badge lime px 2237 (100 % of control); back max luma 246.4 (Δ 0.0); content lift 0.0 pt → expected alpha 0.000
+QA-16-T3-cap-xxxL-before.png: strip luma 42.10 → band alpha 0.000; badge lime px 2237 (100 % of control); back max luma 246.4 (Δ 0.0); content lift 0.0 pt → expected alpha 0.000
+control QA-16-C2-control-top-then-large.png: strip luma 42.10, badge lime px 1453, back max luma 246.4, tiles top 310.3 pt
+QA-16-T5-shrunk-large.png: strip luma 42.10 → band alpha 0.000; badge lime px 1453 (100 % of control); back max luma 246.4 (Δ 0.0); content lift 0.0 pt → expected alpha 0.000
+QA-16-M4b-shrunk-large-before-back.png: strip luma 42.10 → band alpha 0.000; badge lime px 1453 (100 % of control); back max luma 246.4 (Δ 0.0); content lift 0.0 pt → expected alpha 0.000
+## positive controls: QA's own pre-fix captures (F03-QA-D2, 67d9ecb, JPEG)
+QA-16-A11Y-cap-xxxL.jpg: strip luma 19.67 → band alpha 1.006; badge lime px 0 (0 % of control); back max luma 249.7 (Δ 3.2); content lift 0.0 pt → expected alpha 0.000
+QA-16-A11Y-back-to-large.jpg: strip luma 19.67 → band alpha 1.006; badge lime px 0 (0 % of control); back max luma 249.7 (Δ 3.2); content lift 0.0 pt → expected alpha 0.000
+QA-16-A11Y-ax5-top-then-large.jpg: strip luma 41.65 → band alpha 0.020; badge lime px 1276 (88 % of control); back max luma 250.6 (Δ 4.1); content lift 0.0 pt → expected alpha 0.000
+## iPhone 16e (390 pt)
+control QA-16e-T1-T4-ax5-offset0.png: strip luma 42.05, badge lime px 2214, back max luma 246.4, tiles top 503.0 pt
+QA-16e-M1-up-at-offset0-ax5.png: strip luma 42.05 → band alpha 0.000; badge lime px 2214 (100 % of control); back max luma 246.4 (Δ 0.0); content lift 0.0 pt → expected alpha 0.000
+QA-16e-T2-ax5-scrolled-end.png: strip luma 19.78 → band alpha 1.001; badge lime px 0 (0 % of control); back max luma 246.4 (Δ 0.0); content lift 156.3 pt → expected alpha 1.000
+QA-16e-T2b-ax5-scrolled-end-2.png: strip luma 19.78 → band alpha 1.001; badge lime px 0 (0 % of control); back max luma 246.4 (Δ 0.0); content lift 156.3 pt → expected alpha 1.000
+control QA-16e-C1-control-top-then-xxxL.png: strip luma 42.05, badge lime px 2214, back max luma 246.4, tiles top 339.0 pt
+QA-16e-T5-shrunk-xxxL.png: strip luma 42.05 → band alpha 0.000; badge lime px 2214 (100 % of control); back max luma 246.4 (Δ 0.0); content lift 0.0 pt → expected alpha 0.000
+control QA-16e-C2-control-top-then-large.png: strip luma 42.05, badge lime px 1415, back max luma 246.4, tiles top 308.0 pt
+QA-16e-T5-shrunk-large.png: strip luma 42.05 → band alpha 0.000; badge lime px 1415 (100 % of control); back max luma 246.4 (Δ 0.0); content lift 0.0 pt → expected alpha 0.000
+## iPhone 16 Pro Max (440 pt)
+control QA-pm-T1-ax5-offset0.png: strip luma 42.63, badge lime px 2858, back max luma 246.4, tiles top 569.0 pt
+QA-pm-M1-up-at-offset0-ax5.png: strip luma 42.63 → band alpha 0.000; badge lime px 2858 (100 % of control); back max luma 246.4 (Δ 0.0); content lift 0.0 pt → expected alpha 0.000
+QA-pm-T2-ax5-scrolled-end.png: strip luma 19.78 → band alpha 1.001; badge lime px 0 (0 % of control); back max luma 246.4 (Δ 0.0); content lift 171.7 pt → expected alpha 1.000
+QA-pm-T2b-ax5-scrolled-end-2.png: strip luma 19.78 → band alpha 1.001; badge lime px 0 (0 % of control); back max luma 246.4 (Δ 0.0); content lift 171.7 pt → expected alpha 1.000
+control QA-pm-C1-control-top-then-xxxL.png: strip luma 42.63, badge lime px 2858, back max luma 246.4, tiles top 384.0 pt
+QA-pm-T5-shrunk-xxxL.png: strip luma 42.63 → band alpha 0.000; badge lime px 2858 (100 % of control); back max luma 246.4 (Δ 0.0); content lift 0.0 pt → expected alpha 0.000
+control QA-pm-C2-control-top-then-large.png: strip luma 42.63, badge lime px 1891, back max luma 246.4, tiles top 348.0 pt
+QA-pm-T5-shrunk-large.png: strip luma 42.63 → band alpha 0.000; badge lime px 1891 (100 % of control); back max luma 246.4 (Δ 0.0); content lift 0.0 pt → expected alpha 0.000
+## pixel diffs below the status bar (any channel > 2 levels)
+QA-16-T5-shrunk-xxxL.png vs QA-16-C1-control-top-then-xxxL.png: 0 / 2801304 px differ below the status bar
+QA-16-T5-shrunk-large.png vs QA-16-C2-control-top-then-large.png: 0 / 2801304 px differ below the status bar
+QA-16-M3-after-fling-shrink-xxxL.png vs QA-16-C1-control-top-then-xxxL.png: 0 / 2801304 px differ below the status bar
+QA-16-M3b-after-drag-shrink-xxxL.png vs QA-16-C1-control-top-then-xxxL.png: 0 / 2801304 px differ below the status bar
+QA-16-M4c-shrunk-xxxL-before-next.png vs QA-16-C1-control-top-then-xxxL.png: 0 / 2801304 px differ below the status bar
+QA-16-M4b-shrunk-large-before-back.png vs QA-16-C2-control-top-then-large.png: 6263 / 2801304 px differ below the status bar; bbox 127,839 – 266,844 pt
+QA-16-T3-cap-xxxL-before.png vs QA-16-C1-control-top-then-xxxL.png: 0 / 2801304 px differ below the status bar
+QA-16-T3-cap-xxxL-after-drag.png vs QA-16-T3-cap-xxxL-before.png: 0 / 2801304 px differ below the status bar
+QA-16e-T5-shrunk-xxxL.png vs QA-16e-C1-control-top-then-xxxL.png: 0 / 2751840 px differ below the status bar
+QA-16e-T5-shrunk-large.png vs QA-16e-C2-control-top-then-large.png: 0 / 2751840 px differ below the status bar
+QA-16e-T3-cap-xxxL-after-drag.png vs QA-16e-T3-cap-xxxL-before.png: 0 / 2751840 px differ below the status bar
+QA-pm-T5-shrunk-xxxL.png vs QA-pm-C1-control-top-then-xxxL.png: 0 / 3548160 px differ below the status bar
+QA-pm-T5-shrunk-large.png vs QA-pm-C2-control-top-then-large.png: 0 / 3548160 px differ below the status bar
+QA-pm-T3-cap-xxxL-after-drag.png vs QA-pm-T3-cap-xxxL-before.png: 0 / 3548160 px differ below the status bar
+## negative control of the diff: offset 0 vs scrolled end must differ
+QA-16-T2-ax5-scrolled-end.png vs QA-16-T1-ax5-offset0.png: 1871453 / 2801304 px differ below the status bar; bbox 0,60 – 393,852 pt
+## fresh win at large (S1, never scrolled or resized) vs the shrink-path control
+QA-16-S1-result-rest.png vs QA-16-C2-control-top-then-large.png: 0 / 2801304 px differ below the status bar
+note: the only non-zero pair (M4b, 6263 px) is confined to 127…266 × 839…844 pt = the iOS home indicator (system overlay, adapts to the content behind it), not app pixels.

@@ -1,0 +1,64 @@
+# F03-QA-D2R win + retry smoke timing — iPhone 16 (393×852), large, debug App d7a7c0af, 2026-09-29
+# QA tools: qa/d2/src (qa-probe-d2, qa-t0-fit, qa-timing-d2) + qa/d2r/src/qa-band-d2r (video mode); regions in pt
+## S1 QV-16-S1-win-retry-L5.mov
+dim fit over 7 frames: T0 = 2.8063 s (spread 2.8 ms); last undimmed frame 2.8233, first dimmed 2.8567
+row on its cells (<= 1 pt) through T0 +602 ms; first frame off its cells: T0 +617 ms
+frames in [T0, T0+600): 33; max lime px outside the board: 0
+frame gaps > 30 ms in T0-50 … T0+1400: +-33 (33 ms), +385 (52 ms), +452 (33 ms), +1252 (12108 ms)
+## S2 QV-16-S2-win-L5.mov
+dim fit over 6 frames: T0 = 2.8641 s (spread 2.8 ms); last undimmed frame 2.8817, first dimmed 2.9300
+row on its cells (<= 1 pt) through T0 +601 ms; first frame off its cells: T0 +619 ms
+frames in [T0, T0+600): 34; max lime px outside the board: 0
+frame gaps > 30 ms in T0-50 … T0+1400: +-48 (48 ms), +368 (35 ms), +418 (37 ms), +650 (37 ms)
+## first result pixel (headline region 60,140 273×70, first frame > 1 luma off the pre-level)
+S1 +719
+S2 +716
+## primary pill (46.3,566.4 299.2×53.7; src/qa-pill-rest.py)
+data/S1-pill2.csv: 99% +935; last change > 0.3 luma in (+935, +950]
+data/S2-pill.csv: 99% +938; last change > 0.3 luma in (+949, +974]
+## cross-check, Frontend timing-d2.py on QA's S2 video
+frame gaps > 30 ms in T0-50 … T0+1400: T0-18 (33 ms), T0+15 (48 ms), T0+432 (35 ms), T0+482 (37 ms), T0+714 (37 ms)
+C2   row on its board cells (max displacement 0.00 pt) through  T0     +599 ms
+     first frame the row has left its cells (> 0.5 pt):     T0     +617 ms
+     first result pixel (back-button / headline slots):     T0     +714 ms
+     HAMLE card at its final value from:                    T0     +750 ms
+     HUD at its final value from:                           T0     +714 ms
+     primary pill at rest from:                             T0     +972 ms
+     stars at rest from:                                    T0    +1287 ms
+## retry (S1): board region 30,310 333×330 from the first result change after the tap
+retry start 16.2550 s; board within 1 luma of its final value from +320 ms
+## drag-shrink video (M3b): per-frame band alpha / badge / tiles top
+control QA-16-T1-ax5-offset0.png: strip luma 42.10, badge lime px 2237, back max luma 246.4, tiles top 508.3 pt
+t,alpha,badge,tilesTopPt
+0.0000,-0.029,1918,509.1
+2.4283,-0.014,1921,509.1
+2.5250,0.092,1675,507.8
+2.6400,0.901,0,497.8
+2.7367,1.027,0,487.7
+2.9050,1.015,0,477.7
+3.0533,1.004,0,467.7
+3.2200,1.012,0,457.7
+3.3717,1.000,0,447.7
+3.5433,1.002,0,437.7
+3.6867,1.007,0,427.7
+3.8533,1.004,0,417.7
+4.0067,1.006,0,407.7
+4.1750,1.006,0,397.7
+4.3200,1.006,0,387.7
+4.4883,1.006,0,377.7
+4.6433,1.006,0,367.6
+4.8067,1.006,0,357.6
+4.9550,1.006,0,351.0
+5.4117,1.006,0,351.0
+5.4383,1.005,0,341.6
+5.4533,-0.007,1921,341.6
+## fling-then-shrink video (M3)
+control QA-16-T1-ax5-offset0.png: strip luma 42.10, badge lime px 2237, back max luma 246.4, tiles top 508.3 pt
+t,alpha,badge,tilesTopPt
+0.0000,1.027,0,351.0
+3.8217,1.027,0,351.0
+3.8250,1.027,0,351.0
+3.8300,1.027,0,341.6
+3.8467,-0.015,1904,341.6
+5.0750,-0.010,1919,341.6
+5.0767,-0.010,1925,341.6

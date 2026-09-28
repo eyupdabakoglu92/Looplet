@@ -19,3 +19,6 @@
 * **`orchestration-at-fe-d2r-delivery.md`** — the F03 orchestration at the F03-FE-D2R delivery (2026-09-28, commit `77c33b9`), byte for byte.
   * Contents: the F03-FE-D2R brief (Current Brief), the delivered task line, F03.D2R-PARITY PASS (Frontend provenance), Delivery Review Pending, and the D2 QA-verdict decision (Last Decision).
   * Taken right before the Tech Lead's D2 rework checkpoint on 2026-09-28. That checkpoint accepted the rework, set the gate to Ready for QA, recorded the rulings in `architecture.md` §20.10 and opened F03-QA-D2R.
+* **`qa-at-d2-verdict.md`** — `features/f03-puzzle-play-session/qa.md` at the F03-QA-D2 verdict (Rejected, 92 / 100, blocking F03-QA-D2-01, 2026-09-28, commit `f28aedb`), byte for byte (SHA-1 `52155e9b…`; moved by QA at F03-QA-D2R, 2026-09-29).
+  * Moved rather than appended to because `tools/workflow-flow-audit.mjs` reads the first `Final Score` / `Lowest Dimension` in `qa.md` (the D1R precedent, `architecture.md` §19.12 (3)).
+  * The live `qa.md` carries the F03-QA-D2R re-QA report and links here; its evidence ledger reuses this report's runtime rows (E-J*, E-V*, E-R1, E-N*, E-B*, E-L*, E-M*, E-RM*, E-D1, E-P1) under the fingerprint rule.
