@@ -1,0 +1,130 @@
+rules sha1 aa4c5dc27d59a33c441483c0b184403b562764c6
+mutated rules sha1 0ef407f31527760fd5b2a55dbabfad18025a41e5
+
+===== N-DIRECT-CREATE — exit 1
+i  emulators: Starting emulators: auth, firestore
+i  emulators: Detected demo project ID "demo-looplet", emulated services will use a demo configuration and attempts to access non-emulated services for this project will fail.
+i  firestore: Firestore Emulator logging to firestore-debug.log
+✔  firestore: Firestore Emulator was started in standard edition.
+✔  firestore: Firestore Emulator UI websocket is running on 9150.
+i  Running script: jest --verbose test/rules.test.ts
+  console.warn
+    [2026-09-29T10:38:22.736Z]  @firebase/firestore: Firestore (12.18.0): GrpcConnection RPC 'Write' stream 0x4da32371 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+    false for 'create' @ L21, false for 'create' @ L28, false for 'update' @ L23, false for 'update' @ L28
+
+      at Logger.defaultLogHandler [as _logHandler] (node_modules/@firebase/logger/src/logger.ts:110:57)
+      at Logger.warn (node_modules/@firebase/logger/src/logger.ts:201:10)
+      at logWarn (node_modules/@firebase/firestore/src/util/log.ts:69:15)
+      at ClientDuplexStreamImpl.<anonymous> (node_modules/@firebase/firestore/src/platform/node/grpc_connection.ts:337:9)
+      at Object.onReceiveStatus (node_modules/@grpc/grpc-js/src/client.ts:705:18)
+      at Object.onReceiveStatus (node_modules/@grpc/grpc-js/src/client-interceptors.ts:419:48)
+      at node_modules/@grpc/grpc-js/src/resolving-call.ts:132:24
+
+  console.warn
+    [2026-09-29T10:38:22.882Z]  @firebase/firestore: Firestore (12.18.0): GrpcConnection RPC 'Write' stream 0x4da32372 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+    false for 'create' @ L21, false for 'create' @ L28, false for 'update' @ L23, false for 'update' @ L28
+
+      at Logger.defaultLogHandler [as _logHandler] (node_modules/@firebase/logger/src/logger.ts:110:57)
+      at Logger.warn (node_modules/@firebase/logger/src/logger.ts:201:10)
+      at logWarn (node_modules/@firebase/firestore/src/util/log.ts:69:15)
+      at ClientDuplexStreamImpl.<anonymous> (node_modules/@firebase/firestore/src/platform/node/grpc_connection.ts:337:9)
+      at Object.onReceiveStatus (node_modules/@grpc/grpc-js/src/client.ts:705:18)
+      at Object.onReceiveStatus (node_modules/@grpc/grpc-js/src/client-interceptors.ts:419:48)
+      at node_modules/@grpc/grpc-js/src/resolving-call.ts:132:24
+
+  console.warn
+    [2026-09-29T10:38:22.924Z]  @firebase/firestore: Firestore (12.18.0): GrpcConnection RPC 'Write' stream 0x4da32374 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+    false for 'update' @ L23, false for 'update' @ L28
+
+      at Logger.defaultLogHandler [as _logHandler] (node_modules/@firebase/logger/src/logger.ts:110:57)
+      at Logger.warn (node_modules/@firebase/logger/src/logger.ts:201:10)
+      at logWarn (node_modules/@firebase/firestore/src/util/log.ts:69:15)
+      at ClientDuplexStreamImpl.<anonymous> (node_modules/@firebase/firestore/src/platform/node/grpc_connection.ts:337:9)
+      at Object.onReceiveStatus (node_modules/@grpc/grpc-js/src/client.ts:705:18)
+      at Object.onReceiveStatus (node_modules/@grpc/grpc-js/src/client-interceptors.ts:419:48)
+      at node_modules/@grpc/grpc-js/src/resolving-call.ts:132:24
+
+  console.warn
+    [2026-09-29T10:38:22.970Z]  @firebase/firestore: Firestore (12.18.0): GrpcConnection RPC 'Write' stream 0x4da32376 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+    false for 'delete' @ L23, false for 'delete' @ L28
+
+      at Logger.defaultLogHandler [as _logHandler] (node_modules/@firebase/logger/src/logger.ts:110:57)
+      at Logger.warn (node_modules/@firebase/logger/src/logger.ts:201:10)
+      at logWarn (node_modules/@firebase/firestore/src/util/log.ts:69:15)
+      at ClientDuplexStreamImpl.<anonymous> (node_modules/@firebase/firestore/src/platform/node/grpc_connection.ts:337:9)
+      at Object.onReceiveStatus (node_modules/@grpc/grpc-js/src/client.ts:705:18)
+      at Object.onReceiveStatus (node_modules/@grpc/grpc-js/src/client-interceptors.ts:419:48)
+      at node_modules/@grpc/grpc-js/src/resolving-call.ts:132:24
+
+⚠  Script exited unsuccessfully (code 1)
+i  emulators: Shutting down emulators.
+i  firestore: Stopping Firestore Emulator
+i  auth: Stopping Authentication Emulator
+i  hub: Stopping emulator hub
+i  logging: Stopping Logging Emulator
+
+Error: Script "jest --verbose test/rules.test.ts" exited with code 1
+FAIL test/rules.test.ts
+  dailyResults rules — no client access
+    ✕ denies a signed-in user's direct create of their own valid entry (373 ms)
+    ✕ denies a direct create of an own entry with an invalid payload (34 ms)
+    ✕ denies a direct create in a non-date bucket (27 ms)
+    ✓ denies creating another user's entry (154 ms)
+    ✓ denies an unauthenticated create (24 ms)
+    ✓ denies update of an existing entry (42 ms)
+    ✓ denies delete of an existing entry (46 ms)
+    ✓ denies reading any entry (no cross-user / no self read in the MVP) (45 ms)
+
+  ● dailyResults rules — no client access › denies a signed-in user's direct create of their own valid entry
+
+    Expected request to fail, but it succeeded.
+
+      61 |   it("denies a signed-in user's direct create of their own valid entry", async () => {
+      62 |     const db = env.authenticatedContext("alice").firestore();
+    > 63 |     await assertFails(setDoc(doc(db, entryPath("alice")), sampleDoc("alice")));
+         |     ^
+      64 |   });
+      65 |
+      66 |   it("denies a direct create of an own entry with an invalid payload", async () => {
+
+      at node_modules/@firebase/rules-unit-testing/src/util.ts:137:9
+      at Object.<anonymous> (test/rules.test.ts:63:5)
+
+  ● dailyResults rules — no client access › denies a direct create of an own entry with an invalid payload
+
+    Expected request to fail, but it succeeded.
+
+      66 |   it("denies a direct create of an own entry with an invalid payload", async () => {
+      67 |     const db = env.authenticatedContext("alice").firestore();
+    > 68 |     await assertFails(
+         |     ^
+      69 |       setDoc(doc(db, entryPath("alice")), {
+      70 |         ...sampleDoc("alice"),
+      71 |         moves: 1, // < optimalMoves (9)
+
+      at node_modules/@firebase/rules-unit-testing/src/util.ts:137:9
+      at Object.<anonymous> (test/rules.test.ts:68:5)
+
+  ● dailyResults rules — no client access › denies a direct create in a non-date bucket
+
+    Expected request to fail, but it succeeded.
+
+      78 |   it("denies a direct create in a non-date bucket", async () => {
+      79 |     const db = env.authenticatedContext("alice").firestore();
+    > 80 |     await assertFails(
+         |     ^
+      81 |       setDoc(doc(db, "dailyResults/zz_not-a-date-123/entries/alice"), sampleDoc("alice")),
+      82 |     );
+      83 |   });
+
+      at node_modules/@firebase/rules-unit-testing/src/util.ts:137:9
+      at Object.<anonymous> (test/rules.test.ts:80:5)
+
+Test Suites: 1 failed, 1 total
+Tests:       3 failed, 5 passed, 8 total
+Snapshots:   0 total
+Time:        2.105 s, estimated 3 s
+Ran all test suites matching /test\/rules.test.ts/i.
+
+
+restored rules sha1 aa4c5dc27d59a33c441483c0b184403b562764c6

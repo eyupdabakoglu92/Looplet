@@ -1,0 +1,8 @@
+2026-09-29T10:38:16Z
+N-DIRECT-CREATE: exit 1; Tests:       3 failed, 5 passed, 8 total
+  ✕ denies a signed-in user's direct create of their own valid entry (373 ms)
+  ✕ denies a direct create of an own entry with an invalid payload (34 ms)
+  ✕ denies a direct create in a non-date bucket (27 ms)
+expected failures caught: True; no other failure: True; passed: 5
+restored byte-identical: True (rules aa4c5dc27d59)
+neg-be7 exit 0

@@ -1,0 +1,13 @@
+2026-09-29T13:20:53Z
+anon uid VPdNQ7njDCmcbuUz7ud61FYnHNEI
+-- R1-DIRECT: signed-in anonymous client creates its own entry directly (REST, the loaded rules)
+HTTP 403
+{"error":{"code":403,"message":"\nfalse for 'create' @ L21, false for 'create' @ L26","status":"PERMISSION_DENIED"}}
+-- same under a non-date bucket
+HTTP 403
+{"error":{"code":403,"message":"\nfalse for 'create' @ L21, false for 'create' @ L26","status":"PERMISSION_DENIED"}}
+-- admin count after
+docs=0
+{
+}
+

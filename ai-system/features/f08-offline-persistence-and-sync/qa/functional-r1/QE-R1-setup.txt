@@ -1,0 +1,7 @@
+2026-09-29T10:40:16Z
+emulator rules copy sha1: aa4c5dc27d59a33c441483c0b184403b562764c6  /private/tmp/claude-501/-Users-eyupcandabakoglu-Projects-Looplet/28592117-be7e-4ff9-a51f-2c0a7fef47b1/scratchpad/fb/firestore.rules
+infra/firestore.rules sha1: aa4c5dc27d59a33c441483c0b184403b562764c6  /Users/eyupcandabakoglu/Projects/Looplet/infra/firestore.rules
+2026-09-29T13:21:04Z
+uninstalled (store wiped)
+keychain reset
+installed

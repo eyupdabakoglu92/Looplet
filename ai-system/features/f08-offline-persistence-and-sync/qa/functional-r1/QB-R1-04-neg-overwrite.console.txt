@@ -1,0 +1,9 @@
+2026-09-29T10:37:54Z
+N-OVERWRITE: exit 1; Tests:       2 failed, 5 passed, 7 total
+  ✕ ALREADY_SUBMITTED on a repeat — first run stays authoritative (35 ms)
+  ✕ is idempotent across many repeats — one doc, one recordedAt (27 ms)
+N-OVERWRITE-OLDFIX: exit 1; Tests:       2 failed, 5 passed, 7 total
+  ✕ ALREADY_SUBMITTED on a repeat — first run stays authoritative (24 ms)
+  ✕ is idempotent across many repeats — one doc, one recordedAt (23 ms)
+restored byte-identical: True (handler bcda26628a69, test cf73770d9a49)
+neg-be6 exit 0

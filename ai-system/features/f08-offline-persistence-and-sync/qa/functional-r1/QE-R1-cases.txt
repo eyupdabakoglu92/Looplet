@@ -1,0 +1,46 @@
+== A1 offline (proxy down) produce 2026-09-29T13:21:48Z proxy=down
+queue|1|pending|1|hX97EkmEsLSaYDArnKAofNqCpc1D|tr|2026-09-29|retryable
+entry|2026-09-29|queued|12
+player|aadc0b81-b199-4ca8-b7fe-0246e1bbddfc|hX97EkmEsLSaYDArnKAofNqCpc1D
+docs=0
+-- proxy (last 3)
+fn-proxy on :5001 -> :5002
+2026-09-29T13:21:44.772Z down /demo-looplet/us-central1/submitDailyResultV1 -> closed without forwarding
+-- app (last 4 sync lines)
+flutter: debug-sync: produced 2026-09-29 → DailyCompletionOutcome.firstRun
+flutter: sync: submitDailyResultV1 failed — unknown: The network connection was lost.
+flutter: debug-sync: drain after produce 2026-09-29 done
+== A2 reconnect (proxy pass) + double drain tap 2026-09-29T13:22:02Z proxy=pass
+queue|1|pending|1|hX97EkmEsLSaYDArnKAofNqCpc1D|tr|2026-09-29|retryable
+entry|2026-09-29|queued|12
+player|aadc0b81-b199-4ca8-b7fe-0246e1bbddfc|hX97EkmEsLSaYDArnKAofNqCpc1D
+docs=0
+-- proxy (last 3)
+fn-proxy on :5001 -> :5002
+2026-09-29T13:21:44.772Z down /demo-looplet/us-central1/submitDailyResultV1 -> closed without forwarding
+-- app (last 4 sync lines)
+flutter: sync: submitDailyResultV1 failed — unknown: The network connection was lost.
+flutter: debug-sync: drain after produce 2026-09-29 done
+flutter: debug-sync: manual drain done
+flutter: debug-sync: manual drain done
+next_attempt_at=1790688164493 now=1790688130038 due_in_ms=34455
+== A3 due + double drain tap (proxy pass) 2026-09-29T13:22:57Z proxy=pass
+queue|1|synced|1|hX97EkmEsLSaYDArnKAofNqCpc1D|tr|2026-09-29|
+entry|2026-09-29|synced|12
+player|aadc0b81-b199-4ca8-b7fe-0246e1bbddfc|hX97EkmEsLSaYDArnKAofNqCpc1D
+docs=1
+  hX97EkmEsLSaYDArnKAofNqCpc1D moves 12 stars 2 recordedAtUtcMs 1790688171476 completedAtUtcMs 1790688104650
+-- proxy (last 3)
+fn-proxy on :5001 -> :5002
+2026-09-29T13:21:44.772Z down /demo-looplet/us-central1/submitDailyResultV1 -> closed without forwarding
+2026-09-29T13:22:50.214Z pass /demo-looplet/us-central1/submitDailyResultV1 upstream 200 b'{"result":{"status":"CREATED","recordedAt":1790688171476}}'
+-- app (last 4 sync lines)
+flutter: debug-sync: manual drain done
+flutter: debug-sync: manual drain done
+flutter: debug-sync: manual drain done
+flutter: debug-sync: manual drain done
+== A4 settle 2026-09-29T13:23:13Z: proxy requests 2 (expect 2: 1 down + 1 pass)
+docs=1
+  hX97EkmEsLSaYDArnKAofNqCpc1D moves 12 stars 2 recordedAtUtcMs 1790688171476 completedAtUtcMs 1790688104650
+auth emulator users:
+None ['VPdNQ7njDCmcbuUz7ud61FYnHNEI', 'hX97EkmEsLSaYDArnKAofNqCpc1D']

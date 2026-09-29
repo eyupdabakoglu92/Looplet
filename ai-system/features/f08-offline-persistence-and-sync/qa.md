@@ -503,3 +503,137 @@ Hepsi **EXECUTED THIS RUN** (2026-09-29 09:37–10:10Z), QA tarafından; hiçbir
 ```text
 Run Tech Lead
 ```
+
+---
+
+# F08-QA-FUNCTIONAL-R1 — F08-BE7 sonrası fonksiyonel yeniden koşu (2026-09-29)
+
+> Plan: `architecture.md` → A9 ruling 4 (A10'da aktive edildi). Brief: `orchestration.md` → Current Brief. Kanıt: `qa/functional-r1/` (`qa/functional-r1/README.md`). Yukarıdaki bölümler değiştirilmedi.
+
+## 0. QA Execution Plan
+
+* **Stage / Scope:** functional / end-to-end. Release stage F08.DEPLOY-AUTHORIZATION ile ayrıca bloklu.
+* **Modüller:** `core`; `backend-security` (değişen yüzey: `firestore.rules` + `rules.test.ts` — auth/security kuralı); `client-ui` (scope end-to-end; app değişmedi → kanıt reuse); `stateful-flow` (queue → callable → doc yolu yeni kurallarla). Preflight PASS (önerilen = beyan edilen). Visual Scope `none`.
+* **Regression Depth:** `full` (auth/security kuralı değişti). Etki sınırı ölçüldü: 84430c9 → HEAD arasında `ai-system/` dışında yalnız `infra/firestore.rules`, `infra/functions/test/rules.test.ts`, `infra/README.md` değişti; `app/` `9de12e6a…`, `packages/` `ffae8965…`, `tools/` `43eb1a47…` tree'leri ve iki lockfile aynı.
+* **Evidence Reuse:** `allowed` — A9'un dört fingerprint'i bu turda yeniden hesaplandı ve eşleşti (aşağıda). Kurallara bağlı her şey yeniden koşuldu.
+* **Fingerprint (test edilen):** HEAD `695f783` (cb96719 + yalnız doküman); `firestore.rules` `aa4c5dc2…`; `rules.test.ts` `2c7df84a…`; handler `bcda2662…`; `validate.ts` `8f0398ea…`; `submitDailyResult.test.ts` `cf73770d…`; `package-lock.json` `97187c5f…`; `app/` tree `9de12e6a…`; `app/pubspec.lock` `defec859…`. Brief'teki değerlerin hepsi birebir.
+* **Canonical target:** macOS host — Node v24.7.0, firebase-tools 15.29.0, OpenJDK 21.0.12.1 (PATH'te), Flutter 3.32.8; Firestore + Auth (+ Functions) emülatörü, proje `demo-looplet`; iPhone 16 simülatörü `D0011CE7-…` (iOS 18.6), emülatör define'lı debug build.
+* **Fail-fast:** backend build → `npm test` → emülatör suite (QB-R1-01…03) pahalı runtime'dan önce — hepsi PASS.
+
+## 1. Evidence Ledger
+
+**EXECUTED THIS RUN** (QA, 2026-09-29; backend 10:37–10:40Z, emülatör + app 13:20–13:23Z):
+
+| Evidence ID | Claim / Scenario | Class | Command / Action | Target | Result / Counts | Provenance / Fingerprint | Isolation |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| QB-R1-01 | Backend build | build | `npm ci && npm run build` (`infra/functions`) | host | exit 0 | `QB-R1-01-build.log`; HEAD `695f783` | — |
+| QB-R1-02 | Emülatörsüz suite | unit | `npm test` | host | exit 0 — 18 passed, 15 skipped (emülatör-gated, beklenen) | `QB-R1-02-unit.log` | — |
+| QB-R1-03 | Kurallar + callable suite | repeatable integration | setup-manifest komutu (`JAVA_HOME` + PATH Java 21) `npm run test:emulator` | Firestore + Auth emülatörü | exit 0 — **33 / 33**, 3 / 3 suite, skip 0; `rules.test.ts` 8 test (own / invalid-payload / non-date / other / unauth create, update, delete, read — hepsi `assertFails`) okundu | `QB-R1-03-emulator.log`; rules `aa4c5dc2…`, rules test `2c7df84a…` | handler doğrudan çağrılıyor (HTTPS katmanı QE-R1-A'da) |
+| QB-R1-04 | N-OVERWRITE: first-run-authoritative testi overwrite regresyonunu yakalıyor | negatif | `python3 evidence/neg-be6.py` | aynı | N-OVERWRITE exit 1, 2 fail / 7; N-OVERWRITE-OLDFIX exit 1; handler + test bayt-özdeş geri yüklendi | `QB-R1-04-*`; teslim log'u git'ten geri yüklendi | mutasyon geçici |
+| QB-R1-05 | N-DIRECT-CREATE: kural testleri eski client-create kuralını yakalıyor | negatif | `python3 evidence/neg-be7.py` | aynı | exit 1, **tam olarak** 3 fail (own valid, invalid payload, non-date bucket) / 5 pass / 8; kurallar bayt-özdeş geri yüklendi | `QB-R1-05-*`; teslim log'u git'ten geri yüklendi | mutasyon geçici |
+| QB-R1-06 | **QA kural probu R1 (F1 kapanışı)** | repeatable integration | `qa-probe-rules-r1.test.ts` (P1–P8) `emulators:exec --only firestore` | Firestore emülatörü, `infra/firestore.rules` | exit 0 — 8 / 8: **P3 DENIED** (own invalid create, belge yok), **P6 DENIED** (non-date bucket, belge yok); P1, P2, P4, P5 denied; P7 unauth create denied; P8 sahibin okuması denied | `QB-R1-06-rules-probe.log` | prob dosyası koşu sonrası silindi; `git status infra` temiz |
+| QB-R1-07 | Prob kontrolü: aynı prob eski kurallarla F1'i yakalıyor | negatif | aynı prob, `QA_RULES=` → `84430c9:infra/firestore.rules` (`b75628e6…`) | aynı | exit 1 — **yalnız P3 ve P6 fail**, 6 pass | `QB-R1-07-rules-probe-control-old.log` | eski kurallar scratchpad kopyası |
+| QE-R1-00 | Çalışan emülatöre yüklenen kurallar yeni kurallar | runtime + repeatable integration | auth emülatöründe anonim signUp → ID token → Firestore REST create: `tr_2026-09-29/entries/<uid>` (moves 1 / optimal 9 / stars 9) ve `zz_not-a-date-123/entries/<uid>` | emülatör (kurallar `aa4c5dc2…` kopyası) | ikisi de **HTTP 403 `PERMISSION_DENIED`** (`false for 'create' @ L21`); admin okuması 0 doküman | `QE-R1-00-direct-create-loaded-rules.txt`, `QE-R1-setup.txt` | REST = client SDK'nın kullandığı yol; token emülatör token'ı |
+| QE-R1-A | **Exactly-once client ↔ emülatör, yeni kurallarla** (AC4 / AC11; callable hâlâ yazıyor, app hâlâ sync ediyor) | runtime + repeatable integration | uninstall + keychain reset + install; emülatörler (auth, firestore, functions :5002) + `qa-fn-proxy.py` :5001; `/debug/sync`: proxy `down` → produce; `pass` → due sonrası çift drain dokunuşu | simülatör + emülatör | A1: 1 öğe `pending` a=1 `retryable`, entry `queued`, **0 doc**. A2 (due öncesi çift drain): istek yok (backoff, N1 ile tutarlı). A3 (due sonrası çift drain): upstream 200 `CREATED`, queue `synced`, entry `synced`, **1 doc** (moves 12, stars 2). A4: 5 s sonra toplam istek 2 (1 down + 1 pass), doc 1 | `QE-R1-cases.txt`, `QE-R1-proxy.log`, `QE-R1-app.log`, `QE-R1-A3-synced.png`; `app/` `9de12e6a…` | "offline" = functions proxy `down` (uçak modu değil) |
+
+**REUSED — fingerprint valid** (kaynak: bu dosyada § F08-QA-FUNCTIONAL, HEAD 84430c9; `app/` `9de12e6a…`, handler `bcda2662…`, `validate.ts` `8f0398ea…`, callable test `cf73770d…`, lockfile'lar — hepsi bu turda yeniden hesaplandı ve eşleşti; toolchain aynı):
+
+| Evidence ID | Claim | Neden hâlâ geçerli |
+| --- | --- | --- |
+| QA-01, QA-02, QA-03, QA-05 | analyze/format, workspace 588 + 202, 9 FE negatifi, entegrasyon 13 / 13 | `app/`, `packages/`, `tools/` tree'leri ve `pubspec.lock` aynı |
+| QJ1, QJ2, QJ4, QJ7 | okunamaz store, Retry, resume + tamper, cold boot | app aynı; kurallar app'in başlangıç / persistence yoluna girmiyor (app Firestore'a doğrudan yazmıyor — A9 Tech Lead doğrulaması) |
+| QE-B, QE-C, QE-D, QE-E, QE-M, QL1, QL2 | drop / hold+kill / first-run-authoritative / kill switch / geçersiz payload → parked / ownership / lifecycle | app + handler + validator aynı; callable Admin SDK ile yazar, kurallar etkilemez — QE-R1-A bunu yeni kurallarla runtime'da doğruladı |
+| QR | release binary kapısı | app aynı (`dc9ae88b…`) |
+
+**INVALIDATED — rerun required:** QB-03 ve QB-05 (eski kurallar `b75628e6…`) → QB-R1-03 / QB-R1-06 ile yeniden koşuldu. QB-01 / QB-02 / QB-04 fingerprint'i geçerliydi ama ucuz olduğu için yeniden koşuldu (QB-R1-01 / 02 / 04).
+
+**PENDING — required class unavailable:** F08.OFFLINE-JOURNEY (AC2 / J8) — `evidence/runtime/offline/` yok; kullanıcı koşusu yapılmamış (§4).
+
+## 2. Acceptance & Critical Journey Coverage
+
+Değişmeyen satırlar § F08-QA-FUNCTIONAL §2'deki gibi (reuse, yukarıdaki fingerprint). Bu turda değişen / yeniden kanıtlanan satırlar:
+
+| AC / Journey | Expected | Evidence IDs | Result |
+| --- | --- | --- | --- |
+| AC2 / J8 ağsız Journey | tüm seviyeler yüklenir, ilerleme kaydolur | — | **PENDING** (kullanıcının ağsız runtime'ı) |
+| AC4 offline tamamlanma → tek gönderim (yeni kurallarla) | 1 doc | QE-R1-A; QE-A…C, QL2 REUSED | PASS |
+| AC5 sunucudaki first run otoriter | sunucu değişmez | QB-R1-03, QB-R1-04; QE-D REUSED | PASS |
+| AC11 kısmi sync → idempotent retry | kopya yok | QB-R1-03; QE-B, QE-C REUSED | PASS |
+| J5 exactly-once | — | QE-R1-A + QE-B…E REUSED | PASS |
+| Misuse: doğrudan client create (F1) — own valid / own invalid / non-date bucket / başka uid / unauth | hepsi reddedilir, belge oluşmaz | QB-R1-03, QB-R1-05, QB-R1-06 (P3, P4, P6, P7), QB-R1-07, QE-R1-00 | PASS |
+| Misuse: overwrite / merge / update / delete / read | reddedilir | QB-R1-03, QB-R1-06 (P1, P2, P8) | PASS |
+| Misuse: duplicate drain | ek istek yok | QE-R1-A (A2, A3 çift dokunuş; 2 istek toplam) | PASS |
+| AC1, AC6–AC10, AC12, J1–J4, J6, J7, geçersiz payload, Retry sebep varken | — | § F08-QA-FUNCTIONAL §2 — REUSED | PASS |
+| AC3 | — | — | F07 kapsamı (known limit) |
+
+## Backend & Security Compliance
+
+* Canonical build/test: QB-R1-01, QB-R1-02, QB-R1-03 PASS; fail-fast gerekmedi.
+
+| Contract control | Evidence | Result |
+| --- | --- | --- |
+| Rules satırı (A9): `dailyResults/**` create/update/delete/read `false`; default-deny | `firestore.rules` okundu (L21, L26); QB-R1-03, QB-R1-06 | PASS |
+| Callable tek yazma yolu, Admin SDK — yeni kurallarla hâlâ yazıyor | QB-R1-03 (callable suite), QE-R1-A (`CREATED`, 1 doc) | PASS |
+| Callable request/response, validation + hata formatı | QB-R1-03; QE-M REUSED | PASS |
+| Create-only + idempotency (transaction) | QB-R1-03, QB-R1-04; QE-B/C REUSED | PASS |
+| QA Focus → Rules (düzeltilmiş) | QB-R1-03 + QB-R1-06 her şekli kapsıyor | PASS |
+
+| Security control | Evidence | Result |
+| --- | --- | --- |
+| **Mass assignment / validation bypass (doğrudan client create) — F1** | QB-R1-06 P3 / P6 DENIED + belge yok; QE-R1-00 runtime 403; QB-R1-07 kontrolü | **PASS — F1 kapandı** |
+| Auth bypass (unauthenticated) | QB-R1-03, QB-R1-06 P7 | PASS |
+| IDOR (başka uid'e yazma) | QB-R1-03, QB-R1-06 P4 | PASS |
+| Overwrite (sahip `setDoc` / merge / update) | QB-R1-03, QB-R1-06 P1 / P2 | PASS |
+| Okuma / silme / dışarı yazma | QB-R1-03, QB-R1-06 P5 / P8 | PASS |
+| Response exposure | QB-R1-03 (değişmeyen handler) | PASS |
+
+Rule → check → negatif zinciri: A9 ruling 1 → `rules.test.ts` üç yeni `assertFails` (+ QA probu P3 / P6) → eski kural geri konunca tam bu testler fail (QB-R1-05, QB-R1-07) → yeni kurallarla pass (QB-R1-03, QB-R1-06). `assertFails` permission-denied ister; bağlantı hatası red sayılmaz.
+
+## Client & UI Compliance
+
+App değişmedi (`9de12e6a…`); § F08-QA-FUNCTIONAL "Client & UI Compliance" satırları REUSED. Bu turda: `/debug/sync` emülatör define'lı debug build'de açıldı, kuyruk durumu (`pending` → `synced`) ekranda ve store'da tutarlı (QE-R1-A, `QE-R1-A3-synced.png`).
+
+## Stateful Flow & Integration
+
+| Boundary / Transition | Actor / Start State | Expected | Evidence IDs | Result |
+| --- | --- | --- | --- | --- |
+| pending → (backoff) → inFlight → synced, yeni kurallarla | anonim client, callable | tek doc, entry `synced` | QE-R1-A | PASS |
+| due öncesi drain | pending, `next_attempt_at` gelecekte | istek yok | QE-R1-A (A2) | PASS |
+| duplicate drain | synced | ek istek yok | QE-R1-A (A3, A4) | PASS |
+| doğrudan client create (callable'ı atlayan aktör) | anonim, kimlikli client | reddedilir | QE-R1-00, QB-R1-06 | PASS |
+| Diğer satırlar (cold boot, corrupt, migration, kill/relaunch, tamper, stale sweep, parked, lifecycle, dispose, regain, kill switch) | — | — | § F08-QA-FUNCTIONAL — REUSED | PASS |
+
+## 3. Findings
+
+Blocking finding yok. **F1 — kapandı** (QB-R1-06 P3 / P6 DENIED, QE-R1-00, QB-R1-07).
+
+## 4. Pending Evidence
+
+* **F08.OFFLINE-JOURNEY (AC2 / J8)** — PENDING. Required class: runtime. Target: gerçek ağsız runtime (kullanıcı `evidence/offline-journey.sh <udid>` çalıştırır — Mac Wi-Fi'ı kapatır / açar; ya da fiziksel cihaz uçak modu; emülatör define'sız debug build). Owner: QA (değerlendirme), kullanıcı (ortam). Prerequisite: kullanıcının koşusu; QA sistem ayarını değiştiremez. Re-evaluation trigger: `evidence/runtime/offline/` çıktısı mevcut olduğunda. Proxy `down` bunun yerine geçmez. Not: simülatörde şu an emülatör define'lı build kurulu — koşudan önce define'sız debug build kurulmalı.
+
+## 5. Regression & Evidence Reuse
+
+* **Etkilenen yüzey:** yalnız `infra/firestore.rules` (+ testi, README). Doğrudan tüketiciler: callable (Admin SDK — kurallardan etkilenmez; QB-R1-03 + QE-R1-A ile doğrulandı) ve app'in debug emülatör bağlantısı (Firestore'a yazmıyor). App / paketler / araçlar / lockfile'lar değişmedi. Full depth: kurallar ve callable yolunun tamamı yeniden koşuldu; geri kalan kapsam fingerprint ile reuse.
+* **Reused / invalidated:** §1 tabloları.
+* **Bağımsız QA probe'ları:** QB-R1-06 (sıkılaştırılmış prob + P7 / P8), QB-R1-07 (probun eski kurallarla kontrolü), QE-R1-00 (çalışan emülatörde REST create → 403), QE-R1-A (yeni kurallarla uçtan uca).
+
+## 6. Final Verdict
+
+* **QA Result: Runtime Validation Pending**
+* **Blocking Issues:** None (F1 kapandı). Stage'i tamamlanmaktan alıkoyan tek kayıt: F08.OFFLINE-JOURNEY PENDING (AC2 / J8, kullanıcı ortamı).
+* **Required Fixes:** None. Gerekli: AC2 için kullanıcının ağsız koşusu → QA hedefli değerlendirme → Functional Approved adayı.
+* **Non-blocking Notes:**
+  * **N1-R1 — ilk backoff ≈ 60 s:** `_nextAttemptAt` `baseDelay × 2^attemptCount` hesaplıyor; ilk hatadan sonra `attemptCount = 1` → 60 s ±%20 (QE-R1-A: 59.7 s; önceki turda 67.3 s). Kontrat "exponential, base 30 s, factor 2" diyor, ilk gecikmenin 30 mu 60 mı olduğunu açıkça söylemiyor; `sync_test.dart` ilk gecikmeyi sabitlemiyor. Exactly-once / cap / parked davranışını etkilemiyor. Tech Lead yorumu netleştirebilir; defect olarak açılmadı.
+  * N1 (zamanlayıcı yok), N3 (Jest teardown satırı — QB-R1-03'te de var), N4 (CI emülatör adımı hiç koşmadı, CI-EMULATOR-JAVA21) ve F08-EVIDENCE-PROXY-ERRORS önceki turdaki gibi açık; QA kendi proxy kopyasını kullandı.
+
+## 7. Tech Lead Note
+
+* **Root-cause alanı:** yok (F1 düzeltmesi doğrulandı). Kalan: AC2 ortamı — kullanıcı.
+* **Routing:** F08.EMULATOR → PASS; F08.OFFLINE-JOURNEY PENDING kalır. Kullanıcı ağsız koşuyu yaptığında QA'yı yalnız AC2 / J8 için hedefli (`targeted`, reuse allowed) yeniden aktive etmek yeterli görünüyor. N1-R1 için kontrat netleştirmesi opsiyonel.
+* **Release:** F1 deploy öncesi kapanma şartı karşılandı. F08-DEVOPS hâlâ F08.DEPLOY-AUTHORIZATION ile bloklu; A9 ruling 6'daki rollback kontrol güncellemesi DevOps'a ait.
+
+## Sonraki Komut
+
+```text
+Run Tech Lead
+```
