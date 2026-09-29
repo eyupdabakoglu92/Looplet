@@ -4,6 +4,7 @@
 > **Amended 2026-09-06 (Firebase-project incident):** "App Init Sequence → App Check provider selection" added — soft-enforce unchanged; debug provider in dev, Play Integrity / App Attest in release; iOS production App Attest deferred (no Apple Developer Program membership) and non-blocking because enforcement is OFF.
 > **Amended 2026-09-29 (Tech Lead — F08 activation after Design Adoption Phase D):** "Activation 2026-09-29" added at the end — the unreadable-DB recovery gap (Resilience row, AC8) is closed in code by F08-FE13; Retry reopens the database connection; a debug-only emulator connection and fake-producer trigger; the local evidence plan and its methods. No semantic change to the locked sections.
 > **Amended 2026-09-29 (Tech Lead — the F08-BE6 checkpoint):** "Activation 2026-09-29 → A8" added — F08-BE6 accepted; the Java 21 command corrected (Java 21 must be first on `PATH`); A6 ruling 5's premise about the CI emulator job corrected (the step exists since F08-BE5 and has never run); F08-QA-FUNCTIONAL activated under A7. No semantic change to the locked sections.
+> **Amended 2026-09-29 (Tech Lead — the checkpoint on the F08-QA-FUNCTIONAL verdict, Decision Pending):** "Activation 2026-09-29 → A9" added, and the locked **Rules** row corrected: clients may not write `dailyResults/**` at all; only the callable writes, through the Admin SDK (QA finding F1). The same correction is made in "Reconciliation Algorithm → Server", "Validation Responsibility" and "QA Focus → Rules", and in `platform.md` §6 / §8. This resolves a conflict inside the locked Firebase Sync Surface section in favour of its own decision (callable; a direct client write was rejected). No product criterion changes.
 > `orchestration.md` is execution authority; `platform.md` / `release.md` are project authority.
 
 ---
@@ -131,7 +132,7 @@ Stored at `kv['active_session'].valueJson`. **Key names are frozen** — F03 ser
 **First-run-authoritative, enforced independently on each side — the two sides never need to be merged (no leaderboard / no read-back in the MVP).**
 
 * **Local:** `daily_entry.firstRun*` fields are written **once**, at the first local completion of that `(guestId, lang, dailyDate)`, and are **immutable** thereafter. A later local completion writes only a `daily_attempt` row (attemptNo ≥ 2) and enqueues **no** further `sync_queue` item for that key.
-* **Server:** the Firestore write is **create-only** (`allow create` iff the doc does not exist and `request.auth.uid` matches the path uid; `update`/`delete`/`read` all `false` in the MVP). The first writer wins; a later write for the same `(uid, lang, dailyDate)` returns `ALREADY_SUBMITTED`.
+* **Server:** the Firestore write is **create-only**, done by the callable only: its transaction creates the doc iff it does not exist, for the uid from `context.auth`. Clients cannot write, update, delete or read `dailyResults/**` (rules: all `false` in the MVP). The first writer wins; a later write for the same `(uid, lang, dailyDate)` returns `ALREADY_SUBMITTED`. *[Corrected 2026-09-29, A9: this line used to describe a client `allow create` rule; see "Rules".]*
 * **"Both think they're first":** impossible to conflict — the server record is first-writer-wins and is never read back by the client in the MVP; the local record is first-local-completion and immutable. `ALREADY_SUBMITTED` simply marks the queue item `synced`.
 
 ---
@@ -178,7 +179,9 @@ Leaderboard-ready (query by `{lang,dailyDate}` → `moves` asc, `durationMs` asc
 
 ### Rules
 
-`dailyResults/**`: `allow create: if request.auth != null && request.auth.uid == <path uid> && !exists(...)`; `allow update, delete, read: if false`. Rules-unit-tested (F08-BE3).
+`dailyResults/**`: `allow create, update, delete, read: if false` — no client access. Only `submitDailyResultV1` writes, through the Admin SDK, which security rules do not apply to. Create-only / first-writer-wins is enforced by the callable's transaction (`snapshot.exists` → `ALREADY_SUBMITTED`); the payload validation above runs before every write. Rules-unit-tested (F08-BE3; the deny-own-create case F08-BE7).
+
+*[Corrected 2026-09-29, A9 — QA finding F1. The row used to read `allow create: if request.auth != null && request.auth.uid == <path uid> && !exists(...)`. That rule let any signed-in client skip the callable: it could write an unvalidated entry for itself, which the callable then kept as the first run, and create entries under any bucket name. It contradicted this section's own decision ("a direct client create-only write was considered and rejected") and the "server-written" document.]*
 
 ### Remote Config
 
@@ -259,7 +262,7 @@ App Check is **soft-enforce / monitor** for the whole MVP (`platform.md` §6/§1
 
 * **`app` persistence layer:** schema validity, migration correctness (+ never-drop guard), write-through completeness, restore fidelity, resilience fallbacks, snapshot shape validation.
 * **`DailyResultSyncService`:** exactly-once delivery, backoff/cap, stale-`inFlight` sweep, `awaitingAuth` handling, session-level survival, `daily_entry.syncStatus` mirroring.
-* **Callable + Firestore rules:** server-side create-only enforcement + full payload validation + App Check (soft).
+* **Callable + Firestore rules:** server-side create-only enforcement + full payload validation + App Check (soft). The callable is the only write path; the rules deny every client read and write on `dailyResults/**` (A9).
 * **F02 engine:** the restored `EngineConfig` + move list re-derive thaw/solved — F08 does not re-validate engine semantics.
 * **Client pre-enqueue:** assert payload validity in debug; drop + log an invalid payload in release (never enqueue a bad item).
 
@@ -276,7 +279,7 @@ App Check is **soft-enforce / monitor** for the whole MVP (`platform.md` §6/§1
 * **Clock (`automated` + `runtime`):** clock moved backward/forward mid-session → elapsed unaffected.
 * **Guest schema (`automated`):** every player-owned row has a non-null `guestId`; no device-id key.
 * **Ownership (`runtime`):** trigger a completion, dispose the triggering screen → sync still completes.
-* **Rules (`repeatable integration`):** create-own allowed; create-other denied; update/delete/read denied.
+* **Rules (`repeatable integration`):** a direct client create is denied — own entry, another user's entry, unauthenticated, an invalid payload, a non-date bucket; update/delete/read denied; the callable still creates (Admin SDK). *[Corrected 2026-09-29, A9: was "create-own allowed".]*
 * **Evidence class:** `runtime` (resume / offline / sync on device or emulator) + `repeatable integration` (callable + rules via the Firebase emulator) + `automated functional` (schema / migration / serialization units). **Not `source-only`** (`platform.md` §10 requires runtime proof for resume + daily behavior).
 * **QA scope:** end-to-end (app persistence + Firebase emulator). `Security compliance` in scope at the rules/callable level (create-only, auth-scoped path, payload validation, App Check attach); no PII, no cross-user read.
 
@@ -530,3 +533,48 @@ No UI Designer task and no visual gate. If FE13 needs any player-visible change,
 * the backend negative to re-run is N-OVERWRITE (`evidence/neg-be6.py`).
 
 The backend handler and rules fingerprints above are the ones A7's reuse clause refers to. The test files changed in BE6, so QA re-runs the suite and does not reuse the old result.
+
+### A9. QA checkpoint 2026-09-29 (F08-QA-FUNCTIONAL — verdict Decision Pending, commit d882211)
+
+**Verdict reviewed:** `qa.md` → "F08-QA-FUNCTIONAL" (§0–§7) and its evidence in `qa/functional/`. QA tested HEAD 84430c9: `app/` tree `9de12e6a…`; `firestore.rules` `b75628e6…`; the handler `bcda2662…`; `validate.ts` `8f0398ea…`; the test `cf73770d…`. The Tech Lead checked that these SHA-1s are still the working tree's.
+
+**Result of the stage:**
+* PASS, run by QA this turn: F08.EMULATOR (31 / 31, N-OVERWRITE caught), F08.LOCAL-RESUME, F08.LIFECYCLE, F08.COLD-BOOT-REVIEW, F08.UNREADABLE-DB, F08.STORAGE; every A7 journey except J8; every misuse check except the rules probe below; the release binary gate.
+* PENDING: F08.OFFLINE-JOURNEY (AC2) — the user's no-network run.
+* **F1 (High, security — authority conflict):** QA's own rules probe (`qa/functional/qa-probe-rules.test.ts`, log `QB-05-rules-probe.log`) shows that a signed-in client can skip the callable. P3: a direct create of its own entry with `moves 1 < optimalMoves 9`, `stars 9` and an extra field — ALLOWED. P6: a direct create under the bucket `zz_not-a-date-123` — ALLOWED.
+
+**Tech Lead verification of F1:**
+* `infra/firestore.rules` allows `create` when `request.auth.uid == uid` and checks nothing else. That is exactly what the locked Rules row said.
+* The callable writes through `firebase-admin/firestore` (`submitDailyResult.ts`). Security rules do not apply to the Admin SDK, so the callable does not need any client rule.
+* The app never writes Firestore directly. The only `cloud_firestore` use in `app/lib` is `firebase_emulator.dart`, the debug emulator wiring.
+* So the client `allow create` rule serves no shipped path. It is only a bypass.
+
+**Rulings:**
+1. **F1 — resolved as a Technical Decision: clients get no access to `dailyResults/**`.**
+   * The locked section contradicted itself. Its decision says the sync surface is the callable and "a direct client create-only write was considered and rejected", and the document is "server-written". Its Rules row still allowed that rejected write. `platform.md` §6 carried the same wording from before the callable decision (the F08 PRD had left "callable or direct write" open).
+   * The decision wins over the stale row. The Rules row, "Reconciliation Algorithm → Server", "Validation Responsibility", "QA Focus → Rules" and `platform.md` §6 / §8 are corrected now.
+   * **Rejected alternative — validate the fields and the bucket in the rules.** It would keep a second write path that the contract already rejected, and duplicate the callable's validation in a language where cross-field rules are hard to keep in sync. It gives nothing the callable does not.
+   * **What does not change:** the callable, its validation, its error format and its create-only transaction; the client mapping; the app. AC4 / AC5 / AC11 are still proved through the callable. No product criterion changes, so no Product Owner revision is needed.
+   * **Effect:** a player can no longer pre-write a fake "first run" that the callable would then protect with `ALREADY_SUBMITTED`, and no client can create documents under invented bucket names.
+2. **F08-BE7 is opened (Backend Developer):** apply ruling 1 in `infra/firestore.rules` and `infra/functions/test/rules.test.ts`, with a named negative. Brief: `orchestration.md` → Current Brief.
+3. **Evidence:** F08.EMULATOR goes back to PENDING. Its callable and idempotency part stays valid for the unchanged handler, but its rules part is at the old rules, and the rules and their test change in BE7. QA re-runs it at the BE7 revision. The other PASS records stay PASS; the app is not touched.
+4. **QA re-run plan — F08-QA-FUNCTIONAL-R1** (locked now; activated at the BE7 checkpoint after the preflight):
+   * **Stage:** functional. **Scope:** end-to-end.
+   * **Modules:** `core`, `backend-security`, `client-ui`, `stateful-flow`. `client-ui` stays because the scope is end-to-end; its evidence can be reused.
+   * **Regression Depth:** `full` — an auth / security rule changes.
+   * **Evidence Reuse:** `allowed`, only while these fingerprints are unchanged: `app/` tree `9de12e6a…`; the handler `bcda2662…`; `validate.ts` `8f0398ea…`; `submitDailyResult.test.ts` `cf73770d…`. Everything tied to `firestore.rules` or `rules.test.ts` is `invalidated` and re-run. If a fingerprint differs, QA re-runs what depends on it.
+   * **QA runs itself:**
+     * the emulator suite at the BE7 revision (the setup-manifest command);
+     * N-OVERWRITE again (`evidence/neg-be6.py`) and the BE7 negative;
+     * its own rules probe P1–P6 — P3 and P6 must now be DENIED, and P1, P2, P4, P5 stay denied;
+     * one client ↔ emulator exactly-once case (QE-A shape) with the new rules loaded in the emulator — it shows that the callable still writes and the app still syncs;
+     * AC2 / J8, if the user has run `evidence/offline-journey.sh` by then.
+   * **Verdict:** Functional Approved only if every in-scope record is PASS; Runtime Validation Pending if only F08.OFFLINE-JOURNEY is missing; Rejected with findings.
+5. **QA's non-blocking notes:**
+   * N1 (no timer — a due item waits for the next trigger): conforms to "Ownership & Lifecycle"; no change.
+   * N2 (`evidence/fn-proxy.py` closes the connection on an upstream 4xx / 5xx, so the client sees a network drop): a defect in the delivered evidence tool, not in the app. LE-04 therefore never tested an error response through the proxy; QA's corrected copy covered it (QE-M). Recorded as the follow-up **F08-EVIDENCE-PROXY-ERRORS** (Frontend/Mobile Developer, non-blocking). QA keeps using its own copy.
+   * N3 (the Jest teardown line): as A8 ruling 4.
+   * N4 (the CI emulator step never ran): CI-EMULATOR-JAVA21, as A8 ruling 3.
+6. **Release:** the new rules ship in the same first Firebase deploy, so the release scope does not change and nothing is deployed now. The F08-DEVOPS rollback check "create-own allowed / create-other denied" (`release.md` → rollback table) is out of date. When F08-DEVOPS resumes, DevOps/Release Engineer changes it to "a direct client create is denied; the callable creates". F1 must be closed before any deploy.
+
+**Delivery Review:** Pending until F08-BE7 is reconciled at the next Tech Lead checkpoint.

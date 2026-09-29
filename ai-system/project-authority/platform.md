@@ -1,6 +1,6 @@
 # Project Platform Authority — LOOPLET
 
-Last Updated: 2026-09-21 (§14 visual capture / asset / motion baseline added for the Visual Quality Gate; §3 + §11 shared-enum carve-out extended at F06 close-out; §6 guest-identity decouple + §13 Drift-schema/App-Check notes at F08 contract finalization; §13 App Check provider selection + iOS-App-Attest-deferred at F08 Firebase-project incident)
+Last Updated: 2026-09-29 (§6 + §8: no client access to `dailyResults/**` — the callable is the only write path, F08 A9; §14 visual capture / asset / motion baseline added for the Visual Quality Gate; §3 + §11 shared-enum carve-out extended at F06 close-out; §6 guest-identity decouple + §13 Drift-schema/App-Check notes at F08 contract finalization; §13 App Check provider selection + iOS-App-Attest-deferred at F08 Firebase-project incident)
 Owner: Tech Lead
 
 ---
@@ -128,7 +128,7 @@ Melos-managed monorepo. Domain packages import **no** Flutter.
 * **Identity model (amended 2026-09-06, F08 contract):** the anonymous UID and the durable guest key are **decoupled** — `firebaseUid` = the Firebase Anonymous UID (server identity: Firestore path segment + sync idempotency-key component; `null` until Auth completes); `guestId` = a **locally generated UUID v4**, persisted on first launch, stamped on every player-owned row, available offline before any network. Rationale: offline-first (PRD §5.4/§51) forbids gating local play/persistence on Anonymous Auth, which cannot complete offline on a first launch; the local UUID is also the cleaner anchor for future account adoption (`accountId` added alongside a retained `guestId`). Where earlier text here read "`guestId` = anonymous UID", read this decouple. See `features/f08-offline-persistence-and-sync/architecture.md` → Guest Identity Model.
 * Authorization (Firestore rules):
   * Content in Cloud Storage: public read.
-  * `dailyResults/**`: a client may **create** only `entries/{its own uid}` and only if that document does not already exist (server-enforced first-run authority). No update, no delete, no cross-user read in the MVP.
+  * `dailyResults/**`: **no client access** — no create, update, delete or read in the MVP. Only the `submitDailyResultV1` callable writes, through the Admin SDK; it creates `entries/{the caller's uid}` only if that document does not already exist (server-enforced first-run authority). *[Amended 2026-09-29, F08 `architecture.md` A9: this line used to let a client create its own entry directly, which skipped the callable's validation — QA finding F1.]*
 * App Check (Play Integrity / DeviceCheck) guards the callable function and Firestore writes. Soft-enforce for the MVP; hard-enforce decision deferred to F07/F08.
 
 ---
@@ -150,7 +150,7 @@ Melos-managed monorepo. Domain packages import **no** Flutter.
 * Crashes/ANRs: Crashlytics. Product events: Firebase Analytics (GA4), see F12. Function logs: Cloud Logging.
 * Input validation (callable): payload shape + ranges — `1 ≤ optimalMoves ≤ moves`, `durationMs ≥ 0`, `dailyDate` matches `YYYY-MM-DD`, `lang` in the supported set. Reject with `INVALID_PAYLOAD` otherwise.
 * Secrets: Firebase client config (`firebase_options.dart`) is not secret. Function secrets (if any) via Secret Manager; none required for the MVP beyond project defaults. No secret values in the repo — names only (see `release.md`).
-* Abuse controls: Firestore create-only rule + App Check on writes and the callable. No custom rate limiter in the MVP.
+* Abuse controls: the callable is the only write path (create-only transaction + payload validation); Firestore rules deny all client access to `dailyResults/**`; App Check on the callable. No custom rate limiter in the MVP. *[Amended 2026-09-29, F08 A9.]*
 * Privacy: no PII collected. **[Assumption]** iOS Firebase Analytics is configured **without** IDFA / ad-identifier collection, so no ATT prompt is required for the MVP. A `PrivacyInfo.xcprivacy` declaring **no tracking** (with required API reason codes) is shipped. Android: no ad ID permission.
 
 ---

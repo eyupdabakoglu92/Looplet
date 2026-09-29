@@ -12,7 +12,7 @@ Core workflow tooling requires Node.js 18+. Application/device/emulator environm
 
 ## Technical Authority
 
-project-authority/platform.md and each feature's architecture.md — unchanged.
+project-authority/platform.md and each feature's architecture.md. 2026-09-29: `platform.md` §6 / §8 and the F08 Rules row corrected — no client access to `dailyResults/**`; the callable is the only write path (F08 `architecture.md` A9, QA finding F1).
 
 ## Setup Authority
 
@@ -40,53 +40,46 @@ features/f08-offline-persistence-and-sync/orchestration.md
 
 ## Current Phase
 
-F08 local evidence — F08-QA-FUNCTIONAL (functional stage, plan A7 / A8)
+F08 local evidence — Rework F08-BE7 (QA finding F1, architecture A9), then F08-QA-FUNCTIONAL-R1
 
 ## Current Role
 
-QA
+Backend Developer
 
 ## Current Reason
 
-**The F08-BE6 checkpoint** was on 2026-09-29. Full record: F08 `architecture.md` → Activation → A8.
+**The Tech Lead checkpoint on F08-QA-FUNCTIONAL** was on 2026-09-29. Full record: F08 `architecture.md` → Activation → A9.
 
-* **Accepted:** F08-BE6 (c70527a).
-  * The emulator suite's fixture is now a valid "better" replay; the suite is 31 / 31.
-  * N-OVERWRITE is caught.
-  * Only test code changed.
-* **Delivery Review: Accepted** — F08-FE13, F08-LOCAL-EVIDENCE and F08-BE6.
-* **F08-QA-FUNCTIONAL is active** under the plan locked in A7: modules core, backend-security, client-ui, stateful-flow; regression depth full; evidence reuse invalidated for the app side.
-* The offline Journey (AC2) waits for the user's no-network run.
-* Visual Scope `none`. The release stage stays blocked on F08.DEPLOY-AUTHORIZATION.
+* **QA verdict (d882211): Decision Pending.** Every in-scope journey and misuse check PASS except F1; the offline Journey (AC2) PENDING.
+* **F1:** the Firestore rules let any signed-in client create its own `dailyResults` entry directly, skipping the callable's validation, and under any bucket name.
+* **Decided (Technical Decision):** clients get no access to `dailyResults/**`; only the callable writes (Admin SDK). The locked Rules row contradicted the section's own decision and is corrected, with `platform.md` §6 / §8. No product criterion changes; the app is untouched.
+* **F08-BE7 is Open** (Backend Developer): rules, rules test, named negative. Then the Tech Lead checkpoint and F08-QA-FUNCTIONAL-R1 (plan A9 ruling 4).
+* F08.EMULATOR is PENDING again (rules part). Delivery Review Pending. Visual Scope `none`. The release stage stays blocked on F08.DEPLOY-AUTHORIZATION.
 
 ## Last Completed Action
 
-Tech Lead on 2026-09-29 — **the F08-BE6 checkpoint** (after the delivery in c70527a).
-* **Reviewed:**
-  * `backend.md` F08-BE6;
-  * the test diff against `validate.ts`;
-  * `neg-be6.py` and the logs BE6-00 to BE6-04;
-  * `firestore.rules`.
-* **Fingerprints** match the delivery (test `cf73770d…`, handler `bcda2662…`).
-* **Re-ran** the emulator suite at c70527a: 31 / 31, exit 0. This is not a QA claim.
-* **Decided** (A8):
-  1. F08-BE6 — accepted;
-  2. the setup-manifest command — corrected (Java 21 first on `PATH`);
-  3. the CI emulator step — A6 ruling 5's premise corrected. The step exists since F08-BE5 but CI has never run (0 GitHub Actions runs), and it needs Java 21 → CI-EMULATOR-JAVA21 (DevOps/Release Engineer). It does not block functional QA;
-  4. the Jest teardown warning — a note;
-  5. `firestore.rules` without `!exists` — equivalent, no change.
-* **State:** Delivery Review Accepted; F08-QA-FUNCTIONAL Open; QA Result None; owner → QA.
-* Archived: history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-be6-checkpoint.md.
+Tech Lead on 2026-09-29 — **the checkpoint on the F08-QA-FUNCTIONAL verdict** (after the QA run in d882211).
+* **Reviewed:** `qa.md` § F08-QA-FUNCTIONAL and `qa/functional/` (incl. the rules probe `QB-05`); the tested SHA-1s match the working tree.
+* **Verified F1:** `firestore.rules` allows `create` on uid alone; the callable writes through `firebase-admin` (rules do not apply); the app has no direct Firestore write.
+* **Decided** (A9):
+  1. F1 — no client access to `dailyResults/**`; the architecture Rules / Reconciliation / Validation / QA Focus rows and `platform.md` §6 / §8 corrected; field checks in the rules rejected;
+  2. F08-BE7 opened (Backend Developer);
+  3. F08.EMULATOR → PENDING (rules part invalidated);
+  4. the F08-QA-FUNCTIONAL-R1 plan: functional, end-to-end, core + backend-security + client-ui + stateful-flow, full, reuse allowed by fingerprint;
+  5. QA notes: N1 no change; N2 → F08-EVIDENCE-PROXY-ERRORS; N3 / N4 as A8;
+  6. release: no scope change; the F08-DEVOPS rollback check updated when it resumes.
+* **State:** Rework; Delivery Review Pending; QA Result Decision Pending (last verdict); owner → Backend Developer.
+* Archived: history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-qa-functional-checkpoint.md.
 
 ## Next Expected Action
 
-Run QA on F08-QA-FUNCTIONAL (the F08 orchestration Current Brief; plan F08 `architecture.md` → Activation A7, corrected by A8). Functional stage:
-* the eight critical journeys and the misuse checks;
-* re-run the named negatives, including N-OVERWRITE;
-* a result per Pending Evidence record;
-* the verdict in `qa.md`.
+Run Backend Developer on F08-BE7 (the F08 orchestration Current Brief; ruling F08 `architecture.md` → A9):
+* `infra/firestore.rules` denies every client access to `dailyResults/**`;
+* `rules.test.ts`: the own-entry create is denied; invalid-payload and non-date-bucket direct creates are denied;
+* the named negative N-DIRECT-CREATE; the emulator suite green on Java 21;
+* `backend.md` → F08-BE7.
 
-Then the Tech Lead checkpoint on the verdict. Optional and at any time: the user runs `ai-system/features/f08-offline-persistence-and-sync/evidence/offline-journey.sh <udid>` for AC2. It turns the Mac's Wi-Fi off and back on. No deployment or billing action.
+Then the Tech Lead checkpoint, then F08-QA-FUNCTIONAL-R1. Optional and at any time: the user runs `ai-system/features/f08-offline-persistence-and-sync/evidence/offline-journey.sh <udid>` for AC2. It turns the Mac's Wi-Fi off and back on. No deployment or billing action.
 
 ## Portfolio Summary
 
@@ -95,7 +88,7 @@ Then the Tech Lead checkpoint on the verdict. Optional and at any time: the user
 * F00: Done again (2026-09-27) — Phase C is complete (the conformance audit was accepted). Its design-system layer closed 2026-09-26: Foundation Selected (Direction C), 90/100, Visual Quality Gate Passed via the scoped exception F00.VISUAL-93-THRESHOLD.
 * F05: Done (2026-09-29) — Design Adoption Phase D3 (Home + app shell, `new-surface`, architecture §18) closed: F05-QA-D3 Approved with Notes, 94 / 100, gate Passed (§18.9). The user's N1 decision is live (PO-REV-2026-09-29-F05-CONTINUE). Previously Done 2026-09-27 (F05-QA-STRICT2 Approved with Notes).
 * F04: Done — the panel is now the full-screen result (D2, F03 carrier, closed 2026-09-29; F04 §7 / §8 amended 2026-09-28; ACs unchanged and passed on the result).
-* F08: **In Progress — the active feature.** F08-FE13 + F08-LOCAL-EVIDENCE accepted 2026-09-29 (A6); F08-BE6 Open with the Backend Developer, then F08-QA-FUNCTIONAL (plan A7). Independent local/emulator validation pending, release task Blocked, release/final acceptance pending. Its `StoreErrorScreen` now uses the Foundation (D3, F08 App Init step 1 amended).
+* F08: **Rework — the active feature.** FE13 + LOCAL-EVIDENCE (A6) and BE6 (A8) accepted; F08-QA-FUNCTIONAL returned Decision Pending on F1 (the rules allowed a direct client create); F1 resolved at A9 → F08-BE7 Open with the Backend Developer, then F08-QA-FUNCTIONAL-R1. AC2 waits for the user's no-network run; release task Blocked, release/final acceptance pending. Its `StoreErrorScreen` now uses the Foundation (D3, F08 App Init step 1 amended).
 * F07, F09–F13: Not Started. Pending follow-ons are in workflow-follow-ups.md.
 
 ## Release Decision
@@ -122,10 +115,11 @@ F08.DEPLOY-AUTHORIZATION is OPEN with Blocking Scope = release. The old deferral
   * RESULT-F00-COMPONENT-ALIGN — the `EN İYİ` ★ offset and the pressed-pill brightness.
   * Release-build pacing was not measured (debug video only); it belongs to FIRST-APP-DISTRIBUTION — for the result (D2) and the Home entrance (D3, F05-QA-D3 N1).
 * **Post-D3 follow-ups (non-blocking, in workflow-follow-ups.md):** FIRST-APP-DISTRIBUTION (the profile / release store-error capture, moved from the F05 ledger); F08-RETRY-STORE-CONNECTION (+ the one-frame Retry feedback, N2); RESULT-F00-COMPONENT-ALIGN (+ the `LimePill` arrow at AX5, N3); OPTIONAL-QUALITY-NOTES (N4, N5); RELEASE-SCOPED-EVIDENCE (process).
-* **Commits:** the D1 rework, its closure and the D2 activation are in 489606d — its tracked `app/` diff from 5798c70 hashes to QA's `88f1dca3…` and the two changed sources match QA's SHA-1s (re-verified at the D2 checkpoint); the F03-UI-D2 handoff is in 6352a75; the F03-FE-D2 delivery is in 67d9ecb (`app/` tree `f5641d2f…`, QA's evidence-reuse fingerprint); the F03-QA-D2 verdict is in f28aedb; the reconciliation in 3cd4a3b; the F03-FE-D2R rework in 77c33b9 (`app/` tree `5298c81a…`, the re-QA fingerprint); the F03-QA-D2R verdict in 5677471. The D2 closure and the D3 activation are in 171f0c1; the PO revision in 230ce0c; its resync in 9a36147; the F05-UI-D3 handoff in 981b807; the visual-gate checkpoint in 7c1a946; the F05-FE-D3 delivery in af5aec8 (`app/` `b4ad263e…`, the D3 QA fingerprint); the implementation checkpoint in 078c926; the F05-QA-D3 verdict in e46f384. The D3 closure is in b7493d6. The F08 activation is in 1d373d7; the F08-FE13 / LOCAL-EVIDENCE delivery in beb7bfe (`app/` `9de12e6a…`); the FE13 checkpoint in b8e37ab; the F08-BE6 delivery in c70527a. The BE6 checkpoint is uncommitted (documents only).
+* **Commits:** the D1 rework, its closure and the D2 activation are in 489606d — its tracked `app/` diff from 5798c70 hashes to QA's `88f1dca3…` and the two changed sources match QA's SHA-1s (re-verified at the D2 checkpoint); the F03-UI-D2 handoff is in 6352a75; the F03-FE-D2 delivery is in 67d9ecb (`app/` tree `f5641d2f…`, QA's evidence-reuse fingerprint); the F03-QA-D2 verdict is in f28aedb; the reconciliation in 3cd4a3b; the F03-FE-D2R rework in 77c33b9 (`app/` tree `5298c81a…`, the re-QA fingerprint); the F03-QA-D2R verdict in 5677471. The D2 closure and the D3 activation are in 171f0c1; the PO revision in 230ce0c; its resync in 9a36147; the F05-UI-D3 handoff in 981b807; the visual-gate checkpoint in 7c1a946; the F05-FE-D3 delivery in af5aec8 (`app/` `b4ad263e…`, the D3 QA fingerprint); the implementation checkpoint in 078c926; the F05-QA-D3 verdict in e46f384. The D3 closure is in b7493d6. The F08 activation is in 1d373d7; the F08-FE13 / LOCAL-EVIDENCE delivery in beb7bfe (`app/` `9de12e6a…`); the FE13 checkpoint in b8e37ab; the F08-BE6 delivery in c70527a; the BE6 checkpoint in 84430c9; the F08-QA-FUNCTIONAL verdict in d882211. The QA checkpoint (A9) is uncommitted (documents only).
 * **F08 unreadable-DB gap (found 2026-09-29):** fixed in F08-FE13 (beb7bfe) and accepted at the checkpoint; the runtime and automated evidence awaits independent QA (F08.UNREADABLE-DB). The Retry reconnect is delivered too. The one-frame Retry feedback (N2) stays a follow-up.
 * **Migration partial-apply (found by F08-FE13, 2026-09-29):** Drift does not wrap `onUpgrade` in a transaction, so a failing step could leave a partial apply. It is fixed and accepted (F08 A6 ruling 1). The first real schema step must add its own real-file migration test.
 * **Emulator suite (F08-BE6):** was 30 / 31 because of a contract-invalid fixture, not a handler defect; fixed in c70527a and accepted — 31 / 31 on Java 21 (first on `PATH`; setup-manifest).
+* **Firestore rules bypass (F1, found by F08-QA-FUNCTIONAL 2026-09-29):** the rules let any signed-in client write its own `dailyResults` entry directly (no validation) and under any bucket name. Nothing is deployed, so there is no live exposure. Ruled at A9 (no client access); the fix is F08-BE7, and it must be closed before any deploy.
 * **CI never executed (CI-EMULATOR-JAVA21, found 2026-09-29):** the GitHub Actions API reports 0 runs, and `origin/main` is still the bootstrap commit. Every CI job in `ci.yml` is CI-wired only. The emulator step needs Java 21 before its first run. Owner: DevOps/Release Engineer; non-blocking for F08 functional QA.
 
 ## Contract Version

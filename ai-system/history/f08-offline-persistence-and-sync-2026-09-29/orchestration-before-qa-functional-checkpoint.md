@@ -6,15 +6,15 @@ F08
 
 ## Current Status
 
-Rework
+In QA
 
 ## Current Owner
 
-Backend Developer
+Tech Lead
 
 ## Next Role
 
-Backend Developer
+Tech Lead
 
 ## Active Task Ledger
 
@@ -22,14 +22,12 @@ Backend Developer
 - [x] Task ID: F08-LOCAL-EVIDENCE | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: On the F08-FE13 build, capture the local evidence of architecture Activation A4 — resume fidelity incl. restart / thaw / tamper; exactly-once and lifecycle against the Firebase emulator; the emulator rules / callable suite; storage-full; the unreadable-DB runtime; the production-shaped cold boot; offline Journey only on a real no-network runtime. No deploy; no product-semantics change. Brief: Current Brief | Depends On: F08-FE13
 - [x] Task ID: F08-BE6 | Assigned Role: Backend Developer | Status: Done | Summary: Fix the contract-invalid fixture in `infra/functions/test/submitDailyResult.test.ts` "ALREADY_SUBMITTED on a repeat" (`moves` 8 < `optimalMoves` 9), keep its first-run-authoritative assertions, prove them with a named negative run, and re-run the emulator suite green on Java 21 (architecture Activation A6 ruling 6). Test code only. Brief: Current Brief | Depends On: -
 - [x] Task ID: F08-QA-FUNCTIONAL | Assigned Role: QA | Status: Done | Summary: DONE 2026-09-29 — verdict **Decision Pending** (qa.md § F08-QA-FUNCTIONAL; functional, end-to-end, HEAD 84430c9, `app/` 9de12e6a…). All in-scope journeys and misuse checks PASS; F1 (rules allow a direct client create that bypasses callable validation — authority conflict in the locked Firebase Sync Surface) needs a Tech Lead decision; F08.OFFLINE-JOURNEY (AC2) PENDING. Evidence: qa/functional/ | Depends On: F08-LOCAL-EVIDENCE, F08-BE6
-- [ ] Task ID: F08-BE7 | Assigned Role: Backend Developer | Status: Open | Summary: QA finding F1 (architecture A9 ruling 1): `infra/firestore.rules` denies all client access to `dailyResults/**` (only the callable writes, Admin SDK); `rules.test.ts` flips "create own entry" to denied and adds the invalid-payload and non-date-bucket direct creates; named negative N-DIRECT-CREATE; emulator suite green on Java 21; `infra/README.md` rules row. Rules + test + docs only. Brief: Current Brief | Depends On: -
-- [ ] Task ID: F08-QA-FUNCTIONAL-R1 | Assigned Role: QA | Status: Queued | Summary: Functional re-run after F08-BE7 under the plan locked in architecture A9 ruling 4 — emulator suite + N-OVERWRITE + the BE7 negative, the QA rules probe P1–P6 (P3 / P6 now denied), one client ↔ emulator exactly-once case under the new rules, AC2 if the user has run it; other functional evidence reused by fingerprint | Depends On: F08-BE7
-- [ ] Task ID: F08-DEVOPS | Assigned Role: DevOps/Release Engineer | Status: Blocked | Summary: Resume release readiness only after explicit billing/target approval; retain runbook and remaining smoke; the existing CI emulator step (F08-BE5) must run on Java 21 and show a real green run (CI-EMULATOR-JAVA21; architecture A8 ruling 3); update the rules rollback check to "a direct client create is denied; the callable creates" (A9 ruling 6) | Depends On: F08-QA-FUNCTIONAL-R1
+- [ ] Task ID: F08-DEVOPS | Assigned Role: DevOps/Release Engineer | Status: Blocked | Summary: Resume release readiness only after explicit billing/target approval; retain runbook and remaining smoke; the existing CI emulator step (F08-BE5) must run on Java 21 and show a real green run (CI-EMULATOR-JAVA21; architecture A8 ruling 3) | Depends On: F08-QA-FUNCTIONAL
 - [ ] Task ID: F08-QA-FINAL | Assigned Role: QA | Status: Queued | Summary: Final acceptance of reviewed release proof and any affected functional scope | Depends On: F08-DEVOPS
 
 ## Open Tasks
 
-* F08-BE7 — Backend Developer (Open): the Firestore rules deny every client access to `dailyResults/**`; tests + named negative (Current Brief).
+* None open for a delivery role — F08-QA-FUNCTIONAL returned Decision Pending (qa.md); the Tech Lead resolves F1 and routes.
 
 ## Handoff Plan
 
@@ -37,7 +35,7 @@ None
 
 ## Delivery Review
 
-Pending
+Accepted
 
 ## QA Scope
 
@@ -53,7 +51,7 @@ full
 
 ## Evidence Reuse
 
-allowed
+invalidated
 
 ## QA Stage
 
@@ -90,20 +88,19 @@ None
 ## Pending Evidence
 
 - Evidence ID: F08.EMULATOR
-  * Scenario: Rules/callable create-only, auth isolation and idempotency scenarios; every direct client write to `dailyResults/**` denied, incl. own entry, invalid payload and a non-date bucket (A9)
+  * Scenario: Rules/callable create-only, auth isolation and idempotency scenarios
   * Required Class: repeatable integration
   * Target / Environment: Isolated Firebase emulator project or an identifiable existing CI emulator run
   * Owner Role: QA
   * Prerequisite / External Decision: JDK/emulator tooling — **present 2026-09-29** (OpenJDK 21 keg-only, first on `PATH`; firebase-tools 15.29; the command in setup-manifest.md, project `demo-looplet`); client ↔ emulator runs use the F08-FE13 debug wiring (delivered). No Blaze upgrade/real deploy required
-  * Re-evaluation Trigger: F08-BE7 delivery (rules + rules test changed); F08-QA-FUNCTIONAL-R1
+  * Re-evaluation Trigger: Evidence captured or existing evidence reviewed against the current scope
   * Blocks: F08 functional acceptance
-  * Result: PENDING
+  * Result: PASS
   * Delivery Evidence: 2026-09-29 (LE-03, LE-04): suite 30/31 — one backend test sends an invalid payload (frontend.md F08-FE13 §16.1); client ↔ emulator cases A–E. Tooling: firebase-tools 15.29 needs JDK 21 (installed, not linked).
   * Tech Lead 2026-09-29 (A6 ruling 6): the red test is a fixture defect (handler correct) → F08-BE6; the suite must be green before QA. Canonical command with Java 21: setup-manifest.md → Canonical Verification Commands.
   * Delivery Evidence (F08-BE6, 2026-09-29, HEAD b8e37ab + the fixed test): suite **31 / 31**, exit 0 (`evidence/runtime/BE6-02-fixed-suite.log.txt`); N-OVERWRITE caught (`BE6-04-neg.log.txt`). Java 21 must be on PATH, not only `JAVA_HOME` (backend.md F08-BE6 §14.1). QA review pending.
   * Tech Lead 2026-09-29 (A8): BE6 accepted; Tech Lead re-run at c70527a 31 / 31, exit 0 (not a QA claim); setup-manifest command corrected. The CI emulator step has never run (CI-EMULATOR-JAVA21) — not a source for this record.
   * QA 2026-09-29 (F08-QA-FUNCTIONAL): suite 31 / 31 exit 0 (QB-03), N-OVERWRITE caught (QB-04), client ↔ emulator cases A–E + invalid payload → parked (QE-*); create-only, auth isolation and idempotency PASS. Separate finding F1 (direct client create bypasses validation) — qa.md §3.
-  * Tech Lead 2026-09-29 (A9 ruling 3): **Result reset to PENDING.** F1 is resolved by denying all client access to `dailyResults/**`; F08-BE7 changes `firestore.rules` and `rules.test.ts`, so the rules part of this PASS is at old rules. The callable / idempotency part stays valid while the handler `bcda2662…` and `validate.ts` `8f0398ea…` are unchanged. QA re-runs the suite, the negatives and its rules probe (P3 / P6 must be DENIED) at the BE7 revision in F08-QA-FUNCTIONAL-R1.
 
 - Evidence ID: F08.LOCAL-RESUME
   * Scenario: Kill/relaunch exact restore, undo/restart/thaw state and untrusted cached thaw re-derivation
@@ -198,31 +195,37 @@ None
 
 ## Blockers
 
-None
+* F1 (qa.md § F08-QA-FUNCTIONAL §3) — authority conflict: the locked Rules row allows a direct client create, while the same section calls the document server-written and rejects direct writes. Needs a Tech Lead decision before the backend fix and a QA re-run.
 
 ## Next Action
 
-Run Backend Developer — F08-BE7 (Current Brief): deny all client access to `dailyResults/**` in `infra/firestore.rules`, update `rules.test.ts`, run the named negative N-DIRECT-CREATE and the emulator suite on Java 21, record `backend.md` → F08-BE7. Then Run Tech Lead (checkpoint before F08-QA-FUNCTIONAL-R1). Optional at any time: the user's no-network run for AC2 (`evidence/offline-journey.sh <udid>`).
+Run Tech Lead — reconcile F08-QA-FUNCTIONAL (Decision Pending): decide F1 (Firestore rules vs the server-written / direct-write-rejected contract; qa.md § F08-QA-FUNCTIONAL §3), route the fix, and keep F08.OFFLINE-JOURNEY PENDING for the user's no-network run.
 
 ## Last Decision
 
-2026-09-29 — Tech Lead checkpoint on the F08-QA-FUNCTIONAL verdict (QA, commit d882211; Decision Pending). Full record: architecture → Activation 2026-09-29 → A9.
+2026-09-29 — Tech Lead checkpoint on F08-BE6 (commit c70527a). Full record: architecture → Activation 2026-09-29 → A8.
 
-* **Reviewed:** `qa.md` § F08-QA-FUNCTIONAL and `qa/functional/`; the SHA-1s QA tested are still the working tree's.
-* **Stage result:** every in-scope journey and misuse check PASS except F1; F08.OFFLINE-JOURNEY (AC2) PENDING.
-* **F1 resolved — Technical Decision:** clients get **no access** to `dailyResults/**`; only the callable writes (Admin SDK, which the rules do not apply to). The locked Rules row had kept a client `allow create` that the section's own decision had rejected; the decision wins. Corrected in architecture (Rules, Reconciliation → Server, Validation Responsibility, QA Focus → Rules) and `platform.md` §6 / §8. Rejected alternative: field and bucket checks in the rules. No product criterion changes; the app is untouched.
-* **Opened:** F08-BE7 (Backend Developer). **Queued:** F08-QA-FUNCTIONAL-R1 under the plan in A9 ruling 4 (full depth; evidence reuse allowed by fingerprint; the rules scope re-run).
-* **Evidence:** F08.EMULATOR back to PENDING (rules part invalidated). Other PASS records kept.
-* **Notes:** N1 conforms, no change; N2 → follow-up F08-EVIDENCE-PROXY-ERRORS (Frontend/Mobile Developer, non-blocking); N3 / N4 as A8.
-* **Release:** unchanged scope; the F08-DEVOPS rollback check is updated when it resumes (A9 ruling 6). No deploy.
+* **Accepted:** F08-BE6.
+  * The second call is now a valid "better" replay (`moves: 10`, `stars: 3`), so the test reaches the idempotency branch it names.
+  * The assertions are stronger, and N-OVERWRITE is caught.
+  * Only test code changed; the handler, validator and rules fingerprints are unchanged since 8479ddb.
+* **Tech Lead re-run:** the emulator suite at c70527a — 31 / 31, exit 0. This is not a QA claim.
+* **Corrected:**
+  * the setup-manifest command: Java 21 must also be first on `PATH`;
+  * the premise of A6 ruling 5: the CI emulator step exists since F08-BE5, but CI has never run (0 GitHub Actions runs). It needs Java 21 → follow-up CI-EMULATOR-JAVA21 (DevOps/Release Engineer). It does not block functional QA.
+* **Notes, no change:**
+  * `firestore.rules` has no `!exists` — equivalent, because `create` fires only on a missing document;
+  * the Jest teardown warning.
+* **Delivery Review: Accepted** (FE13, LOCAL-EVIDENCE, BE6).
+* **Activated:** F08-QA-FUNCTIONAL under A7; QA Result reset to None.
 
-The pre-checkpoint orchestration is archived as history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-qa-functional-checkpoint.md.
+The pre-checkpoint orchestration is archived as history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-be6-checkpoint.md.
 
 ## Last Update
 
-* Updated By: Tech Lead
+* Updated By: QA
 * Timestamp: 2026-09-29
-* Summary: Checkpoint on F08-QA-FUNCTIONAL (Decision Pending). F1 resolved (A9): no client access to `dailyResults/**`. Status Rework; F08-BE7 Open; F08-QA-FUNCTIONAL-R1 Queued; F08.EMULATOR PENDING; Delivery Review Pending; owner → Backend Developer.
+* Summary: F08-QA-FUNCTIONAL Done — verdict Decision Pending (F1 authority conflict on the Firestore rules); every other in-scope scenario PASS; F08.OFFLINE-JOURNEY PENDING; owner → Tech Lead.
 
 ## Context & Follow-ups
 
@@ -259,11 +262,6 @@ F08 implementation/runbook and the F08-FE12 fix are retained. Exact old tasks an
   * **Activated:** F08-QA-FUNCTIONAL (A7).
   * **Next:** owner → QA.
 * 2026-09-29 — QA: F08-QA-FUNCTIONAL Done — **Decision Pending** (qa.md). PASS: F08.EMULATOR, LOCAL-RESUME, LIFECYCLE, COLD-BOOT-REVIEW, UNREADABLE-DB; PENDING: OFFLINE-JOURNEY. F1: the rules allow a direct client create that bypasses validation (authority conflict). Owner → Tech Lead.
-* 2026-09-29 — Tech Lead: checkpoint on the F08-QA-FUNCTIONAL verdict (A9).
-  * **Decided:** F1 — no client access to `dailyResults/**`; architecture + `platform.md` corrected.
-  * **Opened:** F08-BE7; **Queued:** F08-QA-FUNCTIONAL-R1 (plan A9 ruling 4).
-  * **Reset:** F08.EMULATOR → PENDING; Delivery Review → Pending; Status → Rework.
-  * **Next:** owner → Backend Developer.
 
 
 ## Release Constraints
@@ -271,37 +269,73 @@ F08 implementation/runbook and the F08-FE12 fix are retained. Exact old tasks an
 The 2026-09-06 user decision to defer billing/deploy is preserved. In Progress now reflects still-available validation work, not renewed deploy permission. F08-DEVOPS remains Blocked. Environment/JDK/device availability has not been freshly probed; use current evidence, not the old environment assumptions.
 ## Current Brief
 
-**F08-BE7 — no client access to `dailyResults/**`** (QA finding F1; ruling: architecture → Activation 2026-09-29 → A9 ruling 1; the corrected "Firebase Sync Surface → Rules" row)
+**F08-QA-FUNCTIONAL — the functional-stage verdict** (plan: architecture → Activation 2026-09-29 → A7, corrected by A8; stage functional; modules core, backend-security, client-ui, stateful-flow; regression depth full; evidence reuse invalidated)
 
-**Why:** QA's rules probe showed that any signed-in client can create its own `dailyResults/{bucket}/entries/{uid}` directly, skipping the callable's validation (P3: `moves 1 < optimalMoves 9`, `stars 9`, an extra field → allowed), and under any bucket name (P6: `zz_not-a-date-123` → allowed). The callable writes through the Admin SDK, which rules do not apply to, and the app never writes Firestore directly. So the client rule is only a bypass.
+**What is under test:**
+* the app at `app/` tree `9de12e6a…` (beb7bfe; unchanged since);
+* `infra/functions` at c70527a — the test `cf73770d…`, the handler `bcda2662…`, `validate.ts` `8f0398ea…`, `firestore.rules` `b75628e6…`.
 
-**Starting point** (check it; say so if it differs):
-* `infra/firestore.rules` `b75628e6…`;
-* `infra/functions/test/rules.test.ts` `9d4db0bb…`;
-* the handler `bcda2662…`, `validate.ts` `8f0398ea…`, `submitDailyResult.test.ts` `cf73770d…` — these must **not** change.
+Record the tree / SHA-1s you actually test. If they differ, say so; do not assume these.
 
-**Scope:**
-1. `infra/firestore.rules` — `dailyResults/{bucket}/entries/{uid}`: no client create, update, delete or read. Keep an explicit match block with a comment saying that only `submitDailyResultV1` writes, through the Admin SDK, and that create-only / first-writer-wins lives in the callable's transaction. Keep the default-deny block. Rewrite the header comment, which now says the signed-in user may create.
-2. `infra/functions/test/rules.test.ts`:
-   * "lets a signed-in user create their own entry" becomes a denial (`assertFails`) of that same valid document;
-   * add a denied direct create of the user's own entry with an invalid payload (the P3 shape);
-   * add a denied direct create in a non-date bucket (the P6 shape);
-   * keep create-other, unauthenticated, update, delete and read denied;
-   * update the file comment ("create-only") to match.
-3. **Named negative N-DIRECT-CREATE:** put the old rule (`allow create: if request.auth != null && request.auth.uid == uid;`) back temporarily and run the rules suite. The own-entry, invalid-payload and bucket tests must fail. Restore the file byte for byte and check the SHA-1s. Keep the script and log under `evidence/` next to `neg-be6.py`.
-4. The full emulator suite with the setup-manifest command (`JAVA_HOME=/opt/homebrew/opt/openjdk@21 PATH=/opt/homebrew/opt/openjdk@21/bin:$PATH npm run test:emulator`) must be green. The callable tests must still pass unchanged: that shows the server path still writes under the new rules. Also run `npm run build` and `npm test`.
-5. `infra/README.md` — the `firestore.rules` row now says "`dailyResults/**`: no client access; only the callable writes (Admin SDK); default-deny elsewhere".
+**Inputs:**
+* `prd.md` — AC1–AC10 (AC3 is F07, AC10 is automated-only: A7 known limits);
+* `architecture.md` — the locked sections, A1–A4, A6–A8;
+* the delivery claims in `frontend.md` (F08-FE13, F08-LOCAL-EVIDENCE) and `backend.md` (F08-BE6), and `evidence/README.md`.
+
+Delivery evidence is input, not proof. Re-run what the plan requires.
+
+**Scope** — the A7 plan, in full:
+1. The eight critical journeys.
+2. The misuse / negative checks:
+   * the named negatives N-CLASS, N-LOOP, N-RETRY, N-TXN, N-FULL, N-GATE and the backend N-OVERWRITE (`evidence/neg-be6.py`);
+   * rules: create-other, update, delete and read are denied;
+   * callable: an invalid payload → `INVALID_PAYLOAD` → the client parks the item;
+   * the release binary contains no emulator / debug-route strings.
+3. Every Pending Evidence record in scope:
+   * F08.EMULATOR;
+   * F08.LOCAL-RESUME;
+   * F08.LIFECYCLE;
+   * F08.OFFLINE-JOURNEY;
+   * F08.COLD-BOOT-REVIEW;
+   * F08.UNREADABLE-DB.
+
+   F08.STORAGE is already PASS; re-check it under full regression. F08.DEPLOY-SMOKE is release-stage, not this stage.
+
+**Methods:**
+* the iPhone 16 simulator (iOS 18.6), debug builds;
+* the emulator suite with the setup-manifest command: `JAVA_HOME=/opt/homebrew/opt/openjdk@21 PATH=/opt/homebrew/opt/openjdk@21/bin:$PATH npm run test:emulator` — `JAVA_HOME` alone fails;
+* `xcrun simctl keychain <udid> reset` before a client ↔ emulator run (A6 ruling 8);
+* "offline" for exactly-once means the functions proxy / emulator is down; say so. It is not the AC2 offline Journey.
+
+**Known limits — not findings:**
+* AC3 Offline Daily and the Remote Config kill-switch wiring are F07 (A6 ruling 4).
+* AC10 clock is automated-only.
+* The profile / release store-error capture is FIRST-APP-DISTRIBUTION.
+* The CI emulator step has never run (CI-EMULATOR-JAVA21). A local emulator run satisfies F08.EMULATOR.
+* The Jest "worker process has failed to exit gracefully" line is a harness note (A8 ruling 4), unless it hides a failure.
+
+Root causes in delivery artifacts are hypotheses. Report any finding the evidence supports, even one that contradicts a delivery or Tech Lead claim.
 
 **Non-goals:**
-* no change to the handler, the validator, the callable tests, the app or CI (CI-EMULATOR-JAVA21 stays with DevOps/Release Engineer);
-* no deploy, no rules dry-run against the real project, no billing or Remote Config change;
-* no edit to the feature `release.md` (the rollback check is updated by DevOps/Release Engineer at F08-DEVOPS, A9 ruling 6).
+* no product or test code changes;
+* no real Firebase write beyond the existing production-shaped anonymous sign-in;
+* no deploy, billing or Remote Config change;
+* no system-setting change (the offline Journey is the user's run).
 
-**Output:** `backend.md` → "F08-BE7": what changed and why; the SHA-1s before and after; the suite counts and exit codes with the time and revision; the N-DIRECT-CREATE result; the unchanged handler / validator / callable-test SHA-1s. Evidence per `prompt-evidence-integrity-standard.md`. Set Delivery Review Pending and hand back to the Tech Lead (no Handoff Plan: the checkpoint before QA is mandatory).
+**Output:** append "F08-QA-FUNCTIONAL" to `qa.md` (do not rewrite the 2026-09-06 report). It needs:
+* the evidence record per `prompt-evidence-integrity-standard.md` (command, target, revision, counts, exit code, time);
+* a result per Pending Evidence record — QA owns PASS / FAIL;
+* the misuse results.
+
+**Verdict:**
+* Functional Approved — only if every in-scope record is PASS;
+* Runtime Validation Pending — if only F08.OFFLINE-JOURNEY (AC2) is missing its no-network run;
+* Rejected — with findings.
+
+Then `Run Tech Lead`.
 
 ## Earlier briefs
 
-* The F08-QA-FUNCTIONAL brief (2026-09-29) — in history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-qa-functional-checkpoint.md.
 * The F08-BE6 brief (2026-09-29) — in history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-be6-checkpoint.md.
 * The F08-FE13 → F08-LOCAL-EVIDENCE brief (2026-09-29) — in history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-fe13-checkpoint.md.
 * The 2026-09-18 migration brief and older F08 briefs — in history/core-sync-2026-09-18/features/f08-offline-persistence-and-sync/orchestration.md and history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-activation.md.
