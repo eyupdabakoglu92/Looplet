@@ -232,7 +232,7 @@
 * **[OPEN — F07 release gate, Tech Lead + DevOps]** the production pack host and its plan / billing needs.
 * **[OPEN — Product Owner, optional]** AC7's Share wording (prd Open Questions (1)).
 * ~~F07.DIRECTION-SELECT~~ — RESOLVED 2026-09-29: Direction A (A2).
-* **[OPEN — decision gate, later]** F07.DAILY-POOL-SIGNOFF — the user signs off the pool; opened when F07-CONTENT delivers.
+* **[OPEN — decision gate, `release`]** F07.DAILY-POOL-SIGNOFF — the user signs off the pool; opened at the F07-CONTENT checkpoint (A4).
 
 ---
 
@@ -371,3 +371,58 @@
 * **F07-CONTENT → Open** (Content Designer, Current Brief). Its dependency, F07-TOOL, is Done and accepted.
 * **F07-FE stays Queued.** It is activated at the F07-CONTENT checkpoint, where the Tech Lead also opens the sign-off gate F07.DAILY-POOL-SIGNOFF. The user's review of the pool can then run while F07-FE builds.
 * The contract is otherwise unchanged.
+
+---
+
+## A4. F07-CONTENT checkpoint (Tech Lead, 2026-09-29)
+
+**Reconciliation of F07-CONTENT** (`content-design.md`; commit 9af777f):
+
+* **Task coverage:** all four Current Brief items are delivered.
+  1. 60 pool puzzles, `content/daily/tr/pool/daily-tr-2026-11-01.json` … `2026-12-30.json`, written by `export` (`contentVersion 2026-11-01.1`).
+  2. 60 definitions at `tools/looplet_authoring/drafts/daily/tr/_defs/` (outside `content/`, A3 ruling 1).
+  3. `content/daily/tr/daily_manifest_tr.json` — the locked shape, 60 contiguous assignments.
+  4. `content-design.md` — the per-day table, the editorial targets, the commands and exit codes, the AI-drafted / not-playtested status, the known gaps.
+* **Scope:** the commit touches only `content/daily/tr/`, the defs and the two F07 documents. No code, no tool, no app, no F08, no `content/journey/` change.
+* **Contract compliance:** D2 (2) and (6); A3 rulings 1 (served-as-is), 3 (no definition repeats), 5 (the provisional calendar, #1 … #60); AC3 (5×5, 5-letter targets, columns on). The pool is `type: daily`, `lang tr` throughout.
+* **Evidence read and re-run by the Tech Lead** (on 9af777f, clean tree):
+  * `melos run content:check` → exit 0, 110 s (the delivery's 110 s; CI jobs set no `timeout-minutes`, so the +75 s is not a risk).
+  * `pack-daily ../../content/daily/tr` → exit 0, `60 days 2026-11-01 … 2026-12-30, #1 … #60`; **54,106 bytes, sha256 `fb33384d…db31` — byte-identical to the delivery's pack**. Written to the scratchpad, not the repo.
+  * **Independent negatives** on 5-day scratch copies (11-01 … 11-05), with an unmodified baseline → `check: OK`, exit 0:
+    * a stale stored optimum (11-05: 5 → 4) → `stored optimalMoves 4 != fresh solve 5`, exit 1;
+    * 11-05 carrying 11-01's definition → `duplicate puzzle definition` and `[noRepeat] … within 30 days`, exit 1;
+    * 11-03 with `dailyDate` 11-04 → `check` `[puzzleDate]`, exit 1; `pack-daily` `[puzzleDate]`, `nothing written`, no output directory.
+  * **The per-day table recomputed from the artifacts** (a read-only script): 60 / 60 rows match (date, `#N`, id, target, class, locked / frozen counts, `optimalMoves`, label, score). Every def matches its artifact (grid, target, locked, frozen). Every locked cell holds its target letter at its column.
+  * **Editorial numbers confirmed:** 34 × opt 4, 26 × opt 5; 58 medium, 2 hard, 0 expert; columns on 60 / 60; 0 failing 7-day windows; the longest same-class run is 1; 30 distinct targets, each used exactly twice, 30 days apart; all 30 are eligible (with Turkish casing) and all 30 are Journey targets. Because 30 days is a weekday shift of 2, a word's two days always have different classes.
+  * The 54 / 54 tool-test claim was not re-run: no code changed (scope above).
+* **Tech Lead finding — frozen tiles that can never thaw.** A sound necessary-condition test: a frozen row can thaw only if some dictionary word of 4–5 letters fits a row window with the frozen letters at their fixed columns, **and** the other letters exist among the grid's non-frozen tiles. Failing it proves "never"; passing it does not prove a thaw is reachable.
+  * **Daily:** 18 of the 26 days with frozen tiles can never thaw — 11-01, 11-04, 11-07, 11-08, 11-11, 11-14, 11-15, 11-21, 11-28, 11-29, 12-02, 12-05, 12-06, 12-09, 12-12, 12-16, 12-19, 12-27. On these days the frozen tile is a permanent pivot, like a locked tile.
+  * **Journey correction:** L22 (no `A` in its grid) and L24 fail the same test, as well as the recorded L26, L27, L28 and L30. FROZEN-ROW-THAW-CONTENT said L21–L25 could thaw; it checked the frozen letter only. Recorded there; the Journey stays Done (the win never requires a thaw).
+  * **Not a gate failure:** no product criterion or contract rule requires a frozen tile to be thawable, and every stored optimum is solver-proven with the frozen tiles in place.
+* **Delivery Review: Accepted.** The delivery is complete and its evidence holds. Acceptance of the pool as product content is the user's sign-off (below).
+
+**Rulings on `content-design.md` §6:**
+
+1. **Target words (§6 item 2) — Technical ruling: 30 words, each used twice, accepted for the MVP pool, subject to the sign-off.**
+   * "60 distinct targets, none a Journey target" was an editorial target in the Tech Lead's brief, not a product criterion. It is **withdrawn as infeasible** under the current corpus: `isEligibleTarget` accepts only the 30 Journey targets.
+   * The product rule (product PRD F06: the pool must not duplicate Journey puzzles or repeat within a rolling window) is about puzzles. It holds and is gate-enforced: all 60 definitions are distinct from each other, from the Journey and from the smoke set.
+   * The fix is a larger target list, F01-PRODUCTION-CORPUS. Days 31–60 can be re-authored from their defs, but **only before the first publish** (A3 ruling 5: published days never change).
+2. **Locked and frozen tiles before the Journey teaches them (§6 item 3) — Hybrid, decided as an Assumption.**
+   * The Daily ships all four mechanic classes from #1. The product sets no mechanic restriction on the Daily, and the Journey itself introduces locked (L16) and frozen (L21) tiles with no hint; only columns have a micro-tutorial (F05 §9).
+   * The user's playtest tests this assumption. If the tiles confuse, the route is a Product Owner revision — for example, a first-encounter hint for locked / frozen tiles, which would also serve Journey L16 / L21 — not a content workaround. Any day is someone's first Daily, so re-ordering the pool does not solve it.
+3. **Frozen thaw (Tech Lead finding above).** Consistent with the shipped Journey (6 of its 10 frozen levels cannot thaw either). Part of the sign-off; the root cause is the provisional 103-word dictionary (F01-PRODUCTION-CORPUS).
+   * **Coupling recorded:** a thaw depends on the app's bundled dictionary, and a thaw can shorten the optimal path. The optimum of any content with frozen tiles is therefore proven only for the dictionary it was solved with. `content:check` re-solves every artifact, so CI catches a changed optimum before a publish. After the first Daily publish, though, a dictionary change in the app changes play on already published days. **Any dictionary asset change requires a Tech Lead impact check on the published Daily days and the Journey** (recorded in F01-PRODUCTION-CORPUS).
+4. **Difficulty (§6 item 5):** medium / hard, never expert — met. No scorer re-tune in F07 (CONTENT-TOOLING-TUNING stays open).
+5. **Frozen placement (§6 item 4)** and **the calendar (§6 item 6):** unchanged (A3 ruling 5).
+6. **A playtest path — amends D2 (7) and D4 for debug builds only.** The pool is dated 2026-11-01 … 12-30, and the dev pack generator shifts only the dev fixture, so today nobody can play a pool day in the app.
+   * F07-FE adds **`--dart-define=LOOPLET_DAILY_TODAY=YYYY-MM-DD`**: in a **debug** build it fixes the Daily's "today" for the whole process — the D3 triggers, the population window and eviction, the D4 start date and rollover, and the D6 displayed streak. Profile and release builds ignore it (a named negative test). Journey, durations and `completedAtUtcMs` are unaffected.
+   * The D2 (7) pack override may point at the `pack-daily` output of the real pool. Prefer a host file path (`file://`) that the simulator can read, so that no App Transport Security change is needed. If only a plain `http://localhost` server works, report it before adding any ATS exception; none may reach release builds.
+   * F07-FE documents the exact playtest recipe in `frontend.md` (build the pack, the two defines, the run command).
+   * F07.FIRST-RUN-SYNC and the sync evidence use the real date, never the override.
+
+**Decision gate F07.DAILY-POOL-SIGNOFF — opened** (orchestration → Open Decision Gates).
+
+* **Blocking Scope `release`:** the sign-off is the precondition for publishing the pool. It blocks F07-DEVOPS, F07-QA-FINAL and Done, not F07-FE or functional QA (role-execution-contract §5.3; the A3 routing planned the review to run while F07-FE builds).
+* A rework choice (options B / C) or a Product Owner revision (D) changes the pool, and so invalidates the content part of any functional QA evidence taken before it. The Tech Lead re-plans QA at that intake.
+
+**Routing:** **F07-FE → Open** (Frontend/Mobile Developer, the orchestration Current Brief). F07-CONTENT is Done and accepted. The contract is otherwise unchanged.
