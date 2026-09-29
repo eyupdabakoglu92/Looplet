@@ -15,3 +15,9 @@
 * **`orchestration-before-be7-checkpoint.md`** — the F08 orchestration right before the Tech Lead BE7 checkpoint of 2026-09-29, byte for byte (SHA-1 `5e6e7504…`).
   * State: Rework; owner Tech Lead; F08-BE7 Done (the Backend Developer, commit cb96719); Delivery Review Pending; F08-QA-FUNCTIONAL-R1 Queued; F08.EMULATOR and F08.OFFLINE-JOURNEY PENDING; the F08-BE7 Current Brief.
   * Taken right before the checkpoint (F08 `architecture.md` → Activation 2026-09-29 → A10), which activated F08-QA-FUNCTIONAL-R1.
+* **`orchestration-before-qa-r1-checkpoint.md`** — the F08 orchestration right before the Tech Lead checkpoint on the F08-QA-FUNCTIONAL-R1 verdict of 2026-09-29, byte for byte (SHA-1 `751190f7…`).
+  * State: In QA; owner Tech Lead; F08-QA-FUNCTIONAL-R1 Done with **Runtime Validation Pending** (QA, uncommitted at the checkpoint); F1 closed; F08.EMULATOR PASS; F08.OFFLINE-JOURNEY PENDING; the F08-QA-FUNCTIONAL-R1 Current Brief.
+  * Taken right before the checkpoint (F08 `architecture.md` → Activation 2026-09-29 → A11), which set F08 Blocked on the user's no-network run.
+* **`orchestration-before-offline-run-intake.md`** — the F08 orchestration right before the Tech Lead intake of the user's no-network run on 2026-09-29, byte for byte (SHA-1 `da2b1880…`).
+  * State: Blocked; owner Tech Lead; F08-QA-FUNCTIONAL-R2 Blocked on the user's run; F08.OFFLINE-JOURNEY PENDING; the A11 Current Brief with the user's steps.
+  * Taken right before the intake (F08 `architecture.md` → Activation 2026-09-29 → A12), which activated F08-QA-FUNCTIONAL-R2.

@@ -10,11 +10,11 @@ In QA
 
 ## Current Owner
 
-QA
+Tech Lead
 
 ## Next Role
 
-QA
+Tech Lead
 
 ## Active Task Ledger
 
@@ -24,13 +24,12 @@ QA
 - [x] Task ID: F08-QA-FUNCTIONAL | Assigned Role: QA | Status: Done | Summary: DONE 2026-09-29 — verdict **Decision Pending** (qa.md § F08-QA-FUNCTIONAL; functional, end-to-end, HEAD 84430c9, `app/` 9de12e6a…). All in-scope journeys and misuse checks PASS; F1 (rules allow a direct client create that bypasses callable validation — authority conflict in the locked Firebase Sync Surface) needs a Tech Lead decision; F08.OFFLINE-JOURNEY (AC2) PENDING. Evidence: qa/functional/ | Depends On: F08-LOCAL-EVIDENCE, F08-BE6
 - [x] Task ID: F08-BE7 | Assigned Role: Backend Developer | Status: Done | Summary: DONE 2026-09-29 (backend.md § F08-BE7): rules `aa4c5dc2…`, rules test `2c7df84a…`; emulator suite 33 / 33; N-DIRECT-CREATE caught (3 / 3 expected fails). QA finding F1 (architecture A9 ruling 1): `infra/firestore.rules` denies all client access to `dailyResults/**` (only the callable writes, Admin SDK); `rules.test.ts` flips "create own entry" to denied and adds the invalid-payload and non-date-bucket direct creates; named negative N-DIRECT-CREATE; emulator suite green on Java 21; `infra/README.md` rules row. Rules + test + docs only. Brief: Current Brief | Depends On: -
 - [x] Task ID: F08-QA-FUNCTIONAL-R1 | Assigned Role: QA | Status: Done | Summary: DONE 2026-09-29 — verdict **Runtime Validation Pending** (qa.md § F08-QA-FUNCTIONAL-R1; HEAD 695f783, rules `aa4c5dc2…`, `app/` 9de12e6a…). F1 closed: QA probe P3 / P6 DENIED, emulator suite 33 / 33, N-OVERWRITE + N-DIRECT-CREATE caught, client ↔ emulator exactly-once PASS under the new rules; F08.OFFLINE-JOURNEY (AC2) PENDING. Evidence: qa/functional-r1/. Plan: Functional re-run after F08-BE7 under the plan locked in architecture A9 ruling 4 — emulator suite + N-OVERWRITE + the BE7 negative, the QA rules probe P1–P6 (P3 / P6 now denied), one client ↔ emulator exactly-once case under the new rules, AC2 if the user has run it; other functional evidence reused by fingerprint | Depends On: F08-BE7
-- [ ] Task ID: F08-QA-FUNCTIONAL-R2 | Assigned Role: QA | Status: Open | Summary: Targeted functional re-run for F08.OFFLINE-JOURNEY (AC2 / J8) only, on the user's real no-network run of 2026-09-29 14:07:49–14:09:45Z (`evidence/runtime/offline/`), under the plan of architecture A11 ruling 4 as corrected at A12 ruling 4 (core, backend-security, client-ui, stateful-flow; targeted; reuse allowed by the R1 fingerprints). Activated at the intake A12. Brief: Current Brief | Depends On: F08-QA-FUNCTIONAL-R1
-- [ ] Task ID: F08-DEVOPS | Assigned Role: DevOps/Release Engineer | Status: Blocked | Summary: Resume release readiness only after explicit billing/target approval; retain runbook and remaining smoke; the existing CI emulator step (F08-BE5) must run on Java 21 and show a real green run (CI-EMULATOR-JAVA21; architecture A8 ruling 3); update the rules rollback check to "a direct client create is denied; the callable creates" (A9 ruling 6) | Depends On: F08-QA-FUNCTIONAL-R2
+- [ ] Task ID: F08-DEVOPS | Assigned Role: DevOps/Release Engineer | Status: Blocked | Summary: Resume release readiness only after explicit billing/target approval; retain runbook and remaining smoke; the existing CI emulator step (F08-BE5) must run on Java 21 and show a real green run (CI-EMULATOR-JAVA21; architecture A8 ruling 3); update the rules rollback check to "a direct client create is denied; the callable creates" (A9 ruling 6) | Depends On: F08-QA-FUNCTIONAL-R1
 - [ ] Task ID: F08-QA-FINAL | Assigned Role: QA | Status: Queued | Summary: Final acceptance of reviewed release proof and any affected functional scope | Depends On: F08-DEVOPS
 
 ## Open Tasks
 
-* F08-QA-FUNCTIONAL-R2 — QA (Open): judge AC2 / J8 on the user's no-network run (Current Brief). F08-DEVOPS stays Blocked on F08.DEPLOY-AUTHORIZATION.
+* None open for a delivery role — F08-QA-FUNCTIONAL-R1 returned Runtime Validation Pending (qa.md); only F08.OFFLINE-JOURNEY (AC2) waits for the user's no-network run.
 
 ## Handoff Plan
 
@@ -50,7 +49,7 @@ core, backend-security, client-ui, stateful-flow
 
 ## Regression Depth
 
-targeted
+full
 
 ## Evidence Reuse
 
@@ -62,7 +61,7 @@ functional
 
 ## QA Result
 
-None
+Runtime Validation Pending
 
 ## Release Scope
 
@@ -137,16 +136,13 @@ None
   * Required Class: runtime
   * Target / Environment: Local device/simulator
   * Owner Role: QA
-  * Prerequisite / External Decision: a real no-network runtime (the user turns the Mac's network off or runs a developer-provided script; or a physical device in airplane mode) — Claude may not change system settings; not replaced by simulated offline (architecture Activation A4). The simulator needs a debug build without the emulator define first (Current Brief, step 1)
+  * Prerequisite / External Decision: a real no-network runtime (the user turns the Mac's network off or runs a developer-provided script; or a physical device in airplane mode) — Claude may not change system settings; not replaced by simulated offline (architecture Activation A4)
   * Re-evaluation Trigger: Evidence captured or existing evidence reviewed against the current scope
   * Blocks: F08/F05 functional acceptance
   * Result: PENDING
   * Delivery Evidence: Not run 2026-09-29: user runtime needed; `evidence/offline-journey.sh` prepared for the user.
   * QA 2026-09-29: not run — needs the user's no-network run (`evidence/offline-journey.sh`); simulated offline does not replace it.
   * QA 2026-09-29 (F08-QA-FUNCTIONAL-R1): still not run — no `evidence/runtime/offline/` output. The simulator currently has the emulator-define debug build; install a define-less debug build before the run.
-  * Tech Lead 2026-09-29 (A11 ruling 4): the only open functional scenario; F08 Blocked on it. Re-evaluated by F08-QA-FUNCTIONAL-R2 once the user's run output exists.
-  * User run 2026-09-29 14:07:49–14:09:45Z (`evidence/runtime/offline/01…06`): Wi-Fi off and the host offline at the start and at the offline relaunch. Before: level 1 unlocked, none completed. Played offline: `journey-tr-01` (best 3 moves, 2★) and `journey-tr-02` (2 moves, 3★); after: highest unlocked 3, completed 1,2. Offline relaunch → Home "YOLCULUK · 2 / 30", Seviye 3. Input for QA, not a PASS.
-  * Tech Lead 2026-09-29 (intake A12): the output is complete and is a valid offline run. Build check: the installed app = the build of 14:05:34Z, its `DART_DEFINES` carry no emulator define, and the store's `firebase_uid` is set (the emulators were down). F08-QA-FUNCTIONAL-R2 activated.
 
 - Evidence ID: F08.STORAGE
   * Scenario: AC7 storage-full/disk-write-failure remains non-destructive and keeps last-good state
@@ -209,24 +205,26 @@ None
 
 ## Next Action
 
-Run QA — F08-QA-FUNCTIONAL-R2 (Current Brief; plan architecture → A11 ruling 4, corrected and activated at A12). Then the Tech Lead checkpoint on the verdict.
+Run Tech Lead — reconcile F08-QA-FUNCTIONAL-R1 (Runtime Validation Pending; qa.md § F08-QA-FUNCTIONAL-R1): F1 closed, F08.EMULATOR PASS; only F08.OFFLINE-JOURNEY (AC2) is PENDING on the user's no-network run (`evidence/offline-journey.sh <udid>`). Non-blocking note N1-R1 (first backoff ≈ 60 s vs "base 30 s").
 
 ## Last Decision
 
-2026-09-29 — Tech Lead intake of the user's no-network run (`Incident:` — a status report, not a defect). Full record: architecture → Activation 2026-09-29 → A12.
+2026-09-29 — Tech Lead checkpoint on F08-BE7 (commit cb96719). Full record: architecture → Activation 2026-09-29 → A10.
 
-* **Classified:** Insufficient Evidence (no defect; the report completes A11's prerequisite). **Workflow Impact:** Continue Current Flow.
-* **Checked:** all six outputs present; offline confirmed at the start and at the relaunch; a define-less build installed; fingerprints of A11 hold (`app/` `9de12e6a…`, rules / handler / validator / callable test unchanged).
-* **Deviations noted for QA:** the Wi-Fi was also switched off by hand before the script; two levels were played, not one.
-* **Activated:** F08-QA-FUNCTIONAL-R2 under A11 ruling 4, corrected: `backend-security` added (the scope is end-to-end; the QA preflight requires it), its evidence reused from R1 by fingerprint. QA Result None; Blockers None.
+* **Accepted:** F08-BE7. `firestore.rules` `aa4c5dc2…` denies every client access to `dailyResults/**`; `rules.test.ts` `2c7df84a…` denies the own-entry, invalid-payload (P3) and non-date-bucket (P6) direct creates.
+* **Tech Lead re-run** at cb96719 (not a QA claim): emulator suite 33 / 33, exit 0; N-DIRECT-CREATE — exactly the three new tests fail with the old rule back.
+* **Unchanged:** handler `bcda2662…`, `validate.ts` `8f0398ea…`, `submitDailyResult.test.ts` `cf73770d…`, `app/` `9de12e6a…` — the A9 reuse fingerprints hold.
+* **Delivery Review: Accepted** (FE13, LOCAL-EVIDENCE, BE6, BE7).
+* **Activated:** F08-QA-FUNCTIONAL-R1 under A9 ruling 4; QA preflight PASS; QA Result reset to None.
+* F1 stays open until QA's own probe shows P3 / P6 denied.
 
-The pre-intake orchestration is archived as history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-offline-run-intake.md.
+The pre-checkpoint orchestration is archived as history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-be7-checkpoint.md.
 
 ## Last Update
 
-* Updated By: Tech Lead
+* Updated By: QA
 * Timestamp: 2026-09-29
-* Summary: intake of the user's no-network run (A12) — valid offline run; F08-QA-FUNCTIONAL-R2 activated (functional, end-to-end; core, backend-security, client-ui, stateful-flow; targeted; reuse allowed); owner → QA.
+* Summary: F08-QA-FUNCTIONAL-R1 Done — verdict Runtime Validation Pending; F1 closed (P3 / P6 DENIED); F08.EMULATOR PASS; F08.OFFLINE-JOURNEY PENDING; owner → Tech Lead.
 
 ## Context & Follow-ups
 
@@ -239,8 +237,6 @@ F08 implementation/runbook and the F08-FE12 fix are retained. Exact old tasks an
 * [Portfolio follow-ups](../../workflow-follow-ups.md) and [migration record](../../history/core-sync-2026-09-18/README.md).
 * Canonical execution: role-execution-contract.md; historical next-command text does not authorize execution.
 * [Orchestration before the activation of 2026-09-29](../../history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-activation.md).
-* [Orchestration before the QA R1 checkpoint](../../history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-qa-r1-checkpoint.md) — incl. the F08-QA-FUNCTIONAL-R1 brief.
-* [Orchestration before the offline-run intake](../../history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-offline-run-intake.md) — incl. the user's run steps (A11).
 
 ## Change Log
 
@@ -277,57 +273,56 @@ F08 implementation/runbook and the F08-FE12 fix are retained. Exact old tasks an
   * **Activated:** F08-QA-FUNCTIONAL-R1 (A9 ruling 4).
   * **Next:** owner → QA.
 * 2026-09-29 — QA: F08-QA-FUNCTIONAL-R1 Done — **Runtime Validation Pending** (qa.md). F1 closed (rules probe P3 / P6 DENIED; suite 33 / 33; both negatives caught; client ↔ emulator exactly-once under the new rules). F08.EMULATOR → PASS; F08.OFFLINE-JOURNEY PENDING. Other functional evidence reused by fingerprint. Owner → Tech Lead.
-* 2026-09-29 — Tech Lead: checkpoint on the F08-QA-FUNCTIONAL-R1 verdict (A11).
-  * **Closed:** F1; F08.EMULATOR PASS.
-  * **Clarified:** the Backoff line (N1-R1; no code change).
-  * **Added:** F08-QA-FUNCTIONAL-R2 (Blocked on the user's no-network run); F08-DEVOPS now depends on it.
-  * **Next:** Status → Blocked; owner Tech Lead; the user runs AC2.
-* 2026-09-29 — Tech Lead: intake of the user's no-network run (A12).
-  * **Checked:** a valid offline run (outputs 01–06; define-less build).
-  * **Activated:** F08-QA-FUNCTIONAL-R2; Status → In QA.
-  * **Next:** owner → QA.
+
 
 ## Release Constraints
 
 The 2026-09-06 user decision to defer billing/deploy is preserved. In Progress now reflects still-available validation work, not renewed deploy permission. F08-DEVOPS remains Blocked. Environment/JDK/device availability has not been freshly probed; use current evidence, not the old environment assumptions.
 ## Current Brief
 
-**F08-QA-FUNCTIONAL-R2 — AC2 / J8 on the user's no-network run** (plan: architecture → A11 ruling 4, corrected and activated at A12; stage functional; scope end-to-end; modules core, backend-security, client-ui, stateful-flow; regression depth targeted; evidence reuse allowed by the R1 fingerprints)
+**F08-QA-FUNCTIONAL-R1 — the functional re-run after F08-BE7** (plan: architecture → Activation 2026-09-29 → A9 ruling 4, activated at A10; stage functional; scope end-to-end; modules core, backend-security, client-ui, stateful-flow; regression depth full; evidence reuse allowed by fingerprint)
 
-**`backend-security`** is selected because the scope is end-to-end (A12 ruling 4). The backend is unchanged since R1. Reuse R1's backend evidence — QB-R1-01…07, QE-R1-00 and QE-R1-A — by fingerprint for the module's build/test prerequisite and its compliance tables. Re-run it only if a backend fingerprint differs.
+**What is under test:**
+* `infra/` at cb96719 — `firestore.rules` `aa4c5dc2…`, `rules.test.ts` `2c7df84a…`; unchanged: the handler `bcda2662…`, `validate.ts` `8f0398ea…`, `submitDailyResult.test.ts` `cf73770d…`;
+* the app at `app/` tree `9de12e6a…` (unchanged since beb7bfe).
 
-**What is under test:** F08.OFFLINE-JOURNEY — the Journey plays and persists with no network, and a cold relaunch while still offline shows the progress. Nothing else changed since R1: `app/` tree `9de12e6a…`; rules `aa4c5dc2…`, handler `bcda2662…`, `validate.ts` `8f0398ea…`, callable test `cf73770d…`. Record what you actually test. If any differs, say so and re-run what depends on it.
+Record the SHA-1s / tree you actually test. If any differs from these, say so and re-run what depends on it instead of reusing.
 
-**Input — the user's run, 2026-09-29 14:07:49–14:09:45Z** (`evidence/runtime/offline/`; the user's evidence, not a QA PASS):
-* `01-offline-check.txt` — Wi-Fi `en0` off; `curl` failed ("offline confirmed");
-* `02-store-before.txt` — highest unlocked 1, nothing completed;
-* `03-result.png` — the result of `journey-tr-02` (2 moves, 3★);
-* `04-store-after.txt` — highest unlocked 3, completed 1,2; bests `journey-tr-01` 3 / 2★, `journey-tr-02` 2 / 3★;
-* `05-relaunch-offline-home.png` — after an offline kill + cold relaunch: Home "YOLCULUK · 2 / 30", Seviye 3;
-* `06-still-offline.txt` — still offline at the relaunch.
-* The simulator's live store is still there (read-only access is fine): `sync_queue` empty, the guest created just before the run.
+**Why:** your F08-QA-FUNCTIONAL verdict (Decision Pending) found F1 — a signed-in client could create its own `dailyResults` entry directly, skipping the callable's validation, and under any bucket name. The Tech Lead ruled that clients get no access to `dailyResults/**` (A9 ruling 1); F08-BE7 implemented it and was accepted (A10). Your earlier F08-QA-FUNCTIONAL results stay valid where their fingerprints are unchanged.
 
-**Deviations from the steps (the user's report):** the Wi-Fi was switched off by hand before the script (the script then confirmed offline itself); two levels were played instead of one; the app was not quit by hand (the script terminates it before its offline launch). Judge whether any of this affects validity.
+**Inputs:**
+* `qa.md` § F08-QA-FUNCTIONAL (your previous verdict and evidence in `qa/functional/`);
+* `architecture.md` — the corrected Rules / Reconciliation / Validation / QA Focus rows, A9, A10;
+* `backend.md` → F08-BE7 and `evidence/README.md` → F08-BE7. Delivery evidence is input, not proof.
 
-**Judge against:** PRD AC2 and architecture "QA Focus → Offline Journey" (airplane mode → all 30 levels load, a level completes, progress + best persist, relaunch still offline → intact).
-* "All 30 levels load": only two were played. Decide from the evidence whether the bundled-content path covers it — for example the Journey content source, the existing tests, or a read of the level assets. A decision the evidence cannot support is a pending item, not a PASS.
-* Claude cannot turn the network off. If you need another no-network run, name exactly what it must capture. That makes the verdict Runtime Validation Pending.
+**Scope — run yourself:**
+1. The emulator suite with the setup-manifest command (`JAVA_HOME=/opt/homebrew/opt/openjdk@21 PATH=/opt/homebrew/opt/openjdk@21/bin:$PATH npm run test:emulator`).
+2. The negatives N-OVERWRITE (`evidence/neg-be6.py`) and N-DIRECT-CREATE (`evidence/neg-be7.py`). Both scripts rewrite the delivery logs `runtime/BE6-04-neg.log.txt` / `runtime/BE7-04-neg.log.txt`; keep your own copy under `qa/` and restore the delivery logs from git.
+3. Your own rules probe P1–P6 (`qa/functional/qa-probe-rules.test.ts`) against the new rules. **P3 and P6 must be DENIED**; P1, P2, P4, P5 stay denied. This is the check that closes F1.
+4. One client ↔ emulator exactly-once case (QE-A shape: functions proxy `down` → pending, then `pass` → exactly one doc), with the new rules loaded in the emulator. It shows that the callable still writes and the app still syncs.
+5. F08.OFFLINE-JOURNEY (AC2 / J8) — only if the user has run `evidence/offline-journey.sh` by then. Otherwise it stays PENDING with that prerequisite.
 
-**Non-goals:** no product, test or rules changes; no network or system-setting change; no deploy.
+**Evidence reuse (allowed):** the other F08-QA-FUNCTIONAL results (QJ1, QJ2, QJ4, QJ7, QE-B…E / M, QL1, QL2, QR, QA-01…05, QB-01…02) may be reused if the app tree and the three unchanged backend SHA-1s still match. State each reuse and its fingerprint.
 
-**Output:** append "F08-QA-FUNCTIONAL-R2" to `qa.md`; update the F08.OFFLINE-JOURNEY record.
+**Pending Evidence to record:** F08.EMULATOR (PENDING → your result) and F08.OFFLINE-JOURNEY. The PASS records F08.LOCAL-RESUME, F08.LIFECYCLE, F08.STORAGE, F08.COLD-BOOT-REVIEW and F08.UNREADABLE-DB stay PASS unless your fingerprint check invalidates them. F08.DEPLOY-SMOKE is release-stage.
+
+**Known limits — not findings:** AC3 and the Remote Config kill-switch wiring are F07; AC10 is automated-only; the profile / release store-error capture is FIRST-APP-DISTRIBUTION; the CI emulator step has never run (CI-EMULATOR-JAVA21); the Jest teardown line (A8 ruling 4); the delivered `evidence/fn-proxy.py` error path (F08-EVIDENCE-PROXY-ERRORS) — use your corrected `qa-fn-proxy.py`.
+
+Report any finding the evidence supports, even one that contradicts a delivery or Tech Lead claim.
+
+**Non-goals:** no product, test or rules changes; no real Firebase write beyond the existing production-shaped anonymous sign-in; no deploy, billing or Remote Config change; no system-setting change.
+
+**Output:** append "F08-QA-FUNCTIONAL-R1" to `qa.md` (do not rewrite earlier sections): the evidence record per `prompt-evidence-integrity-standard.md`, the reuse list with fingerprints, the F1 re-check, a result per Pending Evidence record.
 
 **Verdict:**
-* Functional Approved — only if AC2 passes and every in-scope record is PASS;
-* Runtime Validation Pending — if the run does not suffice and another user run is needed;
+* Functional Approved — only if every in-scope record is PASS (incl. AC2);
+* Runtime Validation Pending — if only F08.OFFLINE-JOURNEY (AC2) is missing its no-network run;
 * Rejected — with findings.
 
 Then `Run Tech Lead`.
 
 ## Earlier briefs
 
-* The user's no-network run steps (A11, 2026-09-29) — in history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-offline-run-intake.md.
-* The F08-QA-FUNCTIONAL-R1 brief (2026-09-29) — in history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-qa-r1-checkpoint.md.
 * The F08-BE7 brief (2026-09-29) — in history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-be7-checkpoint.md.
 * The F08-QA-FUNCTIONAL brief (2026-09-29) — in history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-qa-functional-checkpoint.md.
 * The F08-BE6 brief (2026-09-29) — in history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-be6-checkpoint.md.

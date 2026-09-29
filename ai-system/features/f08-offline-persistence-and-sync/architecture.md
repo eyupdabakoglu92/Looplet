@@ -6,6 +6,8 @@
 > **Amended 2026-09-29 (Tech Lead — the F08-BE6 checkpoint):** "Activation 2026-09-29 → A8" added — F08-BE6 accepted; the Java 21 command corrected (Java 21 must be first on `PATH`); A6 ruling 5's premise about the CI emulator job corrected (the step exists since F08-BE5 and has never run); F08-QA-FUNCTIONAL activated under A7. No semantic change to the locked sections.
 > **Amended 2026-09-29 (Tech Lead — the checkpoint on the F08-QA-FUNCTIONAL verdict, Decision Pending):** "Activation 2026-09-29 → A9" added, and the locked **Rules** row corrected: clients may not write `dailyResults/**` at all; only the callable writes, through the Admin SDK (QA finding F1). The same correction is made in "Reconciliation Algorithm → Server", "Validation Responsibility" and "QA Focus → Rules", and in `platform.md` §6 / §8. This resolves a conflict inside the locked Firebase Sync Surface section in favour of its own decision (callable; a direct client write was rejected). No product criterion changes.
 > **Amended 2026-09-29 (Tech Lead — the F08-BE7 checkpoint):** "Activation 2026-09-29 → A10" added — F08-BE7 accepted (the rules now match the corrected Rules row); F08-QA-FUNCTIONAL-R1 activated under A9 ruling 4. No semantic change to the locked sections.
+> **Amended 2026-09-29 (Tech Lead — the checkpoint on the F08-QA-FUNCTIONAL-R1 verdict, Runtime Validation Pending):** "Activation 2026-09-29 → A11" added — F1 closed; F08 Blocked only on the user's no-network run (AC2). The `sync_queue` **Backoff** line is clarified to the delivered schedule (first retry ≈ 60 s; QA note N1-R1). No product criterion changes.
+> **Amended 2026-09-29 (Tech Lead — intake of the user's no-network run):** "Activation 2026-09-29 → A12" added — the run is valid; F08-QA-FUNCTIONAL-R2 activated under A11 ruling 4. No contract change.
 > `orchestration.md` is execution authority; `platform.md` / `release.md` are project authority.
 
 ---
@@ -120,7 +122,7 @@ Stored at `kv['active_session'].valueJson`. **Key names are frozen** — F03 ser
 * **`idempotencyKey = "{firebaseUid}|{lang}|{dailyDate}"`.** Until `firebaseUid` exists the item sits in the `awaitingAuth` sub-state (a `pending` item whose key cannot yet be formed); it is **not** sent. Drained once Auth completes.
 * **States:** `pending` → `inFlight` → `synced` (terminal success) · `pending`/`inFlight` → `pending` (retry, backoff) · `pending` → `parked` (terminal: attempt cap hit, or a non-retryable error).
 * **`drain()`** (session-level, see Ownership): process `pending` items oldest-first where `now >= nextAttemptAtUtcMs`; mark `inFlight` → call `submitDailyResultV1` → on **ack** (`CREATED` **or** `ALREADY_SUBMITTED`) mark `synced` **and** set `daily_entry.syncStatus = synced` **in the same transaction** → on a retryable error bump `attemptCount`, set `nextAttemptAtUtcMs` via backoff, back to `pending` → on `attemptCount >= 10` or a non-retryable error mark `parked` (+ `daily_entry.syncStatus = parked`).
-* **Backoff:** exponential, base 30 s, factor 2, cap 6 h, ±20 % jitter. **Attempt cap:** 10 → `parked`.
+* **Backoff:** exponential, base 30 s, factor 2, cap 6 h, ±20 % jitter: after the n-th failed attempt the next attempt is due in `30 s × 2^n` (first retry ≈ 60 s, then 120 s, 240 s …), capped at 6 h, then ±20 % jitter, never above 6 h. **Attempt cap:** 10 → `parked`. *[Clarified 2026-09-29, A11 ruling 3: the first-retry delay was not stated; this is the delivered and tested schedule.]*
 * **Stale-`inFlight` sweep:** an item `inFlight` for longer than 2× the client timeout (i.e. > 20 s) is returned to `pending` on the next drain — the idempotency key + server create-only make the retry safe.
 * **Parked-item retry [LOCKED]:** bounded auto-retry — on each app start, `parked` items are moved back to `pending` once, up to `postParkAttemptCount < 3` lifetime; after that they stay `parked` (diagnostic only). The **local result is always authoritative** regardless of queue state.
 * **Exactly-once mechanism (end-to-end):** client idempotency key + server **create-only** Firestore write + `ALREADY_SUBMITTED` treated as a client **success**. A second delivery of the same key is a server no-op returning `ALREADY_SUBMITTED`.
@@ -608,3 +610,61 @@ The backend handler and rules fingerprints above are the ones A7's reuse clause 
 3. **F08-QA-FUNCTIONAL-R1 — activated** under A9 ruling 4, unchanged. Evidence reuse is allowed because the four fingerprints A9 names are unchanged at cb96719 (checked above).
 
 **Delivery Review: Accepted** for F08-FE13, F08-LOCAL-EVIDENCE, F08-BE6 and F08-BE7.
+
+### A11. QA checkpoint 2026-09-29 (F08-QA-FUNCTIONAL-R1 — verdict Runtime Validation Pending)
+
+**Verdict reviewed:** `qa.md` → "F08-QA-FUNCTIONAL-R1" (§0–§7) and `qa/functional-r1/`. QA tested HEAD 695f783. The Tech Lead checked that the fingerprints QA records are still the working tree's: `firestore.rules` `aa4c5dc2…`, `rules.test.ts` `2c7df84a…`, the handler `bcda2662…`, `validate.ts` `8f0398ea…`, `submitDailyResult.test.ts` `cf73770d…`, `app/` tree `9de12e6a…`. `infra/` and `app/` have no uncommitted change.
+
+**Evidence checked (logs read, not re-run):**
+* the emulator suite 33 / 33, exit 0 (`QB-R1-03`);
+* QA's own rules probe 8 / 8 — P3 and P6 are now `assertFails`, and each also checks that no document was written (`QB-R1-06`);
+* the same probe against the old rules `b75628e6…` fails exactly P3 and P6 (`QB-R1-07`). So the probe detects F1; it is not a probe that passes under any rules;
+* a direct REST create against the running emulator returns 403 twice and writes nothing (`QE-R1-00`). So the emulator in the client run had the new rules loaded;
+* the client ↔ emulator case: `down` → one `pending` item and 0 documents; `pass` → `CREATED`, one document, queue and entry `synced`; two requests in total (`QE-R1-cases.txt`, `QE-R1-proxy.log`).
+* The reuse list is sound. Since 84430c9 only `infra/firestore.rules`, `rules.test.ts` and `infra/README.md` changed outside `ai-system/`. The app, packages, tools and both lockfiles are identical, and the app never writes Firestore directly (A9).
+
+**Rulings:**
+1. **F1 — closed.** The fix is in code (A10), and QA's own probe now shows P3 and P6 denied. The condition "F1 must be closed before any deploy" (A9 ruling 6) is met.
+2. **F08.EMULATOR — PASS**, accepted as QA recorded it. The other PASS records stay PASS by fingerprint.
+3. **N1-R1 (the first retry comes after ≈ 60 s, not 30 s) — Technical Decision: the delivered schedule is the contract.** The PRD marks the backoff schedule `[Technical]`. The locked line gave the base and the factor but not the first delay. The code uses `30 s × 2^attemptCount`, counted after each failure. It keeps the cap, the jitter, the attempt cap and exactly-once unchanged. A 30 s first retry would give no player-visible benefit; drains also run on connectivity regain, pause/resume and app start. The Backoff line is clarified; no code or test change. A test that pins the first delay is optional (the next time `sync_test.dart` is touched).
+4. **F08.OFFLINE-JOURNEY (AC2) is the only open functional scenario.** It needs a real no-network runtime (A4). Only the user can provide it: the script turns the Mac's Wi-Fi off, and Claude does not change system settings. No delivery role has executable work on it. So F08 becomes **Blocked**. The blocking scope is the environment prerequisite, not a defect. Owner and next role: Tech Lead.
+   * **F08-QA-FUNCTIONAL-R2** (QA, targeted, reuse allowed) is added **Blocked** on the user's run. After the run, the Tech Lead checks that the output exists and the fingerprints are unchanged, then activates it. Its plan (locked now): stage functional; scope end-to-end; modules `core`, `client-ui`, `stateful-flow` (no backend change since R1); regression depth `targeted` — only AC2 / J8 are new, and nothing else changed; evidence reuse `allowed` by the R1 fingerprints.
+   * **Preparing the run is part of the user's instructions** (orchestration → Current Brief). The simulator must first get a debug build **without** the emulator define: uninstall, reset the simulator keychain, install, and launch once while online, so that a store exists before the script starts.
+5. **Release:** unchanged. F08-DEVOPS stays Blocked on F08.DEPLOY-AUTHORIZATION. Its A9 ruling 6 item (the rollback check "a direct client create is denied; the callable creates") and CI-EMULATOR-JAVA21 still apply when it resumes.
+6. **Non-blocking notes carried:** N1 (no timer), N3 (Jest teardown line), N4 (CI-EMULATOR-JAVA21), F08-EVIDENCE-PROXY-ERRORS — as A9 ruling 5.
+
+**Delivery Review:** Accepted (unchanged; no delivery since A10).
+
+### A12. Intake 2026-09-29 — the user's no-network run (F08.OFFLINE-JOURNEY)
+
+**Input:** `Run Tech Lead. Incident:` — the user's step-by-step report and console output of `evidence/offline-journey.sh`. It reports no defect: it completes A11 ruling 4's prerequisite.
+* **Classified Scope:** Insufficient Evidence — a false alarm as an incident; a status report.
+* **Workflow Impact:** Continue Current Flow.
+
+**Tech Lead checks:**
+* **Outputs:** all six files are present in `evidence/runtime/offline/`.
+  * Offline at the start (14:07:49Z) and at the offline relaunch (14:09:45Z).
+  * Store before: level 1 unlocked, nothing completed. Store after: levels 1 and 2 completed, 3 unlocked, two bests.
+  * Screenshots: the result of level 2, and Home "2 / 30" after the offline relaunch.
+* **Build:**
+  * The installed `Runner.app` has the same timestamp (14:05:34Z) as the last build.
+  * That build's `DART_DEFINES` (`app/ios/Flutter/Generated.xcconfig`) carry no `LOOPLET_FIREBASE_EMULATOR`.
+  * The store's `firebase_uid` is set, and the emulators were down, so the online launch signed in to the configured project.
+  * So the run used the production-shaped path.
+* **Fingerprints of A11 hold:** `app/` `9de12e6a…`, rules `aa4c5dc2…`, handler `bcda2662…`, `validate.ts` `8f0398ea…`, callable test `cf73770d…`; `app/` and `infra/` are clean. HEAD 4cb836a — the F08-QA-FUNCTIONAL-R1 verdict, committed by the user.
+* **Deviations from the steps:**
+  * the Wi-Fi was switched off by hand before the script;
+  * two levels were played instead of one;
+  * the app was not quit by hand; the script terminates it before its offline launch.
+  * None of these obviously invalidates the run; QA judges.
+
+**Rulings:**
+1. **The run is valid input for AC2.** It is the user's evidence, not a PASS; QA judges it.
+2. **F08-QA-FUNCTIONAL-R2 is activated** under A11 ruling 4, corrected by ruling 4 below: functional; end-to-end; `core`, `backend-security`, `client-ui`, `stateful-flow`; `targeted`; reuse `allowed`. QA Result → None; Blockers → None.
+3. **"All 30 levels load"** (QA Focus → Offline Journey) is QA's call from the evidence. If QA needs another no-network run, it names exactly what the run must capture, and the verdict is Runtime Validation Pending.
+4. **Correction to A11 ruling 4 — `backend-security` added.**
+   * The QA preflight failed on the A11 plan: an end-to-end scope requires `backend-security`. The core QA prompt also calls a plan invalid when the scope and the required modules disagree.
+   * Narrowing the scope to the client is rejected. R2's verdict closes the whole functional stage, which is end-to-end.
+   * The backend is unchanged since R1: the rules, handler, validator and callable test fingerprints are the same. So the module's build/test prerequisite and its compliance tables are met by reusing R1's backend evidence by fingerprint (QB-R1-01…07, QE-R1-00, QE-R1-A). QA re-runs it only if a backend fingerprint differs.
+   * Depth stays `targeted`.
+
