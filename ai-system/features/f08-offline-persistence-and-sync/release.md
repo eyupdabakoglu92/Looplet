@@ -1,134 +1,128 @@
 # F08 — offline-persistence-and-sync: Release Readiness
 
-> Task: `F08-DEVOPS` · Role: DevOps/Release Engineer · Date: 2026-09-06
-> Authority: `project-authority/release.md` (§2 F08 = `production-readiness`), `architecture.md` (LOCKED — Firebase Sync Surface, App Init Sequence, Release/Deployment Impact), `qa.md` (verdict `Runtime Validation Pending` + §17 pending scenarios), `orchestration.md` (Active Task Ledger → F08-DEVOPS).
+> Task: `F08-DEVOPS-PREP` · Role: DevOps/Release Engineer · Date: 2026-09-29
+> Authority: project `release.md` (§2 F08 = `production-readiness`, §4 CI, §9 rollback, §10 pinning, §12 approval); `setup-manifest.md`; F08 `architecture.md` A9 ruling 6, A13 ruling 2, A14, A15, A16; `qa.md` § F08-QA-FUNCTIONAL-R1 / R2; `orchestration.md` → Current Brief.
+> Previous version (2026-09-06, task F08-DEVOPS): `history/f08-offline-persistence-and-sync-2026-09-29/release-before-devops-prep.md`.
 
 ---
 
 ## 1. Feature / Release Summary
 
-* **Release Scope:** `production-readiness` — the **first Firebase deploy** for LOOPLET. Surfaces: `submitDailyResultV1` (Cloud Function, 2nd gen), `firestore.rules` (create-only `dailyResults/**`), Remote Config (`daily_enabled` / `daily_sync_enabled` / `share_enabled` / `daily_manifest_url`). **Backend-only** gate — distinct from and earlier than the first app-build distribution gate (still ~F03/F05).
-* **Environment target:** `production` (the single MVP Firebase project `looplet-712e5`; there is no separate backend "staging" — `release.md` §3). Emulator (`demo-looplet`) is the pre-deploy validation surface.
-* **Purpose of this turn:** (A) release-readiness prep + dry-run evidence; (B) fold the `qa.md §17` runtime + emulator scenarios into the `release.md` §8 device smoke; (C) this verdict.
-* **Outcome:** **Release Validation Pending.** Config is substantially ready and every offline/build/compile gate is green, but the actual deploy is blocked on a **billing-plan upgrade (Spark → Blaze)** and requires **explicit Tech Lead approval** (`release.md` §12). No device/JDK here → the QA runtime + emulator scenarios remain to be executed against the CI job + a build. No blocking *code* defect (QA confirmed).
+* **Release scope:** `production-readiness`. F08 is LOOPLET's first Firebase deploy — `submitDailyResultV1` (2nd-gen callable), `firestore.rules`, the Remote Config template. It is a backend-only gate.
+* **Environment target:** `production` (`looplet-712e5`, the single MVP project). The emulator (`demo-looplet`) and CI are the pre-deploy validation surfaces.
+* **The deploy is deferred** (F08.DEPLOY-AUTHORIZATION — B, A16). This turn ran no deploy, no billing change, no Remote Config or console change, and no push.
+* **This turn:**
+  1. the CI repair for run #1 (`36590316947`) — Java 21, TD-FORMAT-SCOPE, TD-CI-TOOLCHAIN, the Node 24 / Ubuntu notices;
+  2. this `release.md` refreshed to the current contract;
+  3. public-repository hygiene recommendations;
+  4. the readiness verdict.
+* **Outcome: Release Validation Pending.** Every CI job's steps pass locally on the repaired config. What is still missing: the CI run itself (the user pushes), the user's F08.DEPLOY-GO, the deploy, and the post-deploy smoke.
 
 ---
 
 ## 2. Impacted Files
 
-**Updated (this turn):**
-
-| File | Change | Why |
+| File | Change | Brief item |
 | --- | --- | --- |
-| `infra/firebase.json` | added a `"remoteconfig": { "template": "remoteconfig.template.json" }` block | without it `firebase deploy --only remoteconfig` errors `No targets in firebase.json match`; the kill-switch template (`release.md` §6) was unreachable by the CLI. Dry-run now passes. |
-| `infra/README.md` | rewrote the "Not done yet" section → "Deploy runbook (F08-DEVOPS)" + recorded the Blaze-plan requirement and the live project state | the DURUM 0 note was stale (project now exists); the deploy prerequisites + commands belong in the repo next to the config. |
-| `ai-system/features/f08-offline-persistence-and-sync/release.md` | **new** — this artifact | `release.md` §11 requires a per-feature release artifact. |
-| `ai-system/features/f08-offline-persistence-and-sync/orchestration.md` | local fields only — `F08-DEVOPS` ledger item, `Blockers`, `Current Status`, `Current Owner`, `Next Role`, `Next Action`, `Change Log` | delivery-role local orchestration update (`prompt-delivery-footer-standard.md`). `feature-board.md` / `system-state.md` untouched (Tech Lead syncs those). |
+| `.github/workflows/ci.yml` | **`verify` + `ios-build`:** Flutter pinned to **3.32.8** through a workflow-level `FLUTTER_VERSION` (`flutter-version` input of the already-pinned `subosito/flutter-action`); a "Toolchain versions" step prints `flutter --version`. | 3 |
+| | **`ios-build`:** `macos-14` → **`macos-15`**; a "Select Xcode 16.4" step selects `/Applications/Xcode_16.4.app` and prints `xcodebuild -version`. It fails with a clear error if the image no longer ships 16.4. A "Disable Swift Package Manager" step (`flutter config --no-enable-swift-package-manager`) keeps CocoaPods, as locally. | 3 |
+| | **`infra`:** new step "Set up Java 21" — `actions/setup-java` (SHA-pinned, v6.0.1) with Temurin 21. It puts Java 21 first on `PATH` before the emulator step; the version step prints `node --version` and `java -version`. The stale "ubuntu ships a JDK" comments are corrected. | 1 |
+| | **All jobs:** `actions/checkout` v4.2.2 (node20) → **v7.0.1** (node24), SHA-pinned. `ubuntu-latest` → **`ubuntu-24.04`**, so the 2026-10-19 switch to Ubuntu 26 cannot change the image silently. | 4 |
+| `melos.yaml` | `format` → `dart format app packages tools`; `format:check` → `dart format --output=none --set-exit-if-changed app packages tools`. A comment gives the reason (TD-FORMAT-SCOPE). | 2 |
+| `ai-system/project-authority/setup-manifest.md` | The canonical `format` / `format:check` lines (Step 1 and Canonical Verification Commands), and the Global constraints toolchain line: "pending" → "implemented", with the concrete CI pins. | 2, 3 |
+| `infra/README.md` | Emulator section: Java 21 first on `PATH`, and CI's `setup-java`. It had said "ubuntu ships a JDK", which was wrong. Deploy prerequisites: the user's F08.DEPLOY-GO (A16) and a Node.js 20 runtime check (§10). Docs only. | 1, 5 |
+| `ai-system/features/f08-offline-persistence-and-sync/release.md` | This refresh. The old version is archived byte for byte (history README entry added). | 5, 6, 8 |
+| `ai-system/features/f08-offline-persistence-and-sync/evidence/devops-prep/` | **New:** the local gate logs DP-01…DP-13 and their README. | 7 |
+| `ai-system/features/f08-offline-persistence-and-sync/orchestration.md` | Local fields only (ledger, owner, next role / action, Release Result, Delivery Review, Pending Evidence, Change Log). | — |
 
-**Not changed (deliberately):**
-
-* `.github/workflows/ci.yml` — the `infra` job (functions build + offline test + emulator `emulators:exec --project demo-looplet`) is already correct and complete for a **gates-only** CI (`release.md` §3: "ci — PR validation, no deploy"). **No deploy job was added** — a production `firebase deploy` is approval-gated and must not run unattended, and adding a half-wired deploy workflow would be the stub-config the DevOps prompt forbids. The deploy path is documented as a runbook instead (§6).
-* `infra/firestore.rules`, `infra/firestore.indexes.json`, `infra/functions/**` — verified, no change needed (rules compile; functions build + offline tests green; `enforceAppCheck: false` confirmed in `index.ts`).
+**Unchanged on purpose:**
+* app / package / tool source; `infra/firestore.rules`; `infra/functions/**`; `remoteconfig.template.json`; `firebase.json`;
+* every existing file under `ai-system/` evidence and QA — the two unformatted QA probes stay byte-identical;
+* the project `release.md` (owner Tech Lead; see §3);
+* dependency versions — no Flutter / Firebase / npm upgrade.
 
 ---
 
 ## 3. Release Authority Reconciliation
 
-* **`release.md` §2** — F08 `production-readiness`, backend-only Firebase gate, `F08-DEVOPS` opens after QA. Honored. §12 — production deploy needs **explicit Tech Lead approval + a passing smoke test**; neither exists yet → this turn does **not** deploy.
-* **`release.md` §4** — CI gate list. The `infra` job covers `infra/functions` `npm ci && build && test` + the `@firebase/rules-unit-testing` + callable emulator suites (via `emulators:exec`). Present and correct. Deploy is explicitly **not** a CI gate (§3).
-* **`release.md` §6** — deploy command `firebase deploy --only functions,firestore:rules` + Remote Config kill-switches `daily_enabled` / `daily_sync_enabled` / `share_enabled`. All four keys are in `remoteconfig.template.json`; the `firebase.json` wiring gap is now fixed. Forward-only Drift migration + never-drop guard already in the app build (F08-FE2).
-* **`release.md` §7** — `FIREBASE_CI_TOKEN` (name only; **not configured** — deferred to this phase per the user). See §5; still `NOT CONFIGURED` — a repo-secret action the user owns, plus `firebase login:ci` tokens are now deprecated by Google (service-account auth is the forward path). Runbook in §6.
-* **`platform.md` §6/§13** — App Check **soft-enforce / monitor** for the whole MVP. `submitDailyResultV1` ships `enforceAppCheck: false`; the client activates the debug provider in dev and Play Integrity / App Attest in release, wrapped so failure is a logged no-op. **Nothing to enforce or hard-gate this turn.** Not changed.
-* **`qa.md` verdict `Runtime Validation Pending`** — no code rework; the six §17 pending scenarios are folded into §8 below (device/emulator smoke) as the runtime-closure checklist for this release gate. A DevOps/Release Engineer cannot override a QA verdict; this artifact carries the runtime work forward, it does not re-adjudicate it.
-* **Conflict:** none between authority docs. The one blocker (**Spark plan**) is an external project-state fact, not a doc conflict — escalated to Tech Lead / user in §10.
+* **TD-FORMAT-SCOPE (A15) vs project `release.md` §4.** §4 still lists the format gate as `dart format --set-exit-if-changed .`. The Tech Lead's later decision wins: the gate now runs over `app packages tools`. Only the §4 wording is stale. The project `release.md` belongs to the Tech Lead, so it is not edited here (§10, N-1).
+* **Project `release.md` §10 (SHA pinning):** met. The one new action (`actions/setup-java`) and the updated `actions/checkout` are pinned to commit SHAs. These are lightweight tags; `git ls-remote` shows the tag commit, and `action.yml` shows `runs.using: node24`.
+* **Project `release.md` §4 (build gates):** `flutter build appbundle --release` and `flutter build ios --release --no-codesign` stay in CI unchanged.
+  * The integration step stays best-effort (`continue-on-error`), as §4 says. A green `verify` job therefore does not prove the integration tests passed; its own step result has to be read.
+* **Project `release.md` §6 / §9 and the F08 rollback — the kill-switch does not exist in release builds yet.**
+  * `dailySyncEnabledProvider` (`app/lib/persistence/sync_providers.dart:42`) returns "on" in every non-debug build. The real Remote Config read is an F07 seam.
+  * The old plan's "client kill-switch first" is therefore not available for the F08 deploy.
+  * It is also not needed for F08. A release build has no daily-result producer: the only producer, `FakeDailyResultProducer`, is reachable only from the `kDebugMode` debug sync screen (`app_router.dart:49`). So a release build sends no traffic to the callable until F07 ships the Daily.
+  * The rollback in §7 is written to this state (N-2).
+* **`platform.md` §3 (Cloud Functions on Node.js 20) vs the calendar.** Node.js 20 reached upstream end-of-life on 2026-04-30, and `infra/functions/package.json` pins `engines.node: "20"`. Whether Google still accepts `nodejs20` deploys has to be checked against the Cloud Functions runtime schedule before the deploy. A runtime change is a platform decision, so it goes to the Tech Lead (§10, N-3). It does not affect CI: the tests run on the runner's Node (22 on `ubuntu-24.04`; locally 24).
+* **QA:** `Functional Approved` (F08-QA-FUNCTIONAL-R2, accepted at A13). Every functional evidence record is PASS. This turn changed no code, so no functional evidence is invalidated. CI config, `melos.yaml` scripts and docs are not inputs of any functional record.
 
 ---
 
 ## 4. CI/CD Pipeline Plan
 
-Only the `infra` job is in scope; it was delivered by F08-BE5 and is **unchanged** this turn — re-stated here as the release gate of record.
+Workflow `CI` (`.github/workflows/ci.yml`). Triggers: `pull_request` to `main` and `push` to `main`. `concurrency` cancels in-progress runs of the same ref. No job deploys.
 
-| Job | Trigger | Commands | Gate effect | Failure behavior |
-| --- | --- | --- | --- | --- |
-| `infra` | PR to `main` + push to `main` | `npm --prefix infra/functions ci` → `run build` (tsc) → `test` (offline: 18 tests) → `npx --yes firebase-tools@15 emulators:exec --only firestore,auth --project demo-looplet "npm --prefix functions run test"` (un-skips `rules.test.ts` + `submitDailyResult.test.ts` — 13 tests) | **Required** for any change touching `infra/**` (`release.md` §4). The emulator step is the `repeatable integration` evidence class `architecture.md → QA Focus` mandates. | Required-gate fail → release blocked (`release.md` §4). |
-
-* **No auth / no token needed** for this job — `--project demo-looplet` is a fully offline emulator project. `FIREBASE_CI_TOKEN` is **not** required for CI validation; it is only required by a (future, not-yet-existing) deploy workflow.
-* **Not executed this turn:** the emulator step needs a JDK; the dev machine has none (`java -version` → "Unable to locate a Java Runtime"). ubuntu-latest ships a JDK, so CI runs it. This is the same CI-only posture as `build:app` (Android) and the iOS release build. Confirming it green on the F08 branch is a `Run` of the GitHub Actions workflow — it could not be triggered from this environment (no `gh`, nothing pushed).
+| Job | Runner | Toolchain (pinned / printed) | Steps | Gate effect | Failure behaviour |
+| --- | --- | --- | --- | --- | --- |
+| `verify` — format · analyze · test | `ubuntu-24.04` | Flutter 3.32.8 (`flutter --version` printed); melos ^6; JDK = runner default (17) for Gradle | bootstrap → `format:check` (`app packages tools`) → `analyze` → `test` → integration (best-effort) → content check → `build:app` (AAB) | required (project `release.md` §4) | any required step fails → job red → release blocked. The integration step cannot fail the job. |
+| `infra` — functions build + test | `ubuntu-24.04` | Temurin **21** via `setup-java` (`java -version` printed); Node = runner (printed) | `npm ci` → `tsc` → offline tests → `emulators:exec` (firebase-tools@15, `demo-looplet`) running the rules + callable suites | required when `infra/` changes (§4); runs on every push | red → release blocked |
+| `ios-build` — iOS release build (no codesign) | `macos-15` | **Xcode 16.4** selected + printed; Flutter 3.32.8 printed; CocoaPods; SPM disabled | select Xcode → Flutter → bootstrap → disable SPM → `flutter build ios --release --no-codesign` | required (§4 build) | red → release blocked; Xcode 16.4 missing → explicit error |
 
 ---
 
 ## 5. Environment & Config
 
-### Environments (`release.md` §3)
+### Environments
 
-| Environment | Deploy mode | Config / secrets | Approval | Smoke / health | Rollback expectation |
+| Environment | Deploy mode | Config / secrets | Approval | Smoke / health | Rollback |
 | --- | --- | --- | --- | --- | --- |
-| local | manual | Firebase emulator suite (`demo-looplet`), no secrets | No | `npm test` + `emulators:exec` (needs a JDK locally) | n/a |
-| ci | automated, **gates only, no deploy** | none (emulator project) | No | the `infra` job | n/a |
-| production (`looplet-712e5`) | **controlled** — `firebase deploy` by DevOps, **Tech Lead approval required** | `FIREBASE_CI_TOKEN` **or** a service-account key (see below); client config files (`firebase_options.dart`, `google-services.json`, `GoogleService-Info.plist`) — **not secret, committed** | **Yes** (`release.md` §12) | §8 device smoke + Cloud Functions error-rate / latency dashboards | functions redeploy-previous; `daily_sync_enabled` kill-switch; no Drift downgrade |
+| local | manual | emulator `demo-looplet`, no secrets; Java 21 first on `PATH` (setup-manifest) | No | the setup-manifest emulator command (33 / 33) | n/a |
+| ci | automated, gates only, **no deploy** | none (`demo-looplet` needs no auth) | No | the three jobs in §4 | n/a |
+| production (`looplet-712e5`) | controlled, manual `firebase deploy` from an authenticated workstation | client configs are committed and not secret; deploy auth: see below | **Yes** — the user's F08.DEPLOY-GO + Tech Lead (`release.md` §12) | §8 S2–S4 + Cloud Functions error / latency | §7 |
 
-### Secrets / config (names only — no values)
+### Secrets (names only)
 
-| Name | Environment | Owner | Purpose | State |
-| --- | --- | --- | --- | --- |
-| `FIREBASE_CI_TOKEN` | ci / production | DevOps/Release Engineer | `firebase deploy` auth for functions / rules / Remote Config from a non-interactive workflow | **NOT CONFIGURED.** Deferred to this phase per the user. Action: the repo owner adds it as a GitHub Actions secret. **Note:** `firebase login:ci` tokens are deprecated by Google; the forward-compatible option is a **Google Cloud service account** with roles `roles/firebasedeploy` + `roles/cloudfunctions.developer` + `roles/firebaserules.admin`, its JSON key stored as `GOOGLE_APPLICATION_CREDENTIALS` (file) / a base64 secret, and `firebase deploy` run with `GOOGLE_APPLICATION_CREDENTIALS` set (no `--token`). Either is a value the user provisions; not creatable here. |
-| Firebase client config files | all | Frontend/Mobile Developer | app ↔ Firebase wiring | **PRESENT + COMMITTED** — `app/lib/firebase_options.dart`, `app/android/app/google-services.json`, `app/ios/Runner/GoogleService-Info.plist`, `infra/.firebaserc` (`default → looplet-712e5`). Verified by the Tech Lead on the Firebase-project incident. |
-| App Store / Play signing secrets (`APP_STORE_CONNECT_API_*`, `PLAY_SERVICE_ACCOUNT_JSON`, …) | ci / production | DevOps/Release Engineer | app-build distribution | **OUT OF SCOPE for F08** (backend-only gate). Belongs to the first app-distribution release (~F03/F05). Listed in `release.md` §7. |
+| Name | Needed for | State |
+| --- | --- | --- |
+| `FIREBASE_CI_TOKEN` or a service-account key (`GOOGLE_APPLICATION_CREDENTIALS`) | an automated deploy workflow only | **NOT CONFIGURED** and not needed now. The deploy is manual. CI validation needs no auth. |
+| `APP_STORE_CONNECT_API_*`, `PLAY_SERVICE_ACCOUNT_JSON` | app distribution | out of F08 scope (FIRST-APP-DISTRIBUTION) |
 
-### Live project state observed this turn (`looplet-712e5`)
+### Live project state
 
-* Billing plan: **Spark (free).** → **blocks Cloud Functions deploy** (see §10).
-* `firestore.googleapis.com`: **enabled** and a `(default)` Firestore database exists (STANDARD / `FIRESTORE_NATIVE`). This was triggered as a prerequisite during the `firebase deploy --dry-run` (the CLI enables required APIs even in dry-run). Benign and required by F08 regardless.
-* `cloudfunctions.googleapis.com` / `cloudbuild.googleapis.com` / `artifactregistry.googleapis.com`: **not enabled** — cannot be, on Spark.
-* Deployed functions: **none** (`functions:list` → "No functions found").
-* Anonymous Auth: enabled (Tech Lead incident verification). App Check: monitor.
+The last observation is from 2026-09-06: Spark plan; a `(default)` Firestore database created as a side effect of the dry-run; no functions deployed; Anonymous Auth enabled; App Check in monitor. **It was not re-verified this turn**, because reading it needs the user's account session. It is re-read at the start of F08-DEVOPS.
 
-### Config validation performed
+### Public-repository hygiene (A14 ruling 2 (e)) — recommendations; the console changes are the user's
 
-* `firebase deploy --only firestore:rules --dry-run` → `rules file firestore.rules compiled successfully`. **PASS.**
-* `firebase deploy --only remoteconfig --dry-run` → `Dry run complete!` (after the `firebase.json` fix). **PASS.**
-* `firebase deploy --only functions --dry-run` → predeploy `tsc` **PASS**, then **STOPS** at "must be on the Blaze (pay-as-you-go) plan … Required API cloudbuild.googleapis.com can't be enabled". **BLOCKED.**
-* `npm --prefix infra/functions run build` → `tsc` exit 0, `lib/` emitted. **PASS.**
-* `npm --prefix infra/functions test` / `melos run infra:test` → **SUCCESS** — 18 passed, 13 emulator-skipped (no JDK).
-* `remoteconfig.template.json` — well-formed; all four `release.md` §6 keys present with correct `valueType` + defaults (`daily_*`/`share_enabled` = `"true"` BOOLEAN, `daily_manifest_url` = `""` STRING placeholder for F07).
+The repository `github.com/eyupdabakoglu92/Looplet` is public. `google-services.json`, `GoogleService-Info.plist` and `firebase_options.dart` are Firebase client identifiers, not secrets (project `release.md` §7), but they are now world-readable. Recommended actions, in the Google Cloud console for `looplet-712e5` → APIs & Services → Credentials:
+
+1. **Restrict each API key by application.**
+   * The Android key → "Android apps": package `com.looplet.looplet_app` plus the SHA-1 of every signing certificate in use (today the debug certificate; the upload and Play signing certificates at FIRST-APP-DISTRIBUTION).
+   * The iOS key → "iOS apps": bundle ID `com.looplet.loopletApp`.
+2. **Restrict each key by API** to the Firebase APIs the app uses today: Identity Toolkit, Token Service, Cloud Firestore, Firebase Installations, Firebase App Check. Add Remote Config (F07) and Google Analytics (F12) when those features land.
+   * An API missing from the list breaks that feature at runtime. After the change, run a debug build once against the real project (not the emulator) — anonymous sign-in, App Check token — before relying on it.
+3. **Check the live Firestore rules.** The repository's rules (deny all client access, A9) have **never been deployed**. The `(default)` database on the project has had the console's rules since 2026-09-06, whatever they are. If they are not deny-by-default, the public config makes that database reachable.
+   * The fix is a rules-only deploy of the committed `firestore.rules`. That is a deploy, so it needs the user's decision. The Tech Lead can offer it at F08.DEPLOY-GO as a rules-only first step; it needs no Blaze plan.
+4. **App Check stays in monitor mode** (`platform.md`; `enforceAppCheck: false`). With a public config, anyone can call the callable once it is deployed and create anonymous users. The callable validates every payload and writes create-only, so the harm is bounded. Enforcement is planned in F08-PLATFORM-ATTESTATION; watch the App Check metrics after the deploy.
 
 ---
 
 ## 6. Deployment Plan
 
-**Target:** `looplet-712e5` (production; single MVP project). **Approval:** Tech Lead, explicit, per `release.md` §12 — **not yet given; do not deploy without it.**
+**Not executed — deferred** (A16). It runs in F08-DEVOPS only after the user's F08.DEPLOY-GO. The runbook is `infra/README.md` → Deploy. It was re-checked against the current code this turn:
 
-### Prerequisites (must all be true before the first deploy)
+1. **Prerequisites:**
+   * F08.DEPLOY-GO (the user) + Tech Lead approval (`release.md` §12);
+   * the Blaze plan with a budget alert — for the function only; rules and Remote Config deploy on Spark;
+   * the Node.js 20 runtime check (§3);
+   * a green CI run at the deploy revision (S1).
+2. `cd infra && firebase deploy --only functions,firestore:rules,remoteconfig --project looplet-712e5 --dry-run`
+3. `firebase deploy --only firestore:rules,remoteconfig --project looplet-712e5` — the rules deny all client access, and the app never writes Firestore directly, so there is no ordering hazard. The Remote Config template publishes the three switches `true` and `daily_manifest_url` empty (F07 fills it); it overwrites any console edits.
+4. `firebase deploy --only functions --project looplet-712e5` → `submitDailyResultV1`, `us-central1`, `maxInstances: 10`, `enforceAppCheck: false`.
+5. `firebase functions:list --project looplet-712e5`, then the smoke S2–S4.
 
-1. **Upgrade `looplet-712e5` to the Blaze plan** — required for 2nd-gen Cloud Functions (`cloudbuild` + `artifactregistry` + `cloudfunctions` APIs). Owner: user (billing). Set a budget alert; F08's function is create-only, low-QPS, `maxInstances: 10` — expected cost ≈ $0 within the free tier, but Blaze is a hard gate.
-2. Tech Lead approval recorded (`release.md` §12).
-3. (For an automated workflow) `FIREBASE_CI_TOKEN` or a service-account key wired — see §5. For a **manual** first deploy from an authenticated workstation, `firebase login` is sufficient.
-
-### Deploy runbook (manual, authenticated operator)
-
-```sh
-cd infra
-
-# 1. Final pre-deploy validation (no changes):
-firebase deploy --only functions,firestore:rules,remoteconfig \
-  --project looplet-712e5 --dry-run
-
-# 2. Rules + Remote Config first (no Blaze needed, low risk, reversible):
-firebase deploy --only firestore:rules,remoteconfig --project looplet-712e5
-
-# 3. Function (needs Blaze). First deploy also enables the build APIs:
-firebase deploy --only functions --project looplet-712e5
-#   → creates: submitDailyResultV1 (us-central1, 2nd gen, enforceAppCheck:false)
-
-# 4. Verify:
-firebase functions:list --project looplet-712e5          # submitDailyResultV1 present
-firebase deploy --only firestore:rules --project looplet-712e5 --dry-run  # in-sync
-```
-
-* **Region:** `us-central1` (pinned in `functions/src/index.ts` `setGlobalOptions`).
-* **Migration handling:** none server-side (Firestore `dailyResults` are additive, create-only). On-device Drift migration ships inside the app build (forward-only, never-drop guard) — not part of this backend deploy.
-* **Feature flags / rollout:** functions deploy all-at-once (stateless); previous version retained by Firebase for redeploy. Client-side kill via `daily_sync_enabled`.
-* **App Check:** leave in **monitor**. Do not toggle enforce. Android release Play Integrity SHA-256 registration is deferred to the app-distribution gate (debug builds use the debug provider; no release app build exists yet).
+* **Migration:** none server-side. The Drift forward-only migration ships in the app build, not in this deploy.
+* **Rollout:** all at once. The function is stateless and release builds send it no traffic before F07 (§3).
 
 ---
 
@@ -136,81 +130,90 @@ firebase deploy --only firestore:rules --project looplet-712e5 --dry-run  # in-s
 
 | Trigger | Action | Verification |
 | --- | --- | --- |
-| `submitDailyResultV1` error rate > 2% (5-min) / broken Daily submit / KPI regression | **Client kill-switch first:** set Remote Config `daily_sync_enabled = false` → `DailyResultSyncService.drain()` becomes a no-op; queued results stay `pending` locally and sync later (nothing lost). Effective within one Remote Config fetch (< 12h; force-fetch on resume). | Function error rate returns to baseline; local queues untouched; re-enable after fix. |
-| Bad function build shipped | `firebase deploy --only functions --project looplet-712e5` from the **previous commit**, or `firebase functions:delete submitDailyResultV1` + redeploy prior. Function is stateless → safe. | `functions:list` + a `CREATED` smoke call (§8) against a scratch uid. |
-| Bad rules shipped | `firebase deploy --only firestore:rules` from the previous commit. `dailyResults` is create-only + already low-risk. | rules dry-run in-sync; a `create-own` allowed / `create-other` denied check. |
-| Bad Remote Config value | Re-publish `remoteconfig.template.json` from the previous commit (`firebase deploy --only remoteconfig`), or edit in console. | `firebase remoteconfig:get`. |
-| On-device data corruption suspicion | **Forward-fix only** — on-device Drift data is never server-rolled-back (`release.md` §9). The never-drop `MigrationGuard` + forward-only migrations are the safety net; a bad on-device migration is fixed by a new app build, not a downgrade. A bad Firestore batch is corrected by a one-off admin script, never a rollback. | migration tests green in the shipping build; `personal_best` / `daily_streak` / `daily_entry` row counts preserved. |
+| Bad function build (5xx > 2 % over 5 min, or a smoke S3 failure) | Redeploy from the previous commit: `firebase deploy --only functions --project looplet-712e5`. If there is no previous version (this is the first deploy): `firebase functions:delete submitDailyResultV1 --project looplet-712e5`. The client treats NOT_FOUND / INTERNAL / UNAVAILABLE as retryable (`callable_sync_sender.dart`). Queue items stay local, back off, and park at the attempt cap; parked items are retried on app start. Nothing is lost. | `functions:list`; S3 against a scratch uid on the redeployed function |
+| Bad rules shipped | `firebase deploy --only firestore:rules --project looplet-712e5` from the previous commit (for the first deploy: the committed deny-all rules are already the safe state). | The rules dry-run is in sync; then **smoke S2**: a direct client create is denied (own entry, invalid payload, non-date bucket, another user, unauthenticated); update / delete / read are denied; **the callable creates** (S3). *Replaces the old check "create-own allowed / create-other denied" (A9 ruling 6).* |
+| Bad Remote Config value | Re-publish `remoteconfig.template.json` from the previous commit (`firebase deploy --only remoteconfig`). | `firebase remoteconfig:get --project looplet-712e5` |
+| Kill the sync client-side | **Not available in release builds before F07** — the client does not read Remote Config yet (§3). Not needed for F08: release builds send no daily results. F07 must wire it before the Daily ships. | — |
+| On-device data | Forward-fix only (project `release.md` §9). The never-drop guard and the forward-only migration are the safety net. Firestore `dailyResults` are create-only; a bad batch gets a one-off admin script. | migration tests green in the shipping build |
 
-* **RTO:** kill-switch < 12h (force-fetch on resume makes it near-immediate for active users); function/rules redeploy < 30 min.
-* **Owner:** DevOps/Release Engineer.
+* **RTO:** function or rules redeploy < 30 min. **Owner:** DevOps/Release Engineer.
 
 ---
 
 ## 8. Observability & Smoke Validation
 
-### Post-deploy smoke — MANDATORY before this gate can pass (`release.md` §8 + `qa.md §17` folded in)
+The smoke list, re-checked against the current rules and code. It is run in F08-DEVOPS after the deploy. **Required class:** runtime / repeatable integration as marked.
 
-Run on a real device/simulator against `looplet-712e5` after the deploy, **and** confirm the CI `infra` emulator job is green on the F08 branch:
-
-| # | Scenario | Pass criteria | Source |
+| # | Scenario | Pass criteria | Class / target |
 | --- | --- | --- | --- |
-| S1 | **CI emulator suites green on the F08 branch** | `infra` job: `rules.test.ts` (create-own allow / create-other deny / unauth deny / update·delete·read deny) + `submitDailyResult.test.ts` (CREATED; ALREADY_SUBMITTED with the doc unchanged; one doc across repeats; per-uid scoping; unauth → no write; invalid → no write) all pass | `qa.md §17.1` |
-| S2 | **Kill / relaunch resume fidelity** | Start a puzzle → N moves + ≥1 undo + a restart + a thawed frozen tile → OS-kill the process → relaunch → grid, `moveCount`, `undosRemaining`, `restartCount`, elapsed, thawed state exactly restored. Tamper `kv['active_session'].thawedFrozenCells` → confirm it is **re-derived** by engine replay, not trusted. | `qa.md §17.2` (AC1/AC6) |
-| S3 | **Lifecycle + connectivity drain** | `paused` → `resumed` → `drain()` fires; connectivity regain → `drain()` fires; dispose the screen that triggered a completion mid-sync → the session-level `DailyResultSyncService` still completes the sync. | `qa.md §17.3` |
-| S4 | **Offline daily → exactly one create-only write** | Airplane mode → complete the daily (fake producer / F07 producer) → `daily_entry` first-run written, `syncStatus = queued`, 1 `sync_queue` row → reconnect → **exactly one** doc at `dailyResults/{lang}_{date}/entries/{uid}`, `syncStatus = synced`. Force a mid-request drop → retried → still one doc. Kill during `inFlight` → relaunch → reclaimed → still one doc. | `qa.md §17` + `release.md` §8 |
-| S5 | **Repeat submit → ALREADY_SUBMITTED, unchanged** | Submit again (same or "better" result) → `ALREADY_SUBMITTED`, server doc byte-unchanged, local `firstRun*` unchanged, a `daily_attempt` row added, no new `sync_queue` row. | `qa.md §17` |
-| S6 | **Kill-switch** | Remote Config `daily_sync_enabled = false` → `drain()` no-op, nothing sent; set back to `true` → queued item syncs. | `release.md` §6/§9 |
-| S7 | **Storage-full fault injection** (residual test-debt, non-blocking) | Simulated disk-write failure → transaction rolls back, last-good state kept, non-fatal `persist_failed`, no crash. May be closed by an automated fault-injection test in a follow-up instead of the device smoke. | `qa.md §17.5` (AC7) |
+| S1 | **CI green at the deploy revision** | All three jobs succeed. The `infra` log shows Java 21, and the emulator step runs the rules suite and the callable suite with 0 skipped.<br>**Rules suite (8):** a direct client create is denied for the own valid entry, an invalid payload, a non-date bucket, another user's entry and an unauthenticated caller; update, delete and read are denied.<br>**Callable suite:** CREATED; ALREADY_SUBMITTED with the doc unchanged; per-uid scoping; unauthenticated → no write; invalid → no write. | repeatable integration / GitHub Actions |
+| S2 | **Live rules deny every client path** | Against `looplet-712e5`, a Firestore REST `createDocument` under `dailyResults/{lang}_{date}/entries/{uid}` returns 403 `PERMISSION_DENIED` in all five cases: with an anonymous ID token for the own uid, with an invalid payload, in a non-date bucket, for another uid, and with no token. A GET, PATCH and DELETE on the S3 document → 403. | runtime / production |
+| S3 | **The callable creates, exactly once** | A **debug** build without the emulator define, pointed at the real project: the debug sync screen runs the fake producer → `CREATED`, exactly one doc at `dailyResults/{lang}_{date}/entries/{uid}`, `syncStatus = synced`. A repeat submit → `ALREADY_SUBMITTED`, the doc byte-unchanged, local `firstRun*` unchanged. | runtime / device or simulator + production |
+| S4 | **App smoke on the smoke build** (project `release.md` §8, scoped to what exists before F07) | Journey level 1 completes; background + relaunch → exact resume. Daily open / submit is F07. | runtime / device or simulator |
 
-* **S-Journey/Daily end-user offline play (AC2/AC3)** — needs F03/F05 screens; **explicitly out of F08 scope**, tracked for F05/F07 QA. Not a gate item here.
-
-### Signals
-
-* Cloud Functions: error rate + p95 latency (Firebase console dashboards). Alert: 5xx > 2% over 5 min.
-* Remote Config: kill-switch toggle is an informational alert.
-* Crashlytics / Cloud Logging / GA4 KPI wiring: **F12 + the app-distribution gate**, not F08.
+* **Now covered elsewhere — no longer smoke items:**
+  * storage-full → F08.STORAGE PASS (automated fault injection, `app/test/persistence/storage_full_test.dart`);
+  * offline Journey (AC2) → F08.OFFLINE-JOURNEY PASS (R2);
+  * resume fidelity and lifecycle → F08.LOCAL-RESUME / F08.LIFECYCLE PASS;
+  * exactly-once and the kill-switch against the emulator → F08.EMULATOR PASS (R1).
+* **Signals:**
+  * Cloud Functions error rate and p95 latency (console); alert on 5xx > 2 % over 5 min (`release.md` §8);
+  * App Check metrics in monitor mode (§5 item 4).
+  * Crashlytics / GA4 belong to F12 and app distribution.
 
 ---
 
 ## 9. Gate Evidence
 
-| Gate | Result | Evidence / Notes |
-| --- | --- | --- |
-| Functions build (`tsc`) | **PASS** | `npm --prefix infra/functions run build` → exit 0, `lib/{index,submitDailyResult,types,validate}.js` emitted. |
-| Functions unit tests (offline) | **PASS** | `melos run infra:test` → SUCCESS; 18 passed, 13 emulator-skipped. |
-| Firestore rules compile | **PASS** | `firebase deploy --only firestore:rules --project looplet-712e5 --dry-run` → "rules file firestore.rules compiled successfully". |
-| Remote Config template | **PASS** | `firebase deploy --only remoteconfig --project looplet-712e5 --dry-run` → "Dry run complete!" (after adding the `remoteconfig` block to `firebase.json`). All 4 `release.md` §6 keys present. |
-| Rules + callable emulator suites (`repeatable integration`) | **PENDING (CI)** | `rules.test.ts` + `submitDailyResult.test.ts` wired into the `infra` job via `emulators:exec --project demo-looplet`. Not run this turn — no JDK locally; not triggered on CI from here. Must be confirmed green on the F08 branch (S1). |
-| Cloud Functions deploy (dry-run) | **BLOCKED** | `firebase deploy --only functions --dry-run` stops: "Your project looplet-712e5 must be on the Blaze (pay-as-you-go) plan … Required API cloudbuild.googleapis.com can't be enabled". Predeploy `tsc` passed; the block is billing-plan, not code. |
-| Production deploy (functions + rules + Remote Config) | **NOT EXECUTED** | Requires Blaze + explicit Tech Lead approval (`release.md` §12). Runbook in §6. |
-| Device / emulator post-deploy smoke (S2–S7) | **PENDING** | No device/simulator/JDK in this environment. Checklist authored in §8; belongs to the smoke run once a build + deploy exist. |
-| Rollback plan | **PASS (documented)** | §7 — kill-switch + function/rules redeploy-previous + forward-fix-only for on-device data. |
-| iOS release App Attest / DeviceCheck | **DEFERRED — non-blocking** | `[OPEN — post-MVP, after Apple Developer Program enrollment]`. App Check is monitor-only; a failed attestation is a logged no-op. |
-| Android release Play Integrity SHA-256 | **DEFERRED — non-blocking for F08** | No Android release keystore / Play App Signing yet (first app-distribution gate, ~F03/F05). Debug builds use the App Check debug provider. |
-| `FIREBASE_CI_TOKEN` / deploy auth | **NOT CONFIGURED** | User-owned repo secret. Runbook + the service-account alternative in §5/§6. Not required for CI validation (emulator project needs no auth); required only for an automated deploy workflow. |
-| Container build / scan | **N/A** | `release.md` §6 — no containerization (mobile + Firebase CLI). |
-| App-build distribution gates (Xcode archive / signing / TestFlight / Play) | **N/A for F08** | Backend-only gate; app distribution is a later release. |
+Local evidence: `evidence/devops-prep/` (README gives the revision and the host). Revision: HEAD `6b31195` plus this turn's working-tree changes. Time: 2026-09-29 15:57–16:05Z.
+
+| Gate / Claim | Evidence Class | Command / Job | Target / Environment | Result / Exit / Counts | Provenance | Isolation / Skips |
+| --- | --- | --- | --- | --- | --- | --- |
+| Format (TD-FORMAT-SCOPE) | static inspection | `melos run format:check` | local, Dart 3.8.1 | exit 0; 194 files, 0 changed | DP-02 | — |
+| Format — negative | static inspection | an unformatted `app/lib` probe + `format:check` | local | exit 1, probe caught; probe removed | DP-03 | — |
+| Format — old scope reproduces run #1 | static inspection | `dart format … .` | local | exit 1; exactly the two `ai-system/` probes | DP-01 | output=none; nothing rewritten |
+| Analyze | static inspection | `melos run analyze` | local | exit 0; no issues | DP-05 | — |
+| Unit / widget tests | unit | `melos run test` | local, Flutter 3.32.8 | exit 0; content 17, core 22, dictionary 32, solver 23, authoring 25, engine 83, app 588 | DP-06 | no skips reported |
+| Content check | static inspection | authoring `check ../../content` | local | exit 0 | DP-07 | — |
+| Build — Android AAB | build | `./gradlew bundleRelease`, Java 17 (the runner default) | local | BUILD SUCCESSFUL; `app-release.aab` 48.2 MB | DP-08b | `melos run build:app` itself fails locally: Flutter picks Android Studio's JBR 25, and Gradle 8.12 cannot run on it (DP-08a; §10 N-4) |
+| Build — iOS no-codesign | build | `flutter build ios --release --no-codesign` | local, Xcode 16.4, CocoaPods, SPM off | exit 0; `Runner.app` 56.0 MB | DP-09 | build ≠ boot |
+| Functions build + offline tests | build / unit | `npm ci`, `run build`, `test` | local, Node 24 | exit 0; 18 passed, 15 emulator-skipped | DP-10, DP-11 | the skips are the emulator suites, run next |
+| Rules + callable suites | repeatable integration | the CI `emulators:exec` command, Java 21 first on `PATH` | local emulator `demo-looplet` | exit 0; 3 / 3 suites, **33 / 33** tests | DP-12 | offline emulator |
+| Java 21 requirement — negative | repeatable integration | the same command, Java 17 first on `PATH` | local | exit 1; "no longer supports Java version before 21" (= run #1) | DP-13 | — |
+| Workflow file | static inspection | Ruby YAML parse of `ci.yml` | local | 3 jobs (`verify` 11 steps, `infra` 7, `ios-build` 8); `env.FLUTTER_VERSION = 3.32.8` | this turn | parse only, not a run |
+| **CI run after the repair** | CI | workflow `CI` on push to `main` | GitHub Actions | **PENDING / NOT RUN** — the user pushes (asked in chat; answer: "Ben push'layacağım") | — | the fix counts only after a green run (A16 ruling 4) |
+| Functional acceptance | runtime + integration (QA) | F08-QA-FUNCTIONAL-R1 / R2 | emulator + simulator | Functional Approved; every functional record PASS | `qa.md` § R1 / R2; `qa/functional-r1/`, `qa/functional-r2/` | QA's limits: N1-R2 (levels 4–30 not opened offline) |
+| Deploy | — | runbook §6 | production | **NOT EXECUTED** — deferred (A16) | — | — |
+| Post-deploy smoke S2–S4 (F08.DEPLOY-SMOKE) | runtime | §8 | production | **PENDING** | — | — |
+| Rollback plan | documented | §7 | — | written to the current rules and code | this file | not exercised |
 
 ---
 
 ## 10. Release Risks
 
-### Blocking (must clear before `F08-DEVOPS` can pass)
+### Blocking — `Release Ready` is impossible until these clear
 
-1. **`looplet-712e5` is on the Spark (free) plan.** 2nd-gen Cloud Functions cannot deploy without Blaze. **Owner: user** (billing decision + upgrade; recommend a low budget alert). Until then `submitDailyResultV1` does not exist server-side and the offline→online daily-result sync path cannot be exercised end-to-end against the real project. *The app itself is unaffected — every Firebase call is best-effort and the sync queue simply waits.*
-2. **Production deploy approval not given.** `release.md` §12 requires explicit Tech Lead approval + a passing smoke. **Owner: Tech Lead.**
-3. **Runtime + emulator evidence not yet produced** (`qa.md` verdict carried forward). S1 (CI emulator job green on the branch) + S2–S6 (device smoke) must be run. **Owner: DevOps/Release Engineer + Tech Lead/user for the device pass.**
+1. **The CI run after the repair.** It has not run yet; the user pushes. Record the run id, every job's conclusion, the integration step's own result, and the printed Flutter / Xcode / Java versions. Owner: DevOps/Release Engineer (or the Tech Lead at the checkpoint — the run is readable on the public repository without signing in).
+   * If a job is red: the `verify` job has never run past its format step on CI (run #1 stopped there). So analyze, test, the integration step, the content check and the AAB build meet CI for the first time now.
+2. **F08.DEPLOY-GO** — the user's deploy decision (the Tech Lead opens it at the PREP checkpoint), then the deploy and smoke S2–S4 (F08.DEPLOY-SMOKE). Owner: user → DevOps/Release Engineer.
 
-### Non-blocking (record, do not hold F08)
+### Needs a Tech Lead decision (non-blocking for this prep)
 
-* `FIREBASE_CI_TOKEN` / service-account deploy auth not wired — only needed for an automated deploy workflow; a manual authenticated first deploy does not need it. **Owner: user/DevOps.**
-* iOS production App Attest / DeviceCheck — `[OPEN — post-MVP]`, App Check monitor-only.
-* Android release Play Integrity SHA-256 — deferred to the first app-distribution gate.
-* Storage-full fault-injection test (S7 / AC7) — residual test-debt; mechanism (Drift transaction rollback + non-fatal event) is source-sound; add an automated test in a follow-up.
-* End-user offline Journey/Daily play (AC2/AC3) — needs F03/F05 screens; tracked for F05/F07 QA.
-* `dailySyncEnabledProvider` (client) + `FakeDailyResultProducer` — F07 seams; F07 wires the real Remote Config read + real Daily producer.
-* `firestore.googleapis.com` was enabled + a `(default)` DB created as a dry-run side effect — benign, required by F08 anyway.
+* **N-1 — the project `release.md` §4 format line** still reads `dart format --set-exit-if-changed .`. It should read `app packages tools` (TD-FORMAT-SCOPE). The Tech Lead owns that file.
+* **N-2 — no kill-switch in release builds before F07.** The F08 deploy is safe without it: no release-build producer exists (§3). F07 must wire the Remote Config read before the Daily ships. That belongs in the F07 contract / follow-ups.
+* **N-3 — the Node.js 20 Cloud Functions runtime** (`platform.md` §3; `engines.node: "20"`) is past upstream end-of-life (2026-04-30). Check deployability before F08.DEPLOY-GO. A runtime bump is a dependency / platform change that needs its own regression run (the emulator suite).
+* **N-4 — the local Android build JDK.** On this machine `melos run build:app` fails: Flutter uses Android Studio's bundled JBR 25, and Gradle 8.12 supports Java ≤ 23. CI is not affected (JDK 17).
+  * Options for the setup-manifest: record `flutter config --jdk-dir <JDK 17 or 21>` as a local prerequisite — a global Flutter setting, so the user's call — or plan a Gradle / AGP upgrade.
+  * Not done here: it changes the user's environment.
+* **N-5 — the live Firestore rules are unknown** (§5 item 3). A rules-only deploy of the deny-all rules needs no Blaze plan. It could be offered as a separate, earlier step of F08.DEPLOY-GO.
+
+### Non-blocking notes
+
+* **CocoaPods:** the `macos-15` image has CocoaPods 1.17.0; `Podfile.lock` was written by 1.16.2. The dependency manager is the same; the lock header may differ. CI does not commit.
+* **Ubuntu:** the Ubuntu jobs are pinned to `ubuntu-24.04`. Revisit when GitHub announces that image's retirement.
+* **npm audit:** `npm ci` reports 14 moderate advisories (advisory gate, `release.md` §10); the upgrade pass belongs to a release.
+* **Public repository:** the §5 hygiene items are recommendations; the console changes are the user's.
+* **App Check:** iOS App Attest and the Android Play Integrity release SHA-256 stay deferred to app distribution; App Check is monitor-only.
 
 ---
 
@@ -218,27 +221,27 @@ Run on a real device/simulator against `looplet-712e5` after the deploy, **and**
 
 ### **Release Validation Pending**
 
-* **Config is substantially ready.** Functions build + offline tests green; `firestore.rules` compiles; Remote Config template validates (after the `firebase.json` fix); the CI `infra` job wires the mandated rules + callable emulator suites; rollback plan documented; App Check correctly left in monitor.
-* **Not `Release Ready`** because: (1) the project must move to **Blaze** before the Cloud Function can deploy — a hard external gate; (2) production deploy requires **explicit Tech Lead approval** (`release.md` §12), not yet given; (3) the contract-mandated **`runtime` + `repeatable integration` evidence** (`qa.md §17` S1–S6) has not been produced — no device/JDK here and nothing pushed to trigger CI.
-* **Not `Release Blocked`** — QA found **no code defect**, there is no failed *code/build* gate, and the rollback plan exists. The gating items are billing, approval, and running the smoke — none require F08 rework.
-* **Deploy was not executed** (correct — approval + Blaze first).
-
-### What closes this gate
-
-1. User upgrades `looplet-712e5` → Blaze (+ budget alert).
-2. Tech Lead records deploy approval.
-3. DevOps runs the §6 runbook (rules + Remote Config, then the function); confirms the CI `infra` emulator job green on the F08 branch (**S1**).
-4. Device/simulator smoke **S2–S6** (S7 may be swapped for an automated fault-injection test); attach evidence here.
-5. Re-run this artifact to **Release Ready (with Notes)** — the Notes being the deferred non-blockers in §10.
+* **Ready now:**
+  * the CI repair is in place and every CI step passes locally on the repaired config, with named negatives for the format scope and Java 21;
+  * the runbook, rollback and smoke are aligned to the deny-all rules (A9) and to the real kill-switch state;
+  * functional QA is approved.
+* **Not Release Ready:** no CI run has proved the repair yet, the deploy is deferred, and the post-deploy smoke (F08.DEPLOY-SMOKE) cannot run without a deploy (A16 ruling 5).
+* **Not Release Blocked:** no required gate has failed on the repaired config, and a rollback plan exists.
+* **What remains, exactly:**
+  1. a green CI run after the user's push (S1 at that revision);
+  2. F08.DEPLOY-GO (the user, opened by the Tech Lead);
+  3. the deploy per §6 in F08-DEVOPS;
+  4. smoke S2–S4 → F08.DEPLOY-SMOKE;
+  5. F08-QA-FINAL.
 
 ---
 
 # WORKFLOW HANDOFF SUGGESTION (NON-AUTHORITATIVE)
 
-* **Completed Tasks:** `F08-DEVOPS` part (A) release-readiness prep + dry-run evidence (functions build, rules compile, Remote Config validate, `firebase.json` fix, live-project state audit); part (B) the `qa.md §17` scenarios authored into the §8 smoke checklist; part (C) this artifact.
-* **Remaining Tasks:** Blaze upgrade (user) → Tech Lead deploy approval → execute the §6 runbook → S1–S6 smoke evidence → re-verdict.
-* **Blockers:** Spark→Blaze plan (user); production-deploy approval (Tech Lead); runtime/emulator smoke not yet run.
-* **Status Suggestion:** Needs Tech Lead Review — F08 stays `In Release`; it is **not `Done`** until this artifact reaches `Release Ready` with the S1–S6 evidence attached.
+* **Completed Tasks:** F08-DEVOPS-PREP — brief items 1–6 and 8; item 7 locally (DP-01…13), with the CI run pending the user's push.
+* **Remaining Tasks:** the CI run after the push; F08.DEPLOY-GO; F08-DEVOPS (deploy + smoke); F08-QA-FINAL.
+* **Blockers:** none for the checkpoint. N-1…N-5 need Tech Lead rulings.
+* **Status Suggestion:** Ready for Tech Lead Review.
 
 ---
 

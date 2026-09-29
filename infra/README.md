@@ -56,9 +56,14 @@ Full readiness analysis + gate evidence:
    with an explicit upgrade prompt. Rules + Remote Config deploy fine on Spark.
    Recommend a low budget alert — `submitDailyResultV1` is create-only, low-QPS,
    `maxInstances: 10`.
-2. **Explicit Tech Lead approval** (`release.md` §12) — production deploy is
-   never the default.
-3. For an **automated** deploy workflow: `FIREBASE_CI_TOKEN` **or** a Google
+2. **The user's F08.DEPLOY-GO decision and explicit Tech Lead approval**
+   (`release.md` §12) — production deploy is never the default. The deploy was
+   deferred again on 2026-09-29 (F08 `architecture.md` A16).
+3. **The `nodejs20` runtime is still deployable.** Node.js 20 reached upstream
+   end-of-life on 2026-04-30; check the Cloud Functions runtime support
+   schedule before the deploy. A runtime change is a Tech Lead / `platform.md`
+   decision, not a deploy-time edit.
+4. For an **automated** deploy workflow: `FIREBASE_CI_TOKEN` **or** a Google
    Cloud service account (`roles/firebasedeploy` + `roles/cloudfunctions.developer`
    + `roles/firebaserules.admin`) JSON key as `GOOGLE_APPLICATION_CREDENTIALS`.
    `firebase login:ci` tokens are deprecated — prefer the service account.
@@ -100,8 +105,11 @@ Region is pinned to `us-central1` (`functions/src/index.ts`). App Check stays in
 ```sh
 cd infra
 firebase emulators:exec --only firestore,auth --project demo-looplet \
-  "npm --prefix functions run test"     # needs a JDK on PATH
+  "npm --prefix functions run test"     # needs Java 21+ first on PATH
 ```
 
-CI runs this in the `infra` job (ubuntu ships a JDK); `demo-looplet` is a fully
-offline emulator project — no auth, no token.
+firebase-tools 15 refuses Java < 21 and uses the first `java` on `PATH`
+(`JAVA_HOME` alone is not enough). The canonical local command is in
+`ai-system/project-authority/setup-manifest.md`. CI runs this in the `infra` job
+after `actions/setup-java` (Temurin 21); `demo-looplet` is a fully offline
+emulator project — no auth, no token.

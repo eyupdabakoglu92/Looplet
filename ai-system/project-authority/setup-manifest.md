@@ -3,7 +3,7 @@
 > Status: OPERATIONAL. Project-specific scaffold/bootstrap recipe for the `Project Setup` role.
 > This file carries operation recipes and canonical commands only — no role or architecture authority.
 
-Last Updated: 2026-09-29 (the Java 21 emulator-suite command, F08 A6; Java 21 on `PATH` too, F08 A8); 2026-09-06 (added the `infra/` Firebase DURUM 0 recipe for F08)
+Last Updated: 2026-09-29 (F08-DEVOPS-PREP: TD-FORMAT-SCOPE and TD-CI-TOOLCHAIN implemented — the format commands and the CI toolchain lines; F08 A15); 2026-09-29 (the Java 21 emulator-suite command, F08 A6; Java 21 on `PATH` too, F08 A8); 2026-09-06 (added the `infra/` Firebase DURUM 0 recipe for F08)
 Owner: Tech Lead
 
 ---
@@ -50,7 +50,7 @@ Target directory: repo root — `/Users/eyupcandabakoglu/Projects/Looplet/` (the
 
 ### Global constraints (apply to every step)
 
-* Flutter: stable channel. Dart SDK constraint for every package: `sdk: '>=3.4.0 <4.0.0'`. **CI pins the canonical local toolchain — Flutter 3.32.8; iOS on Xcode ≥ 16.4 (Swift 6); CocoaPods, SPM not enabled** (F08 `architecture.md` A15, TD-CI-TOOLCHAIN — implementation pending in F08-DEVOPS-PREP; a Flutter upgrade is a separate decision). **`format` / `format:check` cover `app packages tools` only** (TD-FORMAT-SCOPE; the command lines below change with that implementation).
+* Flutter: stable channel. Dart SDK constraint for every package: `sdk: '>=3.4.0 <4.0.0'`. **CI pins the canonical local toolchain — Flutter 3.32.8 (`FLUTTER_VERSION` in `ci.yml`); iOS on `macos-15` with Xcode 16.4 selected explicitly (Swift 6); CocoaPods, SPM disabled explicitly; the `infra` job on Temurin Java 21; Ubuntu jobs on `ubuntu-24.04`** (F08 `architecture.md` A15, TD-CI-TOOLCHAIN — implemented in F08-DEVOPS-PREP; a Flutter upgrade is a separate decision). **`format` / `format:check` cover `app packages tools` only** (TD-FORMAT-SCOPE — implemented in F08-DEVOPS-PREP; `ai-system/` evidence is never reformatted).
 * Pure-Dart packages (`looplet_core`, `looplet_dictionary`, `looplet_engine`, `looplet_content`, `looplet_solver`, `tools/looplet_authoring`) must **not** depend on `flutter`, Firebase, or each other beyond the dependency edges in Workspace Targets.
 * Inter-package dependencies use `path:` references (melos resolves them locally).
 * Shared lints: root `analysis_options.yaml` includes `package:lints/recommended.yaml` plus `implicit-casts: false`, `implicit-dynamic: false`. Every package's `analysis_options.yaml` does `include: ../../analysis_options.yaml` (adjust depth for `app`).
@@ -64,15 +64,15 @@ Target directory: repo root — `/Users/eyupcandabakoglu/Projects/Looplet/` (the
    * `packages:` globs → `packages/**`, `tools/**`, `app`
    * `scripts:` (exact names, used as the canonical commands below):
      * `analyze` → `melos exec -- "dart analyze ."` and, scoped to `app`, `flutter analyze`
-     * `format:check` → `dart format --output=none --set-exit-if-changed .`
-     * `format` → `dart format .`
+     * `format:check` → `dart format --output=none --set-exit-if-changed app packages tools`
+     * `format` → `dart format app packages tools`
      * `test` → `melos exec --dir-exists=test -- "dart test"` for pure packages + `melos exec --scope=app -- "flutter test"`
      * `build:app` → `melos exec --scope=app -- "flutter build appbundle --release"`
 2. Root `pubspec.yaml`: `name: looplet_workspace`, `environment: sdk: '>=3.4.0 <4.0.0'`, `dev_dependencies: melos: ^6.0.0`.
 3. `analysis_options.yaml` (shared, as above).
 4. `.gitignore`: Dart/Flutter standard (`.dart_tool/`, `build/`, `.packages`, `*.iml`, `.idea/`, `ios/Pods/`, `android/.gradle/`, `*.g.dart` is **kept** — no codegen in MVP, so nothing generated to ignore beyond `.dart_tool`).
 5. `README.md`: one paragraph + the canonical commands from this manifest.
-6. `.github/workflows/ci.yml`: per `release.md` §4 — jobs: setup (Flutter stable + `dart pub global activate melos ^6.0.0` + `melos bootstrap`), `melos run format:check`, `melos run analyze`, `melos run test`, `melos run build:app`, `flutter build ios --release --no-codesign` (macOS runner). Pin every third-party action to a commit SHA.
+6. `.github/workflows/ci.yml`: per `release.md` §4 — jobs: setup (Flutter stable pinned to the canonical version + `dart pub global activate melos ^6.0.0` + `melos bootstrap`), `melos run format:check`, `melos run analyze`, `melos run test`, `melos run build:app`, `flutter build ios --release --no-codesign` (macOS runner). Pin every third-party action to a commit SHA.
 
 ### Step 2 — `packages/looplet_core`
 
@@ -165,7 +165,7 @@ Target directory: `infra/` at the repo root (currently a stub `infra/README.md`)
 * Build: `melos run build:app`  _(→ `flutter build appbundle --release` in `app/`)_
 * Test: `melos run test`  _(→ `dart test` in every package with a `test/` dir + `flutter test` in `app/`)_
 * Boot / dev run: `melos exec --scope="looplet_app" -- "flutter run"`  _(or simply `cd app && flutter run`; melos scopes by package name `looplet_app`, not by directory)_
-* Extra verification: `melos run format:check && melos run analyze`
+* Extra verification: `melos run format:check && melos run analyze`  _(`format:check` = `dart format --output=none --set-exit-if-changed app packages tools`; TD-FORMAT-SCOPE, F08 A15)_
 * Bootstrap (run once after scaffold, and after any `pubspec.yaml` change): `melos bootstrap`
 * Firebase emulator suite (rules + callable, project `demo-looplet`, no billing): `cd infra/functions && npm ci && npm run build && JAVA_HOME=/opt/homebrew/opt/openjdk@21 PATH=/opt/homebrew/opt/openjdk@21/bin:$PATH npm run test:emulator`  _(firebase-tools 15.29 needs **Java 21+** and uses the first `java` on `PATH`, so `JAVA_HOME` alone fails with "firebase-tools no longer supports Java version before 21". `openjdk@21` is installed keg-only and not linked, so the system Java is unchanged. Expected: Test Suites 3 / 3, Tests 31 / 31, exit 0. Added 2026-09-29, F08 `architecture.md` Activation A6 ruling 5; corrected at A8 ruling 2.)_
 

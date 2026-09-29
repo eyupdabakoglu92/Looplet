@@ -1,0 +1,7 @@
+Warning: Package resolution error when reading "analysis_options.yaml" file:
+Failed to resolve package URI "package:lints/recommended.yaml" in include.
+Changed ai-system/features/f00-design-foundation/qa/src/qa_probe_main.dart
+Warning: Package resolution error when reading "analysis_options.yaml" file:
+Failed to resolve package URI "package:lints/recommended.yaml" in include.
+Changed ai-system/features/f08-offline-persistence-and-sync/qa/functional-r2/qa_probe_all_levels_test.dart
+Formatted 196 files (2 changed) in 1.68 seconds.

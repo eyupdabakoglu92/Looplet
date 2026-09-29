@@ -1,0 +1,9 @@
+openjdk version "21.0.12.1" 2026-08-18
+ci exit=0
+build exit=0
+offline exit=0
+Test Suites: 2 skipped, 1 passed, 1 of 3 total
+Tests:       15 skipped, 18 passed, 33 total
+emulator exit=0
+Test Suites: 3 passed, 3 total
+Tests:       33 passed, 33 total

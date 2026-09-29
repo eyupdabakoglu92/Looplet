@@ -16,13 +16,16 @@ scripts:
       - melos exec --no-flutter -- "dart analyze ."
       - melos exec --scope="looplet_app" -- "flutter analyze"
 
+  # Scope: the Dart code the workspace owns (app, packages, tools). Evidence
+  # under ai-system/ is a record and is never reformatted (TD-FORMAT-SCOPE,
+  # F08 architecture.md A15).
   format:
-    description: Format all Dart code in place.
-    run: dart format .
+    description: Format the workspace's Dart code (app, packages, tools) in place.
+    run: dart format app packages tools
 
   format:check:
-    description: Fail if any Dart code is not formatted.
-    run: dart format --output=none --set-exit-if-changed .
+    description: Fail if any workspace Dart code (app, packages, tools) is not formatted.
+    run: dart format --output=none --set-exit-if-changed app packages tools
 
   test:
     description: Unit tests in every pure-Dart package with a test/ dir, plus the Flutter app.
