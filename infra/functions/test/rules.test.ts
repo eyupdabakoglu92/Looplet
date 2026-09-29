@@ -1,5 +1,11 @@
 /**
- * Firestore security-rules tests for `dailyResults/**` (create-only).
+ * Firestore security-rules tests for `dailyResults/**` (no client access).
+ *
+ * Only the `submitDailyResultV1` callable writes these entries, through the
+ * Admin SDK (rules do not apply to it); `submitDailyResult.test.ts` covers that
+ * path. Every direct client write or read is denied — including a valid entry
+ * for the caller's own uid, which would otherwise skip the callable's payload
+ * validation (f08 architecture.md A9).
  *
  * EMULATOR-GATED: this suite runs only when the Firestore emulator is up
  * (`FIRESTORE_EMULATOR_HOST` set, e.g. via `firebase emulators:exec`). Under a
@@ -11,7 +17,6 @@ import { readFileSync } from "fs";
 import { resolve } from "path";
 import {
   assertFails,
-  assertSucceeds,
   initializeTestEnvironment,
   type RulesTestEnvironment,
 } from "@firebase/rules-unit-testing";
@@ -38,7 +43,7 @@ const sampleDoc = (uid: string) => ({
   recordedAtUtcMs: 1757145601000,
 });
 
-d("dailyResults create-only rules", () => {
+d("dailyResults rules — no client access", () => {
   let env: RulesTestEnvironment;
 
   beforeAll(async () => {
@@ -53,9 +58,28 @@ d("dailyResults create-only rules", () => {
   afterAll(async () => env?.cleanup());
   beforeEach(async () => env.clearFirestore());
 
-  it("lets a signed-in user create their own entry", async () => {
+  it("denies a signed-in user's direct create of their own valid entry", async () => {
     const db = env.authenticatedContext("alice").firestore();
-    await assertSucceeds(setDoc(doc(db, entryPath("alice")), sampleDoc("alice")));
+    await assertFails(setDoc(doc(db, entryPath("alice")), sampleDoc("alice")));
+  });
+
+  it("denies a direct create of an own entry with an invalid payload", async () => {
+    const db = env.authenticatedContext("alice").firestore();
+    await assertFails(
+      setDoc(doc(db, entryPath("alice")), {
+        ...sampleDoc("alice"),
+        moves: 1, // < optimalMoves (9)
+        stars: 9, // outside 1..3
+        extra: "not in the contract",
+      }),
+    );
+  });
+
+  it("denies a direct create in a non-date bucket", async () => {
+    const db = env.authenticatedContext("alice").firestore();
+    await assertFails(
+      setDoc(doc(db, "dailyResults/zz_not-a-date-123/entries/alice"), sampleDoc("alice")),
+    );
   });
 
   it("denies creating another user's entry", async () => {

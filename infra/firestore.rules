@@ -2,22 +2,23 @@ rules_version = '2';
 
 // LOOPLET Firestore security rules.
 //
-// MVP surface (platform.md §6, f08 architecture.md → Firebase Sync Surface):
+// MVP surface (platform.md §6, f08 architecture.md → Firebase Sync Surface → Rules):
 //   dailyResults/{lang}_{date}/entries/{uid}
-//     - create : only the signed-in user, only their own uid slot.
-//               `create` fires only when the doc does not exist, so this is
-//               inherently first-write-wins / create-only.
-//     - update / delete / read : denied for everyone in the MVP (no leaderboard,
-//               no cross-user reads). A future leaderboard adds scoped reads.
+//     - no client access at all: create, update, delete and read are denied.
+//     - the only writer is the `submitDailyResultV1` callable, through the Admin
+//       SDK, which security rules do not apply to. It validates the payload,
+//       derives the path from `context.auth.uid`, and enforces create-only /
+//       first-writer-wins inside its transaction (an existing entry →
+//       ALREADY_SUBMITTED).
+//     - a client create would skip that validation, so it is denied too
+//       (f08 architecture.md A9). A future leaderboard adds scoped reads.
 // Everything else is denied by default.
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
     match /dailyResults/{bucket}/entries/{uid} {
-      allow create: if request.auth != null
-                    && request.auth.uid == uid;
-      allow update, delete, read: if false;
+      allow create, update, delete, read: if false;
     }
 
     // Default deny.

@@ -32,3 +32,15 @@ Claims and results: `../backend.md` → "F08-BE6". Base HEAD `b8e37ab`; only `in
 | `runtime/BE6-01-baseline-suite.log.txt` | The suite before the fix: attempt 1 (only `JAVA_HOME`) fails on the Java version; attempt 2 (Java 21 on PATH) 30 / 31. |
 | `runtime/BE6-02-fixed-suite.log.txt` | The suite after the fix: 31 / 31. |
 | `runtime/BE6-03-plain-npm-test.log.txt` | `npm test` without the emulator: 18 passed, 13 skipped. |
+
+## F08-BE7 (Backend Developer, 2026-09-29)
+
+Claims and results: `../backend.md` → "F08-BE7". Base HEAD `8f26243`; changed `infra/firestore.rules` (sha1 `b75628e6…` → `aa4c5dc2…`), `infra/functions/test/rules.test.ts` (`9d4db0bb…` → `2c7df84a…`) and `infra/README.md`. The handler, the validator and the callable test are unchanged.
+
+| File | What |
+| --- | --- |
+| `neg-be7.py` | N-DIRECT-CREATE: puts the old client `allow create` rule back; the own valid entry, the own invalid payload (QA P3) and the non-date bucket (QA P6) tests fail, the other five pass. Restores the rules byte for byte. Run from the repo root; needs Java 21 on PATH. Output: `runtime/BE7-04-neg.log.txt`. |
+| `runtime/BE7-00-npm-ci-build.log.txt` | `npm ci && npm run build` at the base. |
+| `runtime/BE7-01-baseline-suite.log.txt` | The suite before the change (old rules): 31 / 31. |
+| `runtime/BE7-02-fixed-suite.log.txt` | The suite after the change: 33 / 33 (rules 8, callable 7, skeleton 18). Notes one invocation error before it (no test ran). |
+| `runtime/BE7-03-plain-npm-test.log.txt` | `npm test` without the emulator: 18 passed, 15 skipped. |

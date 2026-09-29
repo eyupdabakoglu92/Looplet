@@ -23,7 +23,7 @@ implemented by **F08-BE2** against
 | --- | --- |
 | `firebase.json` | functions + firestore + emulator config |
 | `.firebaserc` | project alias (`default` → `looplet-712e5`) |
-| `firestore.rules` | `dailyResults/**` create-only for own uid; default-deny elsewhere |
+| `firestore.rules` | `dailyResults/**`: no client access; only the callable writes (Admin SDK); default-deny elsewhere |
 | `firestore.indexes.json` | empty (a composite index for a future leaderboard is deferred) |
 | `remoteconfig.template.json` | `daily_enabled` / `daily_sync_enabled` / `share_enabled` (true) + `daily_manifest_url` (placeholder) — wired into `firebase.json` `remoteconfig.template` |
 | `functions/` | TypeScript (Node 20) Cloud Functions — `submitDailyResultV1` |

@@ -195,3 +195,90 @@ Ortam: macOS host, Node v24.7.0, firebase-tools 15.29.0, OpenJDK 21.0.12.1 (`/op
 ```
 Run Tech Lead
 ```
+
+---
+
+# F08-BE7 — `dailyResults/**` için client erişimi yok (2026-09-29)
+
+> Kontrat: `architecture.md` → "Firebase Sync Surface" (kilitli) → Rules (A9'da düzeltildi); Activation 2026-09-29 → A9 ruling 1–2. Brief: `orchestration.md` → Current Brief. Kaynak: QA bulgusu F1 (`qa.md` § F08-QA-FUNCTIONAL §3). Taban: HEAD `8f26243`. Yalnız kurallar, kural testi ve `infra/README.md` değişti; handler, validator, callable testi, app ve CI dokunulmadı.
+
+## 1. Feature Summary
+
+* `infra/firestore.rules` artık `dailyResults/{bucket}/entries/{uid}` üzerinde **hiçbir client işlemine** izin vermiyor: `allow create, update, delete, read: if false`. Önceki kural, oturumu olan her client'ın kendi uid'ine callable'ı atlayarak doğrudan (doğrulanmamış, keyfi bucket'lı) kayıt yazmasına izin veriyordu.
+* Tek yazan `submitDailyResultV1`; Admin SDK ile yazdığı için kurallardan etkilenmiyor. Create-only / first-writer-wins callable transaction'ında kalıyor (`snapshot.exists` → `ALREADY_SUBMITTED`).
+* `rules.test.ts`: "kendi kaydını oluşturabilir" testi red testine çevrildi; QA probe'larının P3 (geçersiz payload) ve P6 (tarih olmayan bucket) şekilleri iki yeni red testi olarak eklendi. Emülatör suite'i **33 / 33**; N-DIRECT-CREATE negatifi üç testin de eski kuralı yakaladığını gösteriyor.
+
+## 2. Impacted Files
+
+* **Güncellenen:**
+  * `infra/firestore.rules` — sha1 `b75628e6…` → `aa4c5dc2…`;
+  * `infra/functions/test/rules.test.ts` — `9d4db0bb…` → `2c7df84a…`;
+  * `infra/README.md` — `2207934a…` → `ee49fef8…` (yalnız `firestore.rules` satırı).
+* **Oluşturulan (kanıt):** `evidence/neg-be7.py`; `evidence/runtime/BE7-00-npm-ci-build.log.txt`, `BE7-01-baseline-suite.log.txt`, `BE7-02-fixed-suite.log.txt`, `BE7-03-plain-npm-test.log.txt`, `BE7-04-neg.log.txt`; `evidence/README.md` → "F08-BE7".
+* **Değişmeyen (doğrulandı):** `src/submitDailyResult.ts` `bcda2662…`, `src/validate.ts` `8f0398ea…`, `test/submitDailyResult.test.ts` `cf73770d…`, `firebase.json`, `.github/workflows/ci.yml`, `app/`.
+
+## 3. Task-to-Code Traceability
+
+* **Task ID:** F08-BE7 — **Durum: Complete**
+  * **Brief 1 — kurallar:** `firestore.rules` → `match /dailyResults/{bucket}/entries/{uid}` bloğu açık bırakıldı (okunabilirlik için), tek satır `allow create, update, delete, read: if false;`. Başlık yorumu yeniden yazıldı: client erişimi yok; tek yazan callable (Admin SDK); create-only callable transaction'ında; A9 referansı. Default-deny bloğu aynı.
+  * **Brief 2 — `rules.test.ts`:**
+    * "lets a signed-in user create their own entry" (`assertSucceeds`) → "denies a signed-in user's direct create of their own valid entry" (`assertFails`, aynı geçerli `sampleDoc`);
+    * yeni: "denies a direct create of an own entry with an invalid payload" — `moves: 1` (< `optimalMoves` 9), `stars: 9`, fazladan `extra` alanı (QA P3);
+    * yeni: "denies a direct create in a non-date bucket" — `dailyResults/zz_not-a-date-123/entries/alice` (QA P6);
+    * korunan: create-other, unauthenticated, update, delete, read red testleri;
+    * dosya yorumu ve `describe` adı ("no client access") güncellendi; kullanılmayan `assertSucceeds` import'u kaldırıldı.
+  * **Brief 3 — N-DIRECT-CREATE:** `evidence/neg-be7.py` (aşağıda §11).
+  * **Brief 4 — suite:** build + `npm test` + setup-manifest emülatör komutu yeşil (§11).
+  * **Brief 5 — `infra/README.md`:** `firestore.rules` satırı → "`dailyResults/**`: no client access; only the callable writes (Admin SDK); default-deny elsewhere".
+
+## 7. Contract Compliance Check
+
+* **Endpoint / handler contract:** Preserved — handler ve validator bayt-özdeş (`bcda2662…`, `8f0398ea…`).
+* **Request / response shape:** Preserved.
+* **Error format:** Preserved.
+* **Event payload / ordering:** Not Applicable.
+* **State-machine / boundary semantics:** Preserved + düzeltilmiş Rules satırına hizalandı — client erişimi yok; create-only / first-writer-wins callable'da. Callable suite'i (7 test) yeni kurallar emülatöre yüklüyken değişmeden geçiyor: sunucu yolu hâlâ yazıyor.
+
+## 8. Behavior Preserved
+
+* Callable yolu: `CREATED`, `ALREADY_SUBMITTED` (first-run-authoritative, çoklu tekrar idempotent), `INVALID_PAYLOAD` / `UNSUPPORTED_LANGUAGE`, auth zorunluluğu, soft App Check — hepsi `submitDailyResult.test.ts` + `skeleton.test.ts` ile değişmeden yeşil.
+* App davranışı: app Firestore'a doğrudan yazmıyor (yalnız callable), bu yüzden kural değişikliği client akışını etkilemez. Bunu uçtan uca (app ↔ emülatör) koşmadım — QA-FUNCTIONAL-R1 planında (A9 ruling 4) var.
+
+## 11. Test Evidence by Task
+
+Ortam: macOS host, Node v24.7.0, firebase-tools 15.29.0, OpenJDK 21 (`/opt/homebrew/opt/openjdk@21`, `PATH`'te ilk), proje `demo-looplet` (yalnız emülatör; gerçek Firebase'e erişim, deploy veya dry-run yok). Revizyon: HEAD `8f26243` + bu çalışma ağacı.
+
+| Claim / senaryo | Sınıf | Komut | Sonuç | Kanıt |
+| --- | --- | --- | --- | --- |
+| Kurulum + derleme (taban) | build | `cd infra/functions && npm ci && npm run build` (10:24:26Z) | exit 0 | `BE7-00-*` |
+| Taban suite (eski kurallar) | repeatable integration | `JAVA_HOME=/opt/homebrew/opt/openjdk@21 PATH=/opt/homebrew/opt/openjdk@21/bin:$PATH npm run test:emulator` (10:24:41Z) | exit 0 — 31 / 31 | `BE7-01-*` |
+| Tip kontrolü | static | `npm run build`; `npx tsc --noEmit` (proje) + `rules.test.ts` için `--strict` | exit 0 | — (konsol) |
+| Emülatörsüz yol | unit | `npm test` (10:25:16Z) | exit 0 — 18 passed, **15 skipped** (emülatör-gated iki suite; rules suite artık 8 test) | `BE7-03-*` |
+| Değişiklik sonrası suite | repeatable integration | aynı emülatör komutu (10:25:33Z; kurallar `aa4c5dc2…`, test `2c7df84a…`) | exit 0 — **Test Suites 3 / 3, Tests 33 / 33**, skip 0 (rules 8, callable 7, skeleton 18) | `BE7-02-*` |
+| Eski kural yakalanıyor | negatif | `python3 evidence/neg-be7.py` (repo kökünden) | aşağıdaki tablo | `BE7-04-neg.log.txt` |
+
+**Named negative run** (`evidence/neg-be7.py`; kurallar bayt kopyasından geri yüklendi, sha1 önce = sonra `aa4c5dc2…`):
+
+| Run | Mutasyon | Sonuç | Yakalayan testler |
+| --- | --- | --- | --- |
+| N-DIRECT-CREATE | eski client kuralı geri: `allow create: if request.auth != null && request.auth.uid == uid;` + `update, delete, read: if false` | exit 1 — **3 failed, 5 passed / 8**; script exit 0 (beklenen üç fail, başka fail yok) | "…direct create of their own valid entry", "…own entry with an invalid payload" (P3), "…in a non-date bucket" (P6). Diğer beş red testi eski kuralda da geçiyor (beklenen). |
+
+**Notlar:**
+* `BE7-02`'den önce bir koşuda `npm run test:emulator -- --verbose` kullandım; `--verbose` firebase-tools'a gitti ve `unknown option '--verbose'` ile exit 1 döndü — hiç test koşmadı, kullanım hatası. Log'un başında not edildi; kayıtlı sonuç kanonik komutla alındı.
+* Jest "A worker process has failed to exit gracefully" satırı bu koşuda da var (A8 ruling 4); sonuçları etkilemiyor.
+* **İzolasyon:** rules testleri `@firebase/rules-unit-testing` ile doğrudan `firestore.rules` dosyasını yüklüyor; callable testleri handler'ı doğrudan çağırıyor (Admin SDK → Firestore emülatörü, `firebase.json` kuralları yüklü). Functions emülatörü / HTTPS katmanı ve app ↔ emülatör yolu bu turda koşulmadı.
+
+---
+
+# WORKFLOW HANDOFF SUGGESTION (NON-AUTHORITATIVE)
+
+* **Completed Tasks:** F08-BE7.
+* **Remaining Tasks:** Tech Lead checkpoint (BE7 reconciliation, preflight) → F08-QA-FUNCTIONAL-R1 (plan A9 ruling 4).
+* **Blockers:** yok.
+* **Status Suggestion:** Needs Tech Lead Review.
+
+## 15. Sonraki Komut
+
+```
+Run Tech Lead
+```
