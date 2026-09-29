@@ -10,11 +10,11 @@ In Release
 
 ## Current Owner
 
-Backend Developer
+Tech Lead
 
 ## Next Role
 
-Backend Developer
+Tech Lead
 
 ## Active Task Ledger
 
@@ -26,14 +26,14 @@ Backend Developer
 - [x] Task ID: F08-QA-FUNCTIONAL-R1 | Assigned Role: QA | Status: Done | Summary: DONE 2026-09-29 — verdict **Runtime Validation Pending** (qa.md § F08-QA-FUNCTIONAL-R1; HEAD 695f783, rules `aa4c5dc2…`, `app/` 9de12e6a…). F1 closed: QA probe P3 / P6 DENIED, emulator suite 33 / 33, N-OVERWRITE + N-DIRECT-CREATE caught, client ↔ emulator exactly-once PASS under the new rules; F08.OFFLINE-JOURNEY (AC2) PENDING. Evidence: qa/functional-r1/. Plan: Functional re-run after F08-BE7 under the plan locked in architecture A9 ruling 4 — emulator suite + N-OVERWRITE + the BE7 negative, the QA rules probe P1–P6 (P3 / P6 now denied), one client ↔ emulator exactly-once case under the new rules, AC2 if the user has run it; other functional evidence reused by fingerprint | Depends On: F08-BE7
 - [x] Task ID: F08-QA-FUNCTIONAL-R2 | Assigned Role: QA | Status: Done | Summary: DONE 2026-09-29 — verdict **Functional Approved** (qa.md § F08-QA-FUNCTIONAL-R2; HEAD e55176f, `app/` 9de12e6a…). AC2 / J8 PASS: the user's offline run validated at store level (levels 1–2 completed and 3 opened offline, timestamps inside the offline window; offline cold relaunch → Home 2 / 30); all 30 levels open through the production path (QA probe + control), installed bundle byte-identical; define-less build confirmed. F08.OFFLINE-JOURNEY → PASS. Evidence: qa/functional-r2/. Plan: Targeted functional re-run for F08.OFFLINE-JOURNEY (AC2 / J8) only, on the user's real no-network run of 2026-09-29 14:07:49–14:09:45Z (`evidence/runtime/offline/`), under the plan of architecture A11 ruling 4 as corrected at A12 ruling 4 (core, backend-security, client-ui, stateful-flow; targeted; reuse allowed by the R1 fingerprints). Activated at the intake A12. Brief: Current Brief | Depends On: F08-QA-FUNCTIONAL-R1
 - [x] Task ID: F08-DEVOPS-PREP | Assigned Role: DevOps/Release Engineer | Status: Done | Summary: DONE 2026-09-29 (release.md, verdict **Release Validation Pending**; no deploy, billing or console change). CI repair (Java 21, TD-FORMAT-SCOPE, TD-CI-TOOLCHAIN, checkout v7.0.1, `ubuntu-24.04`), `release.md` refresh, hygiene recommendations; local proof DP-01…13. **Accepted at A17:** CI run #2 `36597006854` (c592081, pushed by the user) — all three jobs green; the best-effort integration step failed inside the green `verify` job (TD-CI-INTEGRATION-GATE). N-1…N-5 ruled at A17 | Depends On: F08-QA-FUNCTIONAL-R2
-- [ ] Task ID: F08-BE8 | Assigned Role: Backend Developer | Status: Open | Summary: TD-FUNCTIONS-RUNTIME (A17 ruling 5): Cloud Functions runtime Node.js 20 → 22 — `infra/functions/package.json` `engines.node` "22", `@types/node` ^22, the lockfile, `infra/README.md`; build, offline tests and the emulator suite (33 / 33) run on Node 22 locally. No handler, validator, rules or CI change; no deploy. Brief: Current Brief | Depends On: -
+- [x] Task ID: F08-BE8 | Assigned Role: Backend Developer | Status: Done | Summary: DONE 2026-09-29 (backend.md § F08-BE8): `engines.node` "22", `@types/node` 20.19.43 → 22.20.4 (lockfile: root + `@types/node` only), `infra/README.md`; on Node 22.23.3 started directly (npm scripts put the host Node 24 first on PATH — backend.md §11): `tsc` exit 0, offline 18 passed / 15 skipped, emulator suite 3 / 3, **33 / 33** (`evidence/runtime/BE8-01`, `BE8-02`). Source, tests, rules, CI unchanged; no deploy. Host note: `node@22` install broke the system node via `simdjson`; restored as node@24 24.21.0 with the user's choice (backend.md §14) | Depends On: -
 - [ ] Task ID: F08-DEVOPS | Assigned Role: DevOps/Release Engineer | Status: Blocked | Summary: Waits on the user's F08.DEPLOY-GO (opened at A17) and F08-BE8. Scope by the chosen option: read the live project state (rules, plan, App Check); pin Node 22 in the CI `infra` job (SHA-pinned `setup-node`); a green CI run at the deploy revision with its logs read (S1: Java 21, Node 22, 0 skipped); the authorized deploy per the runbook; smoke S2–S4 (F08.DEPLOY-SMOKE) incl. "a direct client create is denied; the callable creates"; the release readiness verdict | Depends On: F08-DEVOPS-PREP, F08-BE8
 - [ ] Task ID: F08-QA-FINAL | Assigned Role: QA | Status: Queued | Summary: Final acceptance of the reviewed release proof and the affected functional scope; Regression Depth `full` (the Node 22 runtime change is a dependency / build-config change): the emulator suite re-run at the final revision, other functional evidence reused by fingerprint | Depends On: F08-DEVOPS
 
 ## Open Tasks
 
-* **F08-BE8 — Open** (Backend Developer): the Node.js 22 runtime (Current Brief).
-* F08-DEVOPS — Blocked (F08.DEPLOY-GO, F08-BE8); F08-QA-FINAL Queued.
+* None open. F08-BE8 Done; the Tech Lead checkpoint is next.
+* F08-DEVOPS — Blocked (F08.DEPLOY-GO); F08-QA-FINAL Queued.
 
 ## Handoff Plan
 
@@ -41,7 +41,7 @@ None
 
 ## Delivery Review
 
-Accepted
+Pending
 
 ## QA Scope
 
@@ -237,7 +237,7 @@ None
 
 ## Next Action
 
-Run Backend Developer — F08-BE8 (Current Brief): the Cloud Functions runtime Node.js 20 → 22, verified locally on Node 22; no deploy. Then the Tech Lead checkpoint. In parallel the user answers F08.DEPLOY-GO.
+Run Tech Lead — the F08-BE8 checkpoint: review backend.md § F08-BE8 and `evidence/runtime/BE8-*` (the Node 22 proof is BE8-01 / BE8-02, not the npm-script logs); rule on backend.md §14 (the host node change; the setup-manifest npm-PATH note); take in F08.DEPLOY-GO if the user has answered.
 
 ## Last Decision
 
@@ -251,9 +251,9 @@ The pre-checkpoint orchestration is archived as history/f08-offline-persistence-
 
 ## Last Update
 
-* Updated By: Tech Lead
+* Updated By: Backend Developer
 * Timestamp: 2026-09-29
-* Summary: PREP checkpoint (A17) — PREP accepted on a green CI run #2; F08-BE8 Open (Node.js 22); F08.DEPLOY-GO opened; owner → Backend Developer.
+* Summary: F08-BE8 Done — Cloud Functions on Node.js 22 (`engines.node`, `@types/node`); emulator suite 33 / 33 on Node 22; owner → Tech Lead.
 
 ## Context & Follow-ups
 
@@ -286,6 +286,7 @@ F08 implementation/runbook and the F08-FE12 fix are retained. Exact old tasks an
   * **Decided:** Node.js 22 for Cloud Functions (TD-FUNCTIONS-RUNTIME); N-1, N-2, N-4.
   * **Opened:** F08-BE8; the gate F08.DEPLOY-GO.
   * **Next:** owner → Backend Developer.
+* 2026-09-29 — Backend Developer: F08-BE8 Done (backend.md). `engines.node` 22, `@types/node` 22; suite 33 / 33 on Node 22 (tools started directly — npm scripts ran the host Node 24). Host: the system node restored as 24.21.0 (node@24) after the `simdjson` break. Owner → Tech Lead.
 
 ## Release Constraints
 

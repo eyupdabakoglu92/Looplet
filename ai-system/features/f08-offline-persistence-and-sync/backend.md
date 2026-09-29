@@ -282,3 +282,102 @@ Ortam: macOS host, Node v24.7.0, firebase-tools 15.29.0, OpenJDK 21 (`/opt/homeb
 ```
 Run Tech Lead
 ```
+
+---
+
+# F08-BE8 — Cloud Functions runtime Node.js 20 → 22 (2026-09-29)
+
+> Karar: `architecture.md` → Activation 2026-09-29 → A17 ruling 5 (TD-FUNCTIONS-RUNTIME); `platform.md` §3. Brief: `orchestration.md` → Current Brief. Taban: HEAD `ebe59ce`. Yalnız `infra/functions/package.json`, `package-lock.json` ve `infra/README.md` değişti; handler, validator, kurallar, test mantığı, CI, Remote Config ve app dokunulmadı. Deploy yok.
+
+## 1. Feature Summary
+
+* Google, Cloud Functions'ta Node.js 20 runtime'ını **2026-10-30**'da kapatıyor. O tarihten sonra Node 20'de fonksiyon oluşturulamıyor ve güncellenemiyor. Deploy runtime'ı `engines.node` alanından geliyor; alan artık **`"22"`**.
+* `@types/node` 20.19.43 → **22.20.4** oldu. Lockfile'da başka paket değişmedi.
+* Build, offline testler ve emülatör suite'i **Node 22.23.3** üzerinde yeşil: **33 / 33**. Suite, doğrudan Node 22 ile başlatılarak koşuldu; §11'de neden gerektiği anlatılıyor.
+
+## 2. Impacted Files
+
+* **Güncellenen:**
+  * `infra/functions/package.json` — sha1 `db18898b…` → `458f84e4…`: `engines.node` `"20"` → `"22"`; `@types/node` `^20.0.0` → `^22.20.4`;
+  * `infra/functions/package-lock.json` — `97187c5f…` → `634915c3…`: kök `engines` + `devDependencies` ve `node_modules/@types/node` girdisi (version / resolved / integrity). Toplam 2 paket girdisi değişti (kök + `@types/node`); `undici-types ~6.21.0` bağımlılığı aynı kaldı;
+  * `infra/README.md` — `caee8ef6…` → `74a96030…`: `functions/` satırı "Node 22"; Deploy önkoşulu 3 → `nodejs22` ve takvim.
+* **Oluşturulan (kanıt):** `evidence/runtime/BE8-00-node22-ci-build.log.txt`, `BE8-01-node22-offline-tests.log.txt`, `BE8-02-node22-emulator-suite.log.txt`, `BE8-03-node22-ci-command.log.txt`.
+* **Değişmeyen (doğrulandı, `git diff HEAD` boş):** `infra/functions/src/**` (`submitDailyResult.ts` `bcda2662…`, `validate.ts` `8f0398ea…`), `infra/functions/test/**`, `infra/firestore.rules` `aa4c5dc2…`, `infra/firebase.json`, `.github/`, `app/`.
+
+## 3. Task-to-Code Traceability
+
+* **Task ID:** F08-BE8 — **Durum: Complete**
+  * **Brief 1 — sürümler:** `engines.node` `"22"`. `@types/node` yalnız bu paket için güncellendi: `npm install --package-lock-only --save-dev "@types/node@^22.0.0"`. npm aralığı `^22.20.4` olarak yazdı; brief'teki `^22` aralığının içinde, package.json ile lockfile uyumlu (`npm ci` exit 0).
+  * **Brief 2 — uyumluluk, yükseltme yapılmadı:**
+    * `firebase-functions` 6.6.0 `engines.node >=14.10.0`; `firebase-admin` 13.10.0 `>=18`.
+    * firebase-tools 15.29.0'ın runtime tablosunda (`lib/deploy/functions/runtimes/supported/types.js`) `nodejs22` GA olarak geçiyor. Node 24 gerekmedi.
+  * **Brief 3 — Node 22 doğrulaması:** kullanıcının onayıyla `brew install node@22` kuruldu (keg-only, 22.23.3). Komutlarda PATH'in başına kondu. Sonuçlar §11'de.
+  * **Brief 4 — `infra/README.md`:** runtime satırı ve önkoşul 3 güncellendi. Takvim kaynağı Google Cloud runtime-support sayfası (A17).
+  * **Brief 5 — bu bölüm.**
+
+## 7. Contract Compliance Check
+
+* **Endpoint / handler contract:** Preserved — `src/**` bayt-özdeş.
+* **Request / response shape:** Preserved.
+* **Error format:** Preserved.
+* **Event payload / ordering:** Not Applicable.
+* **State-machine / boundary semantics:** Preserved — kurallar ve callable değişmedi; 33 testin tamamı Node 22'de aynı sonucu veriyor.
+
+## 8. Behavior Preserved
+
+* Callable'ın `CREATED` / `ALREADY_SUBMITTED` (first-run-authoritative) / `INVALID_PAYLOAD` / `UNSUPPORTED_LANGUAGE` / auth dalları ve 8 kural red testi Node 22'de yeşil (`BE8-02`). Bunlar BE7 tabanıyla (33 / 33) aynı.
+* Kaynakta kullanılan Node API'leri `@types/node` 22 ile derleniyor: `tsc` exit 0 (`BE8-01`). Tip düzeyinde kırılma yok.
+
+## 11. Test Evidence by Task
+
+Ortam: macOS host; Node **22.23.3** (`/opt/homebrew/opt/node@22`, keg-only); npm 10.9.9; firebase-tools 15.29.0; OpenJDK 21.0.12 (`PATH`'te ilk); proje `demo-looplet` (yalnız emülatör; gerçek Firebase'e erişim, deploy veya dry-run yok). Revizyon: HEAD `ebe59ce` + bu çalışma ağacı. Zaman: 2026-09-29, 16:55–17:10Z.
+
+**Önemli yöntem notu — npm script'leri Node 22'yi kanıtlamıyor.** npm'in global prefix'i `/opt/homebrew` (Homebrew varsayılanı). npm, çalıştırdığı her script'in `PATH`'inin başına `/opt/homebrew/bin` ekliyor. Bu da script içindeki `node`'u sistem Node'u (24.21.0) yapıyor. Bu durum `npm test`, `npm run build`, `npm run test:emulator` ve `npx` için geçerli.
+* İlk koşularım bu yüzden Node 24'te koştu. Bunu BE8-03'teki `jest host node: v24.21.0` satırından yakaladım; `npm exec` ile de doğruladım.
+* Kayıtlı Node 22 kanıtı (BE8-01, BE8-02) araçları **doğrudan** Node 22 ikilisiyle başlatıyor. Script'lerin yaptığı iş birebir aynı: `tsc`, `jest --passWithNoTests`, `emulators:exec`.
+* Aynı tuzak, `setup-manifest.md`'deki "keg-only bir aracı PATH'in başına koy" tarifini npm script'leri için geçersiz kılıyor (Java için sorun yok: emülatörün kendisi Java'yı PATH'ten alıyor). Bkz. §14.
+
+| Claim / senaryo | Sınıf | Komut | Sonuç | Kanıt |
+| --- | --- | --- | --- | --- |
+| Kurulum lockfile'dan | build | `npm ci` (npm process Node 22) | exit 0; 14 moderate advisory (eskisiyle aynı, advisory gate) | `BE8-00` (içindeki `npm run build` bölümü Node 24'te koştu; dosyanın başında not var) |
+| Derleme Node 22'de | static / build | `node22 node_modules/typescript/bin/tsc` | exit 0 | `BE8-01` |
+| Emülatörsüz testler Node 22'de | unit | `node22 node_modules/jest/bin/jest.js --passWithNoTests` | exit 0 — 18 passed, 15 skipped (emülatör-gated iki suite; BE7 ile aynı) | `BE8-01` |
+| **Emülatör suite'i Node 22'de** | repeatable integration | `node22 firebase.js --config ../firebase.json emulators:exec --only firestore,auth --project demo-looplet "node22 -e <sürüm> && node22 node_modules/jest/bin/jest.js --passWithNoTests"` | exit 0 — **Test Suites 3 / 3, Tests 33 / 33**, skip 0; script içinde `jest host node: v22.23.3` | `BE8-02` |
+| CI komut biçimi (kontrol) | repeatable integration | `cd infra && npx --yes firebase-tools@15 emulators:exec … "npm --prefix functions run test"` | exit 0 — 33 / 33, **ama `jest host node: v24.21.0`** → Node 22 kanıtı değil | `BE8-03` |
+
+**Kontrol / negatif:**
+* BE8-02 ve BE8-03 aynı suite'i koşuyor; ayrıldıkları tek yer script içindeki `process.version` satırı (v22.23.3 / v24.21.0).
+* Yani kanıt yanlış Node ile koşsaydı bunu gösterirdi, ve BE8-03'te gösterdi.
+* Runtime sürümü için anlamlı bir mutasyon negatifi yok: `engines.node` yalnız deploy'da okunuyor, emülatör suite'i firestore + auth ile koşuyor, functions emülatörü kullanılmıyor.
+
+**İzolasyon:** functions emülatörü / HTTPS katmanı ve gerçek `nodejs22` deploy'u koşulmadı. Deploy-zamanı runtime doğrulaması F08-DEVOPS'ta: CI `infra` job'ında Node 22 pin'i, S1 ve S3.
+
+## 13. Missing / TODO
+
+* **CI:** `infra` job'ı hâlâ runner'ın varsayılan Node'unu kullanıyor. Node 22 pin'i DevOps işi (F08-DEVOPS, brief non-goal). O pin gelene kadar CI testleri Node 22 kanıtı sayılmaz.
+
+## 14. Needs Tech Lead Clarification
+
+1. **Host ortam değişikliği — kullanıcı onayıyla, ama bir yan etkisi oldu.**
+   * `brew install node@22`, Homebrew'un ortak `simdjson` kütüphanesini 3.13.0 → 4.6.11'e yükseltti. Bu da sistemdeki `node` 24.7.0'ı bozdu: `libsimdjson.26.dylib` bulunamıyordu. Diğer bağımlılıklar sağlamdı (eski kütüphane `DYLD_LIBRARY_PATH` ile verilince 24.7.0 çalıştı).
+   * Kullanıcıya seçenekler soruldu. Seçimiyle `brew install node@24` + `brew unlink node` + `brew link --force --overwrite node@24` yapıldı.
+   * **Sistem `node` artık 24.21.0** (aynı major); npm 11.19.0; global `firebase` 15.29.0 çalışıyor.
+   * Eski `node` 24.7.0 keg'i unlink edilmiş olarak duruyor; kaldırmak kullanıcının kararı (`brew uninstall node`).
+   * Önceki kanıtlar host'ta Node 24.7.0 ile alınmıştı. Bu sadece host notudur, fingerprint'leri etkilemez.
+2. **`setup-manifest.md` (Tech Lead):** keg-only Node ile yerel doğrulama tarifi gerekiyorsa, npm script'lerinin `/opt/homebrew/bin`'i öne aldığı yazılmalı; yoksa bir sonraki rol aynı yanlış kanıtı üretir. Kanonik tarif için benim önerim, BE8-02'deki doğrudan çağrı biçimi.
+3. **Takvim tutarsızlığı (bilgi):** firebase-tools 15.29'un tablosu `nodejs22` için decommission'ı **2028-10-31** diyor, Google'ın sayfası **2027-10-31**. `infra/README.md` erken tarihi esas alıyor.
+
+---
+
+# WORKFLOW HANDOFF SUGGESTION (NON-AUTHORITATIVE)
+
+* **Completed Tasks:** F08-BE8.
+* **Remaining Tasks:** Tech Lead checkpoint (BE8 + F08.DEPLOY-GO kararı, kullanıcı cevapladıysa) → F08-DEVOPS (gate'e göre) → F08-QA-FINAL.
+* **Blockers:** yok.
+* **Status Suggestion:** Needs Tech Lead Review.
+
+## 15. Sonraki Komut
+
+```
+Run Tech Lead
+```

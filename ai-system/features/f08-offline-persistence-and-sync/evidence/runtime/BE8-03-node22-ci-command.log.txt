@@ -1,0 +1,138 @@
+NOTE (added after the run): NOT Node 22 evidence. The CI command form via `npx` put /opt/homebrew/bin first on the script's PATH, so jest ran on the host's Node 24.21.0 (see 'jest host node' below). Kept as evidence that the CI command form passes (33 / 33) and that the host quirk exists. The Node 22 suite run is BE8-02. On CI the runner has one Node, so the quirk cannot select another version there; F08-DEVOPS pins Node 22 for that job.
+BE8 working tree on HEAD ebe59ce + F08-BE8 changes; node v22.23.3; 2026-09-29T16:56:24Z
+firebase CLI shebang: #!/usr/bin/env node -> /opt/homebrew/opt/node@22/bin/node
+$ (cd infra) npx --yes firebase-tools@15 emulators:exec --only firestore,auth --project demo-looplet "npm --prefix functions run test"   (the CI infra job's command)
+i  emulators: Starting emulators: auth, firestore
+i  emulators: Detected demo project ID "demo-looplet", emulated services will use a demo configuration and attempts to access non-emulated services for this project will fail.
+i  firestore: Firestore Emulator logging to firestore-debug.log
+✔  firestore: Firestore Emulator was started in standard edition.
+✔  firestore: Firestore Emulator UI websocket is running on 9150.
+i  Running script: node -e 'console.log("jest host node:", process.version)' && npm --prefix functions run test
+jest host node: v24.21.0
+
+> looplet-functions@0.1.0 test
+> jest --passWithNoTests
+
+PASS test/skeleton.test.ts
+  ● Console
+
+    console.warn
+      {"uid":"u1","severity":"WARNING","message":"submitDailyResultV1: missing App Check token (soft-enforce)"}
+
+      39 |   // `platform.md` §6/§13): a missing/failed token is logged, not rejected.
+      40 |   if (request.app === undefined) {
+    > 41 |     logger.warn("submitDailyResultV1: missing App Check token (soft-enforce)", {
+         |            ^
+      42 |       uid,
+      43 |     });
+      44 |   }
+
+      at write (node_modules/firebase-functions/lib/logger/index.js:81:74)
+      at Object.warn (node_modules/firebase-functions/lib/logger/index.js:121:5)
+      at handleSubmitDailyResult (src/submitDailyResult.ts:41:12)
+      at Object.<anonymous> (test/skeleton.test.ts:48:30)
+
+(node:59930) MetadataLookupWarning: received unexpected error = Invalid response from metadata service: incorrect Metadata-Flavor header. Expected 'Google', got no header code = UNKNOWN
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS test/submitDailyResult.test.ts
+PASS test/rules.test.ts
+  ● Console
+
+    console.warn
+      [2026-09-29T16:56:32.513Z]  @firebase/firestore: Firestore (12.18.0): GrpcConnection RPC 'Write' stream 0x20716489 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+      false for 'create' @ L21, false for 'create' @ L26, false for 'update' @ L21, false for 'update' @ L26
+
+      at Logger.defaultLogHandler [as _logHandler] (node_modules/@firebase/logger/src/logger.ts:110:57)
+      at Logger.warn (node_modules/@firebase/logger/src/logger.ts:201:10)
+      at logWarn (node_modules/@firebase/firestore/src/util/log.ts:69:15)
+      at ClientDuplexStreamImpl.<anonymous> (node_modules/@firebase/firestore/src/platform/node/grpc_connection.ts:337:9)
+      at Object.onReceiveStatus (node_modules/@grpc/grpc-js/src/client.ts:705:18)
+      at Object.onReceiveStatus (node_modules/@grpc/grpc-js/src/client-interceptors.ts:419:48)
+      at node_modules/@grpc/grpc-js/src/resolving-call.ts:132:24
+
+    console.warn
+      [2026-09-29T16:56:32.631Z]  @firebase/firestore: Firestore (12.18.0): GrpcConnection RPC 'Write' stream 0x2071648a error. Code: 7 Message: 7 PERMISSION_DENIED: 
+      false for 'create' @ L21, false for 'create' @ L26, false for 'update' @ L21, false for 'update' @ L26
+
+      at Logger.defaultLogHandler [as _logHandler] (node_modules/@firebase/logger/src/logger.ts:110:57)
+      at Logger.warn (node_modules/@firebase/logger/src/logger.ts:201:10)
+      at logWarn (node_modules/@firebase/firestore/src/util/log.ts:69:15)
+      at ClientDuplexStreamImpl.<anonymous> (node_modules/@firebase/firestore/src/platform/node/grpc_connection.ts:337:9)
+      at Object.onReceiveStatus (node_modules/@grpc/grpc-js/src/client.ts:705:18)
+      at Object.onReceiveStatus (node_modules/@grpc/grpc-js/src/client-interceptors.ts:419:48)
+      at node_modules/@grpc/grpc-js/src/resolving-call.ts:132:24
+
+    console.warn
+      [2026-09-29T16:56:32.662Z]  @firebase/firestore: Firestore (12.18.0): GrpcConnection RPC 'Write' stream 0x2071648b error. Code: 7 Message: 7 PERMISSION_DENIED: 
+      false for 'create' @ L21, false for 'create' @ L26, false for 'update' @ L21, false for 'update' @ L26
+
+      at Logger.defaultLogHandler [as _logHandler] (node_modules/@firebase/logger/src/logger.ts:110:57)
+      at Logger.warn (node_modules/@firebase/logger/src/logger.ts:201:10)
+      at logWarn (node_modules/@firebase/firestore/src/util/log.ts:69:15)
+      at ClientDuplexStreamImpl.<anonymous> (node_modules/@firebase/firestore/src/platform/node/grpc_connection.ts:337:9)
+      at Object.onReceiveStatus (node_modules/@grpc/grpc-js/src/client.ts:705:18)
+      at Object.onReceiveStatus (node_modules/@grpc/grpc-js/src/client-interceptors.ts:419:48)
+      at node_modules/@grpc/grpc-js/src/resolving-call.ts:132:24
+
+    console.warn
+      [2026-09-29T16:56:32.685Z]  @firebase/firestore: Firestore (12.18.0): GrpcConnection RPC 'Write' stream 0x2071648c error. Code: 7 Message: 7 PERMISSION_DENIED: 
+      false for 'create' @ L21, false for 'create' @ L26, false for 'update' @ L21, false for 'update' @ L26
+
+      at Logger.defaultLogHandler [as _logHandler] (node_modules/@firebase/logger/src/logger.ts:110:57)
+      at Logger.warn (node_modules/@firebase/logger/src/logger.ts:201:10)
+      at logWarn (node_modules/@firebase/firestore/src/util/log.ts:69:15)
+      at ClientDuplexStreamImpl.<anonymous> (node_modules/@firebase/firestore/src/platform/node/grpc_connection.ts:337:9)
+      at Object.onReceiveStatus (node_modules/@grpc/grpc-js/src/client.ts:705:18)
+      at Object.onReceiveStatus (node_modules/@grpc/grpc-js/src/client-interceptors.ts:419:48)
+      at node_modules/@grpc/grpc-js/src/resolving-call.ts:132:24
+
+    console.warn
+      [2026-09-29T16:56:32.709Z]  @firebase/firestore: Firestore (12.18.0): GrpcConnection RPC 'Write' stream 0x2071648d error. Code: 7 Message: 7 PERMISSION_DENIED: 
+      false for 'create' @ L21, false for 'create' @ L26, false for 'update' @ L21, false for 'update' @ L26
+
+      at Logger.defaultLogHandler [as _logHandler] (node_modules/@firebase/logger/src/logger.ts:110:57)
+      at Logger.warn (node_modules/@firebase/logger/src/logger.ts:201:10)
+      at logWarn (node_modules/@firebase/firestore/src/util/log.ts:69:15)
+      at ClientDuplexStreamImpl.<anonymous> (node_modules/@firebase/firestore/src/platform/node/grpc_connection.ts:337:9)
+      at Object.onReceiveStatus (node_modules/@grpc/grpc-js/src/client.ts:705:18)
+      at Object.onReceiveStatus (node_modules/@grpc/grpc-js/src/client-interceptors.ts:419:48)
+      at node_modules/@grpc/grpc-js/src/resolving-call.ts:132:24
+
+    console.warn
+      [2026-09-29T16:56:32.750Z]  @firebase/firestore: Firestore (12.18.0): GrpcConnection RPC 'Write' stream 0x2071648f error. Code: 7 Message: 7 PERMISSION_DENIED: 
+      false for 'update' @ L21, false for 'update' @ L26
+
+      at Logger.defaultLogHandler [as _logHandler] (node_modules/@firebase/logger/src/logger.ts:110:57)
+      at Logger.warn (node_modules/@firebase/logger/src/logger.ts:201:10)
+      at logWarn (node_modules/@firebase/firestore/src/util/log.ts:69:15)
+      at ClientDuplexStreamImpl.<anonymous> (node_modules/@firebase/firestore/src/platform/node/grpc_connection.ts:337:9)
+      at Object.onReceiveStatus (node_modules/@grpc/grpc-js/src/client.ts:705:18)
+      at Object.onReceiveStatus (node_modules/@grpc/grpc-js/src/client-interceptors.ts:419:48)
+      at node_modules/@grpc/grpc-js/src/resolving-call.ts:132:24
+
+    console.warn
+      [2026-09-29T16:56:32.796Z]  @firebase/firestore: Firestore (12.18.0): GrpcConnection RPC 'Write' stream 0x20716491 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+      false for 'delete' @ L21, false for 'delete' @ L26
+
+      at Logger.defaultLogHandler [as _logHandler] (node_modules/@firebase/logger/src/logger.ts:110:57)
+      at Logger.warn (node_modules/@firebase/logger/src/logger.ts:201:10)
+      at logWarn (node_modules/@firebase/firestore/src/util/log.ts:69:15)
+      at ClientDuplexStreamImpl.<anonymous> (node_modules/@firebase/firestore/src/platform/node/grpc_connection.ts:337:9)
+      at Object.onReceiveStatus (node_modules/@grpc/grpc-js/src/client.ts:705:18)
+      at Object.onReceiveStatus (node_modules/@grpc/grpc-js/src/client-interceptors.ts:419:48)
+      at node_modules/@grpc/grpc-js/src/resolving-call.ts:132:24
+
+A worker process has failed to exit gracefully and has been force exited. This is likely caused by tests leaking due to improper teardown. Try running with --detectOpenHandles to find leaks. Active timers can also cause this, ensure that .unref() was called on them.
+
+Test Suites: 3 passed, 3 total
+Tests:       33 passed, 33 total
+Snapshots:   0 total
+Time:        3.077 s
+Ran all test suites.
+✔  Script exited successfully (code 0)
+i  emulators: Shutting down emulators.
+i  firestore: Stopping Firestore Emulator
+i  auth: Stopping Authentication Emulator
+i  hub: Stopping emulator hub
+i  logging: Stopping Logging Emulator
+exit 0

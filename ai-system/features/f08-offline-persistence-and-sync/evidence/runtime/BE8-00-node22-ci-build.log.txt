@@ -1,0 +1,42 @@
+NOTE (added after the run): `npm ci` itself ran on Node 22.23.3 (npm 10.9.9). The `npm run build` section below does NOT prove Node 22: npm prepends its global prefix bin (/opt/homebrew/bin → the system Node 24.21.0) to a script's PATH, so tsc ran on Node 24. The Node 22 build is BE8-01 (tsc started directly by Node 22).
+BE8 working tree on HEAD ebe59ce + F08-BE8 changes (package.json, package-lock.json, infra/README.md); 2026-09-29T16:55:46Z
+$ which node npm java firebase
+/opt/homebrew/opt/node@22/bin/node
+/opt/homebrew/opt/node@22/bin/npm
+/opt/homebrew/opt/openjdk@21/bin/java
+/opt/homebrew/bin/firebase
+$ node --version
+v22.23.3
+$ npm --version
+10.9.9
+$ java -version
+openjdk version "21.0.12.1" 2026-08-18
+OpenJDK Runtime Environment Homebrew (build 21.0.12.1)
+OpenJDK 64-Bit Server VM Homebrew (build 21.0.12.1, mixed mode, sharing)
+$ npm ci
+npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+npm warn deprecated glob@7.2.3: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead
+npm warn deprecated uuid@9.0.1: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
+
+added 555 packages, and audited 556 packages in 5s
+
+66 packages are looking for funding
+  run `npm fund` for details
+
+13 moderate severity vulnerabilities
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+exit 0
+$ npm run build
+
+> looplet-functions@0.1.0 build
+> tsc
+
+exit 0

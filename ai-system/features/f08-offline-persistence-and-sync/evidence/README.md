@@ -44,3 +44,14 @@ Claims and results: `../backend.md` → "F08-BE7". Base HEAD `8f26243`; changed 
 | `runtime/BE7-01-baseline-suite.log.txt` | The suite before the change (old rules): 31 / 31. |
 | `runtime/BE7-02-fixed-suite.log.txt` | The suite after the change: 33 / 33 (rules 8, callable 7, skeleton 18). Notes one invocation error before it (no test ran). |
 | `runtime/BE7-03-plain-npm-test.log.txt` | `npm test` without the emulator: 18 passed, 15 skipped. |
+
+## F08-BE8 (Backend Developer, 2026-09-29)
+
+Claims and results: `../backend.md` → "F08-BE8". Base HEAD `ebe59ce`; changed `infra/functions/package.json` (`engines.node` 20 → 22, `@types/node` → `^22.20.4`), `infra/functions/package-lock.json` (the root and `@types/node` only) and `infra/README.md`. Source, tests and rules are unchanged.
+
+| File | What |
+| --- | --- |
+| `runtime/BE8-00-node22-ci-build.log.txt` | `npm ci` with npm on Node 22.23.3. Its `npm run build` part ran on the host's Node 24 (npm puts `/opt/homebrew/bin` first on a script's PATH); see the note at the top. |
+| `runtime/BE8-01-node22-offline-tests.log.txt` | `tsc` and jest started directly by Node 22: build exit 0; 18 passed, 15 skipped. |
+| `runtime/BE8-02-node22-emulator-suite.log.txt` | **The Node 22 suite:** firebase-tools and jest started by Node 22 (`jest host node: v22.23.3`); 3 / 3 suites, 33 / 33. |
+| `runtime/BE8-03-node22-ci-command.log.txt` | Control: the CI command form via `npx`. 33 / 33, but jest ran on Node 24 (`jest host node: v24.21.0`) — not Node 22 evidence. |

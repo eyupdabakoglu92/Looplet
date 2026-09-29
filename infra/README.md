@@ -26,7 +26,7 @@ implemented by **F08-BE2** against
 | `firestore.rules` | `dailyResults/**`: no client access; only the callable writes (Admin SDK); default-deny elsewhere |
 | `firestore.indexes.json` | empty (a composite index for a future leaderboard is deferred) |
 | `remoteconfig.template.json` | `daily_enabled` / `daily_sync_enabled` / `share_enabled` (true) + `daily_manifest_url` (placeholder) — wired into `firebase.json` `remoteconfig.template` |
-| `functions/` | TypeScript (Node 20) Cloud Functions — `submitDailyResultV1` |
+| `functions/` | TypeScript (Node 22) Cloud Functions — `submitDailyResultV1` |
 
 ## Local development
 
@@ -59,9 +59,13 @@ Full readiness analysis + gate evidence:
 2. **The user's F08.DEPLOY-GO decision and explicit Tech Lead approval**
    (`release.md` §12) — production deploy is never the default. The deploy was
    deferred again on 2026-09-29 (F08 `architecture.md` A16).
-3. **The `nodejs20` runtime is still deployable.** Node.js 20 reached upstream
-   end-of-life on 2026-04-30; check the Cloud Functions runtime support
-   schedule before the deploy. A runtime change is a Tech Lead / `platform.md`
+3. **The runtime is `nodejs22`** (`engines.node: "22"`; `platform.md` §3,
+   F08 `architecture.md` A17 TD-FUNCTIONS-RUNTIME, F08-BE8). Node.js 20 is
+   decommissioned on Cloud Functions on 2026-10-30 — no create or update after
+   that date. Node.js 22 is deprecated 2027-04-30 and decommissioned 2027-10-31
+   (Google Cloud runtime-support page, read 2026-09-29; firebase-tools 15.29's
+   own table says 2028-10-31 — the Google page is the one to trust). Re-check the
+   schedule before each deploy; a runtime change is a Tech Lead / `platform.md`
    decision, not a deploy-time edit.
 4. For an **automated** deploy workflow: `FIREBASE_CI_TOKEN` **or** a Google
    Cloud service account (`roles/firebasedeploy` + `roles/cloudfunctions.developer`

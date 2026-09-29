@@ -1,0 +1,42 @@
+BE8 working tree on HEAD ebe59ce + F08-BE8 changes; 2026-09-29T16:57:38Z. No npm script is used for execution: npm prepends its global prefix bin (/opt/homebrew/bin → the system Node 24) to a script's PATH, so every tool below is started directly with /opt/homebrew/opt/node@22/bin/node.
+$ /opt/homebrew/opt/node@22/bin/node --version
+v22.23.3
+$ /opt/homebrew/opt/node@22/bin/node node_modules/typescript/bin/tsc   (= npm run build)
+exit 0
+index.js
+index.js.map
+submitDailyResult.js
+submitDailyResult.js.map
+types.js
+types.js.map
+validate.js
+validate.js.map
+$ /opt/homebrew/opt/node@22/bin/node -e (jest host check)
+host node v22.23.3
+$ /opt/homebrew/opt/node@22/bin/node node_modules/jest/bin/jest.js --passWithNoTests   (= npm test; emulator suites auto-skip)
+PASS test/skeleton.test.ts
+  ● Console
+
+    console.warn
+      {"uid":"u1","severity":"WARNING","message":"submitDailyResultV1: missing App Check token (soft-enforce)"}
+
+      39 |   // `platform.md` §6/§13): a missing/failed token is logged, not rejected.
+      40 |   if (request.app === undefined) {
+    > 41 |     logger.warn("submitDailyResultV1: missing App Check token (soft-enforce)", {
+         |            ^
+      42 |       uid,
+      43 |     });
+      44 |   }
+
+      at write (node_modules/firebase-functions/lib/logger/index.js:81:74)
+      at Object.warn (node_modules/firebase-functions/lib/logger/index.js:121:5)
+      at handleSubmitDailyResult (src/submitDailyResult.ts:41:12)
+      at Object.<anonymous> (test/skeleton.test.ts:48:30)
+
+
+Test Suites: 2 skipped, 1 passed, 1 of 3 total
+Tests:       15 skipped, 18 passed, 33 total
+Snapshots:   0 total
+Time:        1.561 s, estimated 3 s
+Ran all test suites.
+exit 0
