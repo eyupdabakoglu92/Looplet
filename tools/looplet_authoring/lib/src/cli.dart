@@ -7,6 +7,7 @@ import 'package:looplet_engine/looplet_engine.dart';
 import 'package:looplet_solver/looplet_solver.dart';
 
 import 'content_check.dart';
+import 'daily_source.dart';
 import 'dictionary_validator.dart';
 import 'move_shorthand.dart';
 import 'puzzle_def.dart';
@@ -22,6 +23,7 @@ CommandRunner<int> buildRunner({StringSink? out, StringSink? err}) {
     ..addCommand(_PlaytestCommand(stdOut, stdErr))
     ..addCommand(_ExportCommand(stdOut, stdErr))
     ..addCommand(_CheckCommand(stdOut, stdErr))
+    ..addCommand(_PackDailyCommand(stdOut, stdErr))
     ..addCommand(_FillCommand(stdOut, stdErr));
 }
 
@@ -241,6 +243,89 @@ class _CheckCommand extends _BaseCommand {
     }
     err.writeln('check: ${failures.length} failure(s)');
     return 1;
+  }
+}
+
+// --- pack-daily ------------------------------------------------------------
+
+class _PackDailyCommand extends _BaseCommand {
+  _PackDailyCommand(super.out, super.err) {
+    argParser
+      ..addOption('repo-root', defaultsTo: '.')
+      ..addOption(
+        'out',
+        help: 'the served pack to write (default: '
+            '<repo-root>/build/daily/daily_pack_<lang>.json)',
+      )
+      ..addOption('window-days', defaultsTo: '30');
+  }
+
+  @override
+  String get name => 'pack-daily';
+  @override
+  String get description =>
+      'Build the served Daily pack (daily_pack_<lang>.json) from a '
+      'daily/<lang>/ source: the manifest + pool/. Refuses, naming each broken '
+      'rule, unless every F07 D2 (2) rule holds.';
+
+  @override
+  Future<int> execute() async {
+    final rest = argResults!.rest;
+    if (rest.isEmpty) {
+      err.writeln('usage: pack-daily <daily/<lang> dir | manifest.json> '
+          '[--out <path>]');
+      return 64;
+    }
+    final manifestPath = _manifestPathFor(rest.first);
+    if (manifestPath == null) {
+      err.writeln('pack-daily: no daily_manifest_<lang>.json in ${rest.first}');
+      return 1;
+    }
+    final result = buildDailyPack(
+      manifestPath,
+      noRepeatWindowDays: int.parse(argResults!['window-days'] as String),
+    );
+    final pack = result.pack;
+    if (pack == null) {
+      for (final failure in result.failures) {
+        err.writeln('pack-daily FAIL: $failure');
+      }
+      err.writeln('pack-daily: ${result.failures.length} failure(s); '
+          'nothing written');
+      return 1;
+    }
+
+    final outPath = argResults!['out'] as String? ??
+        '$repoRoot/build/daily/daily_pack_${pack.lang}.json';
+    final outFile = File(outPath).absolute;
+    final sourceDir = File(manifestPath).absolute.parent.path;
+    if (outFile.path.startsWith('$sourceDir${Platform.pathSeparator}')) {
+      err.writeln('pack-daily: refusing to write into the source ($outPath); '
+          'the pack is build output');
+      return 1;
+    }
+    outFile.parent.createSync(recursive: true);
+    outFile.writeAsStringSync(encodeDailyPack(pack));
+    out.writeln('wrote $outPath (${pack.lang}, ${pack.days.length} days '
+        '${pack.days.first.dailyDate} … ${pack.days.last.dailyDate}, '
+        '#${pack.days.first.dailyNumber} … #${pack.days.last.dailyNumber}, '
+        'contentVersion ${pack.contentVersion})');
+    return 0;
+  }
+
+  /// [arg] itself when it is a file, else the one `daily_manifest_*.json` in
+  /// the directory [arg].
+  static String? _manifestPathFor(String arg) {
+    if (FileSystemEntity.isFileSync(arg)) return arg;
+    final dir = Directory(arg);
+    if (!dir.existsSync()) return null;
+    final manifests = dir
+        .listSync()
+        .whereType<File>()
+        .where(
+            (f) => RegExp(r'daily_manifest_[a-z]{2}\.json$').hasMatch(f.path))
+        .toList();
+    return manifests.length == 1 ? manifests.single.path : null;
   }
 }
 

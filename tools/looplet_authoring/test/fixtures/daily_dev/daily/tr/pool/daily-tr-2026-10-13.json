@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "dev-fixture",
+  "id": "daily-tr-2026-10-13",
+  "puzzleType": "daily",
+  "dailyDate": "2026-10-13",
+  "language": "tr",
+  "grid": [
+    "DŞTLN",
+    "TAMİL",
+    "AKIHP",
+    "UINKK",
+    "TNKÖZ"
+  ],
+  "targetWord": "DAMLA",
+  "lockedCells": [],
+  "frozenCells": [],
+  "columnMovesEnabled": true,
+  "optimalMoves": 4,
+  "difficultyScore": 3.668,
+  "difficultyLabel": "easy",
+  "difficultyBreakdown": {
+    "o": 4,
+    "cNorm": 0.0142,
+    "tdDegree": 0,
+    "locked": 0,
+    "frozen": 0,
+    "firstMoves": 2,
+    "distinctOptimalSolutions": 8
+  }
+}

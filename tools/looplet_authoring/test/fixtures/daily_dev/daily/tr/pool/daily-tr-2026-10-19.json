@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "dev-fixture",
+  "id": "daily-tr-2026-10-19",
+  "puzzleType": "daily",
+  "dailyDate": "2026-10-19",
+  "language": "tr",
+  "grid": [
+    "PISSİ",
+    "KİUTN",
+    "ŞEZKŞ",
+    "TNYPÜ",
+    "ÜMYTA"
+  ],
+  "targetWord": "KİTAP",
+  "lockedCells": [],
+  "frozenCells": [],
+  "columnMovesEnabled": true,
+  "optimalMoves": 5,
+  "difficultyScore": 4.068,
+  "difficultyLabel": "medium",
+  "difficultyBreakdown": {
+    "o": 5,
+    "cNorm": 0.0017,
+    "tdDegree": 0,
+    "locked": 0,
+    "frozen": 0,
+    "firstMoves": 5,
+    "distinctOptimalSolutions": 16
+  }
+}

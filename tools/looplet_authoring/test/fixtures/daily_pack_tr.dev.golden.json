@@ -1,0 +1,786 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "dev-fixture-2026-10-15",
+  "lang": "tr",
+  "numberingEpoch": "2026-10-01",
+  "days": [
+    {
+      "dailyDate": "2026-10-01",
+      "dailyNumber": 1,
+      "puzzle": {
+        "schemaVersion": 1,
+        "contentVersion": "dev-fixture",
+        "id": "daily-tr-2026-10-01",
+        "puzzleType": "daily",
+        "dailyDate": "2026-10-01",
+        "language": "tr",
+        "grid": [
+          "ASALM",
+          "BCDFG",
+          "HJKLN",
+          "PRTUV",
+          "YZBCD"
+        ],
+        "targetWord": "MASAL",
+        "lockedCells": [],
+        "frozenCells": [],
+        "columnMovesEnabled": false,
+        "optimalMoves": 1,
+        "difficultyScore": 0.813,
+        "difficultyLabel": "easy",
+        "difficultyBreakdown": {
+          "o": 1,
+          "cNorm": 0.0,
+          "tdDegree": 0,
+          "locked": 0,
+          "frozen": 0,
+          "firstMoves": 1,
+          "distinctOptimalSolutions": 1
+        }
+      }
+    },
+    {
+      "dailyDate": "2026-10-02",
+      "dailyNumber": 2,
+      "puzzle": {
+        "schemaVersion": 1,
+        "contentVersion": "dev-fixture",
+        "id": "daily-tr-2026-10-02",
+        "puzzleType": "daily",
+        "dailyDate": "2026-10-02",
+        "language": "tr",
+        "grid": [
+          "SALMA",
+          "BCDFG",
+          "HJKLN",
+          "PRTUV",
+          "YZBCD"
+        ],
+        "targetWord": "MASAL",
+        "lockedCells": [],
+        "frozenCells": [],
+        "columnMovesEnabled": false,
+        "optimalMoves": 2,
+        "difficultyScore": 3.813,
+        "difficultyLabel": "easy",
+        "difficultyBreakdown": {
+          "o": 2,
+          "cNorm": 0.0,
+          "tdDegree": 1,
+          "locked": 0,
+          "frozen": 0,
+          "firstMoves": 1,
+          "distinctOptimalSolutions": 1
+        }
+      }
+    },
+    {
+      "dailyDate": "2026-10-03",
+      "dailyNumber": 3,
+      "puzzle": {
+        "schemaVersion": 1,
+        "contentVersion": "dev-fixture",
+        "id": "daily-tr-2026-10-03",
+        "puzzleType": "daily",
+        "dailyDate": "2026-10-03",
+        "language": "tr",
+        "grid": [
+          "DABCF",
+          "XENİZ",
+          "HJKLN",
+          "PRTUV",
+          "YZBCD"
+        ],
+        "targetWord": "DENİZ",
+        "lockedCells": [],
+        "frozenCells": [],
+        "columnMovesEnabled": true,
+        "optimalMoves": 1,
+        "difficultyScore": 0.813,
+        "difficultyLabel": "easy",
+        "difficultyBreakdown": {
+          "o": 1,
+          "cNorm": 0.0,
+          "tdDegree": 0,
+          "locked": 0,
+          "frozen": 0,
+          "firstMoves": 1,
+          "distinctOptimalSolutions": 1
+        }
+      }
+    },
+    {
+      "dailyDate": "2026-10-04",
+      "dailyNumber": 4,
+      "puzzle": {
+        "schemaVersion": 1,
+        "contentVersion": "dev-fixture",
+        "id": "daily-tr-2026-10-04",
+        "puzzleType": "daily",
+        "dailyDate": "2026-10-04",
+        "language": "tr",
+        "grid": [
+          "SALMA",
+          "BCDFG",
+          "HJKLN",
+          "PRTUV",
+          "YZBCD"
+        ],
+        "targetWord": "MASAL",
+        "lockedCells": [
+          "3,3"
+        ],
+        "frozenCells": [],
+        "columnMovesEnabled": true,
+        "optimalMoves": 2,
+        "difficultyScore": 4.612,
+        "difficultyLabel": "medium",
+        "difficultyBreakdown": {
+          "o": 2,
+          "cNorm": 0.0,
+          "tdDegree": 1,
+          "locked": 1,
+          "frozen": 0,
+          "firstMoves": 1,
+          "distinctOptimalSolutions": 1
+        }
+      }
+    },
+    {
+      "dailyDate": "2026-10-05",
+      "dailyNumber": 5,
+      "puzzle": {
+        "schemaVersion": 1,
+        "contentVersion": "dev-fixture",
+        "id": "daily-tr-2026-10-05",
+        "puzzleType": "daily",
+        "dailyDate": "2026-10-05",
+        "language": "tr",
+        "grid": [
+          "BCDFG",
+          "MHJKL",
+          "XASAL",
+          "PRTUV",
+          "YZBCD"
+        ],
+        "targetWord": "MASAL",
+        "lockedCells": [],
+        "frozenCells": [
+          "2,2"
+        ],
+        "columnMovesEnabled": true,
+        "optimalMoves": 1,
+        "difficultyScore": 2.013,
+        "difficultyLabel": "easy",
+        "difficultyBreakdown": {
+          "o": 1,
+          "cNorm": 0.0,
+          "tdDegree": 0,
+          "locked": 0,
+          "frozen": 1,
+          "firstMoves": 1,
+          "distinctOptimalSolutions": 1
+        }
+      }
+    },
+    {
+      "dailyDate": "2026-10-06",
+      "dailyNumber": 6,
+      "puzzle": {
+        "schemaVersion": 1,
+        "contentVersion": "dev-fixture",
+        "id": "daily-tr-2026-10-06",
+        "puzzleType": "daily",
+        "dailyDate": "2026-10-06",
+        "language": "tr",
+        "grid": [
+          "ANASL",
+          "OPMİS",
+          "ÜOİİE",
+          "MKÇÜZ",
+          "MYİRE"
+        ],
+        "targetWord": "ASLAN",
+        "lockedCells": [],
+        "frozenCells": [],
+        "columnMovesEnabled": false,
+        "optimalMoves": 2,
+        "difficultyScore": 3.813,
+        "difficultyLabel": "easy",
+        "difficultyBreakdown": {
+          "o": 2,
+          "cNorm": 0.0,
+          "tdDegree": 1,
+          "locked": 0,
+          "frozen": 0,
+          "firstMoves": 1,
+          "distinctOptimalSolutions": 1
+        }
+      }
+    },
+    {
+      "dailyDate": "2026-10-07",
+      "dailyNumber": 7,
+      "puzzle": {
+        "schemaVersion": 1,
+        "contentVersion": "dev-fixture",
+        "id": "daily-tr-2026-10-07",
+        "puzzleType": "daily",
+        "dailyDate": "2026-10-07",
+        "language": "tr",
+        "grid": [
+          "ZDDOZ",
+          "İPHZR",
+          "HLIÜN",
+          "EMBAD",
+          "DKNHU"
+        ],
+        "targetWord": "BADEM",
+        "lockedCells": [],
+        "frozenCells": [],
+        "columnMovesEnabled": false,
+        "optimalMoves": 2,
+        "difficultyScore": 1.813,
+        "difficultyLabel": "easy",
+        "difficultyBreakdown": {
+          "o": 2,
+          "cNorm": 0.0,
+          "tdDegree": 0,
+          "locked": 0,
+          "frozen": 0,
+          "firstMoves": 1,
+          "distinctOptimalSolutions": 1
+        }
+      }
+    },
+    {
+      "dailyDate": "2026-10-08",
+      "dailyNumber": 8,
+      "puzzle": {
+        "schemaVersion": 1,
+        "contentVersion": "dev-fixture",
+        "id": "daily-tr-2026-10-08",
+        "puzzleType": "daily",
+        "dailyDate": "2026-10-08",
+        "language": "tr",
+        "grid": [
+          "ŞPMGR",
+          "ÇEBAH",
+          "NGİTO",
+          "GBKYE",
+          "İEYZM"
+        ],
+        "targetWord": "BAHÇE",
+        "lockedCells": [],
+        "frozenCells": [],
+        "columnMovesEnabled": false,
+        "optimalMoves": 2,
+        "difficultyScore": 1.813,
+        "difficultyLabel": "easy",
+        "difficultyBreakdown": {
+          "o": 2,
+          "cNorm": 0.0,
+          "tdDegree": 0,
+          "locked": 0,
+          "frozen": 0,
+          "firstMoves": 1,
+          "distinctOptimalSolutions": 1
+        }
+      }
+    },
+    {
+      "dailyDate": "2026-10-09",
+      "dailyNumber": 9,
+      "puzzle": {
+        "schemaVersion": 1,
+        "contentVersion": "dev-fixture",
+        "id": "daily-tr-2026-10-09",
+        "puzzleType": "daily",
+        "dailyDate": "2026-10-09",
+        "language": "tr",
+        "grid": [
+          "BLÇIZ",
+          "MIENO",
+          "PÜLNG",
+          "BDERİ",
+          "ŞALKD"
+        ],
+        "targetWord": "BALIK",
+        "lockedCells": [],
+        "frozenCells": [],
+        "columnMovesEnabled": true,
+        "optimalMoves": 4,
+        "difficultyScore": 3.119,
+        "difficultyLabel": "easy",
+        "difficultyBreakdown": {
+          "o": 4,
+          "cNorm": 0.0188,
+          "tdDegree": 0,
+          "locked": 0,
+          "frozen": 0,
+          "firstMoves": 5,
+          "distinctOptimalSolutions": 8
+        }
+      }
+    },
+    {
+      "dailyDate": "2026-10-10",
+      "dailyNumber": 10,
+      "puzzle": {
+        "schemaVersion": 1,
+        "contentVersion": "dev-fixture",
+        "id": "daily-tr-2026-10-10",
+        "puzzleType": "daily",
+        "dailyDate": "2026-10-10",
+        "language": "tr",
+        "grid": [
+          "ZUÇEK",
+          "BÜOLŞ",
+          "HALUT",
+          "ÜRŞAG",
+          "DGGGŞ"
+        ],
+        "targetWord": "BULUT",
+        "lockedCells": [],
+        "frozenCells": [],
+        "columnMovesEnabled": true,
+        "optimalMoves": 3,
+        "difficultyScore": 2.708,
+        "difficultyLabel": "easy",
+        "difficultyBreakdown": {
+          "o": 3,
+          "cNorm": 0.0278,
+          "tdDegree": 0,
+          "locked": 0,
+          "frozen": 0,
+          "firstMoves": 2,
+          "distinctOptimalSolutions": 3
+        }
+      }
+    },
+    {
+      "dailyDate": "2026-10-11",
+      "dailyNumber": 11,
+      "puzzle": {
+        "schemaVersion": 1,
+        "contentVersion": "dev-fixture",
+        "id": "daily-tr-2026-10-11",
+        "puzzleType": "daily",
+        "dailyDate": "2026-10-11",
+        "language": "tr",
+        "grid": [
+          "NTAÇB",
+          "AGİHL",
+          "DÜMŞH",
+          "NMLNU",
+          "ÜİAUZ"
+        ],
+        "targetWord": "ÇANTA",
+        "lockedCells": [],
+        "frozenCells": [],
+        "columnMovesEnabled": true,
+        "optimalMoves": 3,
+        "difficultyScore": 2.813,
+        "difficultyLabel": "easy",
+        "difficultyBreakdown": {
+          "o": 3,
+          "cNorm": 0.0002,
+          "tdDegree": 0,
+          "locked": 0,
+          "frozen": 0,
+          "firstMoves": 1,
+          "distinctOptimalSolutions": 1
+        }
+      }
+    },
+    {
+      "dailyDate": "2026-10-12",
+      "dailyNumber": 12,
+      "puzzle": {
+        "schemaVersion": 1,
+        "contentVersion": "dev-fixture",
+        "id": "daily-tr-2026-10-12",
+        "puzzleType": "daily",
+        "dailyDate": "2026-10-12",
+        "language": "tr",
+        "grid": [
+          "YSMHK",
+          "ÜZGPA",
+          "TOIÇP",
+          "URŞNÇ",
+          "PRATH"
+        ],
+        "targetWord": "ÇORAP",
+        "lockedCells": [],
+        "frozenCells": [],
+        "columnMovesEnabled": true,
+        "optimalMoves": 4,
+        "difficultyScore": 3.821,
+        "difficultyLabel": "easy",
+        "difficultyBreakdown": {
+          "o": 4,
+          "cNorm": 0.0029,
+          "tdDegree": 0,
+          "locked": 0,
+          "frozen": 0,
+          "firstMoves": 1,
+          "distinctOptimalSolutions": 2
+        }
+      }
+    },
+    {
+      "dailyDate": "2026-10-13",
+      "dailyNumber": 13,
+      "puzzle": {
+        "schemaVersion": 1,
+        "contentVersion": "dev-fixture",
+        "id": "daily-tr-2026-10-13",
+        "puzzleType": "daily",
+        "dailyDate": "2026-10-13",
+        "language": "tr",
+        "grid": [
+          "DŞTLN",
+          "TAMİL",
+          "AKIHP",
+          "UINKK",
+          "TNKÖZ"
+        ],
+        "targetWord": "DAMLA",
+        "lockedCells": [],
+        "frozenCells": [],
+        "columnMovesEnabled": true,
+        "optimalMoves": 4,
+        "difficultyScore": 3.668,
+        "difficultyLabel": "easy",
+        "difficultyBreakdown": {
+          "o": 4,
+          "cNorm": 0.0142,
+          "tdDegree": 0,
+          "locked": 0,
+          "frozen": 0,
+          "firstMoves": 2,
+          "distinctOptimalSolutions": 8
+        }
+      }
+    },
+    {
+      "dailyDate": "2026-10-14",
+      "dailyNumber": 14,
+      "puzzle": {
+        "schemaVersion": 1,
+        "contentVersion": "dev-fixture",
+        "id": "daily-tr-2026-10-14",
+        "puzzleType": "daily",
+        "dailyDate": "2026-10-14",
+        "language": "tr",
+        "grid": [
+          "ÖOIİO",
+          "ÖZÜZD",
+          "UENEZ",
+          "ÖKGÇD",
+          "SEUŞO"
+        ],
+        "targetWord": "DENİZ",
+        "lockedCells": [],
+        "frozenCells": [],
+        "columnMovesEnabled": true,
+        "optimalMoves": 4,
+        "difficultyScore": 3.491,
+        "difficultyLabel": "easy",
+        "difficultyBreakdown": {
+          "o": 4,
+          "cNorm": 0.0179,
+          "tdDegree": 0,
+          "locked": 0,
+          "frozen": 0,
+          "firstMoves": 3,
+          "distinctOptimalSolutions": 16
+        }
+      }
+    },
+    {
+      "dailyDate": "2026-10-15",
+      "dailyNumber": 15,
+      "puzzle": {
+        "schemaVersion": 1,
+        "contentVersion": "dev-fixture",
+        "id": "daily-tr-2026-10-15",
+        "puzzleType": "daily",
+        "dailyDate": "2026-10-15",
+        "language": "tr",
+        "grid": [
+          "ARIBI",
+          "DYIÜB",
+          "UMÜHB",
+          "EIRUN",
+          "FRROE"
+        ],
+        "targetWord": "FIRIN",
+        "lockedCells": [],
+        "frozenCells": [],
+        "columnMovesEnabled": true,
+        "optimalMoves": 4,
+        "difficultyScore": 2.784,
+        "difficultyLabel": "easy",
+        "difficultyBreakdown": {
+          "o": 4,
+          "cNorm": 0.0323,
+          "tdDegree": 0,
+          "locked": 0,
+          "frozen": 0,
+          "firstMoves": 7,
+          "distinctOptimalSolutions": 40
+        }
+      }
+    },
+    {
+      "dailyDate": "2026-10-16",
+      "dailyNumber": 16,
+      "puzzle": {
+        "schemaVersion": 1,
+        "contentVersion": "dev-fixture",
+        "id": "daily-tr-2026-10-16",
+        "puzzleType": "daily",
+        "dailyDate": "2026-10-16",
+        "language": "tr",
+        "grid": [
+          "RAZAP",
+          "DÇBÇİ",
+          "EÜUOK",
+          "İLGEM",
+          "SKZÖZ"
+        ],
+        "targetWord": "KABAK",
+        "lockedCells": [],
+        "frozenCells": [],
+        "columnMovesEnabled": true,
+        "optimalMoves": 5,
+        "difficultyScore": 4.079,
+        "difficultyLabel": "medium",
+        "difficultyBreakdown": {
+          "o": 5,
+          "cNorm": 0.0056,
+          "tdDegree": 0,
+          "locked": 0,
+          "frozen": 0,
+          "firstMoves": 5,
+          "distinctOptimalSolutions": 40
+        }
+      }
+    },
+    {
+      "dailyDate": "2026-10-17",
+      "dailyNumber": 17,
+      "puzzle": {
+        "schemaVersion": 1,
+        "contentVersion": "dev-fixture",
+        "id": "daily-tr-2026-10-17",
+        "puzzleType": "daily",
+        "dailyDate": "2026-10-17",
+        "language": "tr",
+        "grid": [
+          "DITYZ",
+          "LADŞŞ",
+          "HIZYB",
+          "EGZKA",
+          "ZKAĞA"
+        ],
+        "targetWord": "KAĞIT",
+        "lockedCells": [],
+        "frozenCells": [],
+        "columnMovesEnabled": true,
+        "optimalMoves": 5,
+        "difficultyScore": 4.446,
+        "difficultyLabel": "medium",
+        "difficultyBreakdown": {
+          "o": 5,
+          "cNorm": 0.0027,
+          "tdDegree": 0,
+          "locked": 0,
+          "frozen": 0,
+          "firstMoves": 3,
+          "distinctOptimalSolutions": 8
+        }
+      }
+    },
+    {
+      "dailyDate": "2026-10-18",
+      "dailyNumber": 18,
+      "puzzle": {
+        "schemaVersion": 1,
+        "contentVersion": "dev-fixture",
+        "id": "daily-tr-2026-10-18",
+        "puzzleType": "daily",
+        "dailyDate": "2026-10-18",
+        "language": "tr",
+        "grid": [
+          "ŞÇBMM",
+          "PUPOM",
+          "PGÜEÇ",
+          "ÖALUN",
+          "SKDKY"
+        ],
+        "targetWord": "KALEM",
+        "lockedCells": [],
+        "frozenCells": [],
+        "columnMovesEnabled": true,
+        "optimalMoves": 5,
+        "difficultyScore": 3.893,
+        "difficultyLabel": "easy",
+        "difficultyBreakdown": {
+          "o": 5,
+          "cNorm": 0.0061,
+          "tdDegree": 0,
+          "locked": 0,
+          "frozen": 0,
+          "firstMoves": 6,
+          "distinctOptimalSolutions": 60
+        }
+      }
+    },
+    {
+      "dailyDate": "2026-10-19",
+      "dailyNumber": 19,
+      "puzzle": {
+        "schemaVersion": 1,
+        "contentVersion": "dev-fixture",
+        "id": "daily-tr-2026-10-19",
+        "puzzleType": "daily",
+        "dailyDate": "2026-10-19",
+        "language": "tr",
+        "grid": [
+          "PISSİ",
+          "KİUTN",
+          "ŞEZKŞ",
+          "TNYPÜ",
+          "ÜMYTA"
+        ],
+        "targetWord": "KİTAP",
+        "lockedCells": [],
+        "frozenCells": [],
+        "columnMovesEnabled": true,
+        "optimalMoves": 5,
+        "difficultyScore": 4.068,
+        "difficultyLabel": "medium",
+        "difficultyBreakdown": {
+          "o": 5,
+          "cNorm": 0.0017,
+          "tdDegree": 0,
+          "locked": 0,
+          "frozen": 0,
+          "firstMoves": 5,
+          "distinctOptimalSolutions": 16
+        }
+      }
+    },
+    {
+      "dailyDate": "2026-10-20",
+      "dailyNumber": 20,
+      "puzzle": {
+        "schemaVersion": 1,
+        "contentVersion": "dev-fixture",
+        "id": "daily-tr-2026-10-20",
+        "puzzleType": "daily",
+        "dailyDate": "2026-10-20",
+        "language": "tr",
+        "grid": [
+          "TPIÜZ",
+          "HHOÇE",
+          "ŞİÇRN",
+          "LMŞÇL",
+          "GTTTÇ"
+        ],
+        "targetWord": "LİMON",
+        "lockedCells": [],
+        "frozenCells": [],
+        "columnMovesEnabled": true,
+        "optimalMoves": 5,
+        "difficultyScore": 4.08,
+        "difficultyLabel": "medium",
+        "difficultyBreakdown": {
+          "o": 5,
+          "cNorm": 0.0057,
+          "tdDegree": 0,
+          "locked": 0,
+          "frozen": 0,
+          "firstMoves": 5,
+          "distinctOptimalSolutions": 37
+        }
+      }
+    },
+    {
+      "dailyDate": "2026-10-21",
+      "dailyNumber": 21,
+      "puzzle": {
+        "schemaVersion": 1,
+        "contentVersion": "dev-fixture",
+        "id": "daily-tr-2026-10-21",
+        "puzzleType": "daily",
+        "dailyDate": "2026-10-21",
+        "language": "tr",
+        "grid": [
+          "İAKİT",
+          "MORIİ",
+          "PÖÜOÇ",
+          "RSNAT",
+          "PZRSZ"
+        ],
+        "targetWord": "MAKAS",
+        "lockedCells": [
+          "0,1"
+        ],
+        "frozenCells": [],
+        "columnMovesEnabled": true,
+        "optimalMoves": 5,
+        "difficultyScore": 5.068,
+        "difficultyLabel": "medium",
+        "difficultyBreakdown": {
+          "o": 5,
+          "cNorm": 0.006,
+          "tdDegree": 0,
+          "locked": 1,
+          "frozen": 0,
+          "firstMoves": 4,
+          "distinctOptimalSolutions": 21
+        }
+      }
+    },
+    {
+      "dailyDate": "2026-10-22",
+      "dailyNumber": 22,
+      "puzzle": {
+        "schemaVersion": 1,
+        "contentVersion": "dev-fixture",
+        "id": "daily-tr-2026-10-22",
+        "puzzleType": "daily",
+        "dailyDate": "2026-10-22",
+        "language": "tr",
+        "grid": [
+          "RANGH",
+          "MGDKO",
+          "ŞŞRAİ",
+          "MLKSM",
+          "RYHDR"
+        ],
+        "targetWord": "MASAL",
+        "lockedCells": [
+          "3,0"
+        ],
+        "frozenCells": [],
+        "columnMovesEnabled": true,
+        "optimalMoves": 4,
+        "difficultyScore": 4.628,
+        "difficultyLabel": "medium",
+        "difficultyBreakdown": {
+          "o": 4,
+          "cNorm": 0.005,
+          "tdDegree": 0,
+          "locked": 1,
+          "frozen": 0,
+          "firstMoves": 1,
+          "distinctOptimalSolutions": 3
+        }
+      }
+    }
+  ]
+}

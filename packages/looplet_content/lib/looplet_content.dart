@@ -1,5 +1,8 @@
 /// Puzzle definition model + JSON serialization for LOOPLET.
 ///
+/// `DailyPack` is the served Daily artifact (F07 D2) and `CalendarDate` its
+/// calendar-date arithmetic (F07 D4).
+///
 /// `Puzzle` is the one content schema consumed by F05 (Journey), F07 (Daily),
 /// and F08 (persistence). Contract:
 /// `ai-system/features/f06-puzzle-content-and-solver-tooling/architecture.md`.
@@ -18,4 +21,6 @@ export 'package:looplet_core/looplet_core.dart'
         PuzzleType,
         TileStatus;
 
+export 'src/calendar_date.dart';
+export 'src/daily_pack.dart';
 export 'src/puzzle.dart';

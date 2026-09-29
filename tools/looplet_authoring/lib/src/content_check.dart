@@ -5,9 +5,11 @@ import 'package:looplet_content/looplet_content.dart';
 import 'package:looplet_engine/looplet_engine.dart';
 import 'package:looplet_solver/looplet_solver.dart';
 
+import 'daily_source.dart';
 import 'dictionary_validator.dart';
 
-/// Runs every content rule over the `.json` artifacts under [root]. Returns a
+/// Runs every content rule over the `.json` artifacts under [root] — and, for
+/// each Daily manifest, the served-pack rules over it and its pool. Returns a
 /// list of human-readable failures (empty = OK). This is the CI content gate.
 Future<List<String>> runContentCheck({
   required String root,
@@ -159,6 +161,13 @@ Future<List<String>> runContentCheck({
         }
       }
     }
+  }
+
+  // Daily manifest + pool: every served-pack rule (F07 architecture.md D2),
+  // through the same build `pack-daily` runs.
+  for (final path in manifests.keys) {
+    final result = buildDailyPack(path, noRepeatWindowDays: noRepeatWindowDays);
+    failures.addAll(result.failures.map((f) => '$path: $f'));
   }
 
   return failures;

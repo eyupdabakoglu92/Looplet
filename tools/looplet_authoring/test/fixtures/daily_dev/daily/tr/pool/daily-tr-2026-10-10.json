@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "dev-fixture",
+  "id": "daily-tr-2026-10-10",
+  "puzzleType": "daily",
+  "dailyDate": "2026-10-10",
+  "language": "tr",
+  "grid": [
+    "ZUÇEK",
+    "BÜOLŞ",
+    "HALUT",
+    "ÜRŞAG",
+    "DGGGŞ"
+  ],
+  "targetWord": "BULUT",
+  "lockedCells": [],
+  "frozenCells": [],
+  "columnMovesEnabled": true,
+  "optimalMoves": 3,
+  "difficultyScore": 2.708,
+  "difficultyLabel": "easy",
+  "difficultyBreakdown": {
+    "o": 3,
+    "cNorm": 0.0278,
+    "tdDegree": 0,
+    "locked": 0,
+    "frozen": 0,
+    "firstMoves": 2,
+    "distinctOptimalSolutions": 3
+  }
+}

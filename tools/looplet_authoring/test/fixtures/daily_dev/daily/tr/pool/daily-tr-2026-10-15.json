@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "dev-fixture",
+  "id": "daily-tr-2026-10-15",
+  "puzzleType": "daily",
+  "dailyDate": "2026-10-15",
+  "language": "tr",
+  "grid": [
+    "ARIBI",
+    "DYIÜB",
+    "UMÜHB",
+    "EIRUN",
+    "FRROE"
+  ],
+  "targetWord": "FIRIN",
+  "lockedCells": [],
+  "frozenCells": [],
+  "columnMovesEnabled": true,
+  "optimalMoves": 4,
+  "difficultyScore": 2.784,
+  "difficultyLabel": "easy",
+  "difficultyBreakdown": {
+    "o": 4,
+    "cNorm": 0.0323,
+    "tdDegree": 0,
+    "locked": 0,
+    "frozen": 0,
+    "firstMoves": 7,
+    "distinctOptimalSolutions": 40
+  }
+}

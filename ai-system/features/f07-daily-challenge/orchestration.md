@@ -10,16 +10,16 @@ In Progress
 
 ## Current Owner
 
-Frontend/Mobile Developer
+Tech Lead
 
 ## Next Role
 
-Frontend/Mobile Developer
+Tech Lead
 
 ## Active Task Ledger
 
 - [x] Task ID: F07-UI | Assigned Role: UI Designer | Status: Done | Summary: The Daily surfaces on the Selected Foundation (architecture D8): the Home Daily entry (secondary; available / done today / needs connection), the Daily screen states (`loading`, `ready`, `doneToday`, `needsConnection`, `unavailable`), the daily Play header, and the daily result variant (official vs replay; Current + Best Streak; the reserved Share place for F13). At least two materially different rendered directions on identical content, then `ui-design.md` with the screen / state / viewport matrix and a Visual Evidence Manifest. Brief: Current Brief | Depends On: -
-- [ ] Task ID: F07-TOOL | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: The daily pack (architecture D2): a `DailyPack` model in `looplet_content`; `looplet_authoring pack-daily` (manifest + pool → the served `daily_pack_{lang}.json`); `check` extended to every D2 (2) rule with named negative cases; a small dev pack from existing smoke / Journey-shaped definitions for delivery and tests (not product content). Brief: Current Brief | Depends On: -
+- [x] Task ID: F07-TOOL | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: The daily pack (architecture D2): a `DailyPack` model in `looplet_content`; `looplet_authoring pack-daily` (manifest + pool → the served `daily_pack_{lang}.json`); `check` extended to every D2 (2) rule with named negative cases; a small dev pack from existing smoke / Journey-shaped definitions for delivery and tests (not product content). Brief: Current Brief | Depends On: -
 - [ ] Task ID: F07-CONTENT | Assigned Role: Content Designer | Status: Queued | Summary: The Turkish Daily pool (workflow-follow-ups F06-CONTENT-DAILY): about 60 solved daily puzzles under `content/daily/tr/pool/`, `daily_manifest_tr.json` (numbering epoch + assignments, 30-day no-repeat), `content-design.md`; `check` + `pack-daily` exit 0. Opens the sign-off gate F07.DAILY-POOL-SIGNOFF on delivery | Depends On: F07-TOOL
 - [ ] Task ID: F07-FE | Assigned Role: Frontend/Mobile Developer | Status: Queued | Summary: The app (architecture D3–D8): `DailyContentSource` + the debug pack override; cache population / prefetch / eviction; the D3 states; D4 dates and rollover; D5 transactional completion (entry + streak + enqueue); D6 streak; D7 Remote Config + kill-switch (`firebase_remote_config`, `http`); `/daily`, the Home entry, the daily Play header and result per `ui-design.md`; tests + named negatives; Visual Parity Evidence against the selected Direction A (`F07-A-*`); emulator sync evidence; architecture A1 rulings | Depends On: F07-UI, F07-TOOL
 - [ ] Task ID: F07-QA-FUNCTIONAL | Assigned Role: QA | Status: Queued | Summary: Functional + visual QA on the emulator and the canonical simulator (architecture D10); the plan is locked at activation | Depends On: F07-FE, F07-CONTENT
@@ -28,7 +28,7 @@ Frontend/Mobile Developer
 
 ## Open Tasks
 
-* **F07-TOOL — Open** (Frontend/Mobile Developer): the daily pack model, `pack-daily`, `check` for D2 (2), a dev pack (Current Brief).
+* F07-TOOL — Done (2026-09-29), delivery in `frontend.md` (F07-TOOL section); awaiting the Tech Lead reconciliation.
 * F07-UI — Done, accepted at A1; **Direction A selected** by the user (A2).
 * Queued: F07-CONTENT (after F07-TOOL), F07-FE (after F07-TOOL), F07-QA-FUNCTIONAL, F07-QA-FINAL. Blocked: F07-DEVOPS (F08's deploy).
 
@@ -38,7 +38,7 @@ None
 
 ## Delivery Review
 
-Accepted
+Pending
 
 ## QA Scope
 
@@ -162,7 +162,7 @@ None
 
 ## Next Action
 
-Run Frontend/Mobile Developer — F07-TOOL (Current Brief): the `DailyPack` model, `looplet_authoring pack-daily`, `check` over every D2 (2) rule with named negatives, and a dev pack. Then close F07-TOOL; owner → Tech Lead (reconciliation; then F07-CONTENT and F07-FE).
+Run Tech Lead — reconcile the F07-TOOL delivery (`frontend.md`, F07-TOOL section: `DailyPack` + validator, `pack-daily`, `check` over D2 (2) with named negatives, the dev pack; §14 assumptions, §16 the non-blocking Daily-reuse note), then activate F07-CONTENT and F07-FE.
 
 ## Last Decision
 
@@ -174,9 +174,9 @@ Run Frontend/Mobile Developer — F07-TOOL (Current Brief): the `DailyPack` mode
 
 ## Last Update
 
-* Updated By: Tech Lead
+* Updated By: Frontend/Mobile Developer
 * Timestamp: 2026-09-29
-* Summary: F07.DIRECTION-SELECT — A recorded (A2); Visual Quality Gate Ready for Implementation; F07-TOOL Open; owner → Frontend/Mobile Developer.
+* Summary: F07-TOOL Done — `DailyPack` + `CalendarDate` (`looplet_content`), `pack-daily`, `check` extended to D2 (2), named negatives, the dev pack fixture; gates green; Delivery Review Pending; owner → Tech Lead.
 
 ## Context & Follow-ups
 
@@ -197,6 +197,7 @@ Run Frontend/Mobile Developer — F07-TOOL (Current Brief): the `DailyPack` mode
 * 2026-09-29 — UI Designer: F07-UI Done — directions A "Hafta döngüsü" (recommended) / B "Günün bileti", 63 renders + 4 sheets, `ui-design.md`; NTLC-1…5; owner → Tech Lead.
 * 2026-09-29 — Tech Lead: F07-UI checkpoint (architecture A1) — accepted; rulings 1–6; F07.DIRECTION-SELECT opened; F07-TOOL briefed; owner Tech Lead (awaiting the decision). [Orchestration at the UI delivery](../../history/f07-daily-challenge-2026-09-29/orchestration-at-ui-delivery.md) (the F07-UI brief).
 * 2026-09-29 — Tech Lead: Decision F07.DIRECTION-SELECT — A (architecture A2) — Direction A selected; gate Ready for Implementation; F07-TOOL Open; owner → Frontend/Mobile Developer.
+* 2026-09-29 — Frontend/Mobile Developer: F07-TOOL Done — `DailyPack` / validator, `pack-daily`, `check` D2 (2), dev pack; content 44 / authoring 54 / app 588 tests green, `content:check` exit 0; Delivery Review Pending; owner → Tech Lead. [frontend.md](frontend.md) (F07-TOOL).
 
 ## Current Brief
 
