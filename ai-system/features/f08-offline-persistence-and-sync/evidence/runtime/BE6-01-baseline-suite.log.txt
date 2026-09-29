@@ -1,0 +1,127 @@
+2026-09-29T09:23:04Z
+
+> looplet-functions@0.1.0 test:emulator
+> firebase --config ../firebase.json emulators:exec --only firestore,auth --project demo-looplet "jest --passWithNoTests"
+
+i  emulators: Shutting down emulators.
+
+Error: firebase-tools no longer supports Java version before 21. Please install a JDK at version 21 or above to get a compatible runtime.
+exit=1
+--- attempt 2 (PATH incl. openjdk@21/bin)
+2026-09-29T09:23:20Z
+openjdk version "21.0.12.1" 2026-08-18
+
+> looplet-functions@0.1.0 test:emulator
+> firebase --config ../firebase.json emulators:exec --only firestore,auth --project demo-looplet "jest --passWithNoTests"
+
+i  emulators: Starting emulators: auth, firestore
+i  emulators: Detected demo project ID "demo-looplet", emulated services will use a demo configuration and attempts to access non-emulated services for this project will fail.
+i  firestore: Firestore Emulator logging to firestore-debug.log
+✔  firestore: Firestore Emulator was started in standard edition.
+✔  firestore: Firestore Emulator UI websocket is running on 9150.
+i  Running script: jest --passWithNoTests
+PASS test/skeleton.test.ts
+  ● Console
+
+    console.warn
+      {"uid":"u1","severity":"WARNING","message":"submitDailyResultV1: missing App Check token (soft-enforce)"}
+
+      39 |   // `platform.md` §6/§13): a missing/failed token is logged, not rejected.
+      40 |   if (request.app === undefined) {
+    > 41 |     logger.warn("submitDailyResultV1: missing App Check token (soft-enforce)", {
+         |            ^
+      42 |       uid,
+      43 |     });
+      44 |   }
+
+      at write (node_modules/firebase-functions/lib/logger/index.js:81:74)
+      at Object.warn (node_modules/firebase-functions/lib/logger/index.js:121:5)
+      at handleSubmitDailyResult (src/submitDailyResult.ts:41:12)
+      at Object.<anonymous> (test/skeleton.test.ts:48:30)
+
+(node:70229) MetadataLookupWarning: received unexpected error = Invalid response from metadata service: incorrect Metadata-Flavor header. Expected 'Google', got no header code = UNKNOWN
+(Use `node --trace-warnings ...` to show where the warning was created)
+FAIL test/submitDailyResult.test.ts
+  ● submitDailyResultV1 › ALREADY_SUBMITTED on a repeat — first run stays authoritative
+
+    moves must be >= 9
+
+      49 |   } catch (error) {
+      50 |     if (error instanceof PayloadError) {
+    > 51 |       throw new HttpsError("invalid-argument", error.message, {
+         |             ^
+      52 |         code: error.code,
+      53 |       });
+      54 |     }
+
+      at handleSubmitDailyResult (src/submitDailyResult.ts:51:13)
+      at call (test/submitDailyResult.test.ts:37:26)
+      at Object.<anonymous> (test/submitDailyResult.test.ts:82:26)
+
+PASS test/rules.test.ts
+  ● Console
+
+    console.warn
+      [2026-09-29T09:23:28.581Z]  @firebase/firestore: Firestore (12.18.0): GrpcConnection RPC 'Write' stream 0x583a2209 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+      false for 'create' @ L18, false for 'create' @ L25, false for 'update' @ L20, false for 'update' @ L25
+
+      at Logger.defaultLogHandler [as _logHandler] (node_modules/@firebase/logger/src/logger.ts:110:57)
+      at Logger.warn (node_modules/@firebase/logger/src/logger.ts:201:10)
+      at logWarn (node_modules/@firebase/firestore/src/util/log.ts:69:15)
+      at ClientDuplexStreamImpl.<anonymous> (node_modules/@firebase/firestore/src/platform/node/grpc_connection.ts:337:9)
+      at Object.onReceiveStatus (node_modules/@grpc/grpc-js/src/client.ts:705:18)
+      at Object.onReceiveStatus (node_modules/@grpc/grpc-js/src/client-interceptors.ts:419:48)
+      at node_modules/@grpc/grpc-js/src/resolving-call.ts:132:24
+
+    console.warn
+      [2026-09-29T09:23:28.695Z]  @firebase/firestore: Firestore (12.18.0): GrpcConnection RPC 'Write' stream 0x583a220a error. Code: 7 Message: 7 PERMISSION_DENIED: 
+      false for 'create' @ L18, false for 'create' @ L25, false for 'update' @ L20, false for 'update' @ L25
+
+      at Logger.defaultLogHandler [as _logHandler] (node_modules/@firebase/logger/src/logger.ts:110:57)
+      at Logger.warn (node_modules/@firebase/logger/src/logger.ts:201:10)
+      at logWarn (node_modules/@firebase/firestore/src/util/log.ts:69:15)
+      at ClientDuplexStreamImpl.<anonymous> (node_modules/@firebase/firestore/src/platform/node/grpc_connection.ts:337:9)
+      at Object.onReceiveStatus (node_modules/@grpc/grpc-js/src/client.ts:705:18)
+      at Object.onReceiveStatus (node_modules/@grpc/grpc-js/src/client-interceptors.ts:419:48)
+      at node_modules/@grpc/grpc-js/src/resolving-call.ts:132:24
+
+    console.warn
+      [2026-09-29T09:23:28.744Z]  @firebase/firestore: Firestore (12.18.0): GrpcConnection RPC 'Write' stream 0x583a220c error. Code: 7 Message: 7 PERMISSION_DENIED: 
+      false for 'update' @ L20, false for 'update' @ L25
+
+      at Logger.defaultLogHandler [as _logHandler] (node_modules/@firebase/logger/src/logger.ts:110:57)
+      at Logger.warn (node_modules/@firebase/logger/src/logger.ts:201:10)
+      at logWarn (node_modules/@firebase/firestore/src/util/log.ts:69:15)
+      at ClientDuplexStreamImpl.<anonymous> (node_modules/@firebase/firestore/src/platform/node/grpc_connection.ts:337:9)
+      at Object.onReceiveStatus (node_modules/@grpc/grpc-js/src/client.ts:705:18)
+      at Object.onReceiveStatus (node_modules/@grpc/grpc-js/src/client-interceptors.ts:419:48)
+      at node_modules/@grpc/grpc-js/src/resolving-call.ts:132:24
+
+    console.warn
+      [2026-09-29T09:23:28.780Z]  @firebase/firestore: Firestore (12.18.0): GrpcConnection RPC 'Write' stream 0x583a220e error. Code: 7 Message: 7 PERMISSION_DENIED: 
+      false for 'delete' @ L20, false for 'delete' @ L25
+
+      at Logger.defaultLogHandler [as _logHandler] (node_modules/@firebase/logger/src/logger.ts:110:57)
+      at Logger.warn (node_modules/@firebase/logger/src/logger.ts:201:10)
+      at logWarn (node_modules/@firebase/firestore/src/util/log.ts:69:15)
+      at ClientDuplexStreamImpl.<anonymous> (node_modules/@firebase/firestore/src/platform/node/grpc_connection.ts:337:9)
+      at Object.onReceiveStatus (node_modules/@grpc/grpc-js/src/client.ts:705:18)
+      at Object.onReceiveStatus (node_modules/@grpc/grpc-js/src/client-interceptors.ts:419:48)
+      at node_modules/@grpc/grpc-js/src/resolving-call.ts:132:24
+
+A worker process has failed to exit gracefully and has been force exited. This is likely caused by tests leaking due to improper teardown. Try running with --detectOpenHandles to find leaks. Active timers can also cause this, ensure that .unref() was called on them.
+
+Test Suites: 1 failed, 2 passed, 3 total
+Tests:       1 failed, 30 passed, 31 total
+Snapshots:   0 total
+Time:        3.038 s, estimated 4 s
+Ran all test suites.
+⚠  Script exited unsuccessfully (code 1)
+i  emulators: Shutting down emulators.
+i  firestore: Stopping Firestore Emulator
+i  auth: Stopping Authentication Emulator
+i  hub: Stopping emulator hub
+i  logging: Stopping Logging Emulator
+
+Error: Script "jest --passWithNoTests" exited with code 1
+exit=1

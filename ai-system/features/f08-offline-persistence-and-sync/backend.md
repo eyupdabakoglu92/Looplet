@@ -116,3 +116,82 @@ The server side of F08's deferred offline-result sync: the `submitDailyResultV1`
 ```
 Run Tech Lead
 ```
+
+---
+
+# F08-BE6 — Emülatör suite'indeki kontrata aykırı fixture (2026-09-29)
+
+> Kontrat: `architecture.md` → "Firebase Sync Surface" (kilitli) → Server-side validation; Activation 2026-09-29 → A6 ruling 6. Brief: `orchestration.md` → Current Brief. Taban: HEAD `b8e37ab`. Yalnız test kodu değişti; `src/`, `firestore.rules`, `firebase.json`, CI dokunulmadı.
+
+## 1. Feature Summary
+
+* `test/submitDailyResult.test.ts` "ALREADY_SUBMITTED on a repeat — first run stays authoritative" ikinci çağrıda `moves: 8` gönderiyordu. Temel payload'da `optimalMoves: 9` olduğundan `validate.ts` (`moves` min = `optimalMoves`) doğru olarak `INVALID_PAYLOAD` ("moves must be >= 9") dönüyordu, yani test adını verdiği idempotency dalına hiç ulaşmıyordu. Handler doğru, fixture yanlıştı.
+* İkinci çağrı artık geçerli bir "daha iyi" tekrar: `moves: 10` (≥ 9, 14'ten az), `stars: 3`, `durationMs: 40000`. Tüm assertion'lar korundu; saklanan dokümanın değişmediği kontrolü `durationMs` ve `recordedAtUtcMs` ile güçlendirildi.
+* Emülatör suite'i: **31 / 31** (önce 30 / 31). N-OVERWRITE negatif koşusu düzeltilmiş testin doğru sebeple kırıldığını gösteriyor.
+
+## 2. Impacted Files
+
+* **Güncellenen:** `infra/functions/test/submitDailyResult.test.ts` (sha1 `6c33f5ff…` → `cf73770d…`).
+* **Oluşturulan (kanıt):** `evidence/neg-be6.py`; `evidence/runtime/BE6-00-npm-ci-build.log.txt`, `BE6-01-baseline-suite.log.txt`, `BE6-02-fixed-suite.log.txt`, `BE6-03-plain-npm-test.log.txt`, `BE6-04-neg.log.txt`.
+
+## 3. Task-to-Code Traceability
+
+* **Task ID:** F08-BE6 — **Durum: Complete**
+  * **Fixture:** `test/submitDailyResult.test.ts` → "ALREADY_SUBMITTED on a repeat":
+    * önce: `data: { moves: 8, stars: 3, durationMs: 40000 }` → `INVALID_PAYLOAD`;
+    * sonra: `data: { moves: 10, stars: 3, durationMs: 40000 }` → handler'ın `snapshot.exists` dalı → `ALREADY_SUBMITTED`.
+  * **Assertion'lar:** `second.status === "ALREADY_SUBMITTED"`, `second.recordedAt === first.recordedAt`, doküman `{ moves: 14, stars: 2, durationMs: 83210, recordedAtUtcMs: first.recordedAt }` (son ikisi eklendi — "değişmedi" iddiasını tamamlıyor).
+  * **Suite taraması (brief madde 2):** `test/` altındaki üç dosyanın her fixture'ı validator'a ve kurallara karşı okundu. Aynı türden başka kusur yok:
+    * `submitDailyResult.test.ts` — "invalid payload" vakası `lang: "de"` → `UNSUPPORTED_LANGUAGE`, `stars: 9` → `INVALID_PAYLOAD`: adıyla aynı sebep; diğer vakalar temel payload'u (geçerli) kullanıyor.
+    * `skeleton.test.ts` — "moves < optimalMoves" (`moves: 3, optimalMoves: 9`) ve diğer 9 red vakası tam olarak adlandırdıkları alan yüzünden reddediliyor; soft App Check vakası (`stars: 9`) bilerek validation'a ulaşıyor.
+    * `rules.test.ts` — `sampleDoc` kontrata uygun; her vaka adlandırdığı kural yüzünden geçiyor/reddediliyor.
+
+## 7. Contract Compliance Check
+
+* **Endpoint / handler contract:** Preserved — `src/` bayt-özdeş (`submitDailyResult.ts` sha1 `bcda2662…`, `validate.ts` `8f0398ea…`; 8479ddb'den beri değişmedi).
+* **Request / response shape:** Preserved.
+* **Error format:** Preserved.
+* **Event payload / ordering:** Not Applicable.
+* **State-machine / boundary semantics:** Preserved — first-run-authoritative ve create-only artık gerçekten test ediliyor.
+
+## 11. Test Evidence by Task
+
+Ortam: macOS host, Node v24.7.0, firebase-tools 15.29.0, OpenJDK 21.0.12.1 (`/opt/homebrew/opt/openjdk@21`, keg-only), proje `demo-looplet` (yalnız emülatör; gerçek Firebase'e erişim yok). Revizyon: HEAD `b8e37ab` + bu çalışma ağacı (tek değişen dosya test).
+
+| Claim / senaryo | Sınıf | Komut | Sonuç | Kanıt |
+| --- | --- | --- | --- | --- |
+| Kurulum + derleme | build | `cd infra/functions && npm ci && npm run build` | exit 0 | `BE6-00-*` |
+| Hatanın yeniden üretimi (fix öncesi) | repeatable integration | `JAVA_HOME=… PATH=<jdk21>/bin:$PATH npm run test:emulator` (09:23Z) | exit 1 — **30 / 31**; tek hata "ALREADY_SUBMITTED on a repeat": `moves must be >= 9` | `BE6-01-*` (2. deneme; 1. deneme yalnız `JAVA_HOME` ile Java sürüm hatası, §14.1) |
+| Düzeltilmiş suite | repeatable integration | aynı komut, fix sonrası (09:23:49Z; test sha1 `cf73770d…`, handler `bcda2662…`) | exit 0 — **Test Suites 3 / 3, Tests 31 / 31**, skip 0 (rules 6, callable 7, skeleton 18) | `BE6-02-*` |
+| Emülatörsüz CI yolu | unit | `npm test` | exit 0 — 18 passed, 13 skipped (emülatör-gated iki suite, beklenen) | `BE6-03-*` |
+| First-run-authoritative gerçekten kontrol ediliyor | negatif | `python3 evidence/neg-be6.py` (repo kökünden) | aşağıdaki tablo | `BE6-04-neg.log.txt` |
+
+**Named negative runs** (`evidence/neg-be6.py`; handler bayt kopyasından geri yüklendi, sha1 önce = sonra `bcda2662…`; test de geri yüklendi `cf73770d…`):
+
+| Run | Mutasyon | Sonuç | Yakalayan test / sebep |
+| --- | --- | --- | --- |
+| N-OVERWRITE | handler mevcut kaydın üzerine yazar (`if (false && snapshot.exists)` + `tx.create` → `tx.set`), düzeltilmiş fixture | exit 1, 2 fail / 7 | "ALREADY_SUBMITTED on a repeat" — `Expected "ALREADY_SUBMITTED", Received "CREATED"`; "idempotent across many repeats" |
+| N-OVERWRITE-OLDFIX | aynı mutasyon, BE6 öncesi fixture (`moves: 8`) | exit 1, 2 fail / 7 | "ALREADY_SUBMITTED on a repeat" yine kırmızı ama sebep `moves must be >= 9` — eski test regresyonu ayırt edemiyordu (bozuk ve sağlam handler'da aynı sonuç) |
+
+**İzolasyon:** handler doğrudan çağrılıyor (`handleSubmitDailyResult`, `CallableRequest` stand-in); Firestore ve Auth emülatörü `emulators:exec` ile; Functions emülatörü ve HTTPS katmanı bu suite'te yok (client ↔ Functions emülatörü yolu F08-LOCAL-EVIDENCE LE-04'te). App Check stand-in `app: {}`.
+
+## 14. Needs Tech Lead Clarification
+
+1. **setup-manifest komutu eksik:** `JAVA_HOME=/opt/homebrew/opt/openjdk@21 npm run test:emulator` tek başına çalışmıyor — firebase-tools `PATH`'teki `java`'yı kullanıyor ve sistem Java'sını görüp `firebase-tools no longer supports Java version before 21` ile çıkıyor (`BE6-01` 1. deneme). Çalışan biçim: `JAVA_HOME=/opt/homebrew/opt/openjdk@21 PATH=/opt/homebrew/opt/openjdk@21/bin:$PATH npm run test:emulator`. `setup-manifest.md` authority'si bende değil; düzeltmesi Tech Lead'de.
+2. **CI emülatör işi zaten var (F08-BE5), A6 ruling 5 "eklenirse" diyor:** `.github/workflows/ci.yml` `infra` job'u "Test functions (Firebase emulator — rules + callable behaviour)" adımıyla `npx --yes firebase-tools@15 emulators:exec …` koşuyor ve "ubuntu-latest ships a JDK on PATH" varsayımına dayanıyor. firebase-tools 15.29 Java 21 istiyor; runner'ın varsayılan Java'sı 21 değilse bu adım Java sürüm hatasıyla kırmızıdır. Ayrıca bu adım BE6 öncesi fixture yüzünden her koşuda 30 / 31 kırmızı olmalıydı. CI koşu geçmişini buradan göremedim (`gh` yok). CI config benim scope'umda değil — DevOps/Release Engineer kararı (Java 21 pin, adımın gerçek sonucu). Bloklamıyor: yerel suite yeşil.
+3. **Bilgi (bloklamaz):** `firestore.rules` create kuralında architecture'daki `&& !exists(...)` ifadesi yazılı değil. Firestore'da `create` yalnız doküman yokken değerlendirildiği ve varolan dokümana yazım `update` (her zaman `false`) olduğu için anlam aynı; `rules.test.ts` "denies update" bunu kapsıyor. Değişiklik yapmadım.
+
+---
+
+# WORKFLOW HANDOFF SUGGESTION (NON-AUTHORITATIVE)
+
+* **Completed Tasks:** F08-BE6.
+* **Remaining Tasks:** Tech Lead checkpoint (BE6 reconciliation, §14.1 setup-manifest komutu, §14.2 CI emülatör adımı) → F08-QA-FUNCTIONAL (plan A7).
+* **Blockers:** yok.
+* **Status Suggestion:** Needs Tech Lead Review.
+
+## 15. Sonraki Komut
+
+```
+Run Tech Lead
+```

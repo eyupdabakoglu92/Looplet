@@ -79,15 +79,23 @@ d("submitDailyResultV1", () => {
 
   it("ALREADY_SUBMITTED on a repeat — first run stays authoritative", async () => {
     const first = await call({ auth: { uid } });
+    // A valid "better" replay: fewer moves (still >= optimalMoves 9), more
+    // stars, a faster time — so it reaches the idempotency branch instead of
+    // being rejected by validation.
     const second = await call({
       auth: { uid },
-      data: { moves: 8, stars: 3, durationMs: 40000 }, // a "better" replay
+      data: { moves: 10, stars: 3, durationMs: 40000 },
     });
     expect(second.status).toBe("ALREADY_SUBMITTED");
     expect(second.recordedAt).toBe(first.recordedAt);
 
     const snap = await docRef().get();
-    expect(snap.data()).toMatchObject({ moves: 14, stars: 2 }); // unchanged
+    expect(snap.data()).toMatchObject({
+      moves: 14,
+      stars: 2,
+      durationMs: 83210,
+      recordedAtUtcMs: first.recordedAt,
+    }); // unchanged
   });
 
   it("is idempotent across many repeats — one doc, one recordedAt", async () => {

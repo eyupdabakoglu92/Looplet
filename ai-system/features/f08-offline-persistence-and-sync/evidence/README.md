@@ -20,3 +20,15 @@ Target: iPhone 16 simulator `D0011CE7-6E50-4367-93FA-B323E81270BE`, iOS 18.6, de
 | `runtime/LE-07*`, `runtime/raw/` | Production-shaped cold boots (no emulator define), empty and existing store; videos + per-frame luma traces (`video-d2.swift trace`). `07a/07b` on the first FE13 build, `07c/07d` on the final one. |
 | `runtime/LE-08*` | Release build with the emulator define: the gated strings are absent, the controls present. |
 | `runtime/integration-final.log.txt` | `flutter test integration_test` on the simulator, final code. |
+
+## F08-BE6 (Backend Developer, 2026-09-29)
+
+Claims and results: `../backend.md` → "F08-BE6". Base HEAD `b8e37ab`; only `infra/functions/test/submitDailyResult.test.ts` changed (sha1 `cf73770d…`).
+
+| File | What |
+| --- | --- |
+| `neg-be6.py` | N-OVERWRITE / N-OVERWRITE-OLDFIX: the handler overwrites an existing entry; the fixed test catches it, the old fixture cannot tell. Restores both files byte for byte. Run from the repo root; needs Java 21 on PATH. Output: `runtime/BE6-04-neg.log.txt`. |
+| `runtime/BE6-00-npm-ci-build.log.txt` | `npm ci && npm run build`. |
+| `runtime/BE6-01-baseline-suite.log.txt` | The suite before the fix: attempt 1 (only `JAVA_HOME`) fails on the Java version; attempt 2 (Java 21 on PATH) 30 / 31. |
+| `runtime/BE6-02-fixed-suite.log.txt` | The suite after the fix: 31 / 31. |
+| `runtime/BE6-03-plain-npm-test.log.txt` | `npm test` without the emulator: 18 passed, 13 skipped. |

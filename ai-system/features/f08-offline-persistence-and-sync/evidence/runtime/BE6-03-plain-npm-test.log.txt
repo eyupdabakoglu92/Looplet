@@ -1,0 +1,29 @@
+
+> looplet-functions@0.1.0 test
+> jest --passWithNoTests
+
+PASS test/skeleton.test.ts
+  ● Console
+
+    console.warn
+      {"uid":"u1","severity":"WARNING","message":"submitDailyResultV1: missing App Check token (soft-enforce)"}
+
+      39 |   // `platform.md` §6/§13): a missing/failed token is logged, not rejected.
+      40 |   if (request.app === undefined) {
+    > 41 |     logger.warn("submitDailyResultV1: missing App Check token (soft-enforce)", {
+         |            ^
+      42 |       uid,
+      43 |     });
+      44 |   }
+
+      at write (node_modules/firebase-functions/lib/logger/index.js:81:74)
+      at Object.warn (node_modules/firebase-functions/lib/logger/index.js:121:5)
+      at handleSubmitDailyResult (src/submitDailyResult.ts:41:12)
+      at Object.<anonymous> (test/skeleton.test.ts:48:30)
+
+
+Test Suites: 2 skipped, 1 passed, 1 of 3 total
+Tests:       13 skipped, 18 passed, 31 total
+Snapshots:   0 total
+Time:        1.622 s, estimated 3 s
+Ran all test suites.

@@ -10,25 +10,24 @@ In Progress
 
 ## Current Owner
 
-Backend Developer
+Tech Lead
 
 ## Next Role
 
-Backend Developer
+Tech Lead
 
 ## Active Task Ledger
 
 - [x] Task ID: F08-FE13 | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: Close the unreadable-DB gap (Resilience row, AC8: classify, quarantine + recreate, `db_reinitialized`, loop guard), make Retry reopen the database connection (F08-RETRY-STORE-CONNECTION), add the debug-only emulator wiring and fake-producer trigger, and the storage-full fault-injection harness (architecture Activation A1–A4). Brief: Current Brief | Depends On: -
 - [x] Task ID: F08-LOCAL-EVIDENCE | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: On the F08-FE13 build, capture the local evidence of architecture Activation A4 — resume fidelity incl. restart / thaw / tamper; exactly-once and lifecycle against the Firebase emulator; the emulator rules / callable suite; storage-full; the unreadable-DB runtime; the production-shaped cold boot; offline Journey only on a real no-network runtime. No deploy; no product-semantics change. Brief: Current Brief | Depends On: F08-FE13
-- [ ] Task ID: F08-BE6 | Assigned Role: Backend Developer | Status: Open | Summary: Fix the contract-invalid fixture in `infra/functions/test/submitDailyResult.test.ts` "ALREADY_SUBMITTED on a repeat" (`moves` 8 < `optimalMoves` 9), keep its first-run-authoritative assertions, prove them with a named negative run, and re-run the emulator suite green on Java 21 (architecture Activation A6 ruling 6). Test code only. Brief: Current Brief | Depends On: -
+- [x] Task ID: F08-BE6 | Assigned Role: Backend Developer | Status: Done | Summary: Fix the contract-invalid fixture in `infra/functions/test/submitDailyResult.test.ts` "ALREADY_SUBMITTED on a repeat" (`moves` 8 < `optimalMoves` 9), keep its first-run-authoritative assertions, prove them with a named negative run, and re-run the emulator suite green on Java 21 (architecture Activation A6 ruling 6). Test code only. Brief: Current Brief | Depends On: -
 - [ ] Task ID: F08-QA-FUNCTIONAL | Assigned Role: QA | Status: Queued | Summary: Independently review and re-run the local / emulator / boot evidence under the locked plan (architecture Activation A7), keep unresolved scenarios, then issue the functional-stage verdict | Depends On: F08-LOCAL-EVIDENCE, F08-BE6
 - [ ] Task ID: F08-DEVOPS | Assigned Role: DevOps/Release Engineer | Status: Blocked | Summary: Resume release readiness only after explicit billing/target approval; retain runbook and remaining smoke; a CI emulator job, if added, pins Java 21 (architecture A6 ruling 5) | Depends On: F08-QA-FUNCTIONAL
 - [ ] Task ID: F08-QA-FINAL | Assigned Role: QA | Status: Queued | Summary: Final acceptance of reviewed release proof and any affected functional scope | Depends On: F08-DEVOPS
 
 ## Open Tasks
 
-* F08-BE6 (Backend Developer) — Open.
-* F08-QA-FUNCTIONAL stays Queued until the Tech Lead checkpoint after F08-BE6.
+* None open for a delivery role — F08-QA-FUNCTIONAL stays Queued until the Tech Lead checkpoint after F08-BE6.
 
 ## Handoff Plan
 
@@ -99,6 +98,7 @@ None
   * Result: PENDING
   * Delivery Evidence: 2026-09-29 (LE-03, LE-04): suite 30/31 — one backend test sends an invalid payload (frontend.md F08-FE13 §16.1); client ↔ emulator cases A–E. Tooling: firebase-tools 15.29 needs JDK 21 (installed, not linked).
   * Tech Lead 2026-09-29 (A6 ruling 6): the red test is a fixture defect (handler correct) → F08-BE6; the suite must be green before QA. Canonical command with Java 21: setup-manifest.md → Canonical Verification Commands.
+  * Delivery Evidence (F08-BE6, 2026-09-29, HEAD b8e37ab + the fixed test): suite **31 / 31**, exit 0 (`evidence/runtime/BE6-02-fixed-suite.log.txt`); N-OVERWRITE caught (`BE6-04-neg.log.txt`). Java 21 must be on PATH, not only `JAVA_HOME` (backend.md F08-BE6 §14.1). QA review pending.
 
 - Evidence ID: F08.LOCAL-RESUME
   * Scenario: Kill/relaunch exact restore, undo/restart/thaw state and untrusted cached thaw re-derivation
@@ -192,7 +192,7 @@ None
 
 ## Next Action
 
-Run Backend Developer on F08-BE6 (Current Brief; contract architecture → Activation 2026-09-29 → A6 ruling 6): fix the fixture, run the named negative, re-run the emulator suite on Java 21 and append the evidence to `backend.md`. Then the Tech Lead checkpoint activates F08-QA-FUNCTIONAL under the locked plan (A7). F08.OFFLINE-JOURNEY waits for the user's run of `evidence/offline-journey.sh`, and does not block the other scenarios. The release stage stays blocked (F08.DEPLOY-AUTHORIZATION OPEN); no deployment or billing action.
+Run Tech Lead — checkpoint on F08-BE6 (backend.md → "F08-BE6"): reconcile the fixture fix and the emulator suite (31 / 31, N-OVERWRITE), resolve §14.1 (the setup-manifest command needs Java 21 on PATH) and §14.2 (the existing CI emulator step and Java 21), then activate F08-QA-FUNCTIONAL under plan A7. F08.OFFLINE-JOURNEY still waits for the user's run of `evidence/offline-journey.sh`. The release stage stays blocked (F08.DEPLOY-AUTHORIZATION OPEN); no deployment or billing action.
 
 ## Last Decision
 
@@ -219,9 +219,9 @@ The pre-checkpoint orchestration is archived as history/f08-offline-persistence-
 
 ## Last Update
 
-* Updated By: Tech Lead
+* Updated By: Backend Developer
 * Timestamp: 2026-09-29
-* Summary: FE13 checkpoint — the delivery was accepted (architecture A6), the QA plan was locked (A7) and F08-BE6 was opened; owner → Backend Developer.
+* Summary: F08-BE6 Done (backend.md) — the fixture is valid, the emulator suite is 31 / 31 and N-OVERWRITE is caught; Delivery Review Pending; owner → Tech Lead.
 
 ## Context & Follow-ups
 
@@ -251,6 +251,7 @@ F08 implementation/runbook and the F08-FE12 fix are retained. Exact old tasks an
   * **Locked:** the QA plan (A7).
   * **Recorded:** Java 21 in setup-manifest.
   * **Next:** owner → Backend Developer.
+* 2026-09-29 — Backend Developer: F08-BE6 Done (backend.md). Test code only; suite 31 / 31 on Java 21; N-OVERWRITE caught. Needs the Tech Lead: the setup-manifest command (Java 21 on PATH), the existing CI emulator step (Java 21). Owner → Tech Lead.
 
 
 ## Release Constraints
