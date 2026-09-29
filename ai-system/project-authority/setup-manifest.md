@@ -3,7 +3,7 @@
 > Status: OPERATIONAL. Project-specific scaffold/bootstrap recipe for the `Project Setup` role.
 > This file carries operation recipes and canonical commands only — no role or architecture authority.
 
-Last Updated: 2026-09-06 (added the `infra/` Firebase DURUM 0 recipe for F08)
+Last Updated: 2026-09-29 (the Java 21 emulator-suite command, F08 A6); 2026-09-06 (added the `infra/` Firebase DURUM 0 recipe for F08)
 Owner: Tech Lead
 
 ---
@@ -167,6 +167,7 @@ Target directory: `infra/` at the repo root (currently a stub `infra/README.md`)
 * Boot / dev run: `melos exec --scope="looplet_app" -- "flutter run"`  _(or simply `cd app && flutter run`; melos scopes by package name `looplet_app`, not by directory)_
 * Extra verification: `melos run format:check && melos run analyze`
 * Bootstrap (run once after scaffold, and after any `pubspec.yaml` change): `melos bootstrap`
+* Firebase emulator suite (rules + callable, project `demo-looplet`, no billing): `cd infra/functions && npm ci && npm run build && JAVA_HOME=/opt/homebrew/opt/openjdk@21 npm run test:emulator`  _(firebase-tools 15.29 needs **Java 21+**; `openjdk@21` is installed keg-only and not linked, so the system Java is unchanged. Added 2026-09-29, F08 `architecture.md` Activation A6 ruling 5.)_
 
 ---
 

@@ -16,7 +16,7 @@ project-authority/platform.md and each feature's architecture.md — unchanged.
 
 ## Setup Authority
 
-project-authority/setup-manifest.md — unchanged.
+project-authority/setup-manifest.md — 2026-09-29: added the Firebase emulator-suite command with Java 21 (firebase-tools 15.29 needs Java 21+; `openjdk@21` is installed keg-only with the user's approval, and the system Java is unchanged). Everything else is unchanged.
 
 ## Release Authority
 
@@ -40,56 +40,62 @@ features/f08-offline-persistence-and-sync/orchestration.md
 
 ## Current Phase
 
-F08 local evidence — F08-FE13 (unreadable-DB recovery, Retry reconnect, emulator tooling, storage-full harness), then F08-LOCAL-EVIDENCE
+F08 local evidence — F08-BE6 (the emulator suite's invalid fixture), then the Tech Lead checkpoint → F08-QA-FUNCTIONAL
 
 ## Current Role
 
-Frontend/Mobile Developer
+Backend Developer
 
 ## Current Reason
 
-**F08 was activated on 2026-09-29**, right after Design Adoption Phase D closed (F05 D3, `architecture.md` §18.9). Full record: F08 `architecture.md` → Activation 2026-09-29.
+**The F08-FE13 checkpoint** was on 2026-09-29. Full record: F08 `architecture.md` → Activation → A6 (rulings) and A7 (QA plan).
 
-* **Gap found at activation:** a store file that is not a database leaves the player stuck on the store-error screen — Retry fails forever. This was seen at runtime in F05-QA-D3 E15 and confirmed in `bootstrap.dart`, where every open failure maps to the error screen. It breaks the locked Resilience row ("recover; last resort recreate, logged `db_reinitialized`, never a crash-loop") and AC8. The earlier F08 QA had read AC8 as the `active_session` row only.
-* **F08-FE13 (Open, Frontend/Mobile Developer):**
-  * classify, quarantine + recreate, with a loop guard;
-  * Retry reopens the connection (F08-RETRY-STORE-CONNECTION);
-  * debug-only Firebase-emulator wiring and a fake-producer trigger (JDK 17 and the Firebase CLI are present, so the emulator runs locally at no cost);
-  * a storage-full harness (`max_page_count` on a real file database).
-* **Then F08-LOCAL-EVIDENCE**, directly:
-  * resume incl. restart / thaw / tamper;
-  * emulator exactly-once and lifecycle;
-  * the rules / callable suite;
-  * the cold boot;
-  * offline Journey only on a real no-network runtime — a user action or a device.
+* **Accepted:** F08-FE13 + F08-LOCAL-EVIDENCE (beb7bfe, `app/` `9de12e6a…`):
+  * the unreadable-DB recovery (AC8 / the Resilience row);
+  * the Retry reconnect;
+  * the debug-only emulator wiring and trigger;
+  * the storage-full harness (F08.STORAGE PASS);
+  * the local runtime evidence.
+* **Also accepted:** the migration `transaction` fix the developer found. Without it the locked row "Migration step throws → abort without partial apply" was false on a real connection.
+* **F08-BE6 (Open, Backend Developer):** the emulator rules / callable suite is 30 / 31.
+  * One test sends `moves` 8 < `optimalMoves` 9, and the handler rightly rejects it.
+  * The job: fix the fixture, run the negative N-OVERWRITE, get the suite green on Java 21.
+  * F08.EMULATOR cannot pass on a red suite.
+* **The F08-QA-FUNCTIONAL plan is locked** (A7): modules core, backend-security, client-ui, stateful-flow; regression depth full; evidence reuse invalidated for the app side.
+* The offline Journey (AC2) waits for the user's no-network run.
 * Visual Scope `none`. The release stage stays blocked on F08.DEPLOY-AUTHORIZATION.
 
 ## Last Completed Action
 
-Tech Lead on 2026-09-29 — **F08 activation** (after the D3 closure, commit b7493d6).
+Tech Lead on 2026-09-29 — **the F08-FE13 checkpoint** (after the delivery in beb7bfe).
 * **Reviewed:**
-  * the F08 contract (Resilience, App Init, Ownership & Lifecycle, QA Focus), the PRD ACs, qa.md's pending scenarios and the FE12 record;
-  * `bootstrap.dart` / `app_router.dart` / `persistence_providers.dart`;
-  * the tooling: OpenJDK 17, the Firebase CLI, `infra/functions` `test:emulator`, ports 9099 / 8080 / 5001;
-  * the fake producer (it exists, with no app emulator wiring).
-* **Decided** (F08 `architecture.md` → Activation A1–A5):
-  1. the unreadable-DB recovery rules;
-  2. Retry reconnect in scope, the one-frame feedback left out;
-  3. the debug-only emulator wiring and trigger;
-  4. the local evidence plan and methods;
-  5. Visual Scope `none`.
-* **New follow-up:** DB-REINIT-NOTICE (a possible player notice; PO copy; the MVP assumption is none).
-* **State:** F08 In Progress; F08-FE13 Open; F08-LOCAL-EVIDENCE Queued (Handoff Plan); F08.UNREADABLE-DB added; owner → Frontend/Mobile Developer.
-* Archived: history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-activation.md.
+  * `frontend.md` F08-FE13 / F08-LOCAL-EVIDENCE;
+  * the diff of the bootstrap, database, migration guard, emulator and sync providers;
+  * the migration-failure tests and the N-TXN mutation;
+  * the failing backend test against `validate.ts`.
+* **Re-ran** the recovery, storage-full and store-error tests: 29 / 29, exit 0. This is not a QA claim.
+* **Decided** (A6):
+  1. the migration transaction — accepted, inside the contract;
+  2. quarantining `-journal` — accepted;
+  3. the named emulator app and skipping App Check in emulator mode — accepted, debug only;
+  4. the debug kill switch — test tooling; the Remote Config wiring stays F07;
+  5. Java 21 — recorded in `setup-manifest.md`;
+  6. the backend fixture → F08-BE6;
+  7. `firebaseUid` survives a recreate — a note, no change;
+  8. the emulator keychain-reset procedure is part of the QA method.
+* **State:** F08-BE6 Open; F08-QA-FUNCTIONAL Queued (depends on F08-BE6); Delivery Review Pending; owner → Backend Developer.
+* Archived: history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-fe13-checkpoint.md.
 
 ## Next Expected Action
 
-Run Frontend/Mobile Developer on F08-FE13 (the F08 orchestration Current Brief; contract F08 `architecture.md` → Activation 2026-09-29), then F08-LOCAL-EVIDENCE directly:
-* code: the unreadable-DB recovery with a loop guard, the Retry reconnect, the debug emulator wiring and trigger, the storage-full harness;
-* tests and the named negative runs N-CLASS, N-LOOP, N-RETRY, N-FULL, N-GATE;
-* runtime and emulator evidence in `frontend.md`.
+Run Backend Developer on F08-BE6 (the F08 orchestration Current Brief; contract F08 `architecture.md` → Activation A6 ruling 6). Test code only:
+* the valid "better replay" fixture;
+* a scan of the suite for the same kind of defect;
+* N-OVERWRITE;
+* `JAVA_HOME=/opt/homebrew/opt/openjdk@21 npm run test:emulator` green;
+* the evidence in `backend.md`.
 
-Then the Tech Lead checkpoint → F08-QA-FUNCTIONAL. No deployment or billing action.
+Then the Tech Lead checkpoint activates F08-QA-FUNCTIONAL (A7). Optional and at any time: the user runs `ai-system/features/f08-offline-persistence-and-sync/evidence/offline-journey.sh <udid>` for AC2. It turns the Mac's Wi-Fi off and back on. No deployment or billing action.
 
 ## Portfolio Summary
 
@@ -98,7 +104,7 @@ Then the Tech Lead checkpoint → F08-QA-FUNCTIONAL. No deployment or billing ac
 * F00: Done again (2026-09-27) — Phase C is complete (the conformance audit was accepted). Its design-system layer closed 2026-09-26: Foundation Selected (Direction C), 90/100, Visual Quality Gate Passed via the scoped exception F00.VISUAL-93-THRESHOLD.
 * F05: Done (2026-09-29) — Design Adoption Phase D3 (Home + app shell, `new-surface`, architecture §18) closed: F05-QA-D3 Approved with Notes, 94 / 100, gate Passed (§18.9). The user's N1 decision is live (PO-REV-2026-09-29-F05-CONTINUE). Previously Done 2026-09-27 (F05-QA-STRICT2 Approved with Notes).
 * F04: Done — the panel is now the full-screen result (D2, F03 carrier, closed 2026-09-29; F04 §7 / §8 amended 2026-09-28; ACs unchanged and passed on the result).
-* F08: **In Progress — the active feature**, activated 2026-09-29 (unreadable-DB gap found; F08-FE13 Open with the Frontend/Mobile Developer, then F08-LOCAL-EVIDENCE); independent local/emulator validation pending, release task Blocked, release/final acceptance pending. Its `StoreErrorScreen` now uses the Foundation (D3, F08 App Init step 1 amended).
+* F08: **In Progress — the active feature.** F08-FE13 + F08-LOCAL-EVIDENCE accepted 2026-09-29 (A6); F08-BE6 Open with the Backend Developer, then F08-QA-FUNCTIONAL (plan A7). Independent local/emulator validation pending, release task Blocked, release/final acceptance pending. Its `StoreErrorScreen` now uses the Foundation (D3, F08 App Init step 1 amended).
 * F07, F09–F13: Not Started. Pending follow-ons are in workflow-follow-ups.md.
 
 ## Release Decision
@@ -125,8 +131,10 @@ F08.DEPLOY-AUTHORIZATION is OPEN with Blocking Scope = release. The old deferral
   * RESULT-F00-COMPONENT-ALIGN — the `EN İYİ` ★ offset and the pressed-pill brightness.
   * Release-build pacing was not measured (debug video only); it belongs to FIRST-APP-DISTRIBUTION — for the result (D2) and the Home entrance (D3, F05-QA-D3 N1).
 * **Post-D3 follow-ups (non-blocking, in workflow-follow-ups.md):** FIRST-APP-DISTRIBUTION (the profile / release store-error capture, moved from the F05 ledger); F08-RETRY-STORE-CONNECTION (+ the one-frame Retry feedback, N2); RESULT-F00-COMPONENT-ALIGN (+ the `LimePill` arrow at AX5, N3); OPTIONAL-QUALITY-NOTES (N4, N5); RELEASE-SCOPED-EVIDENCE (process).
-* **Commits:** the D1 rework, its closure and the D2 activation are in 489606d — its tracked `app/` diff from 5798c70 hashes to QA's `88f1dca3…` and the two changed sources match QA's SHA-1s (re-verified at the D2 checkpoint); the F03-UI-D2 handoff is in 6352a75; the F03-FE-D2 delivery is in 67d9ecb (`app/` tree `f5641d2f…`, QA's evidence-reuse fingerprint); the F03-QA-D2 verdict is in f28aedb; the reconciliation in 3cd4a3b; the F03-FE-D2R rework in 77c33b9 (`app/` tree `5298c81a…`, the re-QA fingerprint); the F03-QA-D2R verdict in 5677471. The D2 closure and the D3 activation are in 171f0c1; the PO revision in 230ce0c; its resync in 9a36147; the F05-UI-D3 handoff in 981b807; the visual-gate checkpoint in 7c1a946; the F05-FE-D3 delivery in af5aec8 (`app/` `b4ad263e…`, the D3 QA fingerprint); the implementation checkpoint in 078c926; the F05-QA-D3 verdict in e46f384. The D3 closure is in b7493d6. The F08 activation is uncommitted (documents only).
-* **F08 unreadable-DB gap (found 2026-09-29):** an unreadable store file is a Retry dead end until reinstall (Resilience row / AC8 not implemented); fixed by F08-FE13. The Retry reconnect (F08-RETRY-STORE-CONNECTION) is in the same task.
+* **Commits:** the D1 rework, its closure and the D2 activation are in 489606d — its tracked `app/` diff from 5798c70 hashes to QA's `88f1dca3…` and the two changed sources match QA's SHA-1s (re-verified at the D2 checkpoint); the F03-UI-D2 handoff is in 6352a75; the F03-FE-D2 delivery is in 67d9ecb (`app/` tree `f5641d2f…`, QA's evidence-reuse fingerprint); the F03-QA-D2 verdict is in f28aedb; the reconciliation in 3cd4a3b; the F03-FE-D2R rework in 77c33b9 (`app/` tree `5298c81a…`, the re-QA fingerprint); the F03-QA-D2R verdict in 5677471. The D2 closure and the D3 activation are in 171f0c1; the PO revision in 230ce0c; its resync in 9a36147; the F05-UI-D3 handoff in 981b807; the visual-gate checkpoint in 7c1a946; the F05-FE-D3 delivery in af5aec8 (`app/` `b4ad263e…`, the D3 QA fingerprint); the implementation checkpoint in 078c926; the F05-QA-D3 verdict in e46f384. The D3 closure is in b7493d6. The F08 activation is in 1d373d7; the F08-FE13 / LOCAL-EVIDENCE delivery in beb7bfe (`app/` `9de12e6a…`). The FE13 checkpoint is uncommitted (documents only).
+* **F08 unreadable-DB gap (found 2026-09-29):** fixed in F08-FE13 (beb7bfe) and accepted at the checkpoint; the runtime and automated evidence awaits independent QA (F08.UNREADABLE-DB). The Retry reconnect is delivered too. The one-frame Retry feedback (N2) stays a follow-up.
+* **Migration partial-apply (found by F08-FE13, 2026-09-29):** Drift does not wrap `onUpgrade` in a transaction, so a failing step could leave a partial apply. It is fixed and accepted (F08 A6 ruling 1). The first real schema step must add its own real-file migration test.
+* **Emulator suite red (F08-BE6):** 30 / 31 because of a contract-invalid fixture, not a handler defect. It needs Java 21 (setup-manifest).
 
 ## Contract Version
 

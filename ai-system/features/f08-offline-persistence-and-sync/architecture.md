@@ -353,7 +353,7 @@ The QA Focus calls for client ↔ emulator runs ("exactly-once sync … via the 
 
 | Scenario (ledger) | Method | Notes |
 | --- | --- | --- |
-| **F08.EMULATOR** — rules and callable (create-only, auth isolation, idempotency) | `cd infra/functions && npm ci && npm run build && npm run test:emulator` (JDK 17 and the Firebase CLI are present; project `demo-looplet`, no billing) | The developer confirms the harness runs and records the result. QA re-runs it independently. |
+| **F08.EMULATOR** — rules and callable (create-only, auth isolation, idempotency) | `cd infra/functions && npm ci && npm run build && npm run test:emulator` (project `demo-looplet`, no billing). *[Corrected at the A6 checkpoint: firebase-tools 15.29 needs **Java 21+**, not JDK 17 — `JAVA_HOME=/opt/homebrew/opt/openjdk@21`; see A6 ruling 5.]* | The developer confirms the harness runs and records the result. QA re-runs it independently. |
 | **Exactly-once client ↔ emulator** (AC4, AC5, AC11; part of F08.EMULATOR / F08.LIFECYCLE) | A3 wiring + the fake producer on the iPhone 16 simulator against `firebase emulators:start --only auth,firestore,functions`:<br>• offline completion → 1 queue item;<br>• reconnect → 1 doc;<br>• a forced mid-request drop (stop the emulator mid-call) → retry → still 1 doc;<br>• a kill during `inFlight` → relaunch → still 1 doc;<br>• a server doc seeded with an earlier run → local later run syncs → server unchanged;<br>• `daily_sync_enabled=false` → no send. | "Offline" here = emulator unreachable (stopped), stated as such. It is not device airplane mode. |
 | **F08.LIFECYCLE** — screen dispose mid-sync; `paused` / `resumed` → `drain()`; connectivity regain → `drain()` | The same setup: trigger, then leave the triggering screen at once; HOME button / relaunch; stop and start the emulator | Record the emulator request log and the queue rows (`sqlite3`) as evidence. |
 | **F08.LOCAL-RESUME** — AC1 / AC6 | iPhone 16 debug build:<br>• a level with frozen tiles (21–30): N moves + an undo + a restart + a thawed tile → kill → relaunch → exact restore of grid, `moveCount`, `undosRemaining`, `restartCount`, elapsed (± capture resolution) and thaw;<br>• tamper `thawedFrozenCells` in `kv['active_session']` → relaunch → thaw re-derived, not trusted. | Grid / moves / undo on a replay are already proven at `b4ad263e…` (F05-QA-D3 E09). The FE13 build changes the database-open path, so the whole scenario is re-run on it. |
@@ -374,3 +374,101 @@ The QA Focus calls for client ↔ emulator runs ("exactly-once sync … via the 
 
 No UI Designer task and no visual gate. If FE13 needs any player-visible change, that is Needs Tech Lead Clarification.
 
+
+### A6. Implementation checkpoint 2026-09-29 (F08-FE13 + F08-LOCAL-EVIDENCE, commit beb7bfe)
+
+**Delivery reviewed:** `frontend.md` → "F08-FE13" and "F08-LOCAL-EVIDENCE"; the code diff of `bootstrap.dart`, `app_database.dart`, `migration_guard.dart`, `firebase_emulator.dart`, `sync_providers.dart`; the migration-failure tests and the N-TXN mutation in `evidence/neg-fe13.py`; the backend test named in `frontend.md` §16.1 against `infra/functions/src/validate.ts`. The committed `app/` tree `9de12e6a…` equals the tree `frontend.md` records.
+
+**Tech Lead re-run (not a QA claim):** `flutter test test/persistence/store_recovery_test.dart test/persistence/storage_full_test.dart test/shell/store_error_screen_test.dart` at beb7bfe, 2026-09-29, macOS host → 29 / 29, exit 0.
+
+**Task coverage:**
+* F08-FE13 closes A1 rules 1–5 (classify, quarantine + recreate, `db_reinitialized`, loop guard, migration / other → the error screen), A2 (Retry closes and replaces the connection), A3 (the emulator define under `kDebugMode`, the `/debug/sync` trigger) and the A4 storage-full harness.
+* F08-LOCAL-EVIDENCE covers every A4 row except the offline Journey. That row waits for a real no-network runtime, as A4 allows.
+
+**Contract compliance:**
+* No schema, migration-step, snapshot, repository or callable change.
+* `StoreErrorScreen`, the splash and Home are unchanged (Visual Scope `none` holds).
+* Additive:
+  * `/debug/sync` (debug only);
+  * the `debugSyncDisabledProvider` stand-in;
+  * the callable failure log line.
+* The release binary gate was checked by strings (LE-08). QA re-checks it.
+
+**Rulings:**
+1. **Migration transaction — Accepted (in contract).** Wrapping the guarded `onUpgrade` loop in `transaction` restores the locked Resilience row "Migration step throws → abort without partial apply; keep old DB". This is not a new behaviour. Without it the row was false on a real connection: a guard violation left the partial delete behind. The row was never proven on a real connection before (the F08-FE2 claim). `MigrationStepError` keeps a throwing step, even one with a SQLite CORRUPT cause, on the migration path and never the recreate path (A1 rule 1). N-TXN catches the removal. **Limit:** `schemaVersion = 1`, so no real step exists yet. The first real migration must add its own v(n) → v(n+1) test on a real file database.
+2. **Quarantining `-journal` — Accepted.** It is an extension of A1 rule 2 that the rule needs: a hot rollback journal left beside a new store would roll into it.
+3. **A named emulator app, and App Check skipped against the emulators — Accepted.**
+   * Both are debug + define only.
+   * The production path still uses the default app: `loopletFirebaseApp()` returns `Firebase.app()` when no emulator app exists, and `FirebaseFunctions.instanceFor(app: Firebase.app())` is the old `FirebaseFunctions.instance`.
+   * The FE12 lazy getter is preserved.
+4. **The debug kill switch — Accepted as test tooling, with a scope limit.**
+   * `dailySyncEnabledProvider` is still the constant `true` outside debug. The real Remote Config read is F07's (locked Remote Config section).
+   * LE-04 E therefore proves the `drain()` no-op when the switch is off. It does not prove the Remote Config wiring.
+   * QA records it that way. It is not an F08 gap.
+5. **Tooling: Java 21.** firebase-tools 15.29 needs Java 21+. `openjdk@21` is installed keg-only (the user approved it; the system Java is unchanged).
+   * The canonical local command is now in `project-authority/setup-manifest.md` → Canonical Verification Commands.
+   * A CI emulator job, when F08-DEVOPS adds one (`release.md` §4, best-effort), must pin Java 21.
+6. **Backend test-data defect — Backend Developer, F08-BE6.**
+   * The test `infra/functions/test/submitDailyResult.test.ts` "ALREADY_SUBMITTED on a repeat" sends `moves: 8` against the base payload's `optimalMoves: 9`. `validate.ts` (`moves` min = `optimalMoves`) correctly returns `INVALID_PAYLOAD`, so the test fails for a reason unrelated to what it names.
+   * The handler is right; the fixture is wrong. The suite has been 30 / 31 since it was first run against the emulator.
+   * F08.EMULATOR cannot pass on a red suite, so the fix comes before QA.
+   * The behaviour itself is also shown client ↔ emulator (LE-04 D). That is supporting evidence only; it does not replace the suite.
+7. **Identity after a recreate — Accepted as a note, no change.**
+   * On iOS the anonymous Firebase user lives in the Keychain and survives a store recreate. The new `guestId` is linked to the same `firebaseUid`.
+   * A recreated store's later run of a day already submitted is therefore `ALREADY_SUBMITTED`. That is consistent with first-run-authoritative and the create-only rule (Guest Identity Model: `firebaseUid` is the server identity).
+   * The quarantined bytes remain the support path (A1 rule 2).
+8. **Emulator run procedure** (`frontend.md` §16.4): a simulator that was ever signed in to the real project needs `xcrun simctl keychain <udid> reset` before an emulator run. Otherwise the real anonymous user is restored and the Auth emulator rejects its token. This is part of the QA method, not a defect.
+
+**Delivery Review:** F08-FE13 and F08-LOCAL-EVIDENCE are accepted. The feature-level review stays Pending until F08-BE6 is reconciled.
+
+### A7. F08-QA-FUNCTIONAL plan (locked now; activated at the checkpoint after F08-BE6)
+
+**Stage:** functional (Release Scope `production-readiness`; the release stage stays blocked on F08.DEPLOY-AUTHORIZATION).
+
+**QA Modules:**
+* `core`;
+* `backend-security` — callable validation, create-only rules, auth-scoped path;
+* `client-ui` — the store-error → Retry → Home flow, the debug-only route that must not exist in release;
+* `stateful-flow` — persistence, resume, migration, queue lifecycle, cold boot.
+
+`visual-quality` is not included (Visual Scope `none`). `release` is not included in the functional stage.
+
+**Regression Depth:** `full`. FE13 touches startup / routing, persistence and migration, and the Firebase init path shared by F03 / F04 / F05.
+
+**Evidence Reuse:** `invalidated` for the app side. The earlier F08 QA (2026-09-06) and F05-QA-D3 E05 / E06 / E09 are at earlier trees, and FE13 changes the open path and the bootstrap. They are supporting evidence only. The unchanged backend handler / rules source may be reused if QA confirms that its fingerprint is unchanged since 8479ddb; the test files change in F08-BE6.
+
+**Critical journeys (start → action → visible result):**
+1. Unreadable store (`seed-d3.sh corrupt`) → cold launch → Home "new":
+   * one quarantine file;
+   * the `db_reinitialized` log;
+   * a second corruption keeps only the newest quarantine;
+   * a recreate that also fails → the error screen, no second recreate in the launch (automated).
+2. Transient open failure (e.g. a directory at the store path) → error screen → remove the cause → Retry → Home, no relaunch.
+3. Migration failure (automated, real file DB) → error screen, rows and `user_version` intact, no quarantine, `migration_failed` log.
+4. Resume: a frozen-tile level with moves + undo + restart + thaw → kill → relaunch → exact restore; tampered `thawedFrozenCells` → re-derived.
+5. Exactly-once against the emulator (the six A4 cases). "Offline" is the functions proxy / emulator being down — not airplane mode, and stated as such.
+6. Lifecycle: leave the triggering screen mid-sync → the doc arrives; paused / resumed → drain; connectivity regain → drain (automated + N-REGAIN; the simulator cannot toggle it).
+7. Production-shaped cold boot, empty and existing store: no light frame, no init error.
+8. Offline Journey (AC2) — only if the user has run `evidence/offline-journey.sh` on a real no-network runtime. Otherwise it stays PENDING with that prerequisite; it is not replaced by a simulated offline mode.
+
+**Misuse / negative checks QA runs itself:**
+* re-run the named negatives — at least N-CLASS, N-LOOP, N-RETRY, N-TXN, N-FULL, N-GATE — and the backend negative from F08-BE6;
+* rules: create-other, update, delete and read are denied;
+* callable: an invalid payload → `INVALID_PAYLOAD` → the client parks the item;
+* the release binary contains none of the emulator / debug-route strings.
+
+**Methods:**
+* iPhone 16 simulator (iOS 18.6) debug builds;
+* `JAVA_HOME=/opt/homebrew/opt/openjdk@21` for the emulator suite;
+* the keychain reset from A6 ruling 8;
+* no real Firebase project write beyond the existing production-shaped anonymous sign-in, no deploy, no billing.
+
+**Exit (functional):**
+* every F08 Pending Evidence record in scope is PASS, or explicitly PENDING with an owner and a prerequisite;
+* the verdict is Functional Approved, or Runtime Validation Pending if AC2 is still missing.
+
+**Known limits (not findings):**
+* Clock (AC10) is automated-only.
+* Offline Daily (AC3) is F07.
+* The Remote Config kill-switch wiring is F07 (A6 ruling 4).
+* The profile / release store-error capture is FIRST-APP-DISTRIBUTION.
