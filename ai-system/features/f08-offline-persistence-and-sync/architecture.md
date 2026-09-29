@@ -5,6 +5,7 @@
 > **Amended 2026-09-29 (Tech Lead — F08 activation after Design Adoption Phase D):** "Activation 2026-09-29" added at the end — the unreadable-DB recovery gap (Resilience row, AC8) is closed in code by F08-FE13; Retry reopens the database connection; a debug-only emulator connection and fake-producer trigger; the local evidence plan and its methods. No semantic change to the locked sections.
 > **Amended 2026-09-29 (Tech Lead — the F08-BE6 checkpoint):** "Activation 2026-09-29 → A8" added — F08-BE6 accepted; the Java 21 command corrected (Java 21 must be first on `PATH`); A6 ruling 5's premise about the CI emulator job corrected (the step exists since F08-BE5 and has never run); F08-QA-FUNCTIONAL activated under A7. No semantic change to the locked sections.
 > **Amended 2026-09-29 (Tech Lead — the checkpoint on the F08-QA-FUNCTIONAL verdict, Decision Pending):** "Activation 2026-09-29 → A9" added, and the locked **Rules** row corrected: clients may not write `dailyResults/**` at all; only the callable writes, through the Admin SDK (QA finding F1). The same correction is made in "Reconciliation Algorithm → Server", "Validation Responsibility" and "QA Focus → Rules", and in `platform.md` §6 / §8. This resolves a conflict inside the locked Firebase Sync Surface section in favour of its own decision (callable; a direct client write was rejected). No product criterion changes.
+> **Amended 2026-09-29 (Tech Lead — the F08-BE7 checkpoint):** "Activation 2026-09-29 → A10" added — F08-BE7 accepted (the rules now match the corrected Rules row); F08-QA-FUNCTIONAL-R1 activated under A9 ruling 4. No semantic change to the locked sections.
 > `orchestration.md` is execution authority; `platform.md` / `release.md` are project authority.
 
 ---
@@ -578,3 +579,32 @@ The backend handler and rules fingerprints above are the ones A7's reuse clause 
 6. **Release:** the new rules ship in the same first Firebase deploy, so the release scope does not change and nothing is deployed now. The F08-DEVOPS rollback check "create-own allowed / create-other denied" (`release.md` → rollback table) is out of date. When F08-DEVOPS resumes, DevOps/Release Engineer changes it to "a direct client create is denied; the callable creates". F1 must be closed before any deploy.
 
 **Delivery Review:** Pending until F08-BE7 is reconciled at the next Tech Lead checkpoint.
+
+### A10. Implementation checkpoint 2026-09-29 (F08-BE7, commit cb96719)
+
+**Delivery reviewed:** `backend.md` → "F08-BE7"; the diff of `infra/firestore.rules`, `infra/functions/test/rules.test.ts` and `infra/README.md` at cb96719; `evidence/neg-be7.py`; the logs `BE7-00` to `BE7-04`.
+
+**Fingerprints at cb96719** (they match `backend.md`):
+* `firestore.rules` `aa4c5dc2…` (was `b75628e6…`);
+* `rules.test.ts` `2c7df84a…` (was `9d4db0bb…`);
+* unchanged: the handler `bcda2662…`, `validate.ts` `8f0398ea…`, `submitDailyResult.test.ts` `cf73770d…`; `app/` tree `9de12e6a…`.
+
+**Tech Lead re-run (not a QA claim):**
+* The emulator suite with the setup-manifest command, `infra/functions` at cb96719, 2026-09-29T10:32Z, macOS host: Test Suites 3 / 3, Tests 33 / 33, exit 0.
+* `python3 evidence/neg-be7.py`: N-DIRECT-CREATE — exit 1, 3 failed / 5 passed / 8; the three failures are exactly the own-entry, invalid-payload and non-date-bucket tests; the rules restored byte for byte. The script rewrites `runtime/BE7-04-neg.log.txt`; the delivery's copy was restored from git, so that file stays the developer's evidence.
+
+**Task coverage:** F08-BE7 is closed. All five brief items are done: the rules deny every client access; the own-entry create is now denied, and the P3 and P6 shapes are two new tests; the named negative; build, `npm test` (18 passed, 15 skipped) and the emulator suite; the `infra/README.md` row.
+
+**Contract compliance:** the rules match the corrected Rules row. The callable, the validation, the error format and the create-only transaction are unchanged. The callable suite passes with the new rules loaded in the emulator, so the server path still writes. No app change.
+
+**Evidence quality:**
+* Every rules test is now an `assertFails`, so a green rules suite alone would not show that the rules are the reason. The negative run does: with the old rule back, exactly the three new tests fail, and the other five pass under both rules. `assertFails` requires a permission-denied error, so a broken connection would not pass as a denial.
+* The one invocation error before `BE7-02` (a `--verbose` argument that firebase-tools rejected; no test ran) is disclosed in the log and in `backend.md`. It is not a result.
+* Not run in BE7 and not claimed: the app ↔ emulator path under the new rules. It is in the QA plan (A9 ruling 4).
+
+**Rulings:**
+1. **F08-BE7 — Accepted.** QA finding F1 is fixed in code. It is not closed until QA re-runs its own rules probe (P3 / P6 must be DENIED).
+2. **F08.EMULATOR stays PENDING** — it is QA's record; QA re-runs it at cb96719 or later.
+3. **F08-QA-FUNCTIONAL-R1 — activated** under A9 ruling 4, unchanged. Evidence reuse is allowed because the four fingerprints A9 names are unchanged at cb96719 (checked above).
+
+**Delivery Review: Accepted** for F08-FE13, F08-LOCAL-EVIDENCE, F08-BE6 and F08-BE7.

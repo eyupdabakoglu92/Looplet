@@ -12,3 +12,6 @@
 * **`orchestration-before-qa-functional-checkpoint.md`** — the F08 orchestration right before the Tech Lead checkpoint on the F08-QA-FUNCTIONAL verdict of 2026-09-29, byte for byte (SHA-1 `de601928…`).
   * State: In QA; owner Tech Lead; F08-QA-FUNCTIONAL Done with **Decision Pending** (QA, commit d882211); finding F1 in Blockers; F08.OFFLINE-JOURNEY PENDING; the F08-QA-FUNCTIONAL Current Brief.
   * Taken right before the checkpoint (F08 `architecture.md` → Activation 2026-09-29 → A9), which resolved F1 and opened F08-BE7.
+* **`orchestration-before-be7-checkpoint.md`** — the F08 orchestration right before the Tech Lead BE7 checkpoint of 2026-09-29, byte for byte (SHA-1 `5e6e7504…`).
+  * State: Rework; owner Tech Lead; F08-BE7 Done (the Backend Developer, commit cb96719); Delivery Review Pending; F08-QA-FUNCTIONAL-R1 Queued; F08.EMULATOR and F08.OFFLINE-JOURNEY PENDING; the F08-BE7 Current Brief.
+  * Taken right before the checkpoint (F08 `architecture.md` → Activation 2026-09-29 → A10), which activated F08-QA-FUNCTIONAL-R1.
