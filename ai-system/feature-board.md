@@ -1,8 +1,8 @@
 # Feature Board — LOOPLET
 
 Last Updated: 2026-09-29
-Active Phase: F08 local evidence — activation (resume point after Design Adoption Phase D)
-Active Owner: Tech Lead
+Active Phase: F08 local evidence — F08-FE13 (unreadable-DB recovery, Retry reconnect, emulator tooling), then F08-LOCAL-EVIDENCE
+Active Owner: Frontend/Mobile Developer
 Active Feature: F08
 Pending Product Revision: None
 Revision Affected Features: None
@@ -19,7 +19,7 @@ Revision Affected Features: None
 | F04 | star-rating-and-personal-best | Done | - | Approved with Notes (historical scope) | P1 | Historical scoped automated acceptance retained; later device-feel and shared persistence notes remain explicit. F04's panel reduce-motion reads (completion_panel.dart) were changed by F03-QA-04 (accessibility only, ACs unchanged, tests green; verified at runtime by the F03 final QA); F03 rework changed panel timing/geometry and code (F03 architecture §18, 2026-09-20: deferred reveal, density, spine glow, Close tap target 44 pt); F04 ACs unchanged, F04 tests green, stays Done. **Phase D2 closed 2026-09-29** (F03 carrier): the panel is now the full-screen result — no Close, a back button (F04 `architecture.md` §7 / §8 amended; F03 §20). F04 AC1–AC10 are unchanged and passed on the result in F03-QA-D2 / D2R (AC9 automated); F04 stays Done. |
 | F05 | journey-progression | Done | - | Approved with Notes (final, visual-quality; D3 F05-QA-D3 94 / 100, gate Passed, 2026-09-29). Previous: Approved with Notes (final, 2026-09-27) | P0 | **Closed again 2026-09-29 after Design Adoption Phase D3 — Home + app shell** (`new-surface`, contract architecture §18, closure §18.9). Shipped: Home on `S-06b` (`Looplet`, the glass card with `YOLCULUK · N / 30`, the loop track — windowing A "sliding five", `LoopNode` open / locked / finish — one lime CTA), the N1 rule (the user's decision; PO-REV-2026-09-29-F05-CONTINUE: after 30 / 30 CONTINUE resumes an in-progress replay), the Flutter splash, the native launch with no white frame (A-4), the Turkish `StoreErrorScreen` with no raw exception (A-3, F08 cross-feature) and AX5 without clipping (A-2 home). Path: F05-UI-D3 (981b807) → F05-FE-D3 (af5aec8) → F05-QA-D3 Approved with Notes (94 / 100, every dimension ≥ 9; e46f384). At the closure the release-scoped store-error capture moved from the F05 ledger to FIRST-APP-DISTRIBUTION (§18.9 (2)). Open follow-ups: FIRST-APP-DISTRIBUTION, F08-RETRY-STORE-CONNECTION, RESULT-F00-COMPONENT-ALIGN, OPTIONAL-QUALITY-NOTES. **History:** Closed 2026-09-27 — the 30-level strict Journey with an enforced build gate, the live home read-model, unlock / CONTINUE / Next Level / terminal (F05-QA-STRICT2 Approved with Notes). |
 | F07 | daily-challenge | Not Started | - | - | P1 | Not activated. Depends on F03/F04/F06/F08. OPEN F06-CONTENT Daily pool (~60), real producer/offline proof and manifest require F07 planning; see workflow-follow-ups.md. |
-| F08 | offline-persistence-and-sync | In Progress | Tech Lead | Runtime Validation Pending | P0 | **Active feature again 2026-09-29** (Phase D complete): the next Tech Lead turn activates F08-LOCAL-EVIDENCE (reuse review incl. F05-QA-D3 E09 / E15; F08-RETRY-STORE-CONNECTION to be scoped). Local/emulator validation pending. Its `StoreErrorScreen` adopts the Foundation in Phase D3 as a cross-feature item (Turkish copy, no raw exception shown; F08 `architecture.md` App Init step 1 amended 2026-09-29, F05 §18.3 (7)). Queued behind the Design Adoption Route (Phase D now), by the incident of 2026-09-26: its offline/resume runtime proof runs through the F03/F05 screens that Phase D changes, and its release gate is OPEN anyway. Not dependent on paid deploy. Release task Blocked on explicit billing/deploy authorization; final QA still required. |
+| F08 | offline-persistence-and-sync | In Progress | Frontend/Mobile Developer | Runtime Validation Pending | P0 | **Activated 2026-09-29** after Phase D (architecture → Activation 2026-09-29). **Gap found:** an unreadable store file is a Retry dead end (locked Resilience row / AC8 not implemented; seen in F05-QA-D3 E15). **F08-FE13 Open:** classify + quarantine + recreate (`db_reinitialized`, loop guard), Retry reconnects (F08-RETRY-STORE-CONNECTION), debug-only emulator wiring + fake-producer trigger, the storage-full harness. Then F08-LOCAL-EVIDENCE (resume incl. restart / thaw / tamper, emulator exactly-once + lifecycle, rules / callable suite, cold boot; offline Journey only on a real no-network runtime) → Tech Lead checkpoint → F08-QA-FUNCTIONAL. Visual Scope none. Release task Blocked on F08.DEPLOY-AUTHORIZATION (no deploy, no billing); final QA still required. |
 | F09 | onboarding-tutorial | Not Started | - | - | P1 | Interactive 3-step tutorial (row / column / form target), action-gated, < 60s, flows into Level 1, shown once. Depends on F03. KPI gate: > 85% completion. |
 | F10 | main-menu-and-settings | Not Started | - | - | P1 | LOOPLET logo, CONTINUE (primary), DAILY (secondary), Journey Progress, Daily Streak, Settings (Sound / Haptics toggles). No Shop/Battle Pass/Clan/Events. Accessibility baseline. Depends on F05, F07. |
 | F11 | audio-and-haptics | Not Started | - | - | P2 | Fixed SFX set + light/medium/success haptics, independent on/off toggles, no BGM, game completable with both off. Depends on F03, F10. |
@@ -28,18 +28,18 @@ Revision Affected Features: None
 
 ## Current Routing
 
-* **Next command:** Run Tech Lead — F08 activation: re-base F08-LOCAL-EVIDENCE on the redesigned screens, review the reusable resume / lifecycle provenance (F03 final QA; F05-QA-STRICT QS-10 / QS-11; F05-QA-D3 E09 / E15), scope F08-RETRY-STORE-CONNECTION, then open the first F08 delivery task.
-* **Active feature: F08** — In Progress, owner Tech Lead. No product revision is pending.
+* **Next command:** Run Frontend/Mobile Developer on F08-FE13 (Current Brief in the F08 orchestration; contract F08 `architecture.md` → Activation 2026-09-29), then F08-LOCAL-EVIDENCE directly (Handoff Plan). Then the Tech Lead checkpoint → F08-QA-FUNCTIONAL.
+* **Active feature: F08** — In Progress, owner Frontend/Mobile Developer. No product revision is pending.
 * **Work queue**, one feature at a time (order set by the incident of 2026-09-26 and the Phase C outcome of 2026-09-27):
   1. ~~**D1 — Play** (F03)~~ — closed 2026-09-28, gate Passed (93 / 100).
   2. ~~**D2 — Won moment + full-screen result** (F03)~~ — closed 2026-09-29, gate Passed (94 / 100).
   3. ~~**D3 — Home + app shell** (F05)~~ — closed 2026-09-29, gate Passed (94 / 100).
-  4. **F08 local evidence** (F08-LOCAL-EVIDENCE, then F08-QA-FUNCTIONAL) — **next**.
+  4. **F08 local evidence** — **active**: activated 2026-09-29 → **F08-FE13** → F08-LOCAL-EVIDENCE → F08-QA-FUNCTIONAL.
 * **Design adoption:** [Design Adoption Route](workflow-follow-ups.md) — Phases A–D done; Phase E (new features start on the Foundation) applies to F07, F09–F13.
 * **Commits:**
   * D1: the rework, its QA / closure records and the D2 activation in 489606d.
   * D2: the F03-UI-D2 handoff in 6352a75; the F03-FE-D2 delivery in 67d9ecb; the F03-QA-D2 verdict in f28aedb; the reconciliation in 3cd4a3b; the F03-FE-D2R rework in 77c33b9 (`app/` tree `5298c81a…`); the F03-QA-D2R verdict in 5677471.
-  * D3: the activation in 171f0c1; the PO revision in 230ce0c; its resync in 9a36147; the F05-UI-D3 handoff in 981b807; the visual-gate checkpoint in 7c1a946; the F05-FE-D3 delivery in af5aec8 (`app/` `b4ad263e…`); the implementation checkpoint in 078c926; the F05-QA-D3 verdict in e46f384. This closure is uncommitted (documents only).
+  * D3: the activation in 171f0c1; the PO revision in 230ce0c; its resync in 9a36147; the F05-UI-D3 handoff in 981b807; the visual-gate checkpoint in 7c1a946; the F05-FE-D3 delivery in af5aec8 (`app/` `b4ad263e…`); the implementation checkpoint in 078c926; the F05-QA-D3 verdict in e46f384; the D3 closure in b7493d6. The F08 activation is uncommitted (documents only).
 * F08 release authorization gates the release stage only; no paid service, deployment, production action or store distribution is authorized. F07, F09–F13 remain Not Started.
 
 ## Open Portfolio Follow-ups

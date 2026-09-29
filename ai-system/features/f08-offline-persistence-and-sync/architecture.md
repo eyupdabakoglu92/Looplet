@@ -2,6 +2,7 @@
 
 > Status: **CONTRACT AUTHORITY — LOCKED.** Finalized 2026-09-06 by the Tech Lead from `analysis.md` (F08.0-AN). Every prior `[PENDING ANALYSIS]` section is now `[LOCKED]`. Delivery artifacts and QA notes do not override the semantics here. The only remaining open values are the ones explicitly marked `[OPEN — …]` and belong to a downstream feature/role, not to F08 implementation.
 > **Amended 2026-09-06 (Firebase-project incident):** "App Init Sequence → App Check provider selection" added — soft-enforce unchanged; debug provider in dev, Play Integrity / App Attest in release; iOS production App Attest deferred (no Apple Developer Program membership) and non-blocking because enforcement is OFF.
+> **Amended 2026-09-29 (Tech Lead — F08 activation after Design Adoption Phase D):** "Activation 2026-09-29" added at the end — the unreadable-DB recovery gap (Resilience row, AC8) is closed in code by F08-FE13; Retry reopens the database connection; a debug-only emulator connection and fake-producer trigger; the local evidence plan and its methods. No semantic change to the locked sections.
 > `orchestration.md` is execution authority; `platform.md` / `release.md` are project authority.
 
 ---
@@ -298,3 +299,78 @@ App Check is **soft-enforce / monitor** for the whole MVP (`platform.md` §6/§1
 * **[OPEN — post-MVP]** App Check hard-enforce; leaderboard + its Firestore composite index.
 * **[OPEN — post-MVP, needs Apple Developer Program enrollment]** iOS production App Check (App Attest / DeviceCheck) configuration — Team ID + `.p8` auth key + Key ID. Not a blocker while App Check is soft-enforced; debug/dev uses the debug provider.
 * **[OPEN — F08-DEVOPS]** Android release Play Integrity: register the release-signing SHA-256 in the Firebase console; `FIREBASE_CI_TOKEN` repo secret (deferred here per the user).
+
+---
+
+## Activation 2026-09-29 (Tech Lead — after Design Adoption Phase D)
+
+> F08 was queued behind the F05 rework and Phase D (incident 2026-09-26). Phase D closed on 2026-09-29 (F05 `architecture.md` §18.9). This section re-bases the local-evidence work on the current app (`b4ad263e…`, HEAD b7493d6) and records the decisions taken now. Execution is in `orchestration.md`.
+
+### A1. Gap found: an unreadable database file is a dead end (Resilience row; AC8)
+
+**Observed** (F05-QA-D3 E15 at runtime, and the code):
+* `appBootstrapProvider` maps **every** open or migrate failure to `AppBootstrapMigrationError` → the store-error screen.
+* A store file that is not a database (`SqliteException(26)`, `file is not a database`) shows the error screen. Retry fails again and again, so the app is unusable until it is reinstalled.
+
+This breaks two authorities:
+* the locked Resilience row "Unreadable DB file / unrecoverable corruption → attempt Drift recovery; last resort recreate the DB (accepted data loss, logged, `db_reinitialized`) — never a crash-loop";
+* PRD AC8 "corrupt save file on launch → … a clean state without crashing, and logs the event".
+
+The earlier F08 QA read AC8 as the `active_session` row only (qa.md AC8), so this path was never exercised. **Classified as an implementation gap against a locked contract** — not a product change. F08-FE13 closes it.
+
+**Rules (Tech Lead decisions, inside the locked row):**
+1. **Classification.** The bootstrap separates three outcomes:
+   * **unreadable** — a `SqliteException` whose (extended) result code is `SQLITE_NOTADB` (26) or `SQLITE_CORRUPT` (11), raised while opening or on the first query;
+   * **migration failure** — `MigrationDataLossError`, or an exception thrown by a migration step;
+   * **other** — anything else (e.g. `SQLITE_CANTOPEN`, `SQLITE_IOERR`, `SQLITE_FULL`, `SQLITE_BUSY`).
+2. **Unreadable → recover:**
+   * close the connection;
+   * **quarantine** the file (and its `-wal` / `-shm`) by renaming it to `looplet.sqlite.corrupt-<utcMs>` in the same directory — never delete it; keep at most the newest one quarantined copy;
+   * recreate the database (the normal `onCreate` seed: a new guest);
+   * log `db_reinitialized` with the result code, via `debugPrint` in every build;
+   * continue to Home.
+
+   "Attempt Drift recovery" means exactly this: there is no partial-page repair in the MVP. The quarantined bytes are kept for a manual support recovery.
+3. **Loop guard.** If the recreated database also fails to open, the bootstrap returns the error state. It never recreates twice in one launch, so there is never a crash-loop and never a recreate-loop.
+4. **Migration failure** (AC9) is unchanged: keep the old database, show the store-error screen, Retry. The screen's copy ("İlerlemen güvende; hiçbir şey silinmedi.") stays true, because this is the only remaining path to it with a readable store.
+5. **Other failures** → the store-error screen, and Retry re-runs the bootstrap on a **fresh connection** (A2).
+6. **Player notice:** none in this scope. AC8 asks for a clean state and a log, not a message. A future notice after `db_reinitialized` ("your saved progress could not be read …") is copy for PO / F10 — tracked as DB-REINIT-NOTICE in `workflow-follow-ups.md`. **Assumption (hybrid):** a silent reset is acceptable for the MVP because the store only becomes unreadable through device-level corruption.
+
+### A2. Retry reopens the database connection (F08-RETRY-STORE-CONNECTION)
+
+* Retry (`StoreErrorScreen`) invalidates the database connection provider as well as `appBootstrapProvider`, so a store that became readable while the app runs (e.g. space freed, a transient I/O error) recovers without a relaunch. The old connection is closed first.
+* F08 AC9 behaviour is otherwise unchanged.
+* **The one-frame Retry feedback (F05-QA-D3 N2) is not in this scope.** It is a visual timing change on a surface whose gate passed in D3. It stays in `workflow-follow-ups.md` for the next shell visual touch, so F08 needs no visual gate.
+
+### A3. Debug-only emulator wiring and fake-producer trigger (test tooling)
+
+The QA Focus calls for client ↔ emulator runs ("exactly-once sync … via the fake producer"; "Ownership … dispose the triggering screen → sync still completes"). Today the app has no way to reach the emulator, so F08-FE13 adds:
+* **`--dart-define=LOOPLET_FIREBASE_EMULATOR=<host>`**, honoured only when `kDebugMode`. After `Firebase.initializeApp` it calls `useAuthEmulator` / `useFirestoreEmulator` / `useFunctionsEmulator` against the `infra/firebase.json` ports, with the project `demo-looplet`. The whole block is compiled out of release builds; there is no runtime switch in release.
+* **A debug-only trigger for `FakeDailyResultProducer`**, reachable without a Daily screen: e.g. an extra launcher in Home's `kDebugMode` debug row (C2 rules: outside the column, hidden when it would hit the caption), or a debug-only route. It must not appear in profile or release builds.
+* No new dependency beyond the Firebase packages already present.
+
+### A4. Local evidence plan (F08-LOCAL-EVIDENCE; reuse is QA's call at F08-QA-FUNCTIONAL)
+
+| Scenario (ledger) | Method | Notes |
+| --- | --- | --- |
+| **F08.EMULATOR** — rules and callable (create-only, auth isolation, idempotency) | `cd infra/functions && npm ci && npm run build && npm run test:emulator` (JDK 17 and the Firebase CLI are present; project `demo-looplet`, no billing) | The developer confirms the harness runs and records the result. QA re-runs it independently. |
+| **Exactly-once client ↔ emulator** (AC4, AC5, AC11; part of F08.EMULATOR / F08.LIFECYCLE) | A3 wiring + the fake producer on the iPhone 16 simulator against `firebase emulators:start --only auth,firestore,functions`:<br>• offline completion → 1 queue item;<br>• reconnect → 1 doc;<br>• a forced mid-request drop (stop the emulator mid-call) → retry → still 1 doc;<br>• a kill during `inFlight` → relaunch → still 1 doc;<br>• a server doc seeded with an earlier run → local later run syncs → server unchanged;<br>• `daily_sync_enabled=false` → no send. | "Offline" here = emulator unreachable (stopped), stated as such. It is not device airplane mode. |
+| **F08.LIFECYCLE** — screen dispose mid-sync; `paused` / `resumed` → `drain()`; connectivity regain → `drain()` | The same setup: trigger, then leave the triggering screen at once; HOME button / relaunch; stop and start the emulator | Record the emulator request log and the queue rows (`sqlite3`) as evidence. |
+| **F08.LOCAL-RESUME** — AC1 / AC6 | iPhone 16 debug build:<br>• a level with frozen tiles (21–30): N moves + an undo + a restart + a thawed tile → kill → relaunch → exact restore of grid, `moveCount`, `undosRemaining`, `restartCount`, elapsed (± capture resolution) and thaw;<br>• tamper `thawedFrozenCells` in `kv['active_session']` → relaunch → thaw re-derived, not trusted. | Grid / moves / undo on a replay are already proven at `b4ad263e…` (F05-QA-D3 E09). The FE13 build changes the database-open path, so the whole scenario is re-run on it. |
+| **F08.OFFLINE-JOURNEY** — AC2 | A real no-network runtime:<br>• the user turns the Mac's network off, or runs a developer-provided script that does so and restores it (Claude may not change system settings);<br>• or a physical device in airplane mode.<br>Then: levels load, a level completes, progress and best persist, relaunch offline → intact. | If no such runtime is available in the turn, the scenario stays PENDING with this prerequisite. It is not replaced by a simulated offline mode. |
+| **F08.STORAGE** — AC7 | Repeatable integration on a **real file database**: lower `PRAGMA max_page_count` until the next write hits `SQLITE_FULL`; assert:<br>• the transaction rolls back;<br>• the last good state is intact;<br>• the non-fatal `persist_failed` path runs;<br>• play continues from memory;<br>• the next boundary retries.<br>Plus a runtime pass if feasible (a debug-only hook applying the same pragma). | A negative run must show the test fails when the rollback is bypassed. |
+| **AC8 unreadable DB** (new, from A1) | Runtime: `seed-d3.sh corrupt` → cold launch → Home "new"; the quarantined file exists; the `db_reinitialized` log. Automated: classification tests (NOTADB, CORRUPT → recover; migration error → error screen; recreate fails → error, no loop). | Negative runs: remove the classification (all → error screen) and remove the loop guard, each caught. |
+| **F08.COLD-BOOT-REVIEW** | QA reviews F08-FE12 provenance at F08-QA-FUNCTIONAL. The production-shaped cold boot (empty / existing store) is re-run on the FE13 build by the developer (startup impact: yes). | F05-QA-D3 E05 / E06 are at `b4ad263e…`; FE13 changes the bootstrap, so they are supporting only. |
+| **F08.DEPLOY-SMOKE** | Unchanged — release scope, F08.DEPLOY-AUTHORIZATION OPEN. | Not in this activation. |
+
+**Offline Daily (AC3)** stays with F07 (F07.OFFLINE-DAILY). **Clock (AC10)** stays automated-only: the simulator follows the host clock, and changing it is a system setting. It is stated as a limit.
+
+### A5. Visual scope
+
+`none` for this F08 work:
+* the recovery path lands on the existing Home "new" state;
+* Retry keeps the D3 screens unchanged;
+* the debug trigger is `kDebugMode` only (the C2 rules).
+
+No UI Designer task and no visual gate. If FE13 needs any player-visible change, that is Needs Tech Lead Clarification.
+
