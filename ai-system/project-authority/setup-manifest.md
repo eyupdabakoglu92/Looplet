@@ -3,7 +3,7 @@
 > Status: OPERATIONAL. Project-specific scaffold/bootstrap recipe for the `Project Setup` role.
 > This file carries operation recipes and canonical commands only — no role or architecture authority.
 
-Last Updated: 2026-09-29 (F08 PREP checkpoint, A17: the Cloud Functions runtime line → Node.js 22 (TD-FUNCTIONS-RUNTIME; implementation in F08-BE8); the local Android-build JDK note (N-4)); 2026-09-29 (F08-DEVOPS-PREP: TD-FORMAT-SCOPE and TD-CI-TOOLCHAIN implemented — the format commands and the CI toolchain lines; F08 A15); 2026-09-29 (the Java 21 emulator-suite command, F08 A6; Java 21 on `PATH` too, F08 A8); 2026-09-06 (added the `infra/` Firebase DURUM 0 recipe for F08)
+Last Updated: 2026-09-29 (F08 BE8 checkpoint, A18: the local Node 22 check and the npm-script PATH caveat); 2026-09-29 (F08 PREP checkpoint, A17: the Cloud Functions runtime line → Node.js 22 (TD-FUNCTIONS-RUNTIME; implementation in F08-BE8); the local Android-build JDK note (N-4)); 2026-09-29 (F08-DEVOPS-PREP: TD-FORMAT-SCOPE and TD-CI-TOOLCHAIN implemented — the format commands and the CI toolchain lines; F08 A15); 2026-09-29 (the Java 21 emulator-suite command, F08 A6; Java 21 on `PATH` too, F08 A8); 2026-09-06 (added the `infra/` Firebase DURUM 0 recipe for F08)
 Owner: Tech Lead
 
 ---
@@ -171,6 +171,11 @@ Target directory: `infra/` at the repo root (currently a stub `infra/README.md`)
 
 ---
 
+* **Local Cloud Functions check on Node 22 (F08 A18).** The deploy runtime is Node 22 (`platform.md` §3). On this host, `node@22` is installed keg-only (`/opt/homebrew/opt/node@22`) and the system `node` is `node@24`.
+  * **Caveat:** an npm script (`npm test`, `npm run …`, `npx`) does not use the Node that is first on `PATH`. npm puts its global prefix bin (`/opt/homebrew/bin`) first on the script's `PATH`, so the script runs the system Node. Found in F08-BE8 (BE8-03, the control).
+  * **Canonical form — every tool started directly by Node 22,** from `infra/functions`, with Java 21 first on `PATH`: `N22=/opt/homebrew/opt/node@22/bin/node; $N22 node_modules/typescript/bin/tsc && $N22 /opt/homebrew/lib/node_modules/firebase-tools/lib/bin/firebase.js --config ../firebase.json emulators:exec --only firestore,auth --project demo-looplet "$N22 -e 'console.log(process.version)' && $N22 node_modules/jest/bin/jest.js --passWithNoTests"`
+  * Expected: v22.x printed; 3 / 3 suites, 33 / 33; exit 0.
+  * CI is not affected: its runner has one Node, pinned to 22 in F08-DEVOPS.
 * **Local Android build JDK (F08 A17, N-4 — the user's environment, not a gate).** On the workstation, `melos run build:app` fails when Flutter picks Android Studio's bundled JBR 25: Gradle 8.12 runs on Java ≤ 23. CI is unaffected (the runner's JDK 17). Local workaround without changing global settings: `cd app/android && JAVA_HOME=/opt/homebrew/opt/openjdk@17 ./gradlew --no-daemon bundleRelease` (F08-DEVOPS-PREP DP-08b; any JDK 17–23 works). A permanent fix — `flutter config --jdk-dir <JDK 17 or 21>` (a global Flutter setting, the user's call) or a Gradle / AGP upgrade (a build-config change with full regression) — is not decided.
 
 ## Canonical Containerization Commands

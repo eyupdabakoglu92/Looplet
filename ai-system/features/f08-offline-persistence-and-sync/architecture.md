@@ -870,3 +870,63 @@ The backend handler and rules fingerprints above are the ones A7's reuse clause 
    * F08-DEVOPS Blocked on F08.DEPLOY-GO and F08-BE8; F08-QA-FINAL Queued.
    * The user can answer the gate while F08-BE8 runs. The Tech Lead checkpoint after F08-BE8 takes in the decision.
 
+### A18. Implementation checkpoint 2026-09-29 (F08-BE8, commit 9f6b6e6)
+
+**Delivery reviewed:** `backend.md` § F08-BE8, `evidence/runtime/BE8-00…03`, and the diff of 9f6b6e6. The diff touches only `infra/functions/package.json` (`engines.node` "22", `@types/node` `^22.20.4`), `package-lock.json` (the root and `@types/node` 20.19.43 → 22.20.4) and `infra/README.md`. `src/**`, `test/**`, `firestore.rules`, `firebase.json`, `.github/` and `app/` are unchanged.
+
+**Tech Lead re-run at 9f6b6e6 (not a QA claim):** `npm ci` exit 0; `tsc` started by Node 22.23.3 exit 0; the emulator suite with firebase-tools and jest started by Node 22 (`jest host node: v22.23.3`) → 3 / 3 suites, **33 / 33**, exit 0. `origin/main` is still c592081, so CI has not run on 9f6b6e6.
+
+**Assessment:**
+* TD-FUNCTIONS-RUNTIME is implemented as ruled. The Node 22 proof is BE8-01 / BE8-02, where every tool is started directly by Node 22.
+* The Backend Developer found that on this host an npm script runs the system Node, whatever Node is first on `PATH`. npm puts its global prefix bin, `/opt/homebrew/bin`, first on a script's `PATH`. This caught a wrong proof before it was recorded: BE8-03 is kept as the control and is marked as not Node 22 evidence. A good catch.
+* **The host changed.** Installing `node@22` upgraded Homebrew's shared `simdjson` and broke the system `node` 24.7.0. With the user's choice, the system `node` is now `node@24` 24.21.0. `node@22` 22.23.3 is keg-only. The old keg is unlinked. No fingerprint depends on the host Node patch version.
+
+**Rulings:**
+1. **F08-BE8 — accepted.** Delivery Review: Accepted.
+2. **`setup-manifest.md` records the local Node 22 check** as BE8-02's direct-invocation form, plus the npm-script `PATH` caveat, so that no later role repeats the wrong proof. The CI form stays valid on CI: the runner has one Node, and F08-DEVOPS pins 22.
+3. **Runtime calendar:** the Google page (Node 22 decommissioned 2027-10-31) is authoritative over firebase-tools' own table (2028-10-31). `infra/README.md` already uses the earlier date. Re-check before each deploy.
+4. **The old `node` 24.7.0 keg** is the user's to remove or keep; nothing depends on it.
+5. **F08 has no executable work left.** F08-DEVOPS now waits only on F08.DEPLOY-GO (still OPEN, A17 ruling 7); F08-QA-FINAL stays Queued. **F08 → Blocked**; Current Owner = Next Role = Tech Lead. Functional acceptance and every functional evidence record stay intact.
+   * The user's answer goes through `Run Tech Lead. Decision: F08.DEPLOY-GO — A / B / C`. The intake then activates F08-DEVOPS in the chosen scope (A or B), or, with C, records the deferral and activates the next executable feature (F09 depends only on F03).
+6. **F08-QA-FINAL scope, unchanged from A17:** Regression Depth `full` (dependency / build-config change); the emulator suite re-run at the final revision, on Node 22.
+
+### A19. Decision F08.DEPLOY-GO — B (2026-09-29): the Firestore rules only
+
+**Input:** `Run Tech Lead. Decision: F08.DEPLOY-GO — B`, with the user's question "why did we skip F07?". Exactly one OPEN gate matched; option (B) as defined at A17 ruling 7. The question is answered in the turn reply and below; it changes no state.
+
+**Decision recorded:**
+* **Authorized now:** a rules-only production deploy — the committed `infra/firestore.rules` (sha1 `aa4c5dc2…`, the BE7 / QA-R1 revision) to `looplet-712e5`, on the Spark plan, no billing. **Tech Lead approval** for this deploy is given here (project `release.md` §12). The user's decision is the other half.
+* **Still deferred:** Blaze / billing, the function deploy (`submitDailyResultV1`, `nodejs22`), the Remote Config template, indexes. No product criterion changes, so no Product Owner revision.
+* **Why the rules first:** the repository is public, so the Firebase client config is world-readable. The `(default)` database has had unknown console rules since 2026-09-06. The committed rules deny every client path (A9). The app never reads or writes Firestore directly (only through the callable, which is not deployed), so the deploy cannot break the app.
+
+**Rulings:**
+1. **F08.DEPLOY-GO — RESOLVED (B).**
+2. **New task F08-DEVOPS-RULES** (DevOps/Release Engineer, **Open**): read the live rules, verify the source, dry-run, deploy the rules only, run the rules-scope smoke, and record it in `release.md`. The brief is in the orchestration.
+   * **Smoke in rules scope (a subset of S2):**
+     * the live ruleset source is byte-identical to the committed file;
+     * unauthenticated REST create / get / update / delete under `dailyResults/**` → 403, and no document is written.
+   * **No test user is created in production.** The authenticated own-uid, other-uid, invalid-payload and non-date-bucket denials are proven on the identical file by the emulator suite (33 / 33; QA R1 probe P1–P8). The live authenticated probe rides S3 in the function deploy, where the debug app creates its anonymous user anyway.
+   * **S1 for the rules:** CI run #2 (c592081) ran the rules suite green on the same `firestore.rules` and `rules.test.ts` bytes. DevOps re-runs the suite locally at the deploy revision. A push is not needed for this deploy.
+3. **F08-DEVOPS (the function + Remote Config deploy and S3 / S4) stays Blocked**, with a narrower scope.
+   * It needs a new gate, **F08.FUNCTION-DEPLOY-GO** (Blaze + the function deploy). That gate opens at the F08-DEVOPS-RULES checkpoint, not now: an OPEN release-scoped gate holds every DevOps activation (contract §5.3), the same reason as A16 ruling 3.
+   * **The function deploy stays held in the meantime by:**
+     * this recorded deferral;
+     * F08-DEVOPS stays Blocked;
+     * F08-DEVOPS-RULES's non-goals;
+     * project `release.md` §3.
+4. **Release Result stays Release Validation Pending.** F08 cannot be Done without the function deploy and S3 (the callable is F08's backend deliverable). F08-QA-FINAL stays Queued.
+5. **F08 → In Release;** Current Owner = Next Role = DevOps/Release Engineer; Blockers None.
+6. **The next feature (after the rules checkpoint) — the F07 question.**
+   * F07 (daily-challenge) was never skipped. Under the feature-selection rules it has not been selectable. The product PRD lists its dependencies as F03, F04, F06 and **F08**, and F08 is not Done.
+   * F07's own delivery also needs the backend that option B defers:
+     * the daily result sync (the callable);
+     * the Remote Config read and kill-switch (F07-KILL-SWITCH);
+     * the daily content distribution.
+   * F07 also needs the Daily content pool (F06-CONTENT-DAILY: about 60 puzzles plus human sign-off).
+   * So while billing stays deferred, F07 cannot be released.
+   * **Options** at the rules checkpoint, when F08 waits on F08.FUNCTION-DEPLOY-GO:
+     * **(1)** F09 (onboarding-tutorial; depends only on F03) — fully executable;
+     * **(2)** F07 development against the emulator. This needs a Tech Lead ruling that F07 may start on F08's *functional* acceptance, with F07's release gated on the function deploy. It is allowed by contract §5.3 only with an explicit dependency justification and a pause / resume record;
+     * **(3)** authorize the function deploy (Blaze) and finish F08 first.
+   * The Tech Lead puts these to the user at that checkpoint.
+

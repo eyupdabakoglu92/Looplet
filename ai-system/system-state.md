@@ -12,11 +12,11 @@ Core workflow tooling requires Node.js 18+. Application/device/emulator environm
 
 ## Technical Authority
 
-project-authority/platform.md and each feature's architecture.md. 2026-09-29 (A17): `platform.md` §3 — Cloud Functions on **Node.js 22** (TD-FUNCTIONS-RUNTIME; Node 20 is decommissioned 2026-10-30; implementation F08-BE8). 2026-09-29: `platform.md` §6 / §8 and the F08 Rules row corrected — no client access to `dailyResults/**`; the callable is the only write path (F08 `architecture.md` A9, QA finding F1).
+project-authority/platform.md and each feature's architecture.md. 2026-09-29 (A17): `platform.md` §3 — Cloud Functions on **Node.js 22** (TD-FUNCTIONS-RUNTIME; Node 20 is decommissioned 2026-10-30; implemented in F08-BE8, 9f6b6e6, accepted at A18). 2026-09-29: `platform.md` §6 / §8 and the F08 Rules row corrected — no client access to `dailyResults/**`; the callable is the only write path (F08 `architecture.md` A9, QA finding F1).
 
 ## Setup Authority
 
-project-authority/setup-manifest.md — 2026-09-29: added the Firebase emulator-suite command with Java 21 (firebase-tools 15.29 needs Java 21+; `openjdk@21` is installed keg-only with the user's approval, and the system Java is unchanged). Corrected the same day at the BE6 checkpoint: Java 21 must also be first on `PATH`. At the CI incident (F08 A15, same day): CI pins the canonical toolchain (Flutter 3.32.8, Xcode ≥ 16.4, CocoaPods), and `format` / `format:check` cover `app packages tools` only. Implemented in F08-DEVOPS-PREP (c592081) and proven by CI run #2. At A17: the Cloud Functions runtime line → Node.js 22; the local Android-build JDK note (N-4). Everything else is unchanged.
+project-authority/setup-manifest.md — 2026-09-29: added the Firebase emulator-suite command with Java 21 (firebase-tools 15.29 needs Java 21+; `openjdk@21` is installed keg-only with the user's approval, and the system Java is unchanged). Corrected the same day at the BE6 checkpoint: Java 21 must also be first on `PATH`. At the CI incident (F08 A15, same day): CI pins the canonical toolchain (Flutter 3.32.8, Xcode ≥ 16.4, CocoaPods), and `format` / `format:check` cover `app packages tools` only. Implemented in F08-DEVOPS-PREP (c592081) and proven by CI run #2. At A17: the Cloud Functions runtime line → Node.js 22; the local Android-build JDK note (N-4). At A18: the local Node 22 check (tools started directly by Node 22 — npm scripts run the system Node). Everything else is unchanged.
 
 ## Release Authority
 
@@ -40,32 +40,31 @@ features/f08-offline-persistence-and-sync/orchestration.md
 
 ## Current Phase
 
-F08 release stage — F08-BE8 (Cloud Functions on Node.js 22) + the user's decision F08.DEPLOY-GO (A17)
+F08 release stage — F08-DEVOPS-RULES (the rules-only production deploy; F08.DEPLOY-GO — B, A19)
 
 ## Current Role
 
-Backend Developer
+DevOps/Release Engineer
 
 ## Current Reason
 
-**The Tech Lead checkpoint on F08-DEVOPS-PREP** ran on 2026-09-29. Full record: F08 `architecture.md` → Activation → A17.
+**The user decided F08.DEPLOY-GO — B** on 2026-09-29. Full record: F08 `architecture.md` → A19.
 
-* **PREP is accepted.** CI run #2 (`36597006854`, the user's push of c592081) is green in all three jobs. The best-effort integration step failed inside the green `verify` job; it is not a gate until the first app-build release (TD-CI-INTEGRATION-GATE).
-* **Node.js 20 is decommissioned on Cloud Functions on 2026-10-30** (Google's runtime page). After that date a function cannot be deployed or updated on it, so the runtime moves to Node.js 22 whatever the deploy date: **F08-BE8**, Backend Developer.
-* **The deploy gate F08.DEPLOY-GO is OPEN** for the user: (A) the full deploy with Blaze, (B) the Firestore rules only, no billing, (C) defer everything. Recommended: B. It does not hold F08-BE8.
+* **Now:** the committed deny-all Firestore rules go to `looplet-712e5` (Spark, no billing) — F08-DEVOPS-RULES. The Tech Lead's approval is given. DevOps confirms with the user in chat right before the real deploy command.
+* **Still deferred:** Blaze, billing, the function and Remote Config deploy. F08.FUNCTION-DEPLOY-GO opens at the rules checkpoint.
+* **F07** was not skipped. It depends on F08, which is not Done, and its own release needs the deferred backend. The next-feature choice (F09 / F07 on the emulator / the function deploy) comes at the rules checkpoint (A19 ruling 6).
 * Every push needs the user's approval in chat.
 
 ## Last Completed Action
 
-Tech Lead on 2026-09-29 — **the F08-DEVOPS-PREP checkpoint** (A17).
-* **Accepted:** PREP; Delivery Review Accepted; CI-FORMAT-GATE, CI-IOS-TOOLCHAIN, CI-EMULATOR-JAVA21 closed.
-* **Decided:** TD-CI-INTEGRATION-GATE; TD-FUNCTIONS-RUNTIME (Node.js 22); N-1, N-2 (F07-KILL-SWITCH), N-4.
-* **Opened:** F08-BE8; the gate F08.DEPLOY-GO.
-* Archived: history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-prep-checkpoint.md.
+Tech Lead on 2026-09-29 — **the decision F08.DEPLOY-GO — B** (A19).
+* **Resolved:** exactly one OPEN gate matched; option B as defined at A17.
+* **Activated:** F08-DEVOPS-RULES; F08 → In Release; owner → DevOps/Release Engineer; new evidence record F08.LIVE-RULES (PENDING).
+* Archived: history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-deploy-go-decision.md.
 
 ## Next Expected Action
 
-Run Backend Developer on F08-BE8 (the F08 orchestration Current Brief): Cloud Functions on Node.js 22, verified locally on Node 22 (the emulator suite 33 / 33); no deploy. Then the Tech Lead checkpoint. In parallel, the user answers `Run Tech Lead. Decision: F08.DEPLOY-GO — A / B / C`.
+Run DevOps/Release Engineer on F08-DEVOPS-RULES (the F08 orchestration Current Brief): the rules-only production deploy and its smoke (F08.LIVE-RULES); no function / Remote Config deploy, no billing. Then the Tech Lead checkpoint.
 
 ## Portfolio Summary
 
@@ -74,12 +73,12 @@ Run Backend Developer on F08-BE8 (the F08 orchestration Current Brief): Cloud Fu
 * F00: Done again (2026-09-27) — Phase C is complete (the conformance audit was accepted). Its design-system layer closed 2026-09-26: Foundation Selected (Direction C), 90/100, Visual Quality Gate Passed via the scoped exception F00.VISUAL-93-THRESHOLD.
 * F05: Done (2026-09-29) — Design Adoption Phase D3 (Home + app shell, `new-surface`, architecture §18) closed: F05-QA-D3 Approved with Notes, 94 / 100, gate Passed (§18.9). The user's N1 decision is live (PO-REV-2026-09-29-F05-CONTINUE). Previously Done 2026-09-27 (F05-QA-STRICT2 Approved with Notes).
 * F04: Done — the panel is now the full-screen result (D2, F03 carrier, closed 2026-09-29; F04 §7 / §8 amended 2026-09-28; ACs unchanged and passed on the result).
-* F08: **In Release — the active feature.** **Functional Approved** (F08-QA-FUNCTIONAL-R2, accepted at A13): every functional evidence record PASS, F1 closed. Release stage: F08-DEVOPS-PREP accepted with a green CI run #2 (A17); Release Validation Pending. **F08-BE8 Open** (Node.js 22); **F08.DEPLOY-GO OPEN** for the user; F08-DEVOPS Blocked; F08-QA-FINAL Queued. Its `StoreErrorScreen` uses the Foundation (D3, F08 App Init step 1 amended).
+* F08: **In Release — the active feature.** **Functional Approved** (F08-QA-FUNCTIONAL-R2, accepted at A13): every functional evidence record PASS, F1 closed. Release stage: PREP accepted with a green CI run #2 (A17); F08-BE8 (Node.js 22) accepted (A18); **F08.DEPLOY-GO — B (A19): F08-DEVOPS-RULES active** (the rules-only production deploy); F08-DEVOPS (function + Remote Config) Blocked; F08-QA-FINAL Queued. Its `StoreErrorScreen` uses the Foundation (D3, F08 App Init step 1 amended).
 * F07, F09–F13: Not Started. Pending follow-ons are in workflow-follow-ups.md.
 
 ## Release Decision
 
-F08.DEPLOY-GO is **OPEN** (2026-09-29, A17): (A) the full first deploy — Blaze with a budget alert, rules + Remote Config + the function on Node 22; (B) the Firestore rules only, now, on Spark — closes the unknown live rules behind the public client config; (C) defer everything. Recommended: B while billing stays deferred. Until the user decides: no Blaze, billing, Firebase deploy or Remote Config change. F08.DEPLOY-AUTHORIZATION (B, A16) and F08.CI-FIRST-PUSH (A14) are RESOLVED. Every push needs the user's approval.
+F08.DEPLOY-GO is RESOLVED — option B (2026-09-29, A19): the committed deny-all Firestore rules are deployed to `looplet-712e5` now (Spark, no billing; Tech Lead approval given). The function (`nodejs22`) and Remote Config deploy stay deferred; they need F08.FUNCTION-DEPLOY-GO, which the Tech Lead opens at the F08-DEVOPS-RULES checkpoint. No Blaze or billing change is authorized. F08.DEPLOY-AUTHORIZATION (A16) and F08.CI-FIRST-PUSH (A14) are RESOLVED. Every push needs the user's approval.
 
 ## Global Risks
 
@@ -100,14 +99,15 @@ F08.DEPLOY-GO is **OPEN** (2026-09-29, A17): (A) the full first deploy — Blaze
   * RESULT-F00-COMPONENT-ALIGN — the `EN İYİ` ★ offset and the pressed-pill brightness.
   * Release-build pacing was not measured (debug video only); it belongs to FIRST-APP-DISTRIBUTION — for the result (D2) and the Home entrance (D3, F05-QA-D3 N1).
 * **Post-D3 follow-ups (non-blocking, in workflow-follow-ups.md):** FIRST-APP-DISTRIBUTION (the profile / release store-error capture, moved from the F05 ledger); F08-RETRY-STORE-CONNECTION (+ the one-frame Retry feedback, N2); RESULT-F00-COMPONENT-ALIGN (+ the `LimePill` arrow at AX5, N3); OPTIONAL-QUALITY-NOTES (N4, N5); RELEASE-SCOPED-EVIDENCE (process).
-* **Commits:** the D1 rework, its closure and the D2 activation are in 489606d — its tracked `app/` diff from 5798c70 hashes to QA's `88f1dca3…` and the two changed sources match QA's SHA-1s (re-verified at the D2 checkpoint); the F03-UI-D2 handoff is in 6352a75; the F03-FE-D2 delivery is in 67d9ecb (`app/` tree `f5641d2f…`, QA's evidence-reuse fingerprint); the F03-QA-D2 verdict is in f28aedb; the reconciliation in 3cd4a3b; the F03-FE-D2R rework in 77c33b9 (`app/` tree `5298c81a…`, the re-QA fingerprint); the F03-QA-D2R verdict in 5677471. The D2 closure and the D3 activation are in 171f0c1; the PO revision in 230ce0c; its resync in 9a36147; the F05-UI-D3 handoff in 981b807; the visual-gate checkpoint in 7c1a946; the F05-FE-D3 delivery in af5aec8 (`app/` `b4ad263e…`, the D3 QA fingerprint); the implementation checkpoint in 078c926; the F05-QA-D3 verdict in e46f384. The D3 closure is in b7493d6. The F08 activation is in 1d373d7; the F08-FE13 / LOCAL-EVIDENCE delivery in beb7bfe (`app/` `9de12e6a…`); the FE13 checkpoint in b8e37ab; the F08-BE6 delivery in c70527a; the BE6 checkpoint in 84430c9; the F08-QA-FUNCTIONAL verdict in d882211; the QA checkpoint (A9) in 8f26243; the F08-BE7 delivery in cb96719; the BE7 checkpoint (A10) in 695f783; the F08-QA-FUNCTIONAL-R1 verdict in 4cb836a; the A11 checkpoint, the offline run and the A12 intake in e55176f; the F08-QA-FUNCTIONAL-R2 verdict in 0d65c73; the A13 checkpoint in 8a0522f — pushed to `origin/main` by the user (CI run #1); the A14–A16 records in 6b31195; the F08-DEVOPS-PREP delivery in c592081 — pushed by the user (CI run #2, green). The A17 checkpoint is uncommitted (documents only).
+* **Commits:** the D1 rework, its closure and the D2 activation are in 489606d — its tracked `app/` diff from 5798c70 hashes to QA's `88f1dca3…` and the two changed sources match QA's SHA-1s (re-verified at the D2 checkpoint); the F03-UI-D2 handoff is in 6352a75; the F03-FE-D2 delivery is in 67d9ecb (`app/` tree `f5641d2f…`, QA's evidence-reuse fingerprint); the F03-QA-D2 verdict is in f28aedb; the reconciliation in 3cd4a3b; the F03-FE-D2R rework in 77c33b9 (`app/` tree `5298c81a…`, the re-QA fingerprint); the F03-QA-D2R verdict in 5677471. The D2 closure and the D3 activation are in 171f0c1; the PO revision in 230ce0c; its resync in 9a36147; the F05-UI-D3 handoff in 981b807; the visual-gate checkpoint in 7c1a946; the F05-FE-D3 delivery in af5aec8 (`app/` `b4ad263e…`, the D3 QA fingerprint); the implementation checkpoint in 078c926; the F05-QA-D3 verdict in e46f384. The D3 closure is in b7493d6. The F08 activation is in 1d373d7; the F08-FE13 / LOCAL-EVIDENCE delivery in beb7bfe (`app/` `9de12e6a…`); the FE13 checkpoint in b8e37ab; the F08-BE6 delivery in c70527a; the BE6 checkpoint in 84430c9; the F08-QA-FUNCTIONAL verdict in d882211; the QA checkpoint (A9) in 8f26243; the F08-BE7 delivery in cb96719; the BE7 checkpoint (A10) in 695f783; the F08-QA-FUNCTIONAL-R1 verdict in 4cb836a; the A11 checkpoint, the offline run and the A12 intake in e55176f; the F08-QA-FUNCTIONAL-R2 verdict in 0d65c73; the A13 checkpoint in 8a0522f — pushed to `origin/main` by the user (CI run #1); the A14–A16 records in 6b31195; the F08-DEVOPS-PREP delivery in c592081 — pushed by the user (CI run #2, green); the A17 checkpoint in ebe59ce; the F08-BE8 delivery in 9f6b6e6 (not pushed). The A18 checkpoint and the A19 intake are uncommitted (documents only).
 * **F08 unreadable-DB gap (found 2026-09-29):** fixed in F08-FE13 (beb7bfe) and accepted at the checkpoint; the runtime and automated evidence awaits independent QA (F08.UNREADABLE-DB). The Retry reconnect is delivered too. The one-frame Retry feedback (N2) stays a follow-up.
 * **Migration partial-apply (found by F08-FE13, 2026-09-29):** Drift does not wrap `onUpgrade` in a transaction, so a failing step could leave a partial apply. It is fixed and accepted (F08 A6 ruling 1). The first real schema step must add its own real-file migration test.
 * **Emulator suite (F08-BE6):** was 30 / 31 because of a contract-invalid fixture, not a handler defect; fixed in c70527a and accepted — 31 / 31 on Java 21 (first on `PATH`; setup-manifest).
 * **Firestore rules bypass (F1, found by F08-QA-FUNCTIONAL 2026-09-29): CLOSED.** The rules let any signed-in client write its own `dailyResults` entry directly, under any bucket name. Nothing was deployed, so there was no live exposure. Ruled at A9 (no client access), fixed in F08-BE7 (cb96719), and closed by QA's own probe in F08-QA-FUNCTIONAL-R1 (A11). The deploy precondition is met.
 * **CI is green (2026-09-29, F08 A17):** run `36597006854` on c592081 — all three jobs succeeded after the F08-DEVOPS-PREP repair (Java 21, format scope, Flutter 3.32.8, Xcode 16.4). Run #1's three causes are closed. **Limit:** the best-effort integration step failed inside the green `verify` job; it has no device target on CI and is not a gate until the first app-build release (CI-INTEGRATION-TARGET). The step logs need a GitHub sign-in and were not read.
-* **Cloud Functions runtime (2026-09-29, F08 A17):** Node.js 20 is decommissioned on 2026-10-30 — no create / update after that date. The runtime moves to Node.js 22 in F08-BE8, before any deploy.
-* **Public repository (2026-09-29, F08 A14):** `github.com/eyupdabakoglu92/Looplet` is public, with its whole history including `ai-system/`. No private key or token is tracked. The Firebase client configs (`google-services.json`, `GoogleService-Info.plist`) are public by design but now world-readable: restrict the API keys and plan App Check enforcement (F08 `release.md` §5; F08-PLATFORM-ATTESTATION). The live Firestore rules are unknown — option B of F08.DEPLOY-GO deploys the committed deny-all rules.
+* **Cloud Functions runtime (2026-09-29, F08 A17):** Node.js 20 is decommissioned on 2026-10-30 — no create / update after that date. The runtime moved to Node.js 22 in F08-BE8 (9f6b6e6, accepted at A18). The CI `infra` job pins Node 22 in F08-DEVOPS.
+* **Host toolchain (2026-09-29, F08 A18):** installing `node@22` upgraded Homebrew's `simdjson` and broke the system `node` 24.7.0; with the user's choice the system `node` is now `node@24` 24.21.0, and `node@22` is keg-only. On this host an npm script runs the system Node whatever is first on `PATH`; local Node 22 checks start the tools directly (setup-manifest).
+* **Public repository (2026-09-29, F08 A14):** `github.com/eyupdabakoglu92/Looplet` is public, with its whole history including `ai-system/`. No private key or token is tracked. The Firebase client configs (`google-services.json`, `GoogleService-Info.plist`) are public by design but now world-readable: restrict the API keys and plan App Check enforcement (F08 `release.md` §5; F08-PLATFORM-ATTESTATION). The live Firestore rules are unknown until F08-DEVOPS-RULES reads them and deploys the committed deny-all rules (F08.DEPLOY-GO — B, A19).
 
 ## Contract Version
 
