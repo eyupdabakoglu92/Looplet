@@ -1,0 +1,28 @@
+binary sha256 dc9ae88b2fc6c162bf864ef2c08a3038e79e47d82a764f1d490036207a51278e
+demo-looplet                 0
+looplet-emulator             0
+firebase: emulators at       0
+debug-sync:                  0
+/debug/sync                  0
+produce + leave              0
++ 1 day                      0
+debug · sync                0
+LOOPLET_FIREBASE_EMULATOR    0
+useFunctionsEmulator         0
+-- controls (must be present)
+submitDailyResultV1          2
+looplet.sqlite               1
+active_session               4
+.corrupt-                    1
+db_reinitialized             0
+-- byte scan (python): UTF-8 / UTF-16LE counts, release App binary
+store: db_reinitialized    utf8=0 utf16le=1
+store: migration_failed    utf8=0 utf16le=1
+store: bootstrap_failed    utf8=0 utf16le=1
+persist_failed             utf8=0 utf16le=3
+debug-sync                 utf8=0 utf16le=0
+demo-looplet               utf8=0 utf16le=0
+looplet-emulator           utf8=0 utf16le=0
+/debug/sync                utf8=0 utf16le=0
+debug · sync               utf8=0 utf16le=0
+firebase: emulators at     utf8=0 utf16le=0

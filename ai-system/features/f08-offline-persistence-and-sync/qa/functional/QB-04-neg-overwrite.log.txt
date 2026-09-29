@@ -1,0 +1,155 @@
+handler sha1 bcda26628a695f0202eb1168e4962fd566d1c57f
+test sha1 cf73770d9a495d0f8c255bcd0533115dbfff79de
+
+===== N-OVERWRITE (fixed fixture) — exit 1
+i  emulators: Starting emulators: auth, firestore
+i  emulators: Detected demo project ID "demo-looplet", emulated services will use a demo configuration and attempts to access non-emulated services for this project will fail.
+i  firestore: Firestore Emulator logging to firestore-debug.log
+✔  firestore: Firestore Emulator was started in standard edition.
+✔  firestore: Firestore Emulator UI websocket is running on 9150.
+i  Running script: jest --verbose test/submitDailyResult.test.ts
+⚠  Script exited unsuccessfully (code 1)
+i  emulators: Shutting down emulators.
+i  firestore: Stopping Firestore Emulator
+i  auth: Stopping Authentication Emulator
+i  hub: Stopping emulator hub
+i  logging: Stopping Logging Emulator
+
+Error: Script "jest --verbose test/submitDailyResult.test.ts" exited with code 1
+(node:76763) MetadataLookupWarning: received unexpected error = Invalid response from metadata service: incorrect Metadata-Flavor header. Expected 'Google', got no header code = UNKNOWN
+(Use `node --trace-warnings ...` to show where the warning was created)
+FAIL test/submitDailyResult.test.ts
+  submitDailyResultV1
+    ✓ CREATED on the first authenticated call, with the doc written (575 ms)
+    ✕ ALREADY_SUBMITTED on a repeat — first run stays authoritative (35 ms)
+    ✕ is idempotent across many repeats — one doc, one recordedAt (23 ms)
+    ✓ scopes the write to the caller's own uid (25 ms)
+    ✓ rejects an unauthenticated call before touching Firestore (15 ms)
+    ✓ rejects an invalid payload with invalid-argument + details.code (7 ms)
+    ✓ throws HttpsError (not a raw error) — no internal leakage (3 ms)
+
+  ● submitDailyResultV1 › ALREADY_SUBMITTED on a repeat — first run stays authoritative
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "ALREADY_SUBMITTED"
+    Received: "CREATED"
+
+      87 |       data: { moves: 10, stars: 3, durationMs: 40000 },
+      88 |     });
+    > 89 |     expect(second.status).toBe("ALREADY_SUBMITTED");
+         |                           ^
+      90 |     expect(second.recordedAt).toBe(first.recordedAt);
+      91 |
+      92 |     const snap = await docRef().get();
+
+      at Object.<anonymous> (test/submitDailyResult.test.ts:89:27)
+
+  ● submitDailyResultV1 › is idempotent across many repeats — one doc, one recordedAt
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 2
+    + Received  + 2
+
+      Object {
+    -   "recordedAt": 1790674829646,
+    -   "status": "ALREADY_SUBMITTED",
+    +   "recordedAt": 1790674829653,
+    +   "status": "CREATED",
+      }
+
+      103 |     for (let i = 0; i < 4; i++) {
+      104 |       const r = await call({ auth: { uid } });
+    > 105 |       expect(r).toEqual({ status: "ALREADY_SUBMITTED", recordedAt: first.recordedAt });
+          |                 ^
+      106 |     }
+      107 |     const all = await getFirestore()
+      108 |       .collection(`dailyResults/tr_2026-09-06/entries`)
+
+      at Object.<anonymous> (test/submitDailyResult.test.ts:105:17)
+
+Test Suites: 1 failed, 1 total
+Tests:       2 failed, 5 passed, 7 total
+Snapshots:   0 total
+Time:        1.695 s, estimated 2 s
+Ran all test suites matching /test\/submitDailyResult.test.ts/i.
+Jest did not exit one second after the test run has completed.
+
+'This usually means that there are asynchronous operations that weren't stopped in your tests. Consider running Jest with `--detectOpenHandles` to troubleshoot this issue.
+
+
+===== N-OVERWRITE-OLDFIX (pre-BE6 fixture) — exit 1
+i  emulators: Starting emulators: auth, firestore
+i  emulators: Detected demo project ID "demo-looplet", emulated services will use a demo configuration and attempts to access non-emulated services for this project will fail.
+i  firestore: Firestore Emulator logging to firestore-debug.log
+✔  firestore: Firestore Emulator was started in standard edition.
+✔  firestore: Firestore Emulator UI websocket is running on 9150.
+i  Running script: jest --verbose test/submitDailyResult.test.ts
+⚠  Script exited unsuccessfully (code 1)
+i  emulators: Shutting down emulators.
+i  firestore: Stopping Firestore Emulator
+i  auth: Stopping Authentication Emulator
+i  hub: Stopping emulator hub
+i  logging: Stopping Logging Emulator
+
+Error: Script "jest --verbose test/submitDailyResult.test.ts" exited with code 1
+FAIL test/submitDailyResult.test.ts
+  submitDailyResultV1
+    ✓ CREATED on the first authenticated call, with the doc written (569 ms)
+    ✕ ALREADY_SUBMITTED on a repeat — first run stays authoritative (23 ms)
+    ✕ is idempotent across many repeats — one doc, one recordedAt (23 ms)
+    ✓ scopes the write to the caller's own uid (25 ms)
+    ✓ rejects an unauthenticated call before touching Firestore (14 ms)
+    ✓ rejects an invalid payload with invalid-argument + details.code (8 ms)
+    ✓ throws HttpsError (not a raw error) — no internal leakage (4 ms)
+
+  ● submitDailyResultV1 › ALREADY_SUBMITTED on a repeat — first run stays authoritative
+
+    moves must be >= 9
+
+      49 |   } catch (error) {
+      50 |     if (error instanceof PayloadError) {
+    > 51 |       throw new HttpsError("invalid-argument", error.message, {
+         |             ^
+      52 |         code: error.code,
+      53 |       });
+      54 |     }
+
+      at handleSubmitDailyResult (src/submitDailyResult.ts:51:13)
+      at call (test/submitDailyResult.test.ts:37:26)
+      at Object.<anonymous> (test/submitDailyResult.test.ts:85:26)
+
+  ● submitDailyResultV1 › is idempotent across many repeats — one doc, one recordedAt
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 2
+    + Received  + 2
+
+      Object {
+    -   "recordedAt": 1790674840072,
+    -   "status": "ALREADY_SUBMITTED",
+    +   "recordedAt": 1790674840078,
+    +   "status": "CREATED",
+      }
+
+      103 |     for (let i = 0; i < 4; i++) {
+      104 |       const r = await call({ auth: { uid } });
+    > 105 |       expect(r).toEqual({ status: "ALREADY_SUBMITTED", recordedAt: first.recordedAt });
+          |                 ^
+      106 |     }
+      107 |     const all = await getFirestore()
+      108 |       .collection(`dailyResults/tr_2026-09-06/entries`)
+
+      at Object.<anonymous> (test/submitDailyResult.test.ts:105:17)
+
+Test Suites: 1 failed, 1 total
+Tests:       2 failed, 5 passed, 7 total
+Snapshots:   0 total
+Time:        1.782 s, estimated 2 s
+Ran all test suites matching /test\/submitDailyResult.test.ts/i.
+
+
+restored handler sha1 bcda26628a695f0202eb1168e4962fd566d1c57f
+restored test sha1 cf73770d9a495d0f8c255bcd0533115dbfff79de

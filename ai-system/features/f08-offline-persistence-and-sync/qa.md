@@ -342,3 +342,164 @@ Tech Lead actions:
 No Product/PO escalation required.
 
 TEXT
+
+---
+
+# F08-QA-FUNCTIONAL — Fonksiyonel stage verdict'i (2026-09-29)
+
+> Plan: `architecture.md` → Activation A7 (A8 ile düzeltilmiş). Brief: `orchestration.md` → Current Brief. Kanıt: `qa/functional/` (`qa/functional/README.md`). Yukarıdaki 2026-09-06 raporu değiştirilmedi; bu bölüm onun yerine geçmez, onu günceller.
+
+## 0. QA Execution Plan
+
+* **Stage / Scope:** functional / end-to-end. Release Scope `production-readiness`; release stage F08.DEPLOY-AUTHORIZATION ile ayrıca bloklu.
+* **Modüller:** `core`; `backend-security` (callable validation, create-only rules, auth-scoped path); `client-ui` (store-error → Retry → Home, debug route'un release'de olmaması); `stateful-flow` (persistence, resume, migration, queue lifecycle, cold boot). Preflight: PASS (önerilen = beyan edilen). Visual Scope `none` → `visual-quality` yok.
+* **Regression Depth:** `full` — FE13 startup/routing, persistence/migration ve paylaşılan Firebase init yolunu değiştiriyor.
+* **Evidence Reuse:** `invalidated` (app tarafı). Önceki F08 QA'sı (2026-09-06) ve teslim kanıtı (LE-01…LE-08, BE6-*) yalnız girdi; required senaryoların tamamı bu turda QA tarafından yeniden koşuldu. Backend handler / rules fingerprint'i 8479ddb'den beri aynı ama test dosyası BE6'da değişti → suite yeniden koşuldu.
+* **Fingerprint:** HEAD `84430c9`; `app/` tree `9de12e6a…` (= FE13 teslim ağacı); `infra/functions` test `cf73770d…`, handler `bcda2662…`, `validate.ts` `8f0398ea…`; `firestore.rules` `b75628e6…`; `package-lock.json` `97187c5f…`; `app/pubspec.lock` `defec859…`.
+* **Canonical target:** iPhone 16 simülatörü `D0011CE7-…` (iOS 18.6), debug build'ler; emülatör koşuları için `--dart-define=LOOPLET_FIREBASE_EMULATOR=127.0.0.1` + simülatör keychain reset (A6 ruling 8); macOS host, Flutter 3.32.8, Node v24.7.0, firebase-tools 15.29.0, OpenJDK 21.0.12.1 (PATH'te).
+* **Fail-fast:** backend canonical build/test (QB-01…03) ve app suite (QA-02) pahalı runtime'dan önce — hepsi PASS.
+
+## 1. Evidence Ledger
+
+Hepsi **EXECUTED THIS RUN** (2026-09-29 09:37–10:10Z), QA tarafından; hiçbir satır teslim özetinden kopyalanmadı.
+
+| Evidence ID | Claim / Scenario | Class | Command / Action | Target | Result / Counts | Provenance | Isolation |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| QB-01 | Backend build | build | `npm ci && npm run build` (`infra/functions`) | host | exit 0 | `QB-01-build.log` | — |
+| QB-02 | Emülatörsüz suite | unit | `npm test` | host | exit 0 — 18 passed, **13 skipped** (emülatör-gated, beklenen) | `QB-02-unit.log` | — |
+| QB-03 | Kurallar + callable suite | repeatable integration | setup-manifest komutu (`JAVA_HOME` + PATH Java 21) `npm run test:emulator` | Firestore + Auth emülatörü, `demo-looplet` | exit 0 — **31 / 31**, skip 0 (3 suite) | `QB-03-emulator.log` | handler doğrudan çağrılıyor (Functions/HTTPS katmanı yok — o yol QE'de) |
+| QB-04 | N-OVERWRITE: first-run-authoritative testi overwrite regresyonunu yakalıyor | negatif | `python3 evidence/neg-be6.py` | aynı | N-OVERWRITE exit 1, 2 fail / 7; N-OVERWRITE-OLDFIX exit 1 (eski fixture ayırt edemiyor); dosyalar bayt-özdeş geri yüklendi | `QB-04-*` | mutasyon geçici |
+| QB-05 | QA kural probu (create-only, IDOR, direct write) | repeatable integration | `qa-probe-rules.test.ts` (P1–P6) `emulators:exec --only firestore` | Firestore emülatörü | exit 0 — 6 / 6; **P3 ve P6 = ALLOWED** (bkz. F1) | `QB-05-rules-probe.log` | probe dosyası koşu sonrası silindi; `git status infra` temiz |
+| QA-01 | Analyze + format | static | `melos run analyze`; `dart format --set-exit-if-changed app packages tools` | host | SUCCESS; 194 dosya, 0 değişiklik | `QA-01-*` | — |
+| QA-02 | Workspace regresyonu | automated functional | `melos run test` | host | exit 0 — app **588 / 588**, paketler 202 (core 22, content 17, dictionary 32, solver 23, engine 83, authoring 25), skip 0 | `QA-02-melos-test.log` | host sqlite3 |
+| QA-03 | 9 adlandırılmış negatif (A1–A4) | negatif | `SP=… python3 evidence/neg-fe13.py` | host | 9 / 9 yakalandı: N-CLASS 3, N-LOOP 1, N-RETRY 2, N-FULL 1, N-FULL-FATAL 1, N-TXN 1, N-QUAR 1, N-GATE 1, N-REGAIN 1 fail; `app/` diff yok | `QA-03-neg-fe13.log` | mutasyonlar geçici |
+| QA-05 | Entegrasyon | automated functional | `flutter test integration_test -d <iPhone 16>` | simülatör | **13 / 13**, exit 0 | `QA-05-integration.log` | — |
+| QJ7 | Production-shaped cold boot, boş + mevcut store | runtime (video) | define'sız debug; `qa-f08.sh coldrec` + `video-d2.swift trace` tam kare | simülatör | Boş: açılış zoom'u → Home (4.73 s) arası maks. luma **22.2**, Home 45.2, yeni guest + `firebaseUid`. Mevcut (20/30 + sv.21 oturumu): maks. **24.6**, Home 3.48 s, 49.1, "Seviye 21 · sürüyor". Açık kare yok, init hatası yok | `QJ7*`, `raw/QJ7*` | gerçek başlangıç yolu (anonim giriş gerçek projeye — FE12'den beri mevcut davranış) |
+| QJ4 | Resume fidelity + tamper (AC1/AC6) | runtime | sv.21: restart → L1 U3 R4 → undo → L0 D0 (erime) → kill → snapshot kontrolü → relaunch → Devam et; sonra kill → `thawedFrozenCells=[]` → relaunch; undo; redo D0 | simülatör | Kill sonrası snapshot bayt-özdeş; relaunch sonrası 13 anahtarın tamamı aynı; ekran birebir (HAMLE 4, 2 undo noktası, erimiş Y, ızgara). Tamper: Y yine erimiş (replay); undo → `[L1,U3,L0]`, thaw `[]` (Y donuk); redo → `["0,1"]` yeniden yazıldı. Ölü süre sayılmadı (duvar saati 69.7 s, elapsed +11.1 s) | `QJ4*` | — |
+| QJ1 | Okunamaz store (AC8) | runtime | `seed-d3.sh corrupt` → launch; tekrar | simülatör | Home "new" 0/30, yeni guest; `store: db_reinitialized — SQLITE_NOTADB (26)`; 392 bayt karantina; ikinci bozulmada yalnız en yeni karantina kaldı | `QJ1*` | — |
+| QJ2 | Geçici açılış hatası + Retry (A2) | runtime | store yolu dizin (CANTOPEN) → launch → Retry (sebep varken) → dizin silindi → Retry | simülatör | hata ekranı (debug kutusu `SqliteException(14)`); sebep varken Retry → yine hata, karantina **yok**; sebep kalkınca Retry → Home, yeni store; **PID aynı** (84160); 2 × `store: bootstrap_failed` | `QJ2*` | — |
+| QE-A…E | Exactly-once client ↔ emülatör (AC4/AC5/AC11) | runtime + repeatable integration | emülatörler (auth, firestore, functions :5002) + `qa-fn-proxy.py` :5001; app emülatör define'lı; debug `/debug/sync` | simülatör + emülatör | A: `down` → 1 öğe pending, 0 doc; `pass` + çift drain dokunuşu → **1 doc** CREATED, ek istek yok. B: `drop` (sunucu yazdı) → pending; retry → ALREADY_SUBMITTED, **1 doc**, `recordedAt` aynı. C: `hold` → inFlight'ta kill → > 20 s → relaunch → stale sweep + başlangıç drain'i → ALREADY_SUBMITTED, **1 doc**. D: sunucuda önceki koşu (9 hamle 3★) → yerel sonraki koşu → ALREADY_SUBMITTED, sunucu **değişmedi**, yerel first-run 12; ikinci yerel tamamlanma → `daily_attempt` #2, yeni kuyruk öğesi/istek yok. E: `daily_sync_enabled=false` → öğe pending a=0, drain dahil **0 istek** | `QE-cases.txt`, `QE-proxy.log`, `QE-final-doc-counts.txt` | "offline" = functions proxy'si `down` — **uçak modu değil**; kill switch debug stand-in (A6 ruling 4) |
+| QE-M | Misuse: geçersiz payload → parked | runtime + repeatable integration | E'deki pending öğenin payload'ı sqlite ile `moves 3 < optimalMoves 8` yapıldı → switch on → drain | aynı | sunucu 400 `INVALID_PAYLOAD` → öğe `parked` (nonRetryable), `daily_entry` `parked`, **0 doc**; yerel first-run değişmedi. Relaunch → bounded revival (postPark 0 → 1), bir deneme, yine `parked` | `QE-cases.txt` (M1, M2, P1) | M1 harness hatası yüzünden geçersiz (bkz. N2); M2 düzeltilmiş proxy ile |
+| QL1 | Ownership: ekran dispose mid-sync | runtime | proxy `slow` (4 s) + "produce + leave" | simülatör + emülatör | Home görünürken öğe `inFlight`, 0 doc → yanıt sonrası `synced`, **1 doc** | `QL1a-*`, `QE-cases.txt` | — |
+| QL2 | Lifecycle: paused / resumed → drain | runtime | `down` + produce → due olunca HOME → `pass` → arka planda due → foreground | aynı | HOME'dan hemen sonra istek (10:04:12.8Z, paused drain; a=2); foreground'da CREATED → `synced`, 1 doc; PID 87934 boyunca aynı | `QE-cases.txt` (L2a–c) | connectivity regain simülatörde tetiklenemiyor → QA-02 + N-REGAIN (QA-03) |
+| QR | Release binary kapısı | build + static | `flutter build ios --release --no-codesign --dart-define=LOOPLET_FIREBASE_EMULATOR=127.0.0.1`; UTF-8 + UTF-16LE bayt taraması | `App.framework/App` sha256 `dc9ae88b…` (LE-08 ile aynı) | exit 0; `demo-looplet`, `looplet-emulator`, `/debug/sync`, `debug-sync`, `debug · sync`, `firebase: emulators at` = **0** (iki kodlamada); kontroller mevcut (`submitDailyResultV1` 2, `store: db_reinitialized` 1, `store: migration_failed` 1, `persist_failed` 3) | `QR-*` | — |
+
+## 2. Acceptance & Critical Journey Coverage
+
+| AC / Journey | Expected | Evidence IDs | Result |
+| --- | --- | --- | --- |
+| AC1 kill/relaunch birebir restore | ızgara, hamle, undo, erime, süre | QJ4, QA-05 | PASS |
+| AC2 ağsız Journey | tüm seviyeler yüklenir, ilerleme kaydolur | — | **PENDING** (kullanıcının ağsız runtime'ı; §4) |
+| AC3 önceden alınmış Daily offline | — | — | F07 kapsamı (A7 known limit; F07.OFFLINE-DAILY) |
+| AC4 offline tamamlanma → tek gönderim | 1 doc | QE-A, QE-B, QE-C, QL2 | PASS |
+| AC5 sunucudaki first run otoriter | sunucu değişmez | QE-D, QB-03, QB-04 | PASS |
+| AC6 `app_backgrounded` öncesi durable | kill anında son durum yazılı | QJ4 (kill öncesi = sonrası snapshot), QL2 | PASS |
+| AC7 storage-full | non-destructive, son iyi durum | QA-02 (`storage_full_test`), QA-03 (N-FULL, N-FULL-FATAL) | PASS (repeatable integration; F08.STORAGE) |
+| AC8 bozuk kayıt | temiz durum, crash yok, log | QJ1, QA-02, QA-03 (N-CLASS/N-LOOP/N-QUAR) | PASS |
+| AC9 forward migration, veri kaybı yok | hata ekranı, veri korunur, kısmi uygulama yok | QA-02 (`store_recovery_test`: satırlar (1,1), karantina yok, `migration_failed`), QA-03 N-TXN | PASS (automated — gerçek adım yok, `schemaVersion = 1`; A6 ruling 1 limiti) |
+| AC10 saat değişimi | monotonic | QA-02 (`elapsed_timer_test`), QJ4 (ölü süre sayılmadı) | PASS (automated-only, A7 known limit) |
+| AC11 kısmi sync → idempotent retry | kopya yok | QE-B, QE-C, QB-03 | PASS |
+| AC12 her satırda `guestId` | — | QA-02 (`app_database_test`, `repositories_test`, `guest_id_test`); şema (`app_database.g.dart`) 49ff4c0'dan beri değişmedi | PASS (automated) |
+| J1 okunamaz store → Home "new" | + tek karantina, log, loop guard | QJ1; loop guard QA-02 + N-LOOP | PASS |
+| J2 geçici hata → Retry → Home, relaunch yok | — | QJ2 | PASS |
+| J3 migration hatası | — | QA-02 + N-TXN | PASS (automated) |
+| J4 resume + tamper | — | QJ4 | PASS |
+| J5 exactly-once (A4'ün altı vakası) | — | QE-A…E | PASS |
+| J6 lifecycle | — | QL1, QL2; regain QA-02 + N-REGAIN | PASS |
+| J7 production-shaped cold boot | açık kare yok | QJ7 | PASS |
+| J8 offline Journey | — | — | PENDING |
+| Misuse: duplicate drain / terminal reuse | ek gönderim yok | QE-A (çift dokunuş), QE-D (replay → attempt) | PASS |
+| Misuse: geçersiz payload | `parked`, doc yok | QE-M | PASS |
+| Misuse: Retry sebep varken | yine hata, karantina yok | QJ2 | PASS |
+
+## Backend & Security Compliance
+
+* Canonical build/test: QB-01, QB-02, QB-03 PASS; fail-fast gerekmedi.
+
+| Contract control | Evidence | Result |
+| --- | --- | --- |
+| Callable request/response (`CREATED` / `ALREADY_SUBMITTED` + `recordedAt`) | QB-03, QE-A/B/D | PASS |
+| Validation + hata formatı (`invalid-argument` + `details.code`) | QB-03, QE-M (`moves must be >= 8`, `INVALID_PAYLOAD`) | PASS |
+| Create-only + idempotency (transaction) | QB-03, QB-04, QE-B/C | PASS |
+| Client eşlemesi (`invalid-argument` → parked; transport → retryable) | QA-02, QE-M, QE-A | PASS |
+
+| Security control | Evidence | Result |
+| --- | --- | --- |
+| Auth bypass (unauthenticated) | QB-03 (callable + rules) | PASS |
+| IDOR (başka uid'e yazma) | QB-03, QB-05 P4 | PASS |
+| Overwrite (sahip `setDoc` / merge) | QB-05 P1, P2 | PASS |
+| Okuma / silme / dışarı yazma | QB-03, QB-05 P5 | PASS |
+| Response exposure (HttpsError, iç hata sızmıyor) | QB-03 | PASS |
+| **Mass assignment / validation bypass (doğrudan client create)** | QB-05 P3, P6 | **FAIL → F1** (authority çelişkisi) |
+
+## Client & UI Compliance
+
+| Check | Evidence | Result |
+| --- | --- | --- |
+| Store-error ekranı (kopya, Retry, debug kutusu yalnız debug) | QJ2 | PASS |
+| Retry: sebep varken hata, sebep kalkınca Home, relaunch yok | QJ2 | PASS |
+| Kurtarma → Home "new"; hydrate öncesi Home yok (splash) | QJ1, QJ7 | PASS |
+| `/debug/sync` + debug satırı release'de yok | QR | PASS |
+| Play geri dönüşü ("Seviye 21 · sürüyor" → Devam et → birebir) | QJ7b, QJ4 | PASS |
+
+## Stateful Flow & Integration
+
+| Boundary / Transition | Actor / Start State | Expected | Evidence IDs | Result |
+| --- | --- | --- | --- | --- |
+| cold boot boş / mevcut | yeni kurulum / 20/30 + oturum | Home, açık kare yok | QJ7 | PASS |
+| corrupt → recreate; ikinci corrupt | NOTADB | tek recreate, en yeni karantina | QJ1, N-LOOP, N-QUAR | PASS |
+| migration hatası | v1 → hata veren adım | hata ekranı, satırlar sağlam, kısmi yok | QA-02, N-TXN | PASS |
+| kill → relaunch (write-through) | oturum ortası | snapshot bayt-özdeş | QJ4 | PASS |
+| untrusted cache | tamper `thawedFrozenCells` | replay'den türetme | QJ4 | PASS |
+| pending → inFlight → synced | drain | tek doc | QE-A, QL1 | PASS |
+| inFlight → kill → stale sweep | > 20 s | retry güvenli, tek doc | QE-C | PASS |
+| pending → parked (non-retryable) → bounded revival | geçersiz payload | parked; app start'ta bir kez | QE-M, P1 | PASS |
+| paused → drain; resumed → drain | arka plan / ön plan | ikisi de gönderir | QL2 | PASS |
+| ekran dispose mid-sync | "produce + leave" | sync tamamlanır | QL1 | PASS |
+| connectivity regain → drain | — | servis kendi listener'ı | QA-02 + N-REGAIN | PASS (automated; simülatör sınırı) |
+| kill switch off | `daily_sync_enabled=false` | istek yok | QE-E | PASS (debug stand-in; RC bağlantısı F07) |
+
+## 3. Findings
+
+**F1 — Firestore kuralları doğrudan client create'e izin veriyor; callable validation atlanabiliyor (authority çelişkisi)**
+* **Severity / Type:** High / Security — authority conflict (implementation defect değil).
+* **İlgili:** `architecture.md` → Firebase Sync Surface (kilitli) → Rules; Validation Responsibility; `backend-security` modülü.
+* **Expected (kilitli kontratın şu satırlarına göre):** doküman "server-written" ("Firestore document (server-written)"); "A direct client create-only write was considered and rejected — cross-field range validation is unsafe to express in security rules alone"; Validation Responsibility: "Callable + Firestore rules: server-side create-only enforcement + full payload validation"; `analysis.md`: "server-side, not client-writable directly".
+* **Actual:** aynı kilitli bölümün Rules satırı `allow create: if request.auth != null && request.auth.uid == <path uid> && !exists(...)` diyor; `firestore.rules` bunu birebir uyguluyor. Sonuç: anonim oturumu olan herhangi bir client, callable'ı atlayıp kendi uid'ine **doğrulanmamış** bir kayıt yazabiliyor (QB-05 P3: `moves 1 < optimalMoves 9`, `stars 9`, fazladan alan → ALLOWED) ve **keyfi bucket adlarına** yazabiliyor (P6: `dailyResults/zz_not-a-date-123/entries/<uid>` → ALLOWED).
+* **Etki:** (a) oyuncu kendi resmi first-run kaydını sahte bir değerle önceden yazabilir — sonra callable `ALREADY_SUBMITTED` döner (first-run-authoritative sahte kaydı korur); (b) bucket adı serbest olduğu için tek bir anonim kullanıcı sınırsız sayıda doküman oluşturabilir → deploy sonrası depolama/yazma maliyeti suistimali; (c) leaderboard gelirse geçersiz veri okunur. MVP'de okuma yok; risk deploy ile gerçek olur.
+* **Adımlar:** `QB-05-rules-probe.log` (P3, P6); probe `qa/functional/qa-probe-rules.test.ts`.
+* **Root-cause önerisi (karar Tech Lead'in):** kilitli Rules satırı ile "server-written / direct write rejected / full payload validation" satırları çelişiyor. Callable Admin SDK ile yazdığı için kurallardan etkilenmiyor; olası yön `allow create: if false` (yalnız server yazar) — bu `rules.test.ts` "lets a signed-in user create their own entry" testini ve kontrat satırını değiştirir. Alternatif: kurallarda alan/bucket doğrulaması (analiz bunu "unsafe" bulmuştu). Seçim sonrası Backend Developer uygular.
+
+## 4. Pending Evidence
+
+* **F08.OFFLINE-JOURNEY (AC2 / J8)** — PENDING. Required class: runtime. Target: gerçek ağsız runtime (kullanıcı `evidence/offline-journey.sh <udid>` çalıştırır — Mac Wi-Fi'ı kapatır/açar; ya da fiziksel cihaz uçak modu). Owner: QA (değerlendirme), kullanıcı (ortam). Prerequisite: kullanıcının koşusu; QA sistem ayarını değiştiremez. Re-evaluation trigger: script çıktısı mevcut olduğunda. Simüle offline (proxy `down`) bunun yerine geçmez.
+
+## 5. Regression & Evidence Reuse
+
+* **Etkilenen yüzey:** bootstrap / store açılışı / Retry / migration guard (FE13), Firebase init (emülatör dalı), sync servisi log'u; backend yalnız test dosyası. Full regression: workspace suite, entegrasyon, 9 negatif, backend suite + negatif, release binary — hepsi bu turda çalıştı.
+* **REUSED:** yok (runtime claim'lerin tamamı bu turda yeniden üretildi). Teslim kanıtı (LE-01…LE-08, BE6-*) yalnız karşılaştırma girdisi; QA sonuçları onlarla tutarlı (release binary sha256 LE-08 ile aynı).
+* **INVALIDATED:** 2026-09-06 F08 QA runtime kanıtı ve F05-QA-D3 E05/E06/E09 (eski ağaçlar) — kullanılmadı.
+* **Bağımsız QA probe'ları:** QB-05 (kural probu — F1'i buldu), QE-M (geçersiz payload → parked), QJ2 sebep varken Retry, QE-A çift drain, P1 parked revival, QR UTF-16 taraması.
+
+## 6. Final Verdict
+
+* **QA Result: Decision Pending**
+* **Blocking Issues:** F1 (authority çelişkisi — Tech Lead kararı gerekli; `backend-security` kontrolü FAIL). Ayrıca F08.OFFLINE-JOURNEY PENDING (tek başına `Runtime Validation Pending` olurdu).
+* **Required Fixes:** 1) Tech Lead F1'deki Rules / "server-written" çelişkisini çözer; 2) seçilen kural Backend Developer tarafından uygulanır + negatif test (doğrudan create reddedilir); 3) QA kural/callable kapsamını hedefli yeniden koşar; 4) AC2 kullanıcı koşusu.
+* **Non-blocking Notes:**
+  * **N1 — zamanlayıcı yok (kontrata uygun):** backoff'u dolan bir öğe kendi kendine gönderilmiyor; bir sonraki tetikleyiciyi (drain, başlangıç, pause/resume, regain, başarılı çağrı) bekliyor (QE-B2: due sonrası 5 s istek yok). Kilitli Ownership & Lifecycle yalnız bu tetikleyicileri istiyor.
+  * **N2 — kanıt aracı hatası:** `evidence/fn-proxy.py` upstream 4xx/5xx'te `HTTPError` fırlatıp bağlantıyı yanıtsız kapatıyor; client bunu ağ kopması (retryable) görüyor. LE-04 bu yüzden hiçbir hata yanıtını proxy üzerinden test etmemiş. QA kopyası (`qa/functional/qa-fn-proxy.py`) düzeltildi; teslim aracı Frontend/Mobile Developer'ın.
+  * **N3:** Jest "worker process has failed to exit gracefully" satırı her koşuda var, sonuçları etkilemiyor (A8 ruling 4).
+  * **N4:** CI emülatör adımı hiç koşmadı (CI-EMULATOR-JAVA21); F08.EMULATOR yerel koşuyla karşılandı.
+
+## 7. Tech Lead Note
+
+* **Root-cause alanı:** F1 contract authority (Tech Lead) → uygulama Backend Developer (`firestore.rules` + `rules.test.ts`). App kodu etkilenmiyor (client callable kullanıyor).
+* **Routing:** F1 için bir decision gate / contract düzeltmesi; ardından hedefli backend fix + QA re-run (backend-security, `targeted`/`impacted` yeterli görünüyor — app kanıtı bu fix'ten etkilenmez, fingerprint `9de12e6a…` korunursa QA kanıtı tekrar kullanılabilir).
+* **Diğer:** AC2 için kullanıcı koşusu hâlâ gerekli. N2 kanıt aracı düzeltmesi opsiyonel (Frontend/Mobile Developer). Release stage F08.DEPLOY-AUTHORIZATION ile bloklu; F1 deploy'dan önce kapanmalı.
+
+## Sonraki Komut
+
+```text
+Run Tech Lead
+```

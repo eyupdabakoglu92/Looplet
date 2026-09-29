@@ -1,0 +1,269 @@
+== A1 offline (proxy down) produce 2026-09-29T09:56:20Z proxy=down
+queue|1|pending|1|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-29|1790675841841|retryable
+entry|2026-09-29|queued|12
+docs=0
+-- proxy (last 3)
+fn-proxy on :5001 -> :5002
+2026-09-29T09:56:13.382Z down /demo-looplet/us-central1/submitDailyResultV1 -> closed without forwarding
+-- app (last 4 sync lines)
+flutter: debug-sync: produced 2026-09-29 → DailyCompletionOutcome.firstRun
+flutter: sync: submitDailyResultV1 failed — unknown: The network connection was lost.
+flutter: debug-sync: drain after produce 2026-09-29 done
+== A2 reconnect (proxy pass) + double drain tap 2026-09-29T09:57:31Z proxy=pass
+queue|1|synced|1|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-29|1790675841841|
+entry|2026-09-29|synced|12
+docs=1
+  E2CBh1wP94meAuwINnXW4otLmiL1 moves 12 stars 2 recordedAtUtcMs 1790675844769 completedAtUtcMs 1790675773301
+-- proxy (last 3)
+fn-proxy on :5001 -> :5002
+2026-09-29T09:56:13.382Z down /demo-looplet/us-central1/submitDailyResultV1 -> closed without forwarding
+2026-09-29T09:57:23.609Z pass /demo-looplet/us-central1/submitDailyResultV1 upstream 200 b'{"result":{"status":"CREATED","recordedAt":1790675844769}}'
+-- app (last 4 sync lines)
+flutter: sync: submitDailyResultV1 failed — unknown: The network connection was lost.
+flutter: debug-sync: drain after produce 2026-09-29 done
+flutter: debug-sync: manual drain done
+flutter: debug-sync: manual drain done
+== B1 drop (server writes, response lost) 2026-09-29T09:57:49Z proxy=drop
+queue|1|synced|1|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-29|1790675841841|
+queue|2|pending|1|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-28|1790675923716|retryable
+entry|2026-09-29|synced|12
+entry|2026-09-28|queued|12
+docs=1
+  E2CBh1wP94meAuwINnXW4otLmiL1 moves 12 stars 2 recordedAtUtcMs 1790675865139 completedAtUtcMs 1790675865083
+-- proxy (last 3)
+2026-09-29T09:56:13.382Z down /demo-looplet/us-central1/submitDailyResultV1 -> closed without forwarding
+2026-09-29T09:57:23.609Z pass /demo-looplet/us-central1/submitDailyResultV1 upstream 200 b'{"result":{"status":"CREATED","recordedAt":1790675844769}}'
+2026-09-29T09:57:45.116Z drop /demo-looplet/us-central1/submitDailyResultV1 upstream 200 b'{"result":{"status":"CREATED","recordedAt":1790675865139}}'
+-- app (last 4 sync lines)
+flutter: debug-sync: manual drain done
+flutter: debug-sync: produced 2026-09-28 → DailyCompletionOutcome.firstRun
+flutter: sync: submitDailyResultV1 failed — unknown: The network connection was lost.
+flutter: debug-sync: drain after produce 2026-09-28 done
+== B2 pass, retry of the same key (no manual drain) 2026-09-29T09:58:48Z proxy=pass
+queue|1|synced|1|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-29|1790675841841|
+queue|2|pending|1|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-28|1790675923716|retryable
+entry|2026-09-29|synced|12
+entry|2026-09-28|queued|12
+docs=1
+  E2CBh1wP94meAuwINnXW4otLmiL1 moves 12 stars 2 recordedAtUtcMs 1790675865139 completedAtUtcMs 1790675865083
+-- proxy (last 3)
+2026-09-29T09:56:13.382Z down /demo-looplet/us-central1/submitDailyResultV1 -> closed without forwarding
+2026-09-29T09:57:23.609Z pass /demo-looplet/us-central1/submitDailyResultV1 upstream 200 b'{"result":{"status":"CREATED","recordedAt":1790675844769}}'
+2026-09-29T09:57:45.116Z drop /demo-looplet/us-central1/submitDailyResultV1 upstream 200 b'{"result":{"status":"CREATED","recordedAt":1790675865139}}'
+-- app (last 4 sync lines)
+flutter: debug-sync: manual drain done
+flutter: debug-sync: produced 2026-09-28 → DailyCompletionOutcome.firstRun
+flutter: sync: submitDailyResultV1 failed — unknown: The network connection was lost.
+flutter: debug-sync: drain after produce 2026-09-28 done
+== B2 pass, manual drain → retry of the same key 2026-09-29T09:59:03Z proxy=pass
+queue|1|synced|1|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-29|1790675841841|
+queue|2|synced|1|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-28|1790675923716|
+entry|2026-09-29|synced|12
+entry|2026-09-28|synced|12
+docs=1
+  E2CBh1wP94meAuwINnXW4otLmiL1 moves 12 stars 2 recordedAtUtcMs 1790675865139 completedAtUtcMs 1790675865083
+-- proxy (last 3)
+2026-09-29T09:57:23.609Z pass /demo-looplet/us-central1/submitDailyResultV1 upstream 200 b'{"result":{"status":"CREATED","recordedAt":1790675844769}}'
+2026-09-29T09:57:45.116Z drop /demo-looplet/us-central1/submitDailyResultV1 upstream 200 b'{"result":{"status":"CREATED","recordedAt":1790675865139}}'
+2026-09-29T09:59:00.888Z pass /demo-looplet/us-central1/submitDailyResultV1 upstream 200 b'{"result":{"status":"ALREADY_SUBMITTED","recordedAt":1790675865139}}'
+-- app (last 4 sync lines)
+flutter: debug-sync: produced 2026-09-28 → DailyCompletionOutcome.firstRun
+flutter: sync: submitDailyResultV1 failed — unknown: The network connection was lost.
+flutter: debug-sync: drain after produce 2026-09-28 done
+flutter: debug-sync: manual drain done
+== C1 hold (request reached the server, response held) 2026-09-29T09:59:20Z proxy=hold
+queue|1|synced|1|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-29|1790675841841|
+queue|2|synced|1|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-28|1790675923716|
+queue|3|inFlight|0|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-27|0|
+entry|2026-09-29|synced|12
+entry|2026-09-28|synced|12
+entry|2026-09-27|queued|12
+docs=1
+  E2CBh1wP94meAuwINnXW4otLmiL1 moves 12 stars 2 recordedAtUtcMs 1790675951793 completedAtUtcMs 1790675951765
+-- proxy (last 3)
+2026-09-29T09:57:45.116Z drop /demo-looplet/us-central1/submitDailyResultV1 upstream 200 b'{"result":{"status":"CREATED","recordedAt":1790675865139}}'
+2026-09-29T09:59:00.888Z pass /demo-looplet/us-central1/submitDailyResultV1 upstream 200 b'{"result":{"status":"ALREADY_SUBMITTED","recordedAt":1790675865139}}'
+2026-09-29T09:59:11.779Z hold /demo-looplet/us-central1/submitDailyResultV1 upstream 200 b'{"result":{"status":"CREATED","recordedAt":1790675951793}}'
+-- app (last 4 sync lines)
+flutter: sync: submitDailyResultV1 failed — unknown: The network connection was lost.
+flutter: debug-sync: drain after produce 2026-09-28 done
+flutter: debug-sync: manual drain done
+flutter: debug-sync: produced 2026-09-27 → DailyCompletionOutcome.firstRun
+-- killed while inFlight 2026-09-29T09:59:22Z
+queue|3|inFlight|0|1790675951772
+== C2 relaunch > 20 s after inFlight (stale sweep, startup drain) 2026-09-29T09:59:46Z proxy=pass
+queue|1|synced|1|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-29|1790675841841|
+queue|2|synced|1|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-28|1790675923716|
+queue|3|synced|0|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-27|1790675980810|
+entry|2026-09-29|synced|12
+entry|2026-09-28|synced|12
+entry|2026-09-27|synced|12
+docs=1
+  E2CBh1wP94meAuwINnXW4otLmiL1 moves 12 stars 2 recordedAtUtcMs 1790675951793 completedAtUtcMs 1790675951765
+-- proxy (last 3)
+2026-09-29T09:59:00.888Z pass /demo-looplet/us-central1/submitDailyResultV1 upstream 200 b'{"result":{"status":"ALREADY_SUBMITTED","recordedAt":1790675865139}}'
+2026-09-29T09:59:11.779Z hold /demo-looplet/us-central1/submitDailyResultV1 upstream 200 b'{"result":{"status":"CREATED","recordedAt":1790675951793}}'
+2026-09-29T09:59:41.040Z pass /demo-looplet/us-central1/submitDailyResultV1 upstream 200 b'{"result":{"status":"ALREADY_SUBMITTED","recordedAt":1790675951793}}'
+-- app (last 4 sync lines)
+== D0 seeded an earlier server run for 2026-09-26 (admin REST: moves 9, stars 3) 2026-09-29T10:00:00Z proxy=pass
+queue|1|synced|1|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-29|1790675841841|
+queue|2|synced|1|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-28|1790675923716|
+queue|3|synced|0|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-27|1790675980810|
+entry|2026-09-29|synced|12
+entry|2026-09-28|synced|12
+entry|2026-09-27|synced|12
+docs=1
+  E2CBh1wP94meAuwINnXW4otLmiL1 moves 9 stars 3 recordedAtUtcMs 1790500001000 completedAtUtcMs 1790500000000
+-- proxy (last 3)
+== D1 a later local run for 2026-09-26 against the seeded earlier server run 2026-09-29T10:00:26Z proxy=pass
+queue|1|synced|1|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-29|1790675841841|
+queue|2|synced|1|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-28|1790675923716|
+queue|3|synced|0|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-27|1790675980810|
+queue|4|synced|0|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-26|0|
+entry|2026-09-29|synced|12
+entry|2026-09-28|synced|12
+entry|2026-09-27|synced|12
+entry|2026-09-26|synced|12
+docs=1
+  E2CBh1wP94meAuwINnXW4otLmiL1 moves 9 stars 3 recordedAtUtcMs 1790500001000 completedAtUtcMs 1790500000000
+-- proxy (last 3)
+2026-09-29T09:59:11.779Z hold /demo-looplet/us-central1/submitDailyResultV1 upstream 200 b'{"result":{"status":"CREATED","recordedAt":1790675951793}}'
+2026-09-29T09:59:41.040Z pass /demo-looplet/us-central1/submitDailyResultV1 upstream 200 b'{"result":{"status":"ALREADY_SUBMITTED","recordedAt":1790675951793}}'
+2026-09-29T10:00:22.889Z pass /demo-looplet/us-central1/submitDailyResultV1 upstream 200 b'{"result":{"status":"ALREADY_SUBMITTED","recordedAt":1790500001000}}'
+-- app (last 4 sync lines)
+== D2 a second local completion for 2026-09-26 (replay) 2026-09-29T10:00:38Z proxy=pass
+queue|1|synced|1|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-29|1790675841841|
+queue|2|synced|1|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-28|1790675923716|
+queue|3|synced|0|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-27|1790675980810|
+queue|4|synced|0|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-26|0|
+entry|2026-09-29|synced|12
+entry|2026-09-28|synced|12
+entry|2026-09-27|synced|12
+entry|2026-09-26|synced|12
+docs=1
+  E2CBh1wP94meAuwINnXW4otLmiL1 moves 9 stars 3 recordedAtUtcMs 1790500001000 completedAtUtcMs 1790500000000
+-- proxy (last 3)
+2026-09-29T09:59:11.779Z hold /demo-looplet/us-central1/submitDailyResultV1 upstream 200 b'{"result":{"status":"CREATED","recordedAt":1790675951793}}'
+2026-09-29T09:59:41.040Z pass /demo-looplet/us-central1/submitDailyResultV1 upstream 200 b'{"result":{"status":"ALREADY_SUBMITTED","recordedAt":1790675951793}}'
+2026-09-29T10:00:22.889Z pass /demo-looplet/us-central1/submitDailyResultV1 upstream 200 b'{"result":{"status":"ALREADY_SUBMITTED","recordedAt":1790500001000}}'
+-- app (last 4 sync lines)
+flutter: debug-sync: produced 2026-09-26 → DailyCompletionOutcome.firstRun
+flutter: debug-sync: drain after produce 2026-09-26 done
+flutter: debug-sync: produced 2026-09-26 → DailyCompletionOutcome.replay
+flutter: debug-sync: drain after produce 2026-09-26 done
+attempt|47f19ce4-900b-4d13-a8b3-a2ac87d4d96f|tr|2026-09-26|2|12|60000|2|1790676035267
+== E daily_sync_enabled=false: produce 2026-09-25 + manual drain 2026-09-29T10:01:01Z proxy=pass
+queue|1|synced|1|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-29|1790675841841|
+queue|2|synced|1|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-28|1790675923716|
+queue|3|synced|0|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-27|1790675980810|
+queue|4|synced|0|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-26|0|
+queue|5|pending|0|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-25|0|
+entry|2026-09-29|synced|12
+entry|2026-09-28|synced|12
+entry|2026-09-27|synced|12
+entry|2026-09-26|synced|12
+entry|2026-09-25|queued|12
+docs=0
+-- proxy (last 3)
+2026-09-29T09:59:11.779Z hold /demo-looplet/us-central1/submitDailyResultV1 upstream 200 b'{"result":{"status":"CREATED","recordedAt":1790675951793}}'
+2026-09-29T09:59:41.040Z pass /demo-looplet/us-central1/submitDailyResultV1 upstream 200 b'{"result":{"status":"ALREADY_SUBMITTED","recordedAt":1790675951793}}'
+2026-09-29T10:00:22.889Z pass /demo-looplet/us-central1/submitDailyResultV1 upstream 200 b'{"result":{"status":"ALREADY_SUBMITTED","recordedAt":1790500001000}}'
+-- app (last 4 sync lines)
+flutter: debug-sync: drain after produce 2026-09-26 done
+flutter: debug-sync: produced 2026-09-25 → DailyCompletionOutcome.firstRun
+flutter: debug-sync: drain after produce 2026-09-25 done
+flutter: debug-sync: manual drain done
+proxy requests before 7, after 7
+tampered|{"lang":"tr","dailyDate":"2026-09-25","dailyId":"fake-daily-tr-2026-09-25","moves":3,"optimalMoves":8,"durationMs":60000,"stars":2,"completedAtUtcMs":1790676058086,"clientAttemptNumber":1}
+== M1 misuse: tampered invalid payload (moves 3 < optimalMoves 8), sync on, drain 2026-09-29T10:01:18Z proxy=pass
+queue|1|synced|1|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-29|1790675841841|
+queue|2|synced|1|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-28|1790675923716|
+queue|3|synced|0|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-27|1790675980810|
+queue|4|synced|0|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-26|0|
+queue|5|pending|1|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-25|1790676135146|retryable
+entry|2026-09-29|synced|12
+entry|2026-09-28|synced|12
+entry|2026-09-27|synced|12
+entry|2026-09-26|synced|12
+entry|2026-09-25|queued|12
+docs=0
+-- proxy (last 3)
+    raise HTTPError(req.full_url, code, msg, hdrs, fp)
+urllib.error.HTTPError: HTTP Error 400: Bad Request
+----------------------------------------
+-- app (last 4 sync lines)
+flutter: debug-sync: drain after produce 2026-09-25 done
+flutter: debug-sync: manual drain done
+flutter: sync: submitDailyResultV1 failed — unknown: The network connection was lost.
+flutter: debug-sync: manual drain done
+queue5|pending|1|retryable
+-- proxy restarted with the 4xx pass-through fix 2026-09-29T10:01:32Z
+== M2 misuse: invalid payload through the fixed proxy, drain 2026-09-29T10:02:19Z proxy=pass
+queue|1|synced|1|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-29|1790675841841|
+queue|2|synced|1|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-28|1790675923716|
+queue|3|synced|0|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-27|1790675980810|
+queue|4|synced|0|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-26|0|
+queue|5|parked|1|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-25|1790676135146|nonRetryable
+entry|2026-09-29|synced|12
+entry|2026-09-28|synced|12
+entry|2026-09-27|synced|12
+entry|2026-09-26|synced|12
+entry|2026-09-25|parked|12
+docs=0
+-- proxy (last 3)
+----------------------------------------
+fn-proxy on :5001 -> :5002
+2026-09-29T10:02:16.338Z pass /demo-looplet/us-central1/submitDailyResultV1 upstream 400 b'{"error":{"details":{"code":"INVALID_PAYLOAD"},"message":"moves must be >= 8","status":"INVALID_ARGUMENT"}}'
+-- app (last 4 sync lines)
+flutter: sync: submitDailyResultV1 failed — unknown: The network connection was lost.
+flutter: debug-sync: manual drain done
+flutter: sync: submitDailyResultV1 failed — invalid-argument: moves must be >= 8
+flutter: debug-sync: manual drain done
+queue5|parked|1|nonRetryable
+== L1a 2026-09-29T10:02:34Z screen left, request held 4 s by the proxy
+queue|6|inFlight|0|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-24
+docs=0
+== L1b after the slow response (screen already disposed) 2026-09-29T10:02:40Z proxy=slow
+queue|1|synced|1|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-29|1790675841841|
+queue|2|synced|1|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-28|1790675923716|
+queue|3|synced|0|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-27|1790675980810|
+queue|4|synced|0|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-26|0|
+queue|5|parked|1|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-25|1790676135146|nonRetryable
+queue|6|synced|0|E2CBh1wP94meAuwINnXW4otLmiL1|tr|2026-09-24|0|
+entry|2026-09-29|synced|12
+entry|2026-09-28|synced|12
+entry|2026-09-27|synced|12
+entry|2026-09-26|synced|12
+entry|2026-09-25|parked|12
+entry|2026-09-24|synced|12
+docs=1
+  E2CBh1wP94meAuwINnXW4otLmiL1 moves 12 stars 2 recordedAtUtcMs 1790676157034 completedAtUtcMs 1790676152954
+-- proxy (last 3)
+fn-proxy on :5001 -> :5002
+2026-09-29T10:02:16.338Z pass /demo-looplet/us-central1/submitDailyResultV1 upstream 400 b'{"error":{"details":{"code":"INVALID_PAYLOAD"},"message":"moves must be >= 8","status":"INVALID_ARGUMENT"}}'
+2026-09-29T10:02:33.000Z slow /demo-looplet/us-central1/submitDailyResultV1 upstream 200 b'{"result":{"status":"CREATED","recordedAt":1790676157034}}'
+-- app (last 4 sync lines)
+flutter: sync: submitDailyResultV1 failed — invalid-argument: moves must be >= 8
+flutter: debug-sync: manual drain done
+flutter: debug-sync: produced 2026-09-24 → DailyCompletionOutcome.firstRun
+flutter: debug-sync: drain after produce 2026-09-24 done
+== L2a 2026-09-29T10:03:11Z proxy=down, produce 2026-09-30
+queue|7|pending|1|1790676250106
+== L2b 2026-09-29T10:04:20Z HOME pressed (paused) with proxy=down
+2026-09-29T10:03:08.721Z down /demo-looplet/us-central1/submitDailyResultV1 -> closed without forwarding
+2026-09-29T10:04:12.760Z down /demo-looplet/us-central1/submitDailyResultV1 -> closed without forwarding
+queue|7|pending|2|1790676353774
+pid 87934
+-- foreground at 2026-09-29T10:05:56Z
+== L2c resumed (same process)
+2026-09-29T10:05:57.113Z pass /demo-looplet/us-central1/submitDailyResultV1 upstream 200 b'{"result":{"status":"CREATED","recordedAt":1790676357177}}'
+queue|7|synced|2
+entry|2026-09-30|synced
+docs=1
+  E2CBh1wP94meAuwINnXW4otLmiL1 moves 12 stars 2 recordedAtUtcMs 1790676357177 completedAtUtcMs 1790676188660
+pid 87934 (start 87934)
+before|5|parked|1|0
+== P1 relaunch: parked-item revival 2026-09-29T10:06:21Z
+after|5|parked|1|1|nonRetryable
+2026-09-29T10:06:16.147Z pass /demo-looplet/us-central1/submitDailyResultV1 upstream 400 b'{"error":{"details":{"code":"INVALID_PAYLOAD"},"message":"moves must be >= 8","status":"INVALID_ARGUMENT"}}'
+docs=0

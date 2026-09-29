@@ -1,0 +1,21 @@
+--- QJ2 2026-09-29T09:51:45Z store path is a directory
+total 8
+drwxr-xr-x  4 eyupcandabakoglu  staff  128 Sep 29 12:51 .
+drwxr-xr-x@ 7 eyupcandabakoglu  staff  224 Sep 29 12:44 ..
+drwxr-xr-x@ 2 eyupcandabakoglu  staff   64 Sep 29 12:51 looplet.sqlite
+-rw-r--r--@ 1 eyupcandabakoglu  staff  392 Sep 29 12:51 looplet.sqlite.corrupt-1790675487371
+--- after Retry with the cause present 2026-09-29T09:52:07Z
+total 8
+drwxr-xr-x  4 eyupcandabakoglu  staff  128 Sep 29 12:51 .
+drwxr-xr-x@ 7 eyupcandabakoglu  staff  224 Sep 29 12:44 ..
+drwxr-xr-x@ 2 eyupcandabakoglu  staff   64 Sep 29 12:51 looplet.sqlite
+-rw-r--r--@ 1 eyupcandabakoglu  staff  392 Sep 29 12:51 looplet.sqlite.corrupt-1790675487371
+--- directory removed 2026-09-29T09:52:07Z
+pid before 84160 after 84160
+--- after Retry, cause removed 2026-09-29T09:52:21Z
+total 176
+drwxr-xr-x  4 eyupcandabakoglu  staff    128 Sep 29 12:52 .
+drwxr-xr-x@ 7 eyupcandabakoglu  staff    224 Sep 29 12:44 ..
+-rw-r--r--  1 eyupcandabakoglu  staff  86016 Sep 29 12:52 looplet.sqlite
+-rw-r--r--@ 1 eyupcandabakoglu  staff    392 Sep 29 12:51 looplet.sqlite.corrupt-1790675487371
+563bcbe9-0c44-4849-a386-18f353eb0c96

@@ -10,24 +10,24 @@ In QA
 
 ## Current Owner
 
-QA
+Tech Lead
 
 ## Next Role
 
-QA
+Tech Lead
 
 ## Active Task Ledger
 
 - [x] Task ID: F08-FE13 | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: Close the unreadable-DB gap (Resilience row, AC8: classify, quarantine + recreate, `db_reinitialized`, loop guard), make Retry reopen the database connection (F08-RETRY-STORE-CONNECTION), add the debug-only emulator wiring and fake-producer trigger, and the storage-full fault-injection harness (architecture Activation A1–A4). Brief: Current Brief | Depends On: -
 - [x] Task ID: F08-LOCAL-EVIDENCE | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: On the F08-FE13 build, capture the local evidence of architecture Activation A4 — resume fidelity incl. restart / thaw / tamper; exactly-once and lifecycle against the Firebase emulator; the emulator rules / callable suite; storage-full; the unreadable-DB runtime; the production-shaped cold boot; offline Journey only on a real no-network runtime. No deploy; no product-semantics change. Brief: Current Brief | Depends On: F08-FE13
 - [x] Task ID: F08-BE6 | Assigned Role: Backend Developer | Status: Done | Summary: Fix the contract-invalid fixture in `infra/functions/test/submitDailyResult.test.ts` "ALREADY_SUBMITTED on a repeat" (`moves` 8 < `optimalMoves` 9), keep its first-run-authoritative assertions, prove them with a named negative run, and re-run the emulator suite green on Java 21 (architecture Activation A6 ruling 6). Test code only. Brief: Current Brief | Depends On: -
-- [ ] Task ID: F08-QA-FUNCTIONAL | Assigned Role: QA | Status: Open | Summary: Independently review and re-run the local / emulator / boot evidence under the locked plan (architecture Activation A7), keep unresolved scenarios, then issue the functional-stage verdict | Depends On: F08-LOCAL-EVIDENCE, F08-BE6
+- [x] Task ID: F08-QA-FUNCTIONAL | Assigned Role: QA | Status: Done | Summary: DONE 2026-09-29 — verdict **Decision Pending** (qa.md § F08-QA-FUNCTIONAL; functional, end-to-end, HEAD 84430c9, `app/` 9de12e6a…). All in-scope journeys and misuse checks PASS; F1 (rules allow a direct client create that bypasses callable validation — authority conflict in the locked Firebase Sync Surface) needs a Tech Lead decision; F08.OFFLINE-JOURNEY (AC2) PENDING. Evidence: qa/functional/ | Depends On: F08-LOCAL-EVIDENCE, F08-BE6
 - [ ] Task ID: F08-DEVOPS | Assigned Role: DevOps/Release Engineer | Status: Blocked | Summary: Resume release readiness only after explicit billing/target approval; retain runbook and remaining smoke; the existing CI emulator step (F08-BE5) must run on Java 21 and show a real green run (CI-EMULATOR-JAVA21; architecture A8 ruling 3) | Depends On: F08-QA-FUNCTIONAL
 - [ ] Task ID: F08-QA-FINAL | Assigned Role: QA | Status: Queued | Summary: Final acceptance of reviewed release proof and any affected functional scope | Depends On: F08-DEVOPS
 
 ## Open Tasks
 
-* F08-QA-FUNCTIONAL (QA) — Open; brief: Current Brief; plan: architecture → Activation A7, corrected by A8.
+* None open for a delivery role — F08-QA-FUNCTIONAL returned Decision Pending (qa.md); the Tech Lead resolves F1 and routes.
 
 ## Handoff Plan
 
@@ -59,7 +59,7 @@ functional
 
 ## QA Result
 
-None
+Decision Pending
 
 ## Release Scope
 
@@ -95,11 +95,12 @@ None
   * Prerequisite / External Decision: JDK/emulator tooling — **present 2026-09-29** (OpenJDK 21 keg-only, first on `PATH`; firebase-tools 15.29; the command in setup-manifest.md, project `demo-looplet`); client ↔ emulator runs use the F08-FE13 debug wiring (delivered). No Blaze upgrade/real deploy required
   * Re-evaluation Trigger: Evidence captured or existing evidence reviewed against the current scope
   * Blocks: F08 functional acceptance
-  * Result: PENDING
+  * Result: PASS
   * Delivery Evidence: 2026-09-29 (LE-03, LE-04): suite 30/31 — one backend test sends an invalid payload (frontend.md F08-FE13 §16.1); client ↔ emulator cases A–E. Tooling: firebase-tools 15.29 needs JDK 21 (installed, not linked).
   * Tech Lead 2026-09-29 (A6 ruling 6): the red test is a fixture defect (handler correct) → F08-BE6; the suite must be green before QA. Canonical command with Java 21: setup-manifest.md → Canonical Verification Commands.
   * Delivery Evidence (F08-BE6, 2026-09-29, HEAD b8e37ab + the fixed test): suite **31 / 31**, exit 0 (`evidence/runtime/BE6-02-fixed-suite.log.txt`); N-OVERWRITE caught (`BE6-04-neg.log.txt`). Java 21 must be on PATH, not only `JAVA_HOME` (backend.md F08-BE6 §14.1). QA review pending.
   * Tech Lead 2026-09-29 (A8): BE6 accepted; Tech Lead re-run at c70527a 31 / 31, exit 0 (not a QA claim); setup-manifest command corrected. The CI emulator step has never run (CI-EMULATOR-JAVA21) — not a source for this record.
+  * QA 2026-09-29 (F08-QA-FUNCTIONAL): suite 31 / 31 exit 0 (QB-03), N-OVERWRITE caught (QB-04), client ↔ emulator cases A–E + invalid payload → parked (QE-*); create-only, auth isolation and idempotency PASS. Separate finding F1 (direct client create bypasses validation) — qa.md §3.
 
 - Evidence ID: F08.LOCAL-RESUME
   * Scenario: Kill/relaunch exact restore, undo/restart/thaw state and untrusted cached thaw re-derivation
@@ -109,8 +110,9 @@ None
   * Prerequisite / External Decision: Runtime target; no paid backend required
   * Re-evaluation Trigger: Evidence captured or existing evidence reviewed against the current scope
   * Blocks: F08 functional acceptance; F03/F05 shared persistence
-  * Result: PENDING
+  * Result: PASS
   * Delivery Evidence: 2026-09-29 (LE-02): level 21 moves + restart + undo + thaw, kill / relaunch exact; tampered thaw re-derived.
+  * QA 2026-09-29: level 21 restart + moves + undo + thaw → kill → relaunch, byte-identical snapshot and exact screen; tampered thaw re-derived; undo after restore (QJ4).
 
 - Evidence ID: F08.LIFECYCLE
   * Scenario: Session-owned sync survives screen disposal; pause/resume and connectivity regain drain correctly
@@ -120,8 +122,9 @@ None
   * Prerequisite / External Decision: Runtime target and isolated integration setup, not production billing
   * Re-evaluation Trigger: Evidence captured or existing evidence reviewed against the current scope
   * Blocks: F08 functional acceptance
-  * Result: PENDING
+  * Result: PASS
   * Delivery Evidence: 2026-09-29 (LE-05): screen disposed mid-sync, paused / resumed drains; connectivity regain automated only (+ N-REGAIN).
+  * QA 2026-09-29: screen dispose mid-sync → doc arrives (QL1); paused and resumed each drain, same process (QL2); connectivity regain automated + N-REGAIN (the simulator cannot toggle it).
 
 - Evidence ID: F08.OFFLINE-JOURNEY
   * Scenario: Offline Journey through actual F03/F05 screens and persisted state
@@ -133,6 +136,7 @@ None
   * Blocks: F08/F05 functional acceptance
   * Result: PENDING
   * Delivery Evidence: Not run 2026-09-29: user runtime needed; `evidence/offline-journey.sh` prepared for the user.
+  * QA 2026-09-29: not run — needs the user's no-network run (`evidence/offline-journey.sh`); simulated offline does not replace it.
 
 - Evidence ID: F08.STORAGE
   * Scenario: AC7 storage-full/disk-write-failure remains non-destructive and keeps last-good state
@@ -163,8 +167,9 @@ None
   * Prerequisite / External Decision: Review provenance/applicable revision; re-run only missing or invalidated scope
   * Re-evaluation Trigger: Evidence captured or existing evidence reviewed against the current scope
   * Blocks: F08 functional acceptance and shared app startup
-  * Result: PENDING
+  * Result: PASS
   * Delivery Evidence: 2026-09-29 (LE-07): FE13 final build, empty + existing store, no light frame.
+  * QA 2026-09-29: fresh production-shaped cold boots at `9de12e6a…`, empty (max luma 22.2) and existing store (24.6), no light frame, no init error (QJ7).
 
 - Evidence ID: F08.UNREADABLE-DB
   * Scenario: AC8 / the Resilience row — an unreadable store file (NOTADB / CORRUPT) on launch → quarantine, recreate, `db_reinitialized` log, Home "new", no error loop; a migration failure still → the store-error screen with data intact; a recreate failure → the error screen, no second recreate
@@ -174,8 +179,9 @@ None
   * Prerequisite / External Decision: F08-FE13
   * Re-evaluation Trigger: F08-FE13 delivery; F08-QA-FUNCTIONAL
   * Blocks: F08 functional acceptance
-  * Result: PENDING
+  * Result: PASS
   * Delivery Evidence: complete 2026-09-29: runtime LE-01 / LE-01c / LE-01d + automated tests + N-CLASS / N-LOOP / N-RETRY / N-QUAR (frontend.md → F08-LOCAL-EVIDENCE)
+  * QA 2026-09-29: NOTADB → quarantine + recreate + `db_reinitialized`, newest quarantine only (QJ1); CANTOPEN → error → Retry → Home without relaunch (QJ2); migration failure + loop guard automated with N-TXN / N-LOOP / N-CLASS / N-QUAR caught (QA-03).
 
 ## Open Decision Gates
 
@@ -189,11 +195,11 @@ None
 
 ## Blockers
 
-None
+* F1 (qa.md § F08-QA-FUNCTIONAL §3) — authority conflict: the locked Rules row allows a direct client create, while the same section calls the document server-written and rejects direct writes. Needs a Tech Lead decision before the backend fix and a QA re-run.
 
 ## Next Action
 
-Run QA — F08-QA-FUNCTIONAL (Current Brief; plan architecture → Activation A7, corrected by A8). Functional stage only. F08.OFFLINE-JOURNEY stays PENDING unless the user has run `evidence/offline-journey.sh` on a real no-network runtime. The release stage stays blocked (F08.DEPLOY-AUTHORIZATION OPEN); no deployment or billing action.
+Run Tech Lead — reconcile F08-QA-FUNCTIONAL (Decision Pending): decide F1 (Firestore rules vs the server-written / direct-write-rejected contract; qa.md § F08-QA-FUNCTIONAL §3), route the fix, and keep F08.OFFLINE-JOURNEY PENDING for the user's no-network run.
 
 ## Last Decision
 
@@ -217,9 +223,9 @@ The pre-checkpoint orchestration is archived as history/f08-offline-persistence-
 
 ## Last Update
 
-* Updated By: Tech Lead
+* Updated By: QA
 * Timestamp: 2026-09-29
-* Summary: F08-BE6 checkpoint — BE6 accepted, Delivery Review Accepted, the Java 21 command corrected, CI-EMULATOR-JAVA21 recorded; F08-QA-FUNCTIONAL activated; owner → QA.
+* Summary: F08-QA-FUNCTIONAL Done — verdict Decision Pending (F1 authority conflict on the Firestore rules); every other in-scope scenario PASS; F08.OFFLINE-JOURNEY PENDING; owner → Tech Lead.
 
 ## Context & Follow-ups
 
@@ -255,6 +261,7 @@ F08 implementation/runbook and the F08-FE12 fix are retained. Exact old tasks an
   * **Corrected:** the Java 21 command (setup-manifest); A6 ruling 5's CI premise → CI-EMULATOR-JAVA21 (DevOps/Release Engineer, non-blocking).
   * **Activated:** F08-QA-FUNCTIONAL (A7).
   * **Next:** owner → QA.
+* 2026-09-29 — QA: F08-QA-FUNCTIONAL Done — **Decision Pending** (qa.md). PASS: F08.EMULATOR, LOCAL-RESUME, LIFECYCLE, COLD-BOOT-REVIEW, UNREADABLE-DB; PENDING: OFFLINE-JOURNEY. F1: the rules allow a direct client create that bypasses validation (authority conflict). Owner → Tech Lead.
 
 
 ## Release Constraints

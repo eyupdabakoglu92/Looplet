@@ -1,0 +1,4 @@
+keychain reset 2026-09-29T09:55:10Z
+wiped /Users/eyupcandabakoglu/Library/Developer/CoreSimulator/Devices/D0011CE7-6E50-4367-93FA-B323E81270BE/data/Containers/Data/Application/639B3A1B-90A6-48C7-8F08-CAFC847EB425/Documents/looplet.sqlite
+47f19ce4-900b-4d13-a8b3-a2ac87d4d96f|E2CBh1wP94meAuwINnXW4otLmiL1
+auth emulator users 1 ['E2CBh1wP94meAuwINnXW4otLmiL1']

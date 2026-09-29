@@ -1,0 +1,24 @@
+2026-09-29T09:50:58Z
+--- before
+total 168
+drwxr-xr-x  3 eyupcandabakoglu  staff     96 Sep 29 12:50 .
+drwxr-xr-x@ 7 eyupcandabakoglu  staff    224 Sep 29 12:44 ..
+-rw-r--r--@ 1 eyupcandabakoglu  staff  86016 Sep 29 12:50 looplet.sqlite
+d1a53e7b-ece1-433a-a5f7-4b1dc83aaac7
+corrupted /Users/eyupcandabakoglu/Library/Developer/CoreSimulator/Devices/D0011CE7-6E50-4367-93FA-B323E81270BE/data/Containers/Data/Application/837E140B-9146-48B1-9665-CD08D910181B/Documents/looplet.sqlite
+--- after first corruption
+total 176
+drwxr-xr-x  4 eyupcandabakoglu  staff    128 Sep 29 12:51 .
+drwxr-xr-x@ 7 eyupcandabakoglu  staff    224 Sep 29 12:44 ..
+-rw-r--r--  1 eyupcandabakoglu  staff  86016 Sep 29 12:51 looplet.sqlite
+-rw-r--r--@ 1 eyupcandabakoglu  staff    392 Sep 29 12:50 looplet.sqlite.corrupt-1790675462654
+176f4ab0-da8b-436d-bb0f-ec88e75972e7
+176f4ab0-da8b-436d-bb0f-ec88e75972e7|1|
+0
+--- after second corruption 2026-09-29T09:51:35Z
+total 176
+drwxr-xr-x  4 eyupcandabakoglu  staff    128 Sep 29 12:51 .
+drwxr-xr-x@ 7 eyupcandabakoglu  staff    224 Sep 29 12:44 ..
+-rw-r--r--  1 eyupcandabakoglu  staff  86016 Sep 29 12:51 looplet.sqlite
+-rw-r--r--@ 1 eyupcandabakoglu  staff    392 Sep 29 12:51 looplet.sqlite.corrupt-1790675487371
+98e826a2-dc8b-4b7d-b389-af387ca6794b
