@@ -200,6 +200,8 @@ The DURUM 0 seeds the kill-switch keys `release.md` §6 requires: `daily_enabled
 
 `DailyPuzzleCache`: `put(lang, dailyDate, Puzzle)`, `get(lang, dailyDate) → Puzzle?`, `evictOlderThan(days)`. F08 owns the `daily_puzzle_cache` table + this interface. **[OPEN — F07]:** when to populate, fetch cadence, retention-days value, eviction schedule.
 
+* **Cross-feature note (F07 `architecture.md` A1 ruling 1, 2026-09-29):** F07 stores the pack's day envelope `{"dailyNumber": N, "puzzle": {…}}` in `puzzle_json` so an offline day keeps its number. The schema and the `DailyPuzzleCache` signatures (`puzzleJson` text) are unchanged; F07 is the only reader. F07 D3 resolves the `[OPEN — F07]` items above.
+
 ---
 
 ## Ownership & Lifecycle [LOCKED]

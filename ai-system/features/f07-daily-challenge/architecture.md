@@ -231,6 +231,85 @@
 
 * **[OPEN — F07 release gate, Tech Lead + DevOps]** the production pack host and its plan / billing needs.
 * **[OPEN — Product Owner, optional]** AC7's Share wording (prd Open Questions (1)).
-* **[OPEN — decision gate, later]**
-  * F07.DIRECTION-SELECT — the user picks the rendered direction; opened when F07-UI delivers;
-  * F07.DAILY-POOL-SIGNOFF — the user signs off the pool; opened when F07-CONTENT delivers.
+* ~~F07.DIRECTION-SELECT~~ — RESOLVED 2026-09-29: Direction A (A2).
+* **[OPEN — decision gate, later]** F07.DAILY-POOL-SIGNOFF — the user signs off the pool; opened when F07-CONTENT delivers.
+
+---
+
+## A1. F07-UI visual-gate checkpoint (Tech Lead, 2026-09-29)
+
+**Reconciliation of F07-UI** (`ui-design.md`, renders in `design/`, sources `design/src/gen-f07.mjs`):
+
+* **Task coverage:** every Current Brief item is delivered.
+  * Two materially different directions on identical content — A "Hafta döngüsü" (the streak drawn as the last seven days in the loop-track language) and B "Günün bileti" (a typographic ticket, a one-line capsule entry). Each covers the Home entry (available, done), `/daily` (ready, needsConnection) and the result (first run 5 / best 12, replay). They differ in composition, entry form, hero and streak object, not in colour.
+  * The full state set for the recommended A: Home entry available / done / needs connection / loading / streak 0 / hidden; `/daily` loading / ready / doneToday / needsConnection / unavailable, pressed, focus; the Play header; the result (first run, replay, 0 → 1 Perfect with best kept, pressed); the Share place; iPhone 16 / 16e / Pro Max; 1.3× and AX5; motion stills with the reduced path.
+  * The screen / state / viewport matrix, components, typography, colour, motion, the strings table and the Visual Evidence Manifest are in `ui-design.md` §5–§12b.
+* **Evidence read, not only listed:**
+  * 63 renders + 4 sheets exist in `design/` (counted);
+  * the fit table `design/src/fit-f07.txt` comes from each page's own check script;
+  * its negative case is recorded: a stacked Share pill overflowed by 28–30 pt at 1.3×, and the slot was moved into the primary row.
+  * Limits stated in the handoff: HTML/CSS renders (not Flutter), no runtime, iOS frames only.
+* **Contract compliance:**
+  * D3 states: all five, plus the Home mapping ruled below.
+  * D6: the effective streak everywhere.
+  * D7: the Home entry is hidden when `daily_enabled == false`.
+  * D8: a secondary entry, with **one lime CTA on Home**; `/daily` back → Home; the result → `/daily` or replay in place; no Next; no Share control; calm needsConnection / unavailable; no raw error text; Turkish copy through a strings table.
+  * C-9: container text capped at 1.3×, free text to AX5.
+* **Self-score:** 94 for A, lowest dimension 9. It is provisional — QA scores the runtime.
+* **Delivery Review:** Accepted.
+
+**Rulings on `ui-design.md` §14:**
+
+1. **NTLC-1 — `#N` offline → option (a).**
+   * F07 stores the pack's **day envelope**, `{"dailyNumber": N, "puzzle": { …the Puzzle JSON… }}`, in `daily_puzzle_cache.puzzle_json`.
+   * F08's schema and `DailyPuzzleCache` signatures are unchanged: the column is text, and F07 is its only reader (`put` / `get` have no other production caller, checked 2026-09-29).
+   * D3 population and D4 restore read the envelope. `dailyNumber` must equal D2 (2)'s numbering, and a row that fails to parse counts as absent (D4: a discarded snapshot → Home).
+   * Recorded as a cross-feature note in F08 `architecture.md` (Offline Daily Cache).
+   * Surfaces show `#N` only when today's day is known (ready, doneToday, the Play header of a cached day). loading / needsConnection / unavailable show `GÜNLÜK` without a number.
+2. **NTLC-2 — the Home entry mapping (amends D8's state list):**
+   * available / done today / needs connection as designed;
+   * `loading` (a fetch in flight, nothing cached) → the quiet "Hazırlanıyor" entry, still tappable;
+   * **`unavailable` for any reason → hidden** — not only `daily_enabled == false`, but also an empty `daily_manifest_url`, no pack entry for today, or an invalid pack;
+   * a deep-linked or restored `/daily` still shows `unavailable`.
+3. **NTLC-3 — the Share place:**
+   * D8's "the layout reserves its place" means a **zero-height slot at the right end of the result's primary row** (63·s round, 10·s gap). F07 draws nothing there.
+   * The 1.3× no-scroll fit is proven with the slot counted (`F07-A-42`, `F07-A-v-16e-result-share-slot-budget-cap-1_3`).
+   * F13 inherits the slot, or brings its own fit proof under the same rule.
+4. **NTLC-4 — Home at AX5 scrolls (direction A):**
+   * **Accepted, as a cross-feature amendment of F05 §18.3 (6)'s AX5 outcome.** With the entry, Home is a clamped scroll view **only above the 1.3× cap**. It needs no scroll up to the cap on 390–440 pt widths (≥ 29 pt spare, measured).
+   * At offset 0, the wordmark, the Journey card, the CTA and the caption stay fully visible. The D2 `ScrollBand` appears only once scrolled. The entrance lands at offset 0.
+   * With the entry hidden, Home is exactly F05 D3 (no scroll at AX5).
+   * If B is selected, this ruling is re-measured before implementation. Recorded in F05 `architecture.md` §18.10.
+5. **NTLC-5 — the daily result layout (amends F03 §20.3 (4) / (10) for daily sessions only):**
+   * a one-line headline;
+   * the stars inside the stats card (`HAMLE · SÜRE · YILDIZ`), with the D2 star pop in the cell at the same times;
+   * `OPTİMAL` moved into the subtitle;
+   * no `EN İYİ` stat — a daily writes no personal best (Dependency Edges, F04);
+   * the replay's official row;
+   * the streak card;
+   * the chip precedence `TEKRAR` > `HARİKA` > `RESMÎ SONUÇ` (`YENİ EN İYİ` does not apply).
+   * The §20.3 (1)–(3) win timeline, input lock, lifecycle and reduced path, and the retry flight, are **unchanged**.
+   * The A streak reveal (1300–1440 ms) is a rest-state reveal after input unlocks, like the stars.
+   * Journey results are unchanged.
+6. **Design-layer additions (no token change): accepted.**
+   * `WeekTrack`, `DailyEntryCard` and the official row;
+   * the `LoopNode` states `missed` / `todayDone` / `todayOffline` and a size parameter;
+   * `StatCell` icon and stars cells; `LimePill` / `OutlinePill` icon slots;
+   * the drawn icons `check` and `offline`.
+   * The week data comes from seven `DailyRepo.firstRun` reads (no F08 API change).
+
+**Gate:** Foundation Selected, exploration and handoff complete → **Visual Quality Gate stays Pending until the selection is recorded** (`visual-quality-gate.md` §3). F07.DIRECTION-SELECT is opened for the user. If B is chosen, the UI Designer re-issues §3–§12b for B (a new F07-UI-B task) before F07-FE.
+
+**Routing:** the feature waits on F07.DIRECTION-SELECT (a feature-scoped gate parks delivery). F07-TOOL is briefed and is activated at the decision intake; F07-FE follows F07-TOOL and the selection.
+
+---
+
+## A2. Decision F07.DIRECTION-SELECT — A (the user, 2026-09-29)
+
+* **Selected:** Direction A "Hafta döngüsü" (`ui-design.md` §2, recommended). Selection authority: the user, through this decision gate. B "Günün bileti" is not built.
+* **Consequences:**
+  * The `F07-A-*` renders are the **selected source** for F07-FE's Visual Parity Evidence and for QA.
+  * The A1 rulings apply as written, including ruling 4: Home scrolls above the 1.3× cap when the entry is shown.
+  * **Visual Quality Gate → Ready for Implementation:** the Foundation is Selected; the exploration, handoff and selection record are complete.
+* **Routing:** F07-TOOL is activated (Frontend/Mobile Developer, the Current Brief). F07-FE follows F07-TOOL through the Tech Lead reconciliation. The selection no longer blocks anything.
+* Nothing else in the contract changes.

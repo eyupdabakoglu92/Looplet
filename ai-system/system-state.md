@@ -40,31 +40,28 @@ features/f07-daily-challenge/orchestration.md
 
 ## Current Phase
 
-F07 — F07-UI (the Daily surfaces: rendered directions + handoff). F08 paused (A21).
+F07 — F07-TOOL (the daily pack tooling). Direction A selected (A2); Visual Quality Gate Ready for Implementation. F08 paused (A21).
 
 ## Current Role
 
-UI Designer
+Frontend/Mobile Developer
 
 ## Current Reason
 
-**The user decided F08.FUNCTION-DEPLOY-GO — C** on 2026-09-29 (F08 `architecture.md` A21).
+**The user decided F07.DIRECTION-SELECT — A** on 2026-09-29 (F07 `architecture.md` A2).
 
-* **The first Firebase deploy stays deferred;** F08 is paused with everything kept. It resumes on `Run Tech Lead. Decision: F08.DEPLOY-RESUME — A`.
-* **F07 (daily-challenge) is active** on the emulator, under a dependency ruling: it builds on F08's Functional Approved client surface, and **its release waits on F08's deploy**.
-* **F07 contract** (`architecture.md` D1–D11): a daily pack behind Remote Config `daily_manifest_url`; cache for today + 7 days; the start date wins across midnight; a transactional first run with the streak and one sync item; the kill-switch; a secondary Home entry; no Share in F07 (F13).
-* **Visual Scope `new-surface`,** so the UI Designer goes first: at least two rendered directions, then the user selects.
+* **Direction A "Hafta döngüsü"** (the streak drawn as the last seven days in the loop-track language) is the selected source; B is not built.
+* The A1 checkpoint rulings bind Frontend and QA: `#N` offline via the day envelope in `puzzle_json`; the Home entry mapping; the Share place in the result's primary row; Home scrolls above the 1.3× cap when the entry shows; the daily result layout.
+* **Visual Quality Gate: Ready for Implementation.** F07-TOOL is Open (Frontend/Mobile Developer).
 
 ## Last Completed Action
 
-Tech Lead on 2026-09-29 — **the decision F08.FUNCTION-DEPLOY-GO — C** (F08 A21) and **the F07 activation**.
-* **F08:** gate resolved; paused (Blocked; resume point F08-DEVOPS); F08.DEPLOY-RESUME opened; fake producer kept until F08 Done.
-* **F07:** `prd.md`, `architecture.md` (D1–D11), `orchestration.md`; F07-UI Open; F05 §18.10 cross-feature note; F06-CONTENT-DAILY and F07-KILL-SWITCH brought into the F07 ledger.
-* Archived: history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-function-deploy-decision.md.
+Tech Lead on 2026-09-29 — **the decision F07.DIRECTION-SELECT — A** (A2): the selection recorded (F07 `ui-design.md` pointer), the gate advanced, F07-TOOL activated.
+Before it: the F07-UI checkpoint (A1) — delivery accepted, §14 ruled, the gate opened.
 
 ## Next Expected Action
 
-Run UI Designer on F07-UI (the F07 orchestration Current Brief): at least two rendered directions for the Daily surfaces on the Foundation, then `ui-design.md` with the Visual Evidence Manifest. Then the Tech Lead visual-gate checkpoint, which opens F07.DIRECTION-SELECT for the user.
+Run Frontend/Mobile Developer on F07-TOOL (the F07 orchestration Current Brief). Then the Tech Lead reconciliation, F07-CONTENT (the Turkish pool) and F07-FE (the app, against the `F07-A-*` selected source).
 
 ## Portfolio Summary
 
@@ -74,7 +71,7 @@ Run UI Designer on F07-UI (the F07 orchestration Current Brief): at least two re
 * F05: Done (2026-09-29) — Design Adoption Phase D3 (Home + app shell, `new-surface`, architecture §18) closed: F05-QA-D3 Approved with Notes, 94 / 100, gate Passed (§18.9). The user's N1 decision is live (PO-REV-2026-09-29-F05-CONTINUE). Previously Done 2026-09-27 (F05-QA-STRICT2 Approved with Notes).
 * F04: Done — the panel is now the full-screen result (D2, F03 carrier, closed 2026-09-29; F04 §7 / §8 amended 2026-09-28; ACs unchanged and passed on the result).
 * F08: **Blocked — paused by the user's decision F08.FUNCTION-DEPLOY-GO — C (A21).** **Functional Approved** (R2, A13); PREP accepted with a green CI run #2 (A17); F08-BE8 (Node.js 22) accepted (A18); the rules-only deploy held and cancelled (A20); Release Validation Pending. Resume: F08.DEPLOY-RESUME → F08-DEVOPS → F08-QA-FINAL. Its client contract is frozen for F07. Its `StoreErrorScreen` uses the Foundation (D3).
-* F07: **In Progress — the active feature** (activated 2026-09-29, A21). F07-UI Open (UI Designer); then F07-TOOL, F07-CONTENT (the Turkish pool), F07-FE, F07-QA-FUNCTIONAL; F07-DEVOPS Blocked on F08's deploy.
+* F07: **In Progress — the active feature** (activated 2026-09-29, A21). F07-UI accepted (A1); Direction A selected (A2); **F07-TOOL Open** (Frontend/Mobile Developer); then F07-CONTENT (the Turkish pool), F07-FE, F07-QA-FUNCTIONAL; F07-DEVOPS Blocked on F08's deploy.
 * F09–F13: Not Started. Pending follow-ons are in workflow-follow-ups.md.
 
 ## Release Decision
@@ -100,7 +97,7 @@ Run UI Designer on F07-UI (the F07 orchestration Current Brief): at least two re
   * RESULT-F00-COMPONENT-ALIGN — the `EN İYİ` ★ offset and the pressed-pill brightness.
   * Release-build pacing was not measured (debug video only); it belongs to FIRST-APP-DISTRIBUTION — for the result (D2) and the Home entrance (D3, F05-QA-D3 N1).
 * **Post-D3 follow-ups (non-blocking, in workflow-follow-ups.md):** FIRST-APP-DISTRIBUTION (the profile / release store-error capture, moved from the F05 ledger); F08-RETRY-STORE-CONNECTION (+ the one-frame Retry feedback, N2); RESULT-F00-COMPONENT-ALIGN (+ the `LimePill` arrow at AX5, N3); OPTIONAL-QUALITY-NOTES (N4, N5); RELEASE-SCOPED-EVIDENCE (process).
-* **Commits:** the D1 rework, its closure and the D2 activation are in 489606d — its tracked `app/` diff from 5798c70 hashes to QA's `88f1dca3…` and the two changed sources match QA's SHA-1s (re-verified at the D2 checkpoint); the F03-UI-D2 handoff is in 6352a75; the F03-FE-D2 delivery is in 67d9ecb (`app/` tree `f5641d2f…`, QA's evidence-reuse fingerprint); the F03-QA-D2 verdict is in f28aedb; the reconciliation in 3cd4a3b; the F03-FE-D2R rework in 77c33b9 (`app/` tree `5298c81a…`, the re-QA fingerprint); the F03-QA-D2R verdict in 5677471. The D2 closure and the D3 activation are in 171f0c1; the PO revision in 230ce0c; its resync in 9a36147; the F05-UI-D3 handoff in 981b807; the visual-gate checkpoint in 7c1a946; the F05-FE-D3 delivery in af5aec8 (`app/` `b4ad263e…`, the D3 QA fingerprint); the implementation checkpoint in 078c926; the F05-QA-D3 verdict in e46f384. The D3 closure is in b7493d6. The F08 activation is in 1d373d7; the F08-FE13 / LOCAL-EVIDENCE delivery in beb7bfe (`app/` `9de12e6a…`); the FE13 checkpoint in b8e37ab; the F08-BE6 delivery in c70527a; the BE6 checkpoint in 84430c9; the F08-QA-FUNCTIONAL verdict in d882211; the QA checkpoint (A9) in 8f26243; the F08-BE7 delivery in cb96719; the BE7 checkpoint (A10) in 695f783; the F08-QA-FUNCTIONAL-R1 verdict in 4cb836a; the A11 checkpoint, the offline run and the A12 intake in e55176f; the F08-QA-FUNCTIONAL-R2 verdict in 0d65c73; the A13 checkpoint in 8a0522f — pushed to `origin/main` by the user (CI run #1); the A14–A16 records in 6b31195; the F08-DEVOPS-PREP delivery in c592081 — pushed by the user (CI run #2, green); the A17 checkpoint in ebe59ce; the F08-BE8 delivery in 9f6b6e6 (not pushed). The A18 checkpoint and the A19 intake are in dfccce3; the held F08-DEVOPS-RULES in b2873cc. The A20 checkpoint is in 79d6c2d. The A21 intake and the F07 activation are uncommitted (documents only).
+* **Commits:** the D1 rework, its closure and the D2 activation are in 489606d — its tracked `app/` diff from 5798c70 hashes to QA's `88f1dca3…` and the two changed sources match QA's SHA-1s (re-verified at the D2 checkpoint); the F03-UI-D2 handoff is in 6352a75; the F03-FE-D2 delivery is in 67d9ecb (`app/` tree `f5641d2f…`, QA's evidence-reuse fingerprint); the F03-QA-D2 verdict is in f28aedb; the reconciliation in 3cd4a3b; the F03-FE-D2R rework in 77c33b9 (`app/` tree `5298c81a…`, the re-QA fingerprint); the F03-QA-D2R verdict in 5677471. The D2 closure and the D3 activation are in 171f0c1; the PO revision in 230ce0c; its resync in 9a36147; the F05-UI-D3 handoff in 981b807; the visual-gate checkpoint in 7c1a946; the F05-FE-D3 delivery in af5aec8 (`app/` `b4ad263e…`, the D3 QA fingerprint); the implementation checkpoint in 078c926; the F05-QA-D3 verdict in e46f384. The D3 closure is in b7493d6. The F08 activation is in 1d373d7; the F08-FE13 / LOCAL-EVIDENCE delivery in beb7bfe (`app/` `9de12e6a…`); the FE13 checkpoint in b8e37ab; the F08-BE6 delivery in c70527a; the BE6 checkpoint in 84430c9; the F08-QA-FUNCTIONAL verdict in d882211; the QA checkpoint (A9) in 8f26243; the F08-BE7 delivery in cb96719; the BE7 checkpoint (A10) in 695f783; the F08-QA-FUNCTIONAL-R1 verdict in 4cb836a; the A11 checkpoint, the offline run and the A12 intake in e55176f; the F08-QA-FUNCTIONAL-R2 verdict in 0d65c73; the A13 checkpoint in 8a0522f — pushed to `origin/main` by the user (CI run #1); the A14–A16 records in 6b31195; the F08-DEVOPS-PREP delivery in c592081 — pushed by the user (CI run #2, green); the A17 checkpoint in ebe59ce; the F08-BE8 delivery in 9f6b6e6 (not pushed). The A18 checkpoint and the A19 intake are in dfccce3; the held F08-DEVOPS-RULES in b2873cc. The A20 checkpoint is in 79d6c2d. The A21 intake and the F07 activation are in 642e1d2; the F07-UI delivery is in decde49; the A1 checkpoint and the A2 decision are uncommitted (documents only).
 * **F08 unreadable-DB gap (found 2026-09-29):** fixed in F08-FE13 (beb7bfe) and accepted at the checkpoint; the runtime and automated evidence awaits independent QA (F08.UNREADABLE-DB). The Retry reconnect is delivered too. The one-frame Retry feedback (N2) stays a follow-up.
 * **Migration partial-apply (found by F08-FE13, 2026-09-29):** Drift does not wrap `onUpgrade` in a transaction, so a failing step could leave a partial apply. It is fixed and accepted (F08 A6 ruling 1). The first real schema step must add its own real-file migration test.
 * **Emulator suite (F08-BE6):** was 30 / 31 because of a contract-invalid fixture, not a handler defect; fixed in c70527a and accepted — 31 / 31 on Java 21 (first on `PATH`; setup-manifest).

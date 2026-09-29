@@ -10,27 +10,26 @@ In Progress
 
 ## Current Owner
 
-Frontend/Mobile Developer
+Tech Lead
 
 ## Next Role
 
-Frontend/Mobile Developer
+Tech Lead
 
 ## Active Task Ledger
 
 - [x] Task ID: F07-UI | Assigned Role: UI Designer | Status: Done | Summary: The Daily surfaces on the Selected Foundation (architecture D8): the Home Daily entry (secondary; available / done today / needs connection), the Daily screen states (`loading`, `ready`, `doneToday`, `needsConnection`, `unavailable`), the daily Play header, and the daily result variant (official vs replay; Current + Best Streak; the reserved Share place for F13). At least two materially different rendered directions on identical content, then `ui-design.md` with the screen / state / viewport matrix and a Visual Evidence Manifest. Brief: Current Brief | Depends On: -
-- [ ] Task ID: F07-TOOL | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: The daily pack (architecture D2): a `DailyPack` model in `looplet_content`; `looplet_authoring pack-daily` (manifest + pool → the served `daily_pack_{lang}.json`); `check` extended to every D2 (2) rule with named negative cases; a small dev pack from existing smoke / Journey-shaped definitions for delivery and tests (not product content). Brief: Current Brief | Depends On: -
+- [ ] Task ID: F07-TOOL | Assigned Role: Frontend/Mobile Developer | Status: Queued | Summary: The daily pack (architecture D2): a `DailyPack` model in `looplet_content`; `looplet_authoring pack-daily` (manifest + pool → the served `daily_pack_{lang}.json`); `check` extended to every D2 (2) rule with named negative cases; a small dev pack from existing smoke / Journey-shaped definitions for delivery and tests (not product content) | Depends On: -
 - [ ] Task ID: F07-CONTENT | Assigned Role: Content Designer | Status: Queued | Summary: The Turkish Daily pool (workflow-follow-ups F06-CONTENT-DAILY): about 60 solved daily puzzles under `content/daily/tr/pool/`, `daily_manifest_tr.json` (numbering epoch + assignments, 30-day no-repeat), `content-design.md`; `check` + `pack-daily` exit 0. Opens the sign-off gate F07.DAILY-POOL-SIGNOFF on delivery | Depends On: F07-TOOL
-- [ ] Task ID: F07-FE | Assigned Role: Frontend/Mobile Developer | Status: Queued | Summary: The app (architecture D3–D8): `DailyContentSource` + the debug pack override; cache population / prefetch / eviction; the D3 states; D4 dates and rollover; D5 transactional completion (entry + streak + enqueue); D6 streak; D7 Remote Config + kill-switch (`firebase_remote_config`, `http`); `/daily`, the Home entry, the daily Play header and result per `ui-design.md`; tests + named negatives; Visual Parity Evidence against the selected Direction A (`F07-A-*`); emulator sync evidence; architecture A1 rulings | Depends On: F07-UI, F07-TOOL
+- [ ] Task ID: F07-FE | Assigned Role: Frontend/Mobile Developer | Status: Queued | Summary: The app (architecture D3–D8): `DailyContentSource` + the debug pack override; cache population / prefetch / eviction; the D3 states; D4 dates and rollover; D5 transactional completion (entry + streak + enqueue); D6 streak; D7 Remote Config + kill-switch (`firebase_remote_config`, `http`); `/daily`, the Home entry, the daily Play header and result per `ui-design.md`; tests + named negatives; Visual Parity Evidence; emulator sync evidence | Depends On: F07-UI, F07-TOOL
 - [ ] Task ID: F07-QA-FUNCTIONAL | Assigned Role: QA | Status: Queued | Summary: Functional + visual QA on the emulator and the canonical simulator (architecture D10); the plan is locked at activation | Depends On: F07-FE, F07-CONTENT
 - [ ] Task ID: F07-DEVOPS | Assigned Role: DevOps/Release Engineer | Status: Blocked | Summary: F07's release (architecture D11): pack hosting, publishing `daily_manifest_url`, rollback by repointing, the release smoke. Blocked on F08's deploy (F08.DEPLOY-RESUME → F08-DEVOPS) and F07's functional QA | Depends On: F07-QA-FUNCTIONAL
 - [ ] Task ID: F07-QA-FINAL | Assigned Role: QA | Status: Queued | Summary: Final acceptance of the release proof and any affected functional scope | Depends On: F07-DEVOPS
 
 ## Open Tasks
 
-* **F07-TOOL — Open** (Frontend/Mobile Developer): the daily pack model, `pack-daily`, `check` for D2 (2), a dev pack (Current Brief).
-* F07-UI — Done, accepted at A1; **Direction A selected** by the user (A2).
-* Queued: F07-CONTENT (after F07-TOOL), F07-FE (after F07-TOOL), F07-QA-FUNCTIONAL, F07-QA-FINAL. Blocked: F07-DEVOPS (F08's deploy).
+* **F07-UI — Done** (UI Designer, 2026-09-29): `ui-design.md` + renders in `design/`; directions A (recommended) and B; Pending Selection (F07.DIRECTION-SELECT, to be opened by the Tech Lead). Awaits the Tech Lead visual-gate checkpoint.
+* Queued: F07-TOOL, F07-CONTENT, F07-FE, F07-QA-FUNCTIONAL, F07-QA-FINAL. Blocked: F07-DEVOPS (F08's deploy).
 
 ## Handoff Plan
 
@@ -38,7 +37,7 @@ None
 
 ## Delivery Review
 
-Accepted
+Pending
 
 ## QA Scope
 
@@ -82,7 +81,7 @@ ai-system/project-authority/design-foundation.md
 
 ## Visual Quality Gate
 
-Ready for Implementation
+Pending
 
 ## Visual Evidence
 
@@ -90,7 +89,7 @@ F07-UI delivery (UI Designer, 2026-09-29) — `ui-design.md` §12b manifest; all
 * direction renders: A `F07-A-01 … 06`, B `F07-B-01 … 06`; side by side `F07-sheet-1-directions-A-vs-B.png`;
 * A candidate state set, Play header, result, text scale / devices, motion stills: `F07-A-*`, sheets 2–4;
 * sources, fit and contrast: `design/src/gen-f07.mjs`, `fit-f07.txt`, `contrast-f07.txt`.
-Verified at A1 (renders counted, fit table read with its negative case). **Selected: Direction A** (the user, F07.DIRECTION-SELECT — A, A2): the `F07-A-*` renders are the selected source.
+Not selected yet; the gate value is the Tech Lead's.
 
 ## Pending Evidence
 
@@ -146,15 +145,7 @@ Verified at A1 (renders counted, fit table read with its negative case). **Selec
 
 ## Open Decision Gates
 
-- Decision ID: F07.DIRECTION-SELECT
-  * Question: Günlük (Daily) ekranları hangi yönle yapılsın? Görsel karşılaştırma: `features/f07-daily-challenge/design/F07-sheet-1-directions-A-vs-B.png` (üst sıra A, alt sıra B; aynı içerik).
-  * Options / Trade-offs: (A) "Hafta döngüsü" — seri, Ana ekrandaki döngü izinin diliyle son 7 gün olarak çizilir; kaçırılan gün zincirde boşluk olarak görünür; Ana ekran girişi üç satırlık bir kart (AX5'te Ana ekran kaydırılır — A1 ruling 4). (B) "Günün bileti" — büyük `#34` numaralı bilet, delikli koçan ve "BUGÜN TAMAM" damgası; Ana ekran girişi tek satırlık kapsül; seri yalnız sayılarla gösterilir. B seçilirse UI Designer tüm durum setini B için yeniden üretir (F07-FE bir tur gecikir).
-  * Recommendation: (A) — ürünün imza motifini günlük alışkanlığa taşır; seri bir şekil olarak okunur (UI Designer self-score 94, B ≈ 90; provisional)
-  * Blocks: F07-FE (the implementation and its Visual Parity Evidence); not F07-TOOL or F07-CONTENT
-  * Blocking Scope: feature
-  * Status: RESOLVED
-  * Resolution: Option (A) by the user — Direction A "Hafta döngüsü"; Visual Quality Gate → Ready for Implementation; F07-TOOL activated (architecture A2)
-  * Resolved At: 2026-09-29
+None
 
 ## Blockers
 
@@ -162,21 +153,22 @@ None
 
 ## Next Action
 
-Run Frontend/Mobile Developer — F07-TOOL (Current Brief): the `DailyPack` model, `looplet_authoring pack-daily`, `check` over every D2 (2) rule with named negatives, and a dev pack. Then close F07-TOOL; owner → Tech Lead (reconciliation; then F07-CONTENT and F07-FE).
+Run Tech Lead — the F07-UI visual-gate checkpoint: review `ui-design.md` (directions A / B, recommendation A), rule on its §14 items (NTLC-1 `#N` offline — a contract gap; NTLC-2 Home entry mapping; NTLC-3 the Share place; NTLC-4 Home scroll at AX5; NTLC-5 result deviations from D2), then open F07.DIRECTION-SELECT for the user.
 
 ## Last Decision
 
-2026-09-29 — Decision F07.DIRECTION-SELECT — A (the user; architecture A2).
+2026-09-29 — Tech Lead activation of F07 after the user's decision F08.FUNCTION-DEPLOY-GO — C (F08 `architecture.md` A21).
 
-* **Direction A "Hafta döngüsü" selected;** B is not built. The `F07-A-*` renders are the selected source; the A1 checkpoint rulings bind Frontend and QA.
-* **Visual Quality Gate → Ready for Implementation.**
-* **Routing:** F07-TOOL Open (Frontend/Mobile Developer); F07-FE follows after the F07-TOOL reconciliation.
+* **Dependency ruling:** F07 builds on F08's Functional Approved client surface; F07's release waits on F08's deployed callable (F08.DEPLOY-RESUME).
+* **Contract:** architecture D1–D11 — the pack format and Remote Config pointer, fetch / cache / eviction, dates and rollover (the start date wins), the transactional first run, the streak rule, the kill-switch, the surfaces and routes (a secondary Home entry; no Share in F07), validation, evidence and release.
+* **Scope:** Visual Scope `new-surface` → UI Designer first; Release Scope `production-readiness`; AC7's Share part carried by F13 AC1 (Assumption, prd Open Questions (1)).
+* **Brought in from workflow-follow-ups:** F06-CONTENT-DAILY (F07-CONTENT), F07-KILL-SWITCH (D7), SHARED-PERSISTENCE-PROOF's F07.OFFLINE-DAILY, and the daily-streak chip of USER-REFERENCE-CONTENT-DELTAS (a proposal the UI Designer may use).
 
 ## Last Update
 
-* Updated By: Tech Lead
+* Updated By: UI Designer
 * Timestamp: 2026-09-29
-* Summary: F07.DIRECTION-SELECT — A recorded (A2); Visual Quality Gate Ready for Implementation; F07-TOOL Open; owner → Frontend/Mobile Developer.
+* Summary: F07-UI delivered — two rendered directions (A recommended, Pending Selection), `ui-design.md` with matrix and Visual Evidence Manifest; five clarification items; owner → Tech Lead (visual-gate checkpoint).
 
 ## Context & Follow-ups
 
@@ -195,23 +187,52 @@ Run Frontend/Mobile Developer — F07-TOOL (Current Brief): the `DailyPack` mode
 
 * 2026-09-29 — Tech Lead: F07 activated (F08.FUNCTION-DEPLOY-GO — C). prd, architecture D1–D11, orchestration; F07-UI Open; owner → UI Designer.
 * 2026-09-29 — UI Designer: F07-UI Done — directions A "Hafta döngüsü" (recommended) / B "Günün bileti", 63 renders + 4 sheets, `ui-design.md`; NTLC-1…5; owner → Tech Lead.
-* 2026-09-29 — Tech Lead: F07-UI checkpoint (architecture A1) — accepted; rulings 1–6; F07.DIRECTION-SELECT opened; F07-TOOL briefed; owner Tech Lead (awaiting the decision). [Orchestration at the UI delivery](../../history/f07-daily-challenge-2026-09-29/orchestration-at-ui-delivery.md) (the F07-UI brief).
-* 2026-09-29 — Tech Lead: Decision F07.DIRECTION-SELECT — A (architecture A2) — Direction A selected; gate Ready for Implementation; F07-TOOL Open; owner → Frontend/Mobile Developer.
 
 ## Current Brief
 
-**F07-TOOL — the daily pack tooling** (architecture D2, D9; Frontend/Mobile Developer — the F06 toolchain owner role)
+**F07-UI — the Daily surfaces on the Foundation** (architecture D8; Visual Scope `new-surface`)
 
-**Read first:** `architecture.md` D2 (the pack format and its rules), D9 (validation responsibility), A1 ruling 1 (the day envelope the app will cache — the same `{dailyNumber, puzzle}` shape as a pack `days[]` entry); `packages/looplet_content` (`Puzzle`); `tools/looplet_authoring` (`cli.dart`, `content_check.dart` — `check` already reads a manifest's `assignments` and enforces the 30-day no-repeat window); `melos.yaml` `content:check`; `project-authority/setup-manifest.md`.
+**Read first:**
+* `prd.md` — AC1–AC7 and the edge cases;
+* `architecture.md` — D3 (the states), D4 (dates), D6 (the displayed streak), D7 (the kill-switch effect), D8 (surfaces and routes);
+* `project-authority/design-foundation.md` — Selected, Direction C "Loop Glass";
+* `features/f00-design-foundation/ui-design.md` — components, states, accessibility;
+* `design/design-doctrine.md`, `design/premium-ui-rubric.md`, `design/visual-quality-gate.md`;
+* the shipped siblings:
+  * Home — F05 `architecture.md` §18, F05 `ui-design.md` (D3);
+  * Play and the result — F03 `ui-design.md`, D1 / D2, F03 `architecture.md` §19 / §20;
+* `templates/feature-ui-design.template.md`;
+* `project-authority/platform.md` §14 — the canonical capture targets: iPhone 16 (primary), 16e, 16 Pro Max.
 
 **Deliver:**
-1. **`DailyPack` in `looplet_content`** (pure Dart): `schemaVersion`, `contentVersion`, `lang`, `numberingEpoch`, `days` (`dailyDate`, `dailyNumber`, `puzzle`); `fromJson` / `toJson` (lowerCamelCase, optional fields omitted); a validator returning **named** violations for every D2 (2) rule — sorted, contiguous and unique dates; `puzzle.dailyDate == dailyDate`; `type == daily`; `id == "daily-{lang}-{dailyDate}"`; parses with `optimalMoves ≥ 1`; `dailyNumber == days since numberingEpoch + 1` (calendar-date arithmetic, D4); the 30-day no-repeat over the puzzle definitions; `lang` matches every puzzle. The app (F07-FE) will reuse this validator at fetch time.
-2. **`looplet_authoring pack-daily`**: `content/daily/{lang}/daily_manifest_{lang}.json` + `pool/` → `daily_pack_{lang}.json` in a build-output path that is not the source (name it; ignored by git); non-zero exit with the named violation on any rule failure; deterministic output (the same inputs give the same bytes).
-3. **`check`** extended so every D2 (2) rule fails on the source manifest + pool, not only the no-repeat window.
-4. **Tests with named negative cases** — one per D2 (2) rule, plus a positive pack round-trip; each negative shown failing for the intended reason.
-5. **A dev pack** for F07-FE delivery and tests, built from existing smoke / Journey-shaped definitions as `type: daily` copies (a fixture, **not** product content; keep it out of `content/daily/tr/pool/`, which F07-CONTENT owns), covering today − 14 … today + 7 relative to a fixed test date and a variant that the D3 date logic can shift.
-6. **`frontend.md` (F07-TOOL section):** task-to-code traceability, the commands run with their exit codes (`melos run analyze`, the package / tool tests, `melos run content:check`, `pack-daily` on the dev fixture), preserved behaviour of existing `check` rules, and anything the Content Designer needs to know (the manifest shape, how to run `pack-daily`).
+1. **At least two materially different rendered directions on identical content**, covering at least:
+   * the Home with its Daily entry (available, and done today);
+   * the Daily screen in `ready` and `needsConnection`;
+   * the daily result — a first run with streak 5 / best 12, and a replay showing the official result unchanged.
+   * Real renders, not text or wireframes. Your recommendation is not a selection: the user picks (F07.DIRECTION-SELECT, opened at the checkpoint).
+2. **For the recommended direction, the full state set:**
+   * the Home entry: available / done today / needs connection / hidden;
+   * Daily: `loading`, `ready`, `doneToday`, `needsConnection`, `unavailable`;
+   * the daily Play header (`GÜNLÜK · #N` + date);
+   * the result: first run / replay, streak 0 → 1 after a missed day, best preserved;
+   * the reserved Share place (empty in F07);
+   * at the three viewports, and at AX5 for the free text (C-9).
+3. **`ui-design.md`:**
+   * the screen / state / viewport matrix;
+   * component, typography, colour, asset and interaction decisions — reuse `app/lib/design` components, and name any new one;
+   * motion: the entry and result transitions, consistent with D2's result motion, or an explicit `not applicable`, with the Reduce Motion behaviour;
+   * Turkish interim copy through a strings table;
+   * the source render records and the **Visual Evidence Manifest**.
 
-**Rules:** no app code (F07-FE); no F08 change; no product Daily content (F07-CONTENT); no Flutter or dependency upgrade; a contract gap goes to the Tech Lead.
+**Rules:**
+* **Home keeps one primary lime CTA** (F05 §18). The Daily entry is secondary.
+* **No Share control in F07** — leave its place only.
+* Never colour-only.
+* No raw error text anywhere.
+* The streak shows the **effective** value (D6).
+* Do not design F10's menu, F13's share card or F12.
+* If a contract point blocks a good design, stop and report it to the Tech Lead rather than working around it.
 
-**Then:** close F07-TOOL; owner → Tech Lead; `Run Tech Lead` (reconciliation; then F07-CONTENT and F07-FE).
+**Non-goals:** no app code; no copy finalisation (PO / localization later); no change to the Foundation tokens. A token gap goes to the Tech Lead.
+
+**Then:** close F07-UI, owner → Tech Lead, `Run Tech Lead` (the visual-gate checkpoint; the user then selects the direction).

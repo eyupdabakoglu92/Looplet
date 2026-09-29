@@ -6,6 +6,8 @@
 >
 > **Status: Pending Selection.** Two directions are rendered on identical content (§2). The UI Designer recommends **A "Hafta döngüsü"**; the user selects at F07.DIRECTION-SELECT (opened by the Tech Lead at the visual-gate checkpoint). Everything from §3 on is written for A; if B is selected, §3–§12b are re-issued for B before implementation.
 >
+> **Tech Lead — selection record (pointer, 2026-09-29):** **the user selected Direction A "Hafta döngüsü"** (F07.DIRECTION-SELECT — A; `architecture.md` A2). The "Pending Selection" text above and in §2 is superseded by this record. The `F07-A-*` records marked *(candidate)* in §12b are now the **selected-source**. The checkpoint rulings (A1) bind Frontend and QA. Visual Quality Gate: Ready for Implementation.
+>
 > **Unchanged:** F08's schema and client API, F03's play session and win timeline (§20.3), F04's star rule, F05's Home composition above the new entry, the Foundation tokens (no new token).
 
 ---

@@ -571,3 +571,4 @@ F05-QA-D3 (`qa.md`, commit e46f384) is **accepted: Approved with Notes, 94 / 100
 * The Journey read-model, the CONTINUE rule (§18.3 (2)), the loop track and the error screen are unchanged.
 * The entry is designed in F07-UI and implemented in F07-FE, with F07's own visual gate and QA. F05 stays Done.
 * F10 later owns the main-menu layout, and may move the entry.
+* **AX5 (F07 `architecture.md` A1 ruling 4, 2026-09-29):** with the entry present, Home becomes a clamped scroll view **only above the 1.3× cap** (up to the cap it still fits without scroll). At offset 0 the wordmark, the Journey card, the CTA and the caption stay fully visible, and the D2 `ScrollBand` shows only once scrolled. With the entry hidden, §18.3 (6)'s no-scroll outcome is unchanged.
