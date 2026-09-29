@@ -1,0 +1,246 @@
+== PC-D3-01: D3-01-home-new-0of30.png (@2x) vs runtime-d3/RT-16-D3-01-new-0of30.png (@3x)
+-- render
+band top 67.0 bottom 86.5 left 94.5 right 126.0 height 19.5
+band top 241.5 bottom 269.0 left 56.5 right 185.5 height 27.5
+band top 492.5 bottom 560.5 left 26.5 right 365.5 height 68.0
+-- runtime
+band top 67.7 bottom 87.0 left 94.7 right 125.7 height 19.3
+band top 237.0 bottom 264.3 left 56.7 right 185.0 height 27.3
+band top 487.0 bottom 555.7 left 26.3 right 365.3 height 68.7
+== PC-D3-01b: D3-01b-home-new-level1-in-progress.png (@2x) vs runtime-d3/RT-16-D3-01b-new-level1-in-progress.png (@3x)
+-- render
+band top 67.0 bottom 86.5 left 94.5 right 126.0 height 19.5
+band top 241.5 bottom 269.0 left 56.5 right 185.5 height 27.5
+band top 492.5 bottom 560.5 left 26.5 right 365.5 height 68.0
+-- runtime
+band top 67.7 bottom 87.0 left 94.7 right 125.7 height 19.3
+band top 237.0 bottom 264.3 left 56.7 right 185.0 height 27.3
+band top 487.0 bottom 555.7 left 26.3 right 365.3 height 68.7
+== PC-D3-02: D3-02-home-mid-4of30.png (@2x) vs runtime-d3/RT-16-D3-02-mid-4of30.png (@3x)
+-- render
+band top 67.0 bottom 86.5 left 94.5 right 126.0 height 19.5
+band top 241.5 bottom 269.0 left 56.5 right 185.5 height 27.5
+band top 332.5 bottom 415.5 left 58.5 right 265.0 height 83.0
+band top 492.5 bottom 560.5 left 26.5 right 365.5 height 68.0
+-- runtime
+band top 67.7 bottom 87.0 left 94.7 right 125.7 height 19.3
+band top 237.0 bottom 264.3 left 56.7 right 185.0 height 27.3
+band top 328.3 bottom 411.3 left 58.7 right 265.0 height 83.0
+band top 487.0 bottom 555.7 left 26.3 right 365.3 height 68.7
+== PC-D3-03: D3-03-home-in-progress-4of30.png (@2x) vs runtime-d3/RT-16-D3-03-in-progress-4of30.png (@3x)
+-- render
+band top 67.0 bottom 86.5 left 94.5 right 126.0 height 19.5
+band top 241.5 bottom 269.0 left 56.5 right 185.5 height 27.5
+band top 332.5 bottom 415.5 left 58.5 right 265.0 height 83.0
+band top 492.5 bottom 560.5 left 26.5 right 365.5 height 68.0
+-- runtime
+band top 67.7 bottom 87.0 left 94.7 right 125.7 height 19.3
+band top 237.0 bottom 264.3 left 56.7 right 185.0 height 27.3
+band top 328.3 bottom 411.3 left 58.7 right 265.0 height 83.0
+band top 487.0 bottom 555.7 left 26.3 right 365.3 height 68.7
+== PC-D3-04a: D3-04a-home-window-12of30.png (@2x) vs runtime-d3/RT-16-D3-04a-window-12of30.png (@3x)
+-- render
+band top 67.0 bottom 86.5 left 94.5 right 126.0 height 19.5
+band top 241.5 bottom 269.0 left 56.5 right 185.5 height 27.5
+band top 332.5 bottom 415.5 left 58.5 right 265.0 height 83.0
+band top 492.5 bottom 560.5 left 26.5 right 365.5 height 68.0
+-- runtime
+band top 67.7 bottom 87.0 left 94.7 right 125.7 height 19.3
+band top 237.0 bottom 264.3 left 56.7 right 185.0 height 27.3
+band top 328.3 bottom 411.3 left 58.7 right 265.0 height 83.0
+band top 487.0 bottom 555.7 left 26.3 right 365.3 height 68.7
+== PC-D3-04b: D3-04b-home-window-25of30.png (@2x) vs runtime-d3/RT-16-D3-04b-window-25of30.png (@3x)
+-- render
+band top 67.0 bottom 86.5 left 94.5 right 126.0 height 19.5
+band top 241.5 bottom 269.0 left 56.5 right 185.5 height 27.5
+band top 332.5 bottom 415.5 left 58.5 right 265.0 height 83.0
+band top 492.5 bottom 560.5 left 26.5 right 365.5 height 68.0
+-- runtime
+band top 67.7 bottom 87.0 left 94.7 right 125.7 height 19.3
+band top 237.0 bottom 264.3 left 56.7 right 185.0 height 27.3
+band top 328.3 bottom 411.3 left 58.7 right 265.0 height 83.0
+band top 487.0 bottom 555.7 left 26.3 right 365.3 height 68.7
+== PC-D3-05: D3-05-home-replay-before-terminal.png (@2x) vs runtime-d3/RT-16-D3-05-replay-before-terminal.png (@3x)
+-- render
+band top 67.0 bottom 86.5 left 94.5 right 126.0 height 19.5
+band top 241.5 bottom 269.0 left 56.5 right 185.5 height 27.5
+band top 307.5 bottom 416.5 left 51.0 right 343.0 height 109.0
+band top 492.5 bottom 560.5 left 26.5 right 365.5 height 68.0
+-- runtime
+band top 67.7 bottom 87.0 left 94.7 right 125.7 height 19.3
+band top 237.0 bottom 264.3 left 56.7 right 185.0 height 27.3
+band top 303.3 bottom 412.0 left 51.0 right 342.7 height 108.7
+band top 487.0 bottom 555.7 left 26.3 right 365.3 height 68.7
+== PC-D3-06: D3-06-home-terminal-30of30.png (@2x) vs runtime-d3/RT-16-D3-06-terminal-30of30.png (@3x)
+-- render
+band top 67.0 bottom 86.5 left 94.5 right 126.0 height 19.5
+band top 206.0 bottom 233.5 left 124.5 right 255.0 height 27.5
+band top 299.0 bottom 415.5 left 58.5 right 346.0 height 116.5
+band top 492.5 bottom 560.5 left 26.5 right 365.5 height 68.0
+-- runtime
+band top 67.7 bottom 87.0 left 94.7 right 125.7 height 19.3
+band top 201.0 bottom 228.3 left 124.7 right 254.7 height 27.3
+band top 295.0 bottom 411.3 left 58.7 right 346.0 height 116.3
+band top 487.0 bottom 555.7 left 26.3 right 365.3 height 68.7
+== PC-D3-07: D3-07-home-terminal-with-replay.png (@2x) vs runtime-d3/RT-16-D3-07-terminal-with-replay.png (@3x)
+-- render
+band top 67.0 bottom 86.5 left 94.5 right 126.0 height 19.5
+band top 206.0 bottom 233.5 left 124.5 right 255.0 height 27.5
+band top 307.5 bottom 416.5 left 51.0 right 343.0 height 109.0
+band top 492.5 bottom 560.5 left 26.5 right 365.5 height 68.0
+-- runtime
+band top 67.7 bottom 87.0 left 94.7 right 125.7 height 19.3
+band top 201.0 bottom 228.3 left 124.7 right 254.7 height 27.3
+band top 303.3 bottom 412.0 left 51.0 right 342.7 height 108.7
+band top 487.0 bottom 555.7 left 26.3 right 365.3 height 68.7
+== PC-D3-10: D3-10-home-text-cap-1_3.png (@2x) vs runtime-d3/A11Y-16-home-ip12-extra-extra-extra-large.png (@3x)
+-- render
+band top 68.5 bottom 94.0 left 115.0 right 155.5 height 25.5
+band top 259.0 bottom 295.0 left 57.0 right 224.5 height 36.0
+band top 358.5 bottom 441.5 left 58.5 right 265.0 height 83.0
+band top 518.5 bottom 586.0 left 26.5 right 365.5 height 67.5
+-- runtime
+band top 69.0 bottom 94.0 left 115.0 right 155.7 height 25.0
+band top 253.7 bottom 289.3 left 57.0 right 224.7 height 35.7
+band top 352.3 bottom 435.3 left 58.7 right 265.0 height 83.0
+band top 511.0 bottom 579.7 left 26.3 right 365.3 height 68.7
+== PC-D3-10b: D3-10b-home-ax5.png (@2x) vs runtime-d3/A11Y-16-home-ip12-accessibility-extra-extra-extra-large.png (@3x)
+-- render
+band top 68.5 bottom 94.0 left 115.0 right 155.5 height 25.5
+band top 259.0 bottom 295.0 left 57.0 right 224.5 height 36.0
+band top 358.5 bottom 441.5 left 58.5 right 265.0 height 83.0
+band top 518.5 bottom 609.0 left 26.5 right 365.5 height 90.5
+-- runtime
+band top 69.0 bottom 94.0 left 115.0 right 155.7 height 25.0
+band top 253.7 bottom 289.3 left 57.0 right 224.7 height 35.7
+band top 352.3 bottom 435.3 left 58.7 right 265.0 height 83.0
+band top 511.0 bottom 587.7 left 26.3 right 365.3 height 76.7
+== PC-D3-10c: D3-10c-home-ax5-terminal-replay.png (@2x) vs runtime-d3/A11Y-16-home-n1-ax5.png (@3x)
+-- render
+band top 68.5 bottom 94.0 left 115.0 right 155.5 height 25.5
+band top 213.0 bottom 249.0 left 145.5 right 315.0 height 36.0
+band top 333.5 bottom 442.5 left 51.0 right 343.0 height 109.0
+band top 518.5 bottom 609.0 left 26.5 right 365.5 height 90.5
+-- runtime
+band top 69.0 bottom 94.0 left 115.0 right 155.7 height 25.0
+band top 207.7 bottom 243.3 left 145.7 right 315.0 height 35.7
+band top 327.3 bottom 436.0 left 51.0 right 342.7 height 108.7
+band top 511.0 bottom 587.7 left 26.3 right 365.3 height 76.7
+== PC-D3-v-16e-ip: D3-v-16e-home-in-progress.png (@2x) vs runtime-d3/RT-16e-home-in-progress.png (@3x)
+-- render
+band top 66.5 bottom 86.0 left 94.0 right 125.0 height 19.5
+band top 239.5 bottom 267.0 left 56.0 right 184.0 height 27.5
+band top 330.0 bottom 412.5 left 58.0 right 263.0 height 82.5
+band top 489.0 bottom 556.0 left 26.0 right 363.0 height 67.0
+-- runtime
+band top 67.3 bottom 86.7 left 94.0 right 124.7 height 19.3
+band top 234.3 bottom 261.7 left 56.0 right 183.7 height 27.3
+band top 324.3 bottom 406.7 left 58.3 right 263.0 height 82.3
+band top 482.3 bottom 551.0 left 26.3 right 362.7 height 68.7
+== PC-D3-v-16e-n1: D3-v-16e-home-terminal-with-replay.png (@2x) vs runtime-d3/RT-16e-home-terminal-with-replay.png (@3x)
+-- render
+band top 66.5 bottom 86.0 left 94.0 right 125.0 height 19.5
+band top 204.0 bottom 231.5 left 123.5 right 253.0 height 27.5
+band top 305.0 bottom 413.5 left 50.5 right 340.5 height 108.5
+band top 489.0 bottom 556.0 left 26.0 right 363.0 height 67.0
+-- runtime
+band top 67.3 bottom 86.7 left 94.0 right 124.7 height 19.3
+band top 199.3 bottom 226.7 left 123.7 right 252.7 height 27.3
+band top 299.3 bottom 407.3 left 50.7 right 340.3 height 108.0
+band top 482.3 bottom 551.0 left 26.3 right 362.7 height 68.7
+== PC-D3-v-16e-cap: D3-v-16e-home-text-cap-1_3.png (@2x) vs runtime-d3/A11Y-16e-home-w12-extra-extra-extra-large.png (@3x)
+-- render
+band top 67.5 bottom 93.0 left 114.0 right 154.5 height 25.5
+band top 256.5 bottom 292.5 left 56.5 right 223.0 height 36.0
+band top 355.5 bottom 438.0 left 58.0 right 263.0 height 82.5
+band top 514.5 bottom 581.5 left 26.0 right 363.0 height 67.0
+-- runtime
+band top 68.7 bottom 93.7 left 114.3 right 154.3 height 25.0
+band top 252.0 bottom 287.3 left 56.7 right 223.0 height 35.3
+band top 350.3 bottom 432.7 left 58.3 right 263.0 height 82.3
+band top 507.7 bottom 576.0 left 26.3 right 362.7 height 68.3
+== PC-D3-v-16e-ax5: D3-v-16e-home-ax5.png (@2x) vs runtime-d3/A11Y-16e-home-w12-ax5.png (@3x)
+-- render
+band top 67.5 bottom 93.0 left 114.0 right 154.5 height 25.5
+band top 256.5 bottom 292.5 left 56.5 right 223.0 height 36.0
+band top 355.5 bottom 438.0 left 58.0 right 263.0 height 82.5
+band top 514.5 bottom 604.5 left 26.0 right 363.0 height 90.0
+-- runtime
+band top 68.7 bottom 93.7 left 114.3 right 154.3 height 25.0
+band top 252.0 bottom 287.3 left 56.7 right 223.0 height 35.3
+band top 350.3 bottom 432.7 left 58.3 right 263.0 height 82.3
+band top 507.7 bottom 583.3 left 26.3 right 362.7 height 75.7
+== PC-D3-v-promax-ip: D3-v-promax-home-in-progress.png (@2x) vs runtime-d3/RT-promax-home-in-progress.png (@3x)
+-- render
+band top 75.5 bottom 97.5 left 106.0 right 141.0 height 22.0
+band top 270.0 bottom 301.5 left 63.0 right 207.5 height 31.5
+band top 372.5 bottom 465.5 left 65.5 right 296.5 height 93.0
+band top 550.5 bottom 627.5 left 29.5 right 409.5 height 77.0
+-- runtime
+band top 76.0 bottom 97.7 left 106.0 right 140.7 height 21.7
+band top 266.3 bottom 297.0 left 63.0 right 207.0 height 30.7
+band top 368.0 bottom 460.7 left 65.7 right 296.7 height 92.7
+band top 545.3 bottom 622.3 left 29.7 right 409.0 height 77.0
+== PC-D3-v-promax-n1: D3-v-promax-home-terminal-with-replay.png (@2x) vs runtime-d3/RT-promax-home-terminal-with-replay.png (@3x)
+-- render
+band top 75.5 bottom 97.5 left 106.0 right 141.0 height 22.0
+band top 230.0 bottom 261.5 left 139.5 right 285.0 height 31.5
+band top 344.5 bottom 466.5 left 57.0 right 384.0 height 122.0
+band top 550.5 bottom 627.5 left 29.5 right 409.5 height 77.0
+-- runtime
+band top 76.0 bottom 97.7 left 106.0 right 140.7 height 21.7
+band top 226.3 bottom 257.0 left 139.3 right 285.0 height 30.7
+band top 340.0 bottom 461.7 left 57.0 right 383.7 height 121.7
+band top 545.3 bottom 622.3 left 29.7 right 409.0 height 77.0
+== PC-D3-v-promax-cap: D3-v-promax-home-text-cap-1_3.png (@2x) vs runtime-d3/A11Y-promax-home-w12-extra-extra-extra-large.png (@3x)
+-- render
+band top 77.0 bottom 105.5 left 128.5 right 174.0 height 28.5
+band top 289.5 bottom 330.0 left 63.5 right 251.5 height 40.5
+band top 401.5 bottom 494.5 left 65.5 right 296.5 height 93.0
+band top 579.5 bottom 656.5 left 29.5 right 409.5 height 77.0
+-- runtime
+band top 77.7 bottom 105.7 left 129.0 right 174.3 height 28.0
+band top 284.3 bottom 324.0 left 63.7 right 251.3 height 39.7
+band top 396.0 bottom 488.7 left 65.7 right 296.7 height 92.7
+band top 573.3 bottom 650.3 left 29.7 right 409.0 height 77.0
+== PC-D3-20c: D3-20c-store-error-debug-build.png (@2x) vs runtime-d3/RT-16-D3-20c-store-error-debug.png (@3x)
+-- render
+band top 67.0 bottom 86.5 left 94.5 right 126.0 height 19.5
+band top 525.5 bottom 592.5 left 27.0 right 366.0 height 67.0
+-- runtime
+band top 67.7 bottom 87.0 left 94.7 right 125.7 height 19.3
+band top 497.7 bottom 566.7 left 27.0 right 366.0 height 69.0
+== PC-D3-20b: D3-20b-store-error-ax5.png (@2x) vs runtime-d3/A11Y-16-store-error-ax5-top.png (@3x)
+-- render
+band top 68.5 bottom 94.0 left 115.0 right 155.5 height 25.5
+band top 723.0 bottom 852.0 left 27.0 right 366.0 height 129.0
+-- runtime
+band top 69.0 bottom 94.0 left 115.0 right 155.7 height 25.0
+band top 710.3 bottom 842.0 left 27.0 right 366.0 height 131.7
+== PC-D3-20d: D3-20d-store-error-ax5-scrolled-end.png (@2x) vs runtime-d3/A11Y-16-store-error-ax5-scrolled-end.png (@3x)
+-- render
+band top 667.0 bottom 814.5 left 27.0 right 366.0 height 147.5
+-- runtime
+band top 449.3 bottom 581.0 left 27.0 right 366.0 height 131.7
+== PC-D3-v-16e-err: D3-v-16e-store-error.png (@2x) vs runtime-d3/RT-16e-store-error-debug.png (@3x)
+-- render
+band top 66.5 bottom 86.0 left 94.0 right 125.0 height 19.5
+band top 573.0 bottom 639.0 left 26.5 right 363.5 height 66.0
+-- runtime
+band top 67.3 bottom 86.7 left 94.0 right 124.7 height 19.3
+band top 492.3 bottom 560.7 left 26.7 right 363.3 height 68.3
+== PC-D3-v-promax-err: D3-v-promax-store-error.png (@2x) vs runtime-d3/RT-promax-store-error-debug.png (@3x)
+-- render
+band top 75.5 bottom 97.5 left 106.0 right 141.0 height 22.0
+band top 646.5 bottom 722.5 left 30.0 right 410.0 height 76.0
+-- runtime
+band top 76.0 bottom 97.7 left 106.0 right 140.7 height 21.7
+band top 558.3 bottom 635.3 left 30.3 right 409.7 height 77.0
+== PC-D3-21: D3-21-launch-ios.png (@2x) vs runtime-d3/COLD-16-empty-2.6.png (@3x)
+-- render
+-- runtime
+== PC-D3-22: D3-22-splash.png (@2x) vs runtime-d3/COLD-16-empty-4.395.png (@3x)
+-- render
+band top 67.0 bottom 86.5 left 94.5 right 126.0 height 19.5
+-- runtime
+band top 67.7 bottom 87.0 left 94.7 right 125.3 height 19.3

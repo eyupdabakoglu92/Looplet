@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The Foundation ground (LoopColors.groundMid) — the launch and window colour. -->
+    <color name="loop_ground">#FF070C25</color>
+</resources>

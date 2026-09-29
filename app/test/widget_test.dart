@@ -1,5 +1,8 @@
+import 'package:flutter/material.dart' show MaterialApp;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:looplet_app/design/design.dart';
+import 'package:looplet_app/home_screen.dart';
 import 'package:looplet_app/main.dart';
 import 'package:looplet_app/persistence/daily_result_sync_service.dart';
 import 'package:looplet_app/persistence/persistence_providers.dart';
@@ -21,17 +24,27 @@ List<Override> _overrides() => <Override>[
 
 void main() {
   testWidgets('app bootstraps and shows the home shell', (tester) async {
+    tester.platformDispatcher.accessibilityFeaturesTestValue =
+        const FakeAccessibilityFeatures(reduceMotion: true);
+    addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
     await tester.pumpWidget(
       ProviderScope(overrides: _overrides(), child: const LoopletApp()),
     );
 
-    // Splash while the local bootstrap (DB open + migrations + snapshot) runs.
-    expect(find.text('LOOPLET'), findsOneWidget);
+    // The splash while the local bootstrap (DB open + migrations + snapshot)
+    // runs: the Foundation ground and the `Looplet` wordmark only.
+    expect(find.byType(LoopletWordmark), findsOneWidget);
+    expect(find.byType(LimePill), findsNothing);
 
     await tester.pumpAndSettle();
 
-    // Bootstrap resolved to ready → the placeholder home (still 'LOOPLET').
-    expect(find.text('LOOPLET'), findsOneWidget);
-    expect(find.text('Couldn’t open your saved data'), findsNothing);
+    // Bootstrap resolved to ready → the D3 Home, the wordmark in place.
+    expect(find.byType(HomeScreen), findsOneWidget);
+    expect(find.byType(LoopletWordmark), findsOneWidget);
+    expect(find.text('Devam et'), findsOneWidget);
+    expect(find.text('Tekrar dene'), findsNothing);
+    final app = tester.widget<MaterialApp>(find.byType(MaterialApp));
+    expect(app.title, 'Looplet');
+    expect(app.theme!.scaffoldBackgroundColor, LoopColors.groundMid);
   });
 }

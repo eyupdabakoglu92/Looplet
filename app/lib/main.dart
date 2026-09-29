@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app_router.dart';
+import 'design/tokens.dart';
 import 'play/play_theme.dart';
 import 'persistence/sync_providers.dart';
 
@@ -30,11 +31,15 @@ class LoopletApp extends ConsumerWidget {
     final router = ref.watch(appRouterProvider);
 
     return MaterialApp.router(
-      title: 'LOOPLET',
+      title: 'Looplet',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: PlayTheme.colorScheme,
-        scaffoldBackgroundColor: PlayTheme.stage1,
+        // The Foundation ground (#070C25): no frame between the native launch,
+        // the splash, Home and the store-error screen shows another colour
+        // (F05 architecture §18.3 (8)).
+        scaffoldBackgroundColor: LoopColors.groundMid,
+        canvasColor: LoopColors.groundMid,
         useMaterial3: true,
       ),
       routerConfig: router,

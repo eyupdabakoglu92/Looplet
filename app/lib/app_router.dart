@@ -6,6 +6,10 @@ import 'bootstrap.dart';
 import 'home_screen.dart';
 import 'play/play_session_args.dart';
 import 'play/play_session_screen.dart';
+import 'shell/splash_screen.dart';
+import 'shell/store_error_screen.dart';
+
+export 'shell/store_error_screen.dart' show StoreErrorScreen;
 
 /// Route names. Kept small — F05 / F07 / F09 / F10 add their screens here.
 abstract final class Routes {
@@ -49,8 +53,12 @@ class _BootstrapGate extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final bootstrap = ref.watch(appBootstrapProvider);
+    // While Retry re-runs the bootstrap the splash frame shows again, not the
+    // previous error (F05 `ui-design.md` §4), hence no skipping on refresh.
     return bootstrap.when(
-      loading: () => const _SplashScreen(),
+      skipLoadingOnRefresh: false,
+      skipLoadingOnReload: false,
+      loading: () => const LoopSplashScreen(),
       error: (error, _) => StoreErrorScreen(
         message: '$error',
         onRetry: () => ref.invalidate(appBootstrapProvider),
@@ -62,66 +70,6 @@ class _BootstrapGate extends ConsumerWidget {
           onRetry: () => ref.invalidate(appBootstrapProvider),
         ),
       },
-    );
-  }
-}
-
-class _SplashScreen extends StatelessWidget {
-  const _SplashScreen();
-
-  @override
-  Widget build(BuildContext context) =>
-      const Scaffold(body: Center(child: Text('LOOPLET')));
-}
-
-/// Shown when the on-device store cannot be opened or a migration failed. Data
-/// is left intact at the previous schema (F08 AC9); Retry re-runs the bootstrap.
-/// F08-owned, plain by design (`f08 architecture.md` — no design handoff).
-class StoreErrorScreen extends StatelessWidget {
-  const StoreErrorScreen({
-    required this.message,
-    required this.onRetry,
-    super.key,
-  });
-
-  final String message;
-  final VoidCallback onRetry;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              const Text(
-                'Couldn’t open your saved data',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 12),
-              const Text(
-                'Your progress is safe. Please try again.',
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              FilledButton(onPressed: onRetry, child: const Text('Retry')),
-              const SizedBox(height: 24),
-              Text(
-                message,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Theme.of(context).colorScheme.outline,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

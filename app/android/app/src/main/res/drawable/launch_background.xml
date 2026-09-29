@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Modify this file to customize your launch splash screen -->
+<!-- The Foundation ground, the same picture as the Flutter splash (F05 ui-design §5 / §11,
+     architecture §18.3 (8)): a solid #070C25 under the launch backdrop rendered from
+     LoopBackdrop (tool/render_launch_backdrop_test.dart). No white or theme colour. -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@android:color/white" />
-
-    <!-- You can insert your own image assets here -->
-    <!-- <item>
+    <item android:drawable="@color/loop_ground" />
+    <item>
         <bitmap
-            android:gravity="center"
-            android:src="@mipmap/launch_image" />
-    </item> -->
+            android:gravity="fill"
+            android:src="@drawable/launch_backdrop" />
+    </item>
 </layer-list>

@@ -1,518 +1,464 @@
-import 'dart:math' as math;
-
-import 'package:flutter/foundation.dart' show kDebugMode;
+import 'package:flutter/foundation.dart' show kDebugMode, visibleForTesting;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'app_router.dart';
+import 'design/design.dart';
+import 'journey/journey_home_view.dart';
 import 'journey/journey_progress.dart';
 import 'journey/journey_strings.dart';
 import 'play/debug_puzzle_library.dart';
 import 'play/play_session_args.dart';
-import 'play/play_theme.dart';
-import 'play/widgets/play_stage.dart';
 import 'reduce_motion.dart';
+import 'shell/splash_screen.dart';
 
-/// The app's home (`/`) — F05 (`ui-design.md` "The loop, filling"). Replaces the
-/// debug placeholder. LOOPLET wordmark, a 30-tick journey-progress ring with the
-/// `N / 30` count at its centre, and one dominant CONTINUE CTA nested into the
-/// ring's bottom gap. Not the F10 menu. App root — no back affordance.
-class HomeScreen extends ConsumerWidget {
-  const HomeScreen({super.key});
+/// The app's home (`/`) — F05, Design Adoption Phase D3 (`ui-design.md` §4–§12,
+/// architecture §18.3 / §18.7): the Loop Glass composition of `S-06b`. The
+/// `Looplet` wordmark; a glass card with `YOLCULUK · N / 30`, a two-line
+/// headline with one lime word and the loop track; one lime "Devam et" pill
+/// with its glow; the caption of where it leads. App root — no back
+/// affordance, no top bar. Not the F10 menu (no future-scope item).
+///
+/// Before the Journey model loads, Home is the splash frame (the wordmark
+/// only — no empty card, no spinner). When the model arrives the content
+/// enters once per app process (C3); never on a return from `/play` (Home
+/// stays mounted) and never when the model updates. No idle motion.
+class HomeScreen extends ConsumerStatefulWidget {
+  const HomeScreen({this.showDebugRow = kDebugMode, super.key});
 
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    // Launch language is `tr` for the MVP (F10 owns switching).
-    const lang = 'tr';
-    final strings = JourneyStrings.of(lang);
-    final modelAsync = ref.watch(journeyProgressModelProvider);
-    final model = modelAsync.asData?.value;
+  /// The dev-only smoke-puzzle launchers (C2). Debug builds only.
+  final bool showDebugRow;
 
-    return Scaffold(
-      backgroundColor: PlayTheme.stage1,
-      body: PlayStage(
-        child: SafeArea(
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 460),
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final ringSize = math
-                      .min(
-                        constraints.maxWidth * 0.62,
-                        constraints.maxHeight * 0.42,
-                      )
-                      .clamp(180.0, 300.0)
-                      .toDouble();
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      const _Wordmark(),
-                      SizedBox(height: ringSize * 0.14),
-                      _JourneyRing(
-                        size: ringSize,
-                        strings: strings,
-                        model: model,
-                      ),
-                      SizedBox(height: ringSize * 0.06),
-                      _ContinueCta(
-                        lang: lang,
-                        strings: strings,
-                        model: model,
-                        maxWidth: constraints.maxWidth,
-                      ),
-                      if (kDebugMode) ...<Widget>[
-                        const SizedBox(height: 28),
-                        const _DebugRow(),
-                      ],
-                    ],
-                  );
-                },
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
+  /// The entrance (ui-design §5): card 0–240, CTA 60–300, caption 120–340 ms.
+  static const Duration entranceDuration = Duration(milliseconds: 340);
 
-class _Wordmark extends StatelessWidget {
-  const _Wordmark();
+  static bool _entrancePlayed = false;
+
+  /// Lets the next Home play its entrance again (tests only).
+  @visibleForTesting
+  static void resetEntranceForTest() => _entrancePlayed = false;
 
   @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: PlayTheme.stageGlow.withValues(alpha: 0.5),
-            blurRadius: 28,
-          ),
-        ],
-      ),
-      child: const Text(
-        'LOOPLET',
-        style: TextStyle(
-          fontSize: 32,
-          fontWeight: FontWeight.w800,
-          letterSpacing: 6,
-          color: PlayTheme.paper,
-          height: 1,
-        ),
-      ),
-    );
-  }
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _JourneyRing extends StatefulWidget {
-  const _JourneyRing({
-    required this.size,
-    required this.strings,
-    required this.model,
-  });
+class _HomeScreenState extends ConsumerState<HomeScreen>
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
+  // Launch language is `tr` for the MVP (F10 owns switching).
+  static const String _lang = 'tr';
 
-  final double size;
-  final JourneyStrings strings;
-  final JourneyProgressModel? model;
+  late final AnimationController _entrance = AnimationController(
+    vsync: this,
+    duration: HomeScreen.entranceDuration,
+  );
+  bool _entranceArmed = false;
 
-  @override
-  State<_JourneyRing> createState() => _JourneyRingState();
-}
-
-class _JourneyRingState extends State<_JourneyRing>
-    with TickerProviderStateMixin {
-  // The in-progress node's slow breathing (a full in-out breath ≈ 4 s) and the
-  // one-shot bloom when the ring enters the "all 30 complete" state
-  // (`ui-design.md §7.1`, §11). Reduced motion → static end-states (§13).
-  late final AnimationController _pulse;
-  late final AnimationController _bloom;
-  bool _reduceMotion = false;
-
-  bool get _inProgress =>
-      widget.model?.inProgressLevel != null &&
-      !(widget.model?.allComplete ?? false);
-  bool get _done => widget.model?.allComplete ?? false;
+  final GlobalKey _captionKey = GlobalKey(debugLabel: 'home.caption');
+  final GlobalKey _debugRowKey = GlobalKey(debugLabel: 'home.debugRow');
+  final GlobalKey _stackKey = GlobalKey(debugLabel: 'home.stack');
+  bool _debugRowFits = false;
 
   @override
   void initState() {
     super.initState();
-    _reduceMotion = reduceMotionRequested();
-    _pulse = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 2000),
-    );
-    _bloom = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 620),
-    );
-    _syncMotion();
-  }
-
-  void _syncMotion() {
-    if (_inProgress && !_reduceMotion) {
-      if (!_pulse.isAnimating) _pulse.repeat(reverse: true);
-    } else {
-      _pulse.stop();
-      _pulse.value = 0;
-    }
-    if (_done) {
-      if (_reduceMotion) {
-        _bloom.value = 1; // settled — no bloom drawn
-      } else if (_bloom.status == AnimationStatus.dismissed) {
-        _bloom.forward();
-      }
-    } else {
-      _bloom.value = 0;
-    }
-  }
-
-  @override
-  void didUpdateWidget(covariant _JourneyRing oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    _syncMotion();
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void dispose() {
-    _pulse.dispose();
-    _bloom.dispose();
+    WidgetsBinding.instance.removeObserver(this);
+    _entrance.dispose();
     super.dispose();
+  }
+
+  // Defensive: Reduce Motion switched on (or its flag arriving) mid-entrance
+  // puts the content at rest at once.
+  @override
+  void didChangeAccessibilityFeatures() {
+    if (reduceMotionRequested() && _entrance.isAnimating) _entrance.value = 1;
+  }
+
+  /// Arms the entrance at the first frame that has the model (C3).
+  void _armEntrance() {
+    if (_entranceArmed) return;
+    _entranceArmed = true;
+    if (HomeScreen._entrancePlayed || reduceMotionRequested()) {
+      _entrance.value = 1;
+    } else {
+      _entrance.forward(from: 0);
+    }
+    HomeScreen._entrancePlayed = true;
+  }
+
+  /// C2: the debug row sits at the bottom and is shown only while it clears
+  /// the caption; measured after layout, so it never overflows.
+  void _checkDebugRow() {
+    final row = _debugRowKey.currentContext?.findRenderObject() as RenderBox?;
+    final caption =
+        _captionKey.currentContext?.findRenderObject() as RenderBox?;
+    final stack = _stackKey.currentContext?.findRenderObject() as RenderBox?;
+    if (row == null || caption == null || stack == null || !mounted) return;
+    final bottomInset = MediaQuery.paddingOf(context).bottom;
+    final rowTop = stack.size.height - bottomInset - 8 - row.size.height;
+    final captionBottom = caption
+        .localToGlobal(Offset(0, caption.size.height), ancestor: stack)
+        .dy;
+    final fits = rowTop >= captionBottom + 12;
+    if (fits != _debugRowFits) setState(() => _debugRowFits = fits);
   }
 
   @override
   Widget build(BuildContext context) {
-    final model = widget.model;
-    final count = model?.progressCount ?? 0;
-    final done = model?.allComplete ?? false;
-    final current = done ? null : model?.continueTarget;
-    final inProgress = model?.inProgressLevel != null;
+    final strings = JourneyStrings.of(_lang);
+    final modelAsync = ref.watch(journeyProgressModelProvider);
+    var model = modelAsync.asData?.value;
+    if (model == null && modelAsync.hasError) {
+      // Keep a working CTA over a dead one: a failing read-model falls back
+      // to the new-player view (level 1), as the shipped home did.
+      debugPrint('journey: home_model_failed — ${modelAsync.error}');
+      model = const JourneyProgressModel(
+        highestUnlockedLevel: 1,
+        completedLevels: <int>{},
+        inProgressLevel: null,
+      );
+    }
+    if (model != null) _armEntrance();
+    final view = model == null ? null : JourneyHomeView.of(model);
 
-    return Semantics(
-      label: widget.strings.progressSemantics(count, current),
-      child: SizedBox(
-        width: widget.size,
-        height: widget.size,
-        child: AnimatedBuilder(
-          animation: Listenable.merge(<Listenable>[_pulse, _bloom]),
-          builder: (context, child) => CustomPaint(
-            painter: _JourneyRingPainter(
-              progressCount: count,
-              currentLevel: current,
-              currentInProgress: inProgress,
-              // 0 (reduced motion / not in-progress) → steady node.
-              pulse: (_inProgress && !_reduceMotion) ? _pulse.value : 0.0,
-              // 1 at entry → 0 once settled; drawn only in the terminal state.
-              bloom: done ? (1.0 - _bloom.value) : 0.0,
+    if (widget.showDebugRow) {
+      // Re-measured after every layout-relevant change: this State depends on
+      // the text scale and the screen size, so a live OS text-size change
+      // rebuilds it and the check runs again (C2).
+      MediaQuery.textScalerOf(context);
+      MediaQuery.sizeOf(context);
+      WidgetsBinding.instance.addPostFrameCallback((_) => _checkDebugRow());
+    }
+
+    return ShellFrame(
+      builder: (context, layout) {
+        if (view == null) return const SizedBox.shrink(); // = the splash frame
+        return Stack(
+          key: _stackKey,
+          children: <Widget>[
+            Positioned.fill(
+              child: SingleChildScrollView(
+                physics: const ClampingScrollPhysics(),
+                padding: EdgeInsets.only(
+                  left: layout.homeColumnLeft,
+                  top: layout.homeColumnTop,
+                  bottom: 24 * layout.s,
+                ),
+                child: Align(
+                  alignment: Alignment.topLeft,
+                  child: SizedBox(
+                    width: layout.homeColumnWidth,
+                    child: _HomeColumn(
+                      view: view,
+                      strings: strings,
+                      entrance: _entrance,
+                      captionKey: _captionKey,
+                      onCta: () => context.push(
+                        Routes.play,
+                        extra: PlaySessionArgs(
+                          source: PuzzleSource.journey,
+                          journeyLevel: view.ctaTarget,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ),
-            child: child,
+            if (widget.showDebugRow)
+              Positioned(
+                left: 16,
+                right: 16,
+                bottom: MediaQuery.paddingOf(context).bottom + 8,
+                child: Offstage(
+                  offstage: !_debugRowFits,
+                  child: KeyedSubtree(
+                    key: _debugRowKey,
+                    child: const _DebugRow(),
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+/// Card → CTA → caption, one flow column so free text can grow with the OS
+/// scale without overlap (ui-design §6).
+class _HomeColumn extends StatelessWidget {
+  const _HomeColumn({
+    required this.view,
+    required this.strings,
+    required this.entrance,
+    required this.captionKey,
+    required this.onCta,
+  });
+
+  final JourneyHomeView view;
+  final JourneyStrings strings;
+  final Animation<double> entrance;
+  final Key captionKey;
+  final VoidCallback onCta;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = LoopScale.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        _Enter(
+          animation: entrance,
+          from: 0,
+          to: 240,
+          rise: 10 * s,
+          child: Padding(
+            padding: EdgeInsets.only(left: 0.5 * s),
+            child: _JourneyCard(view: view, strings: strings),
           ),
-          child: Center(
-            child: _RingCentre(strings: widget.strings, model: model),
+        ),
+        SizedBox(height: 22 * s),
+        _Enter(
+          animation: entrance,
+          from: 60,
+          to: 300,
+          rise: 10 * s,
+          child: Semantics(
+            button: true,
+            label: view.ctaSemantics(strings),
+            onTap: onCta,
+            excludeSemantics: true,
+            child: LimePill(
+              label: view.ctaLabel(strings),
+              onPressed: onCta,
+              glow: true,
+              width: 309 * s,
+              height: 63 * s,
+            ),
           ),
+        ),
+        SizedBox(height: 17 * s),
+        _Enter(
+          animation: entrance,
+          from: 120,
+          to: 340,
+          rise: 10 * s,
+          // The CTA already announces its target; the caption is not read
+          // twice. Free text: follows the OS scale; no-break joins let it
+          // break only before "·".
+          child: ExcludeSemantics(
+            child: SizedBox(
+              width: 309 * s,
+              child: Text(
+                view.caption(strings),
+                key: captionKey,
+                textAlign: TextAlign.center,
+                style: LoopText.bodyText(
+                  s,
+                ).copyWith(fontSize: 14 * s, height: 1.3),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// The Journey card: the label, the headline and the loop track over the two
+/// decorative swirl arcs of `S-06b`, clipped to the card (ui-design §5–§7).
+/// 300·s tall at 1.0× (31 + 11 + 15 + 65 + 12 + 166); it grows only when the
+/// capped label or headline does.
+class _JourneyCard extends StatelessWidget {
+  const _JourneyCard({required this.view, required this.strings});
+
+  final JourneyHomeView view;
+  final JourneyStrings strings;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = LoopScale.of(context);
+    final capped = loopCappedTextScaler(context);
+    final headline = view.headlineText(strings);
+    final headStyle = LoopText.headline(s);
+    return GlassCard(
+      width: LoopTrackGeometry.cardWidth * s,
+      minHeight: 300 * s,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(LoopRadii.card * s - 1),
+        child: Stack(
+          children: <Widget>[
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              height: 300 * s,
+              child: const ExcludeSemantics(
+                child: CustomPaint(painter: _SwirlPainter()),
+              ),
+            ),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                // 31·s from the card's outer top: the glass card's 1 px edge
+                // insets its child by 1 px on each side (`BoxDecoration`
+                // padding), so 2 px come off here to keep the card 300·s tall.
+                Padding(
+                  padding: EdgeInsets.fromLTRB(
+                    24.5 * s,
+                    31 * s - 2,
+                    24.5 * s,
+                    0,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      // The progress, announced once (§18.3 (5)).
+                      Semantics(
+                        container: true,
+                        label: view.progressSemantics(strings),
+                        child: ExcludeSemantics(
+                          child: Text(
+                            strings.journeyLabel(view.progressCount),
+                            style: LoopText.caption(s).copyWith(
+                              fontSize: 11 * s,
+                              letterSpacing: 0.2 * 11 * s,
+                              height: 1,
+                            ),
+                            textScaler: capped,
+                            maxLines: 1,
+                            softWrap: false,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 15 * s),
+                      Text.rich(
+                        TextSpan(
+                          children: <InlineSpan>[
+                            TextSpan(text: headline.before),
+                            TextSpan(
+                              text: headline.emphasis,
+                              style: const TextStyle(color: LoopColors.lime),
+                            ),
+                            TextSpan(text: headline.after),
+                          ],
+                        ),
+                        style: headStyle,
+                        textScaler: capped,
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 12 * s),
+                LoopTrack(
+                  firstLevel: view.windowStart,
+                  states: view.windowStates,
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-class _RingCentre extends StatelessWidget {
-  const _RingCentre({required this.strings, required this.model});
+/// The two decorative swirl arcs of `S-06b` (ui-design §5 Surface), in the
+/// card's 308 × 300 reference box, anchored to its bottom. No semantics.
+class _SwirlPainter extends CustomPainter {
+  const _SwirlPainter();
 
-  final JourneyStrings strings;
-  final JourneyProgressModel? model;
+  static const Color _sage = Color(0x24BECDAA); // rgba(190,205,170,.14)
+  static const Color _peri = Color(0x427884E1); // rgba(120,132,225,.26)
 
-  @override
-  Widget build(BuildContext context) {
-    final loading = model == null;
-    final count = model?.progressCount ?? 0;
-    final done = model?.allComplete ?? false;
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        Text(
-          done ? strings.allCompleteKicker : strings.progressUnit,
-          style: PlayTheme.microLabel.copyWith(
-            color: done
-                ? PlayTheme.amber.withValues(alpha: 0.8)
-                : PlayTheme.muted,
-            letterSpacing: 2,
-          ),
-        ),
-        const SizedBox(height: 6),
-        if (loading)
-          const SizedBox(height: 40)
-        else
-          TweenAnimationBuilder<double>(
-            // a single settle-tick + pulse when the count changes
-            key: ValueKey<int>(count),
-            tween: Tween<double>(begin: 1.06, end: 1),
-            duration: const Duration(milliseconds: 160),
-            curve: Curves.easeOut,
-            builder: (context, scale, child) =>
-                Transform.scale(scale: scale, child: child),
-            child: RichText(
-              text: TextSpan(
-                children: <InlineSpan>[
-                  TextSpan(
-                    text: '$count',
-                    style: const TextStyle(
-                      fontSize: 50,
-                      fontWeight: FontWeight.w700,
-                      color: PlayTheme.paper,
-                      fontFeatures: <FontFeature>[FontFeature.tabularFigures()],
-                      height: 1,
-                    ),
-                  ),
-                  const TextSpan(
-                    text: '  / 30',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700,
-                      color: PlayTheme.muted,
-                      fontFeatures: <FontFeature>[FontFeature.tabularFigures()],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-      ],
-    );
+  void _ellipse(
+    Canvas canvas,
+    Offset centre,
+    double rx,
+    double ry,
+    double degrees,
+    Color color,
+    double width,
+  ) {
+    canvas
+      ..save()
+      ..translate(centre.dx, centre.dy)
+      ..rotate(degrees * 3.141592653589793 / 180)
+      ..drawOval(
+        Rect.fromCenter(center: Offset.zero, width: rx * 2, height: ry * 2),
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = width
+          ..color = color,
+      )
+      ..restore();
   }
-}
-
-class _JourneyRingPainter extends CustomPainter {
-  _JourneyRingPainter({
-    required this.progressCount,
-    required this.currentLevel,
-    required this.currentInProgress,
-    this.pulse = 0.0,
-    this.bloom = 0.0,
-  });
-
-  final int progressCount;
-  final int? currentLevel;
-  final bool currentInProgress;
-
-  /// 0..1 breathing phase for the in-progress node (0 ⇔ steady / reduced motion).
-  final double pulse;
-
-  /// 0..1 one-shot terminal bloom intensity (0 ⇔ none; drawn only at 30 / 30).
-  final double bloom;
-
-  // 300° sweep, 60° gap centred on the bottom.
-  static const double _startDeg = 120; // clockwise from lower-left
-  static const double _sweepDeg = 300;
-  static const int _ticks = 30;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final centre = size.center(Offset.zero);
-    final radius = size.width * 0.5 - 10;
-    final tickLen = size.width * 0.032;
-    const start = _startDeg * math.pi / 180;
-    const sweep = _sweepDeg * math.pi / 180;
-    const step = sweep / (_ticks - 1);
-
-    // 1) all-locked track first.
-    final trackPaint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round
-      ..strokeWidth = 3
-      ..color = PlayTheme.muted.withValues(alpha: 0.3);
-    for (var i = 0; i < _ticks; i++) {
-      final a = start + step * i;
-      _tick(canvas, centre, radius, a, tickLen, trackPaint);
-    }
-
-    // 2) one continuous glow spanning the completed run.
-    if (progressCount > 0) {
-      final endIdx = math.min(progressCount, _ticks) - 1;
-      canvas.drawArc(
-        Rect.fromCircle(center: centre, radius: radius),
-        start,
-        step * endIdx,
-        false,
-        Paint()
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = tickLen + 6
-          ..color = const Color(0xFFFFE9C2).withValues(alpha: 0.10)
-          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 12),
-      );
-      // Terminal: one restrained bloom over the whole closed ring on entry.
-      if (bloom > 0.001 && endIdx == _ticks - 1) {
-        canvas.drawArc(
-          Rect.fromCircle(center: centre, radius: radius),
-          start,
-          sweep,
-          false,
-          Paint()
-            ..style = PaintingStyle.stroke
-            ..strokeWidth = tickLen + 10
-            ..color = const Color(0xFFFFE9C2).withValues(alpha: 0.16 * bloom)
-            ..maskFilter = MaskFilter.blur(BlurStyle.normal, 14 + 18 * bloom),
-        );
-      }
-      final donePaint = Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeCap = StrokeCap.round
-        ..strokeWidth = 3
-        ..color = PlayTheme.amber;
-      for (var i = 0; i <= endIdx; i++) {
-        final a = start + step * i;
-        _tick(canvas, centre, radius, a, tickLen, donePaint);
-      }
-    }
-
-    // 3) the current node.
-    final cur = currentLevel;
-    if (cur != null && cur >= 1 && cur <= _ticks) {
-      final a = start + step * (cur - 1);
-      final bright = Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeCap = StrokeCap.round
-        ..strokeWidth = 3.5
-        ..color = PlayTheme.amber;
-      _tick(canvas, centre, radius, a, tickLen, bright);
-      final tip = Offset(
-        centre.dx + (radius + tickLen * 0.5) * math.cos(a),
-        centre.dy + (radius + tickLen * 0.5) * math.sin(a),
-      );
-      // The in-progress node breathes ≈ ±6 % around its resting size / cyan
-      // opacity; `pulse == 0` (steady / reduced motion) leaves it at rest.
-      final breath = currentInProgress ? pulse : 0.0;
-      final dotScale = 1.0 + 0.06 * breath;
-      canvas.drawCircle(
-        tip,
-        5 * dotScale,
-        Paint()
-          ..color = PlayTheme.amber
-          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4),
-      );
-      canvas.drawCircle(tip, 4 * dotScale, Paint()..color = PlayTheme.amber);
-      if (currentInProgress) {
-        canvas.drawCircle(
-          tip,
-          7.5 * dotScale,
-          Paint()
-            ..style = PaintingStyle.stroke
-            ..strokeWidth = 1.5
-            ..color = PlayTheme.cyan.withValues(alpha: 0.7 + 0.3 * breath),
-        );
-      }
-    }
-  }
-
-  void _tick(Canvas canvas, Offset c, double r, double a, double len, Paint p) {
-    final inner = Offset(
-      c.dx + (r - len * 0.5) * math.cos(a),
-      c.dy + (r - len * 0.5) * math.sin(a),
-    );
-    final outer = Offset(
-      c.dx + (r + len * 0.5) * math.cos(a),
-      c.dy + (r + len * 0.5) * math.sin(a),
-    );
-    canvas.drawLine(inner, outer, p);
+    canvas
+      ..save()
+      ..scale(size.width / 308, size.height / 300);
+    _ellipse(canvas, const Offset(60, 210), 170, 64, -9, _sage, 20);
+    _ellipse(canvas, const Offset(240, 230), 150, 80, -14, _peri, 24);
+    canvas.restore();
   }
 
   @override
-  bool shouldRepaint(_JourneyRingPainter old) =>
-      old.progressCount != progressCount ||
-      old.currentLevel != currentLevel ||
-      old.currentInProgress != currentInProgress ||
-      old.pulse != pulse ||
-      old.bloom != bloom;
+  bool shouldRepaint(_SwirlPainter oldDelegate) => false;
 }
 
-class _ContinueCta extends StatelessWidget {
-  const _ContinueCta({
-    required this.lang,
-    required this.strings,
-    required this.model,
-    required this.maxWidth,
+/// One entrance element: opacity 0 → 1 with a rise, ease-out
+/// `cubic-bezier(.22,.61,.36,1)`, in the [from]–[to] ms window of the
+/// 340 ms entrance (ui-design §5).
+class _Enter extends StatelessWidget {
+  const _Enter({
+    required this.animation,
+    required this.from,
+    required this.to,
+    required this.rise,
+    required this.child,
   });
 
-  final String lang;
-  final JourneyStrings strings;
-  final JourneyProgressModel? model;
+  final Animation<double> animation;
+  final int from;
+  final int to;
+  final double rise;
+  final Widget child;
 
-  /// Available layout width — the pill spans ~68 % of it (`ui-design.md §7.2`).
-  final double maxWidth;
+  static const Curve _ease = Cubic(0.22, 0.61, 0.36, 1);
 
   @override
   Widget build(BuildContext context) {
-    final done = model?.allComplete ?? false;
-    // All complete → replay from level 1 (progress is not reset).
-    // Otherwise → the resolved current/next level (Level 1 when the model is
-    // still loading or errored — a working CTA over a dead one).
-    final target = done ? 1 : (model?.continueTarget ?? 1);
-    final label = done ? strings.replayLabel : strings.continueLabel;
-    final inProgress = !done && model?.inProgressLevel == target;
-    final pillWidth = (maxWidth * 0.68).clamp(220.0, 320.0).toDouble();
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        Semantics(
-          button: true,
-          label: '$label — ${strings.levelWord} $target',
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: () => context.push(
-              Routes.play,
-              extra: PlaySessionArgs(
-                source: PuzzleSource.journey,
-                journeyLevel: target,
-              ),
-            ),
-            child: Container(
-              height: 54,
-              width: pillWidth,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: <Color>[PlayTheme.amber, PlayTheme.amberLo],
-                ),
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: const <BoxShadow>[
-                  BoxShadow(
-                    color: Color(0x4DFFB020),
-                    blurRadius: 20,
-                    offset: Offset(0, 6),
-                  ),
-                ],
-              ),
-              child: Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w700,
-                  color: PlayTheme.inkAmber,
-                  letterSpacing: 0.5,
-                ),
-              ),
-            ),
+    const total = 340;
+    final window = Interval(from / total, to / total, curve: _ease);
+    return AnimatedBuilder(
+      animation: animation,
+      child: child,
+      builder: (context, child) {
+        final t = window.transform(animation.value);
+        if (t >= 1) return child!; // at rest: no Opacity layer
+        return Opacity(
+          opacity: t,
+          child: Transform.translate(
+            offset: Offset(0, rise * (1 - t)),
+            child: child,
           ),
-        ),
-        const SizedBox(height: 10),
-        Text(
-          strings.levelCaption(target, inProgress: inProgress),
-          style: PlayTheme.helper.copyWith(
-            fontSize: 13,
-            color: PlayTheme.muted,
-          ),
-        ),
-      ],
+        );
+      },
     );
   }
 }
 
-/// Dev-only shortcut to the debug smoke set (removed from release builds).
+/// Dev-only shortcut to the debug smoke set (C2: `kDebugMode` only, outside
+/// the content column; Material buttons allowed because players never see it).
 class _DebugRow extends StatelessWidget {
   const _DebugRow();
 
@@ -522,13 +468,14 @@ class _DebugRow extends StatelessWidget {
       spacing: 8,
       runSpacing: 8,
       alignment: WrapAlignment.center,
+      crossAxisAlignment: WrapCrossAlignment.center,
       children: <Widget>[
         const Text(
           'debug',
           style: TextStyle(
             fontSize: 10,
             letterSpacing: 2,
-            color: PlayTheme.muted,
+            color: LoopColors.muted,
           ),
         ),
         for (final id in DebugPuzzleLibrary.ids)

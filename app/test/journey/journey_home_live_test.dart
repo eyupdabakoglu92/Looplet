@@ -30,8 +30,7 @@ void main() {
   });
   tearDown(() => db.close());
 
-  // The in-progress node breathes via a repeating controller; reduced motion
-  // keeps `pumpAndSettle` deterministic (same as journey_home_test.dart).
+  // Reduced motion: Home appears at once, no entrance (F05 D3 ui-design §5).
   void reduceMotion(WidgetTester tester) {
     tester.platformDispatcher.accessibilityFeaturesTestValue =
         const FakeAccessibilityFeatures(disableAnimations: true);
@@ -86,10 +85,11 @@ void main() {
     lastPersistedAtUtcMs: 1757145004200,
   );
 
-  /// The CONTINUE caption(s) currently rendered ("Seviye N" / "… · sürüyor").
+  /// The CONTINUE caption(s) currently rendered ("Seviye N" / "… · sürüyor"),
+  /// with the no-break joins of the D3 caption read back as plain spaces.
   List<String> captions(WidgetTester tester) => tester
       .widgetList<Text>(find.byType(Text))
-      .map((t) => t.data ?? '')
+      .map((t) => (t.data ?? '').replaceAll('\u00A0', ' '))
       .where((s) => s.startsWith('Seviye '))
       .toList();
 
@@ -115,7 +115,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(captions(tester), <String>['Seviye 2 · sürüyor']);
-    await tester.tap(find.text('DEVAM ET'));
+    await tester.tap(find.text('Devam et'));
     await tester.pumpAndSettle();
     expect(lastPlayArgs?.journeyLevel, 2);
   });
@@ -133,7 +133,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(captions(tester), <String>['Seviye 2 · sürüyor']);
-    await tester.tap(find.text('DEVAM ET'));
+    await tester.tap(find.text('Devam et'));
     await tester.pumpAndSettle();
     expect(lastPlayArgs?.journeyLevel, 2);
   });
@@ -157,7 +157,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(captions(tester), <String>['Seviye 3']);
-    await tester.tap(find.text('DEVAM ET'));
+    await tester.tap(find.text('Devam et'));
     await tester.pumpAndSettle();
     expect(lastPlayArgs?.journeyLevel, 3);
   });

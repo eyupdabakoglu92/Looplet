@@ -10,16 +10,16 @@ Rework
 
 ## Current Owner
 
-Frontend/Mobile Developer
+Tech Lead
 
 ## Next Role
 
-Frontend/Mobile Developer
+Tech Lead
 
 ## Active Task Ledger
 
 - [x] Task ID: F05-UI-D3 | Assigned Role: UI Designer | Status: Done | Summary: DELIVERED 2026-09-29 (981b807), ACCEPTED at the Tech Lead visual-gate checkpoint 2026-09-29 (architecture §18.7). ui-design.md is the D3 handoff (the pre-D3 file archived: history/f05-journey-progression-2026-09-29/ui-design-before-phase-d3.md): every Home state incl. the N1 terminal-with-replay (D3-07), the loop track with windowing A "sliding five" (adopted) and B (rendered alternative), the store-error screen, native launch iOS / Android, splash, 1.3× / AX5, device variants, the entrance prototype, window and contrast tables, acceptance list §11.1, manifest §12b. 41 renders + 4 contact sheets in design/ from design/src/gen-d3.mjs (reproduced byte for byte at the checkpoint). | Depends On: -
-- [ ] Task ID: F05-FE-D3 | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: Implement the D3 handoff from `app/lib/design` — Home (`LoopTrack` + the `LoopNode` states), the §18.3 (2) CONTINUE rule, the C1 copy rule, splash, `StoreErrorScreen`, native launch assets, the `MaterialApp` ground, the C2 debug row, the C3 entrance; tests and named negative runs; `frontend.md` Visual Parity Evidence incl. the cold-start recording and the production-shaped cold boot (architecture §18.6, §18.7). Brief: Current Brief | Depends On: F05-UI-D3
+- [x] Task ID: F05-FE-D3 | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: DELIVERED 2026-09-29 (HEAD 7c1a946 + working tree, `app/` fingerprint `b4ad263e…`; frontend.md, the pre-D3 file archived as history/f05-journey-progression-2026-09-29/frontend-before-phase-d3.md). Home (`LoopTrack`, `LoopNode` open / locked / finish), `JourneyHomeView` (window rule, C1, N1 CTA), the shell (`shell/`: splash, store error, wordmark, layout), native launch (iOS + Android incl. API 31+), `MaterialApp` ground; 565 app tests + 13 / 13 integration_test on the iPhone 16; negative runs NA–NH caught; runtime parity on the 16 / 16e / Pro Max in design/runtime-d3/. Two runtime defects found and fixed (debug row on a live AX5 change; the debug text at AX5). Original brief: Implement the D3 handoff from `app/lib/design` — Home (`LoopTrack` + the `LoopNode` states), the §18.3 (2) CONTINUE rule, the C1 copy rule, splash, `StoreErrorScreen`, native launch assets, the `MaterialApp` ground, the C2 debug row, the C3 entrance; tests and named negative runs; `frontend.md` Visual Parity Evidence incl. the cold-start recording and the production-shaped cold boot (architecture §18.6, §18.7). Brief: Current Brief | Depends On: F05-UI-D3
 - [ ] Task ID: F05-QA-D3 | Assigned Role: QA | Status: Queued | Summary: Final-stage independent visual QA of D3 (rubric ≥ 93 from runtime; F05 AC7–AC10 / AC12 incl. the N1 replay rule warm and cold; error screen + Retry; cold start with no white frame; D1 / D2 regression over Home ⇄ `/play`) (architecture §18.6) | Depends On: F05-FE-D3
 
 ## Open Tasks
@@ -32,7 +32,7 @@ None
 
 ## Delivery Review
 
-Accepted
+Pending
 
 ## QA Scope
 
@@ -89,6 +89,8 @@ Their manifest is features/f00-design-foundation/ui-design.md § Visual Evidence
 
 The shipped baseline is conformance-audit.md §2, §3 and §12, captured at 615e94c: `design/audit/cur-home-new.png`, `cur-home-mid.png`, `cur-home-in-progress.png`, `cur-home-late-in-progress.png`, `cur-home-terminal.png`, `cur-a11y-ax5-home-terminal.png`, `cur-a11y-xxxl-home-terminal.png`, `cur-shell-splash.png`, `cur-shell-bootstrap-error.png`, and the pairs `pair-01-home-in-progress.jpg`, `pair-02-home-mid.jpg`.
 
+**The D3 runtime (F05-FE-D3, 2026-09-29):** frontend.md § Visual Parity Evidence — captures, recordings and composites in `design/runtime-d3/` (`RT-*`, `A11Y-*`, `COLD-*`, `PC-D3-*`, `parity-measurements.txt`). Not a gate transition.
+
 The D1 / D2 surfaces that Home opens into and returns from (gate Passed 2026-09-28 / 2026-09-29) are recorded in the F03 orchestration and F03 `architecture.md` §19.12 / §20.11.
 
 **The D3 handoff (accepted 2026-09-29, architecture §18.7):** `ui-design.md` §12a matrix and §12b manifest; the renders `design/D3-*.png` (the build targets: every Home state, the store error, launch and splash, 1.3× / AX5, device variants); windowing A adopted (`DR-D3-A`), B kept as the rendered alternative (`DR-D3-B`); the entrance prototype `design/src/D3-motion-prototype.html`; the expected-value tables `design/src/window-d3.txt` and `contrast-d3.txt`.
@@ -120,7 +122,19 @@ The D1 / D2 surfaces that Home opens into and returns from (gate Passed 2026-09-
   * Prerequisite / External Decision: F05.D3-HANDOFF accepted (gate Ready for Implementation) — met 2026-09-29
   * Re-evaluation Trigger: F05-FE-D3 delivery
   * Blocks: Visual Quality Gate = Ready for QA; F05-QA-D3
+  * Result: PASS
+  * Provenance / Note: iOS Simulator scope. 2026-09-29 Frontend/Mobile Developer, HEAD 7c1a946 + working tree (`app/` `b4ad263e…`), debug build on iOS Simulator 18.6 — iPhone 16 / 16e / Pro Max. Every Home state beside its render (PC-D3-*: horizontal ≤ 0.5 pt; vertical −5…−7.5 pt, the render's own drift from §6, frontend.md §4 / §16 (1)); cold-start recordings from an empty and an existing store with no light frame and an invisible native → Flutter hand-off; Reduce Motion recording; the store error forced (debug) incl. AX5 and Retry; the text sweep large → AX5 → large; N1 tap → level 12 at its saved state. `melos run analyze` / `test` green (app 565); integration_test 13 / 13 on the iPhone 16. Split out: F05.D3-RELEASE-ERROR-CAPTURE (below); Android not run (ANDROID-CI-EVIDENCE).
+
+- Evidence ID: F05.D3-RELEASE-ERROR-CAPTURE
+  * Scenario: The store-error screen in a profile or release build shows no exception text (architecture §18.6)
+  * Required Class: runtime
+  * Target / Environment: a physical iPhone or a distribution build (the iOS Simulator cannot run profile / release builds)
+  * Owner Role: Frontend/Mobile Developer
+  * Prerequisite / External Decision: a device or distribution build — proposed to ride FIRST-APP-DISTRIBUTION; Blocking Scope to be set by the Tech Lead
+  * Re-evaluation Trigger: the first device / distribution build
+  * Blocks: to be decided by the Tech Lead (frontend.md §16 (3))
   * Result: PENDING
+  * Provenance / Note: 2026-09-29 Frontend/Mobile Developer. Covered meanwhile by widget tests (`showDetails: false`: no exception text; negative run NC) and the compile-time `kDebugMode` gate; the debug-build runtime shows the box apart from the player copy.
 
 - Evidence ID: F05.D3-VISUAL-QA
   * Scenario: An independent final-stage QA verdict on D3 — rubric ≥ 93 from runtime (every dimension ≥ 8, no fail condition); F05 AC7–AC10 / AC12 on the new Home incl. the §18.3 (2) replay rule warm and cold; the error screen and Retry; cold start with no white frame; D1 / D2 regression over Home ⇄ `/play`
@@ -150,7 +164,7 @@ None
 
 ## Next Action
 
-Run Frontend/Mobile Developer on F05-FE-D3 — implement the D3 handoff (Current Brief; contract architecture §18.3, the §18.7 rulings and corrections C1–C3; `ui-design.md` §11 and the §11.1 acceptance list). Then hand back to the Tech Lead for the mandatory checkpoint (→ Ready for QA) before F05-QA-D3.
+Run Tech Lead — the D3 implementation checkpoint: reconcile F05-FE-D3 (frontend.md, F05.D3-PARITY), rule on frontend.md §16 (1)–(4) (the render drift vs §6, the iOS launch cross-fade under Reduce Motion, the profile / release store-error capture, the F08 Retry observation), then set the gate and open F05-QA-D3.
 
 ## Last Decision
 
@@ -168,9 +182,9 @@ The orchestration at the UI delivery is archived byte for byte as history/f05-jo
 
 ## Last Update
 
-* Updated By: Tech Lead
+* Updated By: Frontend/Mobile Developer
 * Timestamp: 2026-09-29
-* Summary: D3 visual-gate checkpoint — F05-UI-D3 accepted (architecture §18.7); gate Ready for Implementation; Delivery Review Accepted; F05-FE-D3 Open; owner → Frontend/Mobile Developer.
+* Summary: F05-FE-D3 delivered — the D3 Home, the shell and the native launch; F05.D3-PARITY PASS (iOS Simulator scope), F05.D3-RELEASE-ERROR-CAPTURE PENDING; Delivery Review Pending; owner → Tech Lead (implementation checkpoint).
 
 ## Context & Follow-ups
 
@@ -210,6 +224,7 @@ The orchestration at the UI delivery is archived byte for byte as history/f05-jo
 * 2026-09-29 — Tech Lead: D3 visual-gate checkpoint.
   * **Decided:** F05-UI-D3 accepted; windowing A adopted; §14 rulings 1–5 and corrections C1–C3 (architecture §18.7); pointers added to ui-design.md.
   * **Next:** gate Ready for Implementation; Delivery Review Accepted; F05-FE-D3 Open; owner → Frontend/Mobile Developer.
+* 2026-09-29 — Frontend/Mobile Developer: F05-FE-D3 delivered (frontend.md; the pre-D3 frontend.md archived); F05.D3-PARITY PASS (iOS Simulator scope); F05.D3-RELEASE-ERROR-CAPTURE opened PENDING; Delivery Review Pending; owner → Tech Lead.
 
 ## Current Brief
 

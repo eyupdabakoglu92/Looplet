@@ -200,61 +200,170 @@ class StatCard extends StatelessWidget {
   }
 }
 
-/// A node of the loop track: done = lime rounded square, current = larger
-/// periwinkle square with a halo.
+/// The five states of a loop-track node (F05 `ui-design.md` §7, D3; F05
+/// architecture §18.7 ruling 2). Every state differs in fill *and* edge *and*
+/// size, so none is colour-only.
+enum LoopNodeState {
+  /// A completed level: lime 38·s.
+  done,
+
+  /// Where the player is: periwinkle 58·s with the 76·s halo.
+  current,
+
+  /// Unlocked, not completed, not current: glass fill, solid periwinkle edge.
+  open,
+
+  /// Not yet unlocked: faint fill, dashed muted edge, muted numeral.
+  locked,
+
+  /// Level 30 once the whole Journey is complete: lime 58·s with a lime halo.
+  finish,
+}
+
+/// A node of the loop track. `done` = lime rounded square, `current` = the
+/// larger periwinkle square with a halo; D3 adds `open`, `locked` and `finish`
+/// ([LoopNodeState]). The original call form `LoopNode(number:, current:)`
+/// keeps its behaviour; [state] wins when given.
 class LoopNode extends StatelessWidget {
-  const LoopNode({required this.number, this.current = false, super.key});
+  const LoopNode({
+    required this.number,
+    this.current = false,
+    LoopNodeState? state,
+    super.key,
+  }) : _state = state;
 
   final int number;
   final bool current;
+  final LoopNodeState? _state;
+
+  /// The resolved state.
+  LoopNodeState get state =>
+      _state ?? (current ? LoopNodeState.current : LoopNodeState.done);
+
+  /// Whether [state] is drawn large (58·s) with a 76·s halo.
+  static bool isLarge(LoopNodeState state) =>
+      state == LoopNodeState.current || state == LoopNodeState.finish;
+
+  /// The widget's own square edge for [state] at scale [s]: the halo for the
+  /// large states, the node itself otherwise.
+  static double extentFor(LoopNodeState state, double s) =>
+      (isLarge(state) ? 76 : 38) * s;
+
+  // Local constants of this component (not tokens; §18.7 ruling 2): the open
+  // and locked edges at .62 alpha clear 3 : 1 on the glass card
+  // (`design/src/contrast-d3.txt`: 3.52 and 3.41).
+  static const Color _openFill = Color(0x0FFFFFFF); // rgba(255,255,255,.06)
+  static const Color _openEdge = Color(0x9EA8B4F9); // rgba(168,180,249,.62)
+  static const Color _lockedFill = Color(0x09FFFFFF); // rgba(255,255,255,.035)
+  static const Color _lockedEdge = Color(0x9EAEB4CA); // rgba(174,180,202,.62)
+  static const Color _finishHalo = Color(0x1CDDFA6B); // rgba(221,250,107,.11)
+  static const Color _finishHaloEdge = Color(0x4DDDFA6B); // .30
+
+  /// The spoken state (§18.7 ruling 2): the bare digit does not say whether
+  /// the stop is done or current, and colour is not available to a screen
+  /// reader (F00-FE-A11Y-REWORK QA-02).
+  static String spokenState(LoopNodeState state) => switch (state) {
+    LoopNodeState.done || LoopNodeState.finish => 'tamamlandı',
+    LoopNodeState.current => 'geçerli seviye',
+    LoopNodeState.open => 'açık',
+    LoopNodeState.locked => 'kilitli',
+  };
 
   @override
   Widget build(BuildContext context) {
     final s = LoopScale.of(context);
-    final size = (current ? 58 : 38) * s;
-    final node = Container(
-      width: size,
-      height: size,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        gradient: current ? LoopGradients.nodeCurrent : LoopGradients.nodeDone,
-        borderRadius: BorderRadius.circular(size * 0.34),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: current
-                ? LoopColors.periwinkleLow.withValues(alpha: 0.45)
-                : LoopColors.limeMid.withValues(alpha: 0.28),
-            blurRadius: current ? 30 * s : 20 * s,
-            offset: Offset(0, (current ? 12 : 8) * s),
-          ),
-        ],
+    final st = state;
+    final large = isLarge(st);
+    final size = (large ? 58 : 38) * s;
+    final radius = size * 0.34;
+    final numeral = Text(
+      '$number',
+      style: LoopText.node(
+        (large ? 17 : 14) * s,
+        color: switch (st) {
+          LoopNodeState.open => LoopColors.text,
+          LoopNodeState.locked => LoopColors.muted,
+          _ => LoopColors.limeInk,
+        },
       ),
-      child: Text(
-        '$number',
-        style: LoopText.node((current ? 17 : 14) * s),
-        textScaler: loopCappedTextScaler(context),
-      ),
+      textScaler: loopCappedTextScaler(context),
     );
-    final child = current
+    final Widget node = switch (st) {
+      LoopNodeState.done ||
+      LoopNodeState.current ||
+      LoopNodeState.finish => Container(
+        width: size,
+        height: size,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          gradient: st == LoopNodeState.current
+              ? LoopGradients.nodeCurrent
+              : LoopGradients.nodeDone,
+          borderRadius: BorderRadius.circular(radius),
+          boxShadow: <BoxShadow>[
+            BoxShadow(
+              color: switch (st) {
+                LoopNodeState.current => LoopColors.periwinkleLow.withValues(
+                  alpha: 0.45,
+                ),
+                LoopNodeState.finish => LoopColors.limeMid.withValues(
+                  alpha: 0.34,
+                ),
+                _ => LoopColors.limeMid.withValues(alpha: 0.28),
+              },
+              blurRadius: (large ? 30 : 20) * s,
+              offset: Offset(0, (large ? 12 : 8) * s),
+            ),
+          ],
+        ),
+        child: numeral,
+      ),
+      LoopNodeState.open => Container(
+        width: size,
+        height: size,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: _openFill,
+          borderRadius: BorderRadius.circular(radius),
+          border: Border.all(color: _openEdge, width: 1.5 * s),
+        ),
+        child: numeral,
+      ),
+      LoopNodeState.locked => CustomPaint(
+        painter: DashedRRectPainter(
+          color: _lockedEdge,
+          radius: radius,
+          strokeWidth: 1.5 * s,
+          fill: _lockedFill,
+        ),
+        child: SizedBox(
+          width: size,
+          height: size,
+          child: Center(child: numeral),
+        ),
+      ),
+    };
+    final child = large
         ? Container(
             width: 76 * s,
             height: 76 * s,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: LoopColors.periwinkle.withValues(alpha: 0.16),
+              color: st == LoopNodeState.finish
+                  ? _finishHalo
+                  : LoopColors.periwinkle.withValues(alpha: 0.16),
               borderRadius: BorderRadius.circular(26 * s),
               border: Border.all(
-                color: LoopColors.periwinkle.withValues(alpha: 0.25),
+                color: st == LoopNodeState.finish
+                    ? _finishHaloEdge
+                    : LoopColors.periwinkle.withValues(alpha: 0.25),
               ),
             ),
             child: node,
           )
         : node;
-    // The bare digit doesn't say whether this stop is done or the current
-    // one; the colour distinction alone isn't available to a screen reader
-    // (F00-FE-A11Y-REWORK QA-02 note).
     return Semantics(
-      label: current ? '$number, geçerli seviye' : '$number, tamamlandı',
+      label: '$number, ${spokenState(st)}',
       child: ExcludeSemantics(child: child),
     );
   }

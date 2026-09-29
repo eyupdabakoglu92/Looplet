@@ -9,6 +9,7 @@ export 'components/play_decor.dart';
 export 'components/result_decor.dart';
 export 'components/surfaces.dart';
 export 'components/tile.dart';
+export 'components/track.dart';
 export 'icons.dart';
 export 'tokens.dart';
 export 'turkish_case.dart';
