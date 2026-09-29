@@ -6,28 +6,28 @@ F08
 
 ## Current Status
 
-In QA
+In Progress
 
 ## Current Owner
 
-QA
+Tech Lead
 
 ## Next Role
 
-QA
+Tech Lead
 
 ## Active Task Ledger
 
 - [x] Task ID: F08-FE13 | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: Close the unreadable-DB gap (Resilience row, AC8: classify, quarantine + recreate, `db_reinitialized`, loop guard), make Retry reopen the database connection (F08-RETRY-STORE-CONNECTION), add the debug-only emulator wiring and fake-producer trigger, and the storage-full fault-injection harness (architecture Activation A1–A4). Brief: Current Brief | Depends On: -
 - [x] Task ID: F08-LOCAL-EVIDENCE | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: On the F08-FE13 build, capture the local evidence of architecture Activation A4 — resume fidelity incl. restart / thaw / tamper; exactly-once and lifecycle against the Firebase emulator; the emulator rules / callable suite; storage-full; the unreadable-DB runtime; the production-shaped cold boot; offline Journey only on a real no-network runtime. No deploy; no product-semantics change. Brief: Current Brief | Depends On: F08-FE13
 - [x] Task ID: F08-BE6 | Assigned Role: Backend Developer | Status: Done | Summary: Fix the contract-invalid fixture in `infra/functions/test/submitDailyResult.test.ts` "ALREADY_SUBMITTED on a repeat" (`moves` 8 < `optimalMoves` 9), keep its first-run-authoritative assertions, prove them with a named negative run, and re-run the emulator suite green on Java 21 (architecture Activation A6 ruling 6). Test code only. Brief: Current Brief | Depends On: -
-- [ ] Task ID: F08-QA-FUNCTIONAL | Assigned Role: QA | Status: Open | Summary: Independently review and re-run the local / emulator / boot evidence under the locked plan (architecture Activation A7), keep unresolved scenarios, then issue the functional-stage verdict | Depends On: F08-LOCAL-EVIDENCE, F08-BE6
-- [ ] Task ID: F08-DEVOPS | Assigned Role: DevOps/Release Engineer | Status: Blocked | Summary: Resume release readiness only after explicit billing/target approval; retain runbook and remaining smoke; the existing CI emulator step (F08-BE5) must run on Java 21 and show a real green run (CI-EMULATOR-JAVA21; architecture A8 ruling 3) | Depends On: F08-QA-FUNCTIONAL
+- [ ] Task ID: F08-QA-FUNCTIONAL | Assigned Role: QA | Status: Queued | Summary: Independently review and re-run the local / emulator / boot evidence under the locked plan (architecture Activation A7), keep unresolved scenarios, then issue the functional-stage verdict | Depends On: F08-LOCAL-EVIDENCE, F08-BE6
+- [ ] Task ID: F08-DEVOPS | Assigned Role: DevOps/Release Engineer | Status: Blocked | Summary: Resume release readiness only after explicit billing/target approval; retain runbook and remaining smoke; a CI emulator job, if added, pins Java 21 (architecture A6 ruling 5) | Depends On: F08-QA-FUNCTIONAL
 - [ ] Task ID: F08-QA-FINAL | Assigned Role: QA | Status: Queued | Summary: Final acceptance of reviewed release proof and any affected functional scope | Depends On: F08-DEVOPS
 
 ## Open Tasks
 
-* F08-QA-FUNCTIONAL (QA) — Open; brief: Current Brief; plan: architecture → Activation A7, corrected by A8.
+* None open for a delivery role — F08-QA-FUNCTIONAL stays Queued until the Tech Lead checkpoint after F08-BE6.
 
 ## Handoff Plan
 
@@ -35,7 +35,7 @@ None
 
 ## Delivery Review
 
-Accepted
+Pending
 
 ## QA Scope
 
@@ -59,7 +59,7 @@ functional
 
 ## QA Result
 
-None
+Runtime Validation Pending
 
 ## Release Scope
 
@@ -92,14 +92,13 @@ None
   * Required Class: repeatable integration
   * Target / Environment: Isolated Firebase emulator project or an identifiable existing CI emulator run
   * Owner Role: QA
-  * Prerequisite / External Decision: JDK/emulator tooling — **present 2026-09-29** (OpenJDK 21 keg-only, first on `PATH`; firebase-tools 15.29; the command in setup-manifest.md, project `demo-looplet`); client ↔ emulator runs use the F08-FE13 debug wiring (delivered). No Blaze upgrade/real deploy required
+  * Prerequisite / External Decision: JDK/emulator tooling — **present 2026-09-29** (OpenJDK 17, Firebase CLI; `npm run test:emulator`, project `demo-looplet`); client ↔ emulator runs need the F08-FE13 debug wiring. No Blaze upgrade/real deploy required
   * Re-evaluation Trigger: Evidence captured or existing evidence reviewed against the current scope
   * Blocks: F08 functional acceptance
   * Result: PENDING
   * Delivery Evidence: 2026-09-29 (LE-03, LE-04): suite 30/31 — one backend test sends an invalid payload (frontend.md F08-FE13 §16.1); client ↔ emulator cases A–E. Tooling: firebase-tools 15.29 needs JDK 21 (installed, not linked).
   * Tech Lead 2026-09-29 (A6 ruling 6): the red test is a fixture defect (handler correct) → F08-BE6; the suite must be green before QA. Canonical command with Java 21: setup-manifest.md → Canonical Verification Commands.
   * Delivery Evidence (F08-BE6, 2026-09-29, HEAD b8e37ab + the fixed test): suite **31 / 31**, exit 0 (`evidence/runtime/BE6-02-fixed-suite.log.txt`); N-OVERWRITE caught (`BE6-04-neg.log.txt`). Java 21 must be on PATH, not only `JAVA_HOME` (backend.md F08-BE6 §14.1). QA review pending.
-  * Tech Lead 2026-09-29 (A8): BE6 accepted; Tech Lead re-run at c70527a 31 / 31, exit 0 (not a QA claim); setup-manifest command corrected. The CI emulator step has never run (CI-EMULATOR-JAVA21) — not a source for this record.
 
 - Evidence ID: F08.LOCAL-RESUME
   * Scenario: Kill/relaunch exact restore, undo/restart/thaw state and untrusted cached thaw re-derivation
@@ -193,33 +192,36 @@ None
 
 ## Next Action
 
-Run QA — F08-QA-FUNCTIONAL (Current Brief; plan architecture → Activation A7, corrected by A8). Functional stage only. F08.OFFLINE-JOURNEY stays PENDING unless the user has run `evidence/offline-journey.sh` on a real no-network runtime. The release stage stays blocked (F08.DEPLOY-AUTHORIZATION OPEN); no deployment or billing action.
+Run Tech Lead — checkpoint on F08-BE6 (backend.md → "F08-BE6"): reconcile the fixture fix and the emulator suite (31 / 31, N-OVERWRITE), resolve §14.1 (the setup-manifest command needs Java 21 on PATH) and §14.2 (the existing CI emulator step and Java 21), then activate F08-QA-FUNCTIONAL under plan A7. F08.OFFLINE-JOURNEY still waits for the user's run of `evidence/offline-journey.sh`. The release stage stays blocked (F08.DEPLOY-AUTHORIZATION OPEN); no deployment or billing action.
 
 ## Last Decision
 
-2026-09-29 — Tech Lead checkpoint on F08-BE6 (commit c70527a). Full record: architecture → Activation 2026-09-29 → A8.
+2026-09-29 — Tech Lead checkpoint on F08-FE13 + F08-LOCAL-EVIDENCE (commit beb7bfe, `app/` tree `9de12e6a…`). Full record: architecture → Activation 2026-09-29 → A6 (rulings) and A7 (QA plan).
 
-* **Accepted:** F08-BE6.
-  * The second call is now a valid "better" replay (`moves: 10`, `stars: 3`), so the test reaches the idempotency branch it names.
-  * The assertions are stronger, and N-OVERWRITE is caught.
-  * Only test code changed; the handler, validator and rules fingerprints are unchanged since 8479ddb.
-* **Tech Lead re-run:** the emulator suite at c70527a — 31 / 31, exit 0. This is not a QA claim.
-* **Corrected:**
-  * the setup-manifest command: Java 21 must also be first on `PATH`;
-  * the premise of A6 ruling 5: the CI emulator step exists since F08-BE5, but CI has never run (0 GitHub Actions runs). It needs Java 21 → follow-up CI-EMULATOR-JAVA21 (DevOps/Release Engineer). It does not block functional QA.
-* **Notes, no change:**
-  * `firestore.rules` has no `!exists` — equivalent, because `create` fires only on a missing document;
-  * the Jest teardown warning.
-* **Delivery Review: Accepted** (FE13, LOCAL-EVIDENCE, BE6).
-* **Activated:** F08-QA-FUNCTIONAL under A7; QA Result reset to None.
+* **Accepted:**
+  * F08-FE13 and F08-LOCAL-EVIDENCE — task coverage A1–A4, contract preserved, Visual Scope `none` held;
+  * the migration `transaction` fix, which restores the locked "no partial apply" row (N-TXN catches its removal);
+  * quarantining `-journal`;
+  * the named emulator app and skipping App Check in emulator mode (debug only);
+  * the debug kill switch, as test tooling — it proves the `drain()` no-op, not the Remote Config wiring (F07);
+  * the identity note: `firebaseUid` survives a recreate, which is consistent with first-run-authoritative.
+* **Tech Lead re-run:** the recovery, storage-full and store-error tests — 29 / 29, exit 0. This is not a QA claim.
+* **Routed:**
+  * the backend fixture defect (the suite is 30 / 31; the handler is correct) → F08-BE6, before QA;
+  * Java 21 → setup-manifest's canonical command, plus a note for the F08-DEVOPS CI job.
+* **Locked:** the F08-QA-FUNCTIONAL plan:
+  * modules core, backend-security, client-ui, stateful-flow;
+  * regression depth full;
+  * evidence reuse invalidated for the app side.
+* **Delivery Review** stays Pending until F08-BE6 is reconciled.
 
-The pre-checkpoint orchestration is archived as history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-be6-checkpoint.md.
+The pre-checkpoint orchestration is archived as history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-fe13-checkpoint.md.
 
 ## Last Update
 
-* Updated By: Tech Lead
+* Updated By: Backend Developer
 * Timestamp: 2026-09-29
-* Summary: F08-BE6 checkpoint — BE6 accepted, Delivery Review Accepted, the Java 21 command corrected, CI-EMULATOR-JAVA21 recorded; F08-QA-FUNCTIONAL activated; owner → QA.
+* Summary: F08-BE6 Done (backend.md) — the fixture is valid, the emulator suite is 31 / 31 and N-OVERWRITE is caught; Delivery Review Pending; owner → Tech Lead.
 
 ## Context & Follow-ups
 
@@ -250,11 +252,6 @@ F08 implementation/runbook and the F08-FE12 fix are retained. Exact old tasks an
   * **Recorded:** Java 21 in setup-manifest.
   * **Next:** owner → Backend Developer.
 * 2026-09-29 — Backend Developer: F08-BE6 Done (backend.md). Test code only; suite 31 / 31 on Java 21; N-OVERWRITE caught. Needs the Tech Lead: the setup-manifest command (Java 21 on PATH), the existing CI emulator step (Java 21). Owner → Tech Lead.
-* 2026-09-29 — Tech Lead: BE6 checkpoint (A8).
-  * **Accepted:** F08-BE6; Delivery Review Accepted.
-  * **Corrected:** the Java 21 command (setup-manifest); A6 ruling 5's CI premise → CI-EMULATOR-JAVA21 (DevOps/Release Engineer, non-blocking).
-  * **Activated:** F08-QA-FUNCTIONAL (A7).
-  * **Next:** owner → QA.
 
 
 ## Release Constraints
@@ -262,73 +259,46 @@ F08 implementation/runbook and the F08-FE12 fix are retained. Exact old tasks an
 The 2026-09-06 user decision to defer billing/deploy is preserved. In Progress now reflects still-available validation work, not renewed deploy permission. F08-DEVOPS remains Blocked. Environment/JDK/device availability has not been freshly probed; use current evidence, not the old environment assumptions.
 ## Current Brief
 
-**F08-QA-FUNCTIONAL — the functional-stage verdict** (plan: architecture → Activation 2026-09-29 → A7, corrected by A8; stage functional; modules core, backend-security, client-ui, stateful-flow; regression depth full; evidence reuse invalidated)
+**F08-BE6 — the emulator suite's contract-invalid fixture** (contract: architecture → "Firebase Sync Surface" (locked) → Server-side validation; Activation 2026-09-29 → A6 ruling 6)
 
-**What is under test:**
-* the app at `app/` tree `9de12e6a…` (beb7bfe; unchanged since);
-* `infra/functions` at c70527a — the test `cf73770d…`, the handler `bcda2662…`, `validate.ts` `8f0398ea…`, `firestore.rules` `b75628e6…`.
+**Symptom:**
+* `infra/functions` `npm run test:emulator` is 30 / 31 (LE-03, `evidence/runtime/LE-03-emulator-suite.log.txt`).
+* The failing test is `test/submitDailyResult.test.ts` → "ALREADY_SUBMITTED on a repeat — first run stays authoritative". Its second call sends `moves: 8` on top of the base payload's `optimalMoves: 9`.
+* `src/validate.ts` requires `moves >= optimalMoves`, so the handler rightly returns `INVALID_PAYLOAD`. The test never reaches the idempotency branch it names.
+* The handler is correct; the fixture is wrong.
 
-Record the tree / SHA-1s you actually test. If they differ, say so; do not assume these.
-
-**Inputs:**
-* `prd.md` — AC1–AC10 (AC3 is F07, AC10 is automated-only: A7 known limits);
-* `architecture.md` — the locked sections, A1–A4, A6–A8;
-* the delivery claims in `frontend.md` (F08-FE13, F08-LOCAL-EVIDENCE) and `backend.md` (F08-BE6), and `evidence/README.md`.
-
-Delivery evidence is input, not proof. Re-run what the plan requires.
-
-**Scope** — the A7 plan, in full:
-1. The eight critical journeys.
-2. The misuse / negative checks:
-   * the named negatives N-CLASS, N-LOOP, N-RETRY, N-TXN, N-FULL, N-GATE and the backend N-OVERWRITE (`evidence/neg-be6.py`);
-   * rules: create-other, update, delete and read are denied;
-   * callable: an invalid payload → `INVALID_PAYLOAD` → the client parks the item;
-   * the release binary contains no emulator / debug-route strings.
-3. Every Pending Evidence record in scope:
-   * F08.EMULATOR;
-   * F08.LOCAL-RESUME;
-   * F08.LIFECYCLE;
-   * F08.OFFLINE-JOURNEY;
-   * F08.COLD-BOOT-REVIEW;
-   * F08.UNREADABLE-DB.
-
-   F08.STORAGE is already PASS; re-check it under full regression. F08.DEPLOY-SMOKE is release-stage, not this stage.
-
-**Methods:**
-* the iPhone 16 simulator (iOS 18.6), debug builds;
-* the emulator suite with the setup-manifest command: `JAVA_HOME=/opt/homebrew/opt/openjdk@21 PATH=/opt/homebrew/opt/openjdk@21/bin:$PATH npm run test:emulator` — `JAVA_HOME` alone fails;
-* `xcrun simctl keychain <udid> reset` before a client ↔ emulator run (A6 ruling 8);
-* "offline" for exactly-once means the functions proxy / emulator is down; say so. It is not the AC2 offline Journey.
-
-**Known limits — not findings:**
-* AC3 Offline Daily and the Remote Config kill-switch wiring are F07 (A6 ruling 4).
-* AC10 clock is automated-only.
-* The profile / release store-error capture is FIRST-APP-DISTRIBUTION.
-* The CI emulator step has never run (CI-EMULATOR-JAVA21). A local emulator run satisfies F08.EMULATOR.
-* The Jest "worker process has failed to exit gracefully" line is a harness note (A8 ruling 4), unless it hides a failure.
-
-Root causes in delivery artifacts are hypotheses. Report any finding the evidence supports, even one that contradicts a delivery or Tech Lead claim.
+**Scope (test code only):**
+1. Make the second call a valid "better" replay. For example: `moves` between 9 and 13, `stars: 3`, a shorter `durationMs`. Keep every assertion:
+   * `ALREADY_SUBMITTED`;
+   * the same `recordedAt`;
+   * the stored doc unchanged (`moves: 14, stars: 2`).
+2. Scan the rest of `infra/functions/test/` for another fixture that passes or fails for a reason other than the one its name states. Fix it only if it is the same kind of test-data defect; report anything else as Needs Tech Lead Clarification.
+3. **Named negative run (N-OVERWRITE):**
+   * temporarily make the handler overwrite an existing entry (e.g. `set` instead of the create-only path);
+   * show that the fixed test fails;
+   * restore the handler byte for byte and record the SHA before and after.
+4. **Suite:** `cd infra/functions && npm ci && npm run build && JAVA_HOME=/opt/homebrew/opt/openjdk@21 npm run test:emulator` (setup-manifest → Canonical Verification Commands; project `demo-looplet`). Record the counts, the exit code and the log under `evidence/runtime/`. Also record `npm test`, if the package runs a non-emulator suite.
 
 **Non-goals:**
-* no product or test code changes;
-* no real Firebase write beyond the existing production-shaped anonymous sign-in;
-* no deploy, billing or Remote Config change;
-* no system-setting change (the offline Journey is the user's run).
+* no change to `src/` (handler, validation, rules), `firestore.rules`, `firebase.json` or the callable contract;
+* no app code;
+* no real Firebase project, deploy, billing or Remote Config change.
 
-**Output:** append "F08-QA-FUNCTIONAL" to `qa.md` (do not rewrite the 2026-09-06 report). It needs:
-* the evidence record per `prompt-evidence-integrity-standard.md` (command, target, revision, counts, exit code, time);
-* a result per Pending Evidence record — QA owns PASS / FAIL;
-* the misuse results.
+**Evidence:** append a section "F08-BE6" to `backend.md` (do not rewrite BE1–BE5). It needs:
+* task-to-code traceability;
+* the fixture before / after;
+* the N-OVERWRITE table;
+* the evidence record per `prompt-evidence-integrity-standard.md` §1: command, target, counts, exit code, revision, time, isolation.
 
-**Verdict:**
-* Functional Approved — only if every in-scope record is PASS;
-* Runtime Validation Pending — if only F08.OFFLINE-JOURNEY (AC2) is missing its no-network run;
-* Rejected — with findings.
+Add the delivery evidence to the F08.EMULATOR record as a note. It is QA-owned, so do not mark it PASS.
 
-Then `Run Tech Lead`.
+**Exit:**
+* F08-BE6 Done;
+* the suite green on Java 21;
+* the negative run caught;
+* Delivery Review = Pending → the Tech Lead checkpoint, which activates F08-QA-FUNCTIONAL (A7).
 
 ## Earlier briefs
 
-* The F08-BE6 brief (2026-09-29) — in history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-be6-checkpoint.md.
 * The F08-FE13 → F08-LOCAL-EVIDENCE brief (2026-09-29) — in history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-fe13-checkpoint.md.
 * The 2026-09-18 migration brief and older F08 briefs — in history/core-sync-2026-09-18/features/f08-offline-persistence-and-sync/orchestration.md and history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-activation.md.

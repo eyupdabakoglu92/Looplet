@@ -3,6 +3,7 @@
 > Status: **CONTRACT AUTHORITY — LOCKED.** Finalized 2026-09-06 by the Tech Lead from `analysis.md` (F08.0-AN). Every prior `[PENDING ANALYSIS]` section is now `[LOCKED]`. Delivery artifacts and QA notes do not override the semantics here. The only remaining open values are the ones explicitly marked `[OPEN — …]` and belong to a downstream feature/role, not to F08 implementation.
 > **Amended 2026-09-06 (Firebase-project incident):** "App Init Sequence → App Check provider selection" added — soft-enforce unchanged; debug provider in dev, Play Integrity / App Attest in release; iOS production App Attest deferred (no Apple Developer Program membership) and non-blocking because enforcement is OFF.
 > **Amended 2026-09-29 (Tech Lead — F08 activation after Design Adoption Phase D):** "Activation 2026-09-29" added at the end — the unreadable-DB recovery gap (Resilience row, AC8) is closed in code by F08-FE13; Retry reopens the database connection; a debug-only emulator connection and fake-producer trigger; the local evidence plan and its methods. No semantic change to the locked sections.
+> **Amended 2026-09-29 (Tech Lead — the F08-BE6 checkpoint):** "Activation 2026-09-29 → A8" added — F08-BE6 accepted; the Java 21 command corrected (Java 21 must be first on `PATH`); A6 ruling 5's premise about the CI emulator job corrected (the step exists since F08-BE5 and has never run); F08-QA-FUNCTIONAL activated under A7. No semantic change to the locked sections.
 > `orchestration.md` is execution authority; `platform.md` / `release.md` are project authority.
 
 ---
@@ -353,7 +354,7 @@ The QA Focus calls for client ↔ emulator runs ("exactly-once sync … via the 
 
 | Scenario (ledger) | Method | Notes |
 | --- | --- | --- |
-| **F08.EMULATOR** — rules and callable (create-only, auth isolation, idempotency) | `cd infra/functions && npm ci && npm run build && npm run test:emulator` (project `demo-looplet`, no billing). *[Corrected at the A6 checkpoint: firebase-tools 15.29 needs **Java 21+**, not JDK 17 — `JAVA_HOME=/opt/homebrew/opt/openjdk@21`; see A6 ruling 5.]* | The developer confirms the harness runs and records the result. QA re-runs it independently. |
+| **F08.EMULATOR** — rules and callable (create-only, auth isolation, idempotency) | `cd infra/functions && npm ci && npm run build && npm run test:emulator` (project `demo-looplet`, no billing). *[Corrected at the A6 checkpoint: firebase-tools 15.29 needs **Java 21+**, not JDK 17 — `JAVA_HOME=/opt/homebrew/opt/openjdk@21`; see A6 ruling 5. Corrected again at A8: Java 21 must also be first on `PATH`.]* | The developer confirms the harness runs and records the result. QA re-runs it independently. |
 | **Exactly-once client ↔ emulator** (AC4, AC5, AC11; part of F08.EMULATOR / F08.LIFECYCLE) | A3 wiring + the fake producer on the iPhone 16 simulator against `firebase emulators:start --only auth,firestore,functions`:<br>• offline completion → 1 queue item;<br>• reconnect → 1 doc;<br>• a forced mid-request drop (stop the emulator mid-call) → retry → still 1 doc;<br>• a kill during `inFlight` → relaunch → still 1 doc;<br>• a server doc seeded with an earlier run → local later run syncs → server unchanged;<br>• `daily_sync_enabled=false` → no send. | "Offline" here = emulator unreachable (stopped), stated as such. It is not device airplane mode. |
 | **F08.LIFECYCLE** — screen dispose mid-sync; `paused` / `resumed` → `drain()`; connectivity regain → `drain()` | The same setup: trigger, then leave the triggering screen at once; HOME button / relaunch; stop and start the emulator | Record the emulator request log and the queue rows (`sqlite3`) as evidence. |
 | **F08.LOCAL-RESUME** — AC1 / AC6 | iPhone 16 debug build:<br>• a level with frozen tiles (21–30): N moves + an undo + a restart + a thawed tile → kill → relaunch → exact restore of grid, `moveCount`, `undosRemaining`, `restartCount`, elapsed (± capture resolution) and thaw;<br>• tamper `thawedFrozenCells` in `kv['active_session']` → relaunch → thaw re-derived, not trusted. | Grid / moves / undo on a replay are already proven at `b4ad263e…` (F05-QA-D3 E09). The FE13 build changes the database-open path, so the whole scenario is re-run on it. |
@@ -459,7 +460,7 @@ No UI Designer task and no visual gate. If FE13 needs any player-visible change,
 
 **Methods:**
 * iPhone 16 simulator (iOS 18.6) debug builds;
-* `JAVA_HOME=/opt/homebrew/opt/openjdk@21` for the emulator suite;
+* Java 21 for the emulator suite: `JAVA_HOME=/opt/homebrew/opt/openjdk@21 PATH=/opt/homebrew/opt/openjdk@21/bin:$PATH` (*corrected at A8 — `JAVA_HOME` alone is not enough*);
 * the keychain reset from A6 ruling 8;
 * no real Firebase project write beyond the existing production-shaped anonymous sign-in, no deploy, no billing.
 
@@ -472,3 +473,60 @@ No UI Designer task and no visual gate. If FE13 needs any player-visible change,
 * Offline Daily (AC3) is F07.
 * The Remote Config kill-switch wiring is F07 (A6 ruling 4).
 * The profile / release store-error capture is FIRST-APP-DISTRIBUTION.
+
+### A8. Implementation checkpoint 2026-09-29 (F08-BE6, commit c70527a)
+
+**Delivery reviewed:** `backend.md` → "F08-BE6"; the diff of `infra/functions/test/submitDailyResult.test.ts`; `evidence/neg-be6.py`; the logs `BE6-00` to `BE6-04`; the validator (`src/validate.ts`) and `firestore.rules`.
+
+**Fingerprints at c70527a** (they match `backend.md`):
+* the test `cf73770d…`;
+* the handler `submitDailyResult.ts` `bcda2662…`;
+* `validate.ts` `8f0398ea…`;
+* `firestore.rules` `b75628e6…`.
+
+`src/` and the rules are unchanged since 8479ddb.
+
+**Tech Lead re-run (not a QA claim):**
+* Command: `npm run build`, then `JAVA_HOME=/opt/homebrew/opt/openjdk@21 PATH=/opt/homebrew/opt/openjdk@21/bin:$PATH npm run test:emulator`.
+* Where: `infra/functions` at c70527a, 2026-09-29T09:29Z, macOS host.
+* Result: Test Suites 3 / 3, Tests 31 / 31, exit 0.
+* Jest printed "A worker process has failed to exit gracefully". The same line is in the backend logs. It is a teardown leak in the test harness, not a failure; see ruling 4.
+
+**Task coverage:**
+* F08-BE6 is closed. The second call is now a valid "better" replay: `moves: 10` (≥ `optimalMoves` 9), `stars: 3`, `durationMs: 40000`. The validator has no other rule that couples these fields, so the call reaches the `snapshot.exists` branch the test names.
+* The assertions are kept and made stronger: the stored `durationMs` and `recordedAtUtcMs` must not change either.
+* The scan of the other two test files found no fixture of the same kind.
+
+**Contract compliance:** only test code changed. The callable contract, the validation, the rules and the error format are unchanged.
+
+**Evidence quality:**
+* The negative run is real. N-OVERWRITE makes the handler overwrite an existing entry; the fixed test fails with `Expected "ALREADY_SUBMITTED", Received "CREATED"`.
+* N-OVERWRITE-OLDFIX shows why the fix matters. With the old fixture the test failed for the validation reason whether the handler was broken or not, so it could never catch this regression.
+* Both files were restored byte for byte, and the SHA-1s were checked.
+
+**Rulings:**
+1. **F08-BE6 — Accepted.**
+   * F08.EMULATOR now has a green suite and a named negative. It stays PENDING until QA re-runs it; it is a QA-owned record.
+2. **The Java 21 command — corrected** (`backend.md` §14.1).
+   * `JAVA_HOME` alone is not enough: firebase-tools uses the first `java` on `PATH`. The attempt in `BE6-01` shows the failure.
+   * The canonical command in `project-authority/setup-manifest.md` now also puts Java 21 first on `PATH`. The same correction is made in the A4 table and the A7 methods.
+3. **The CI emulator step — the premise of A6 ruling 5 is corrected** (`backend.md` §14.2).
+   * A6 ruling 5 said "when F08-DEVOPS adds one". That is wrong. `.github/workflows/ci.yml` → job `infra` → "Test functions (Firebase emulator — rules + callable behaviour)" has existed since F08-BE5. It runs `npx --yes firebase-tools@15 emulators:exec …`.
+   * The step is **CI-wired but has never been CI-executed**. The GitHub Actions API reports 0 runs for the repository, and `origin/main` is still the bootstrap commit b1a65a0. So no CI result exists, red or green.
+   * When it first runs, it will probably fail. firebase-tools 15 needs Java 21. The step relies on the runner's default Java, which is probably 17 on `ubuntu-latest` (*Needs verification* from a real run). Until BE6 it would also have failed on the fixture.
+   * The fix is CI config. It belongs to DevOps/Release Engineer, not to the Tech Lead or the Backend Developer. Recorded as the follow-up **CI-EMULATOR-JAVA21** (`workflow-follow-ups.md`), next to CI-FORMAT-GATE. F08-DEVOPS carries it too.
+   * **It does not block F08-QA-FUNCTIONAL.** F08.EMULATOR allows an isolated local emulator run, and QA runs it locally.
+4. **Jest teardown warning — a note, no task.**
+   * "A worker process has failed to exit gracefully" appears on green and red runs alike, and the exit code is right each time.
+   * QA records it if it hides a failure; otherwise it stays a harness note.
+5. **`firestore.rules` has no `!exists(...)` — Accepted as equivalent; no change** (`backend.md` §14.3).
+   * The locked Rules section writes `… && !exists(...)`. Firestore evaluates `create` only when the document does not exist, and a write to an existing document is an `update`, which is always `false`. The meaning is the same.
+   * `rules.test.ts` → "denies update" covers it. QA's rules checks (create-other, update, delete, read denied) stay as they are in A7.
+
+**Delivery Review: Accepted** for F08-FE13, F08-LOCAL-EVIDENCE and F08-BE6.
+
+**QA:** F08-QA-FUNCTIONAL is active under the plan locked in A7. Two changes:
+* the method correction in ruling 2;
+* the backend negative to re-run is N-OVERWRITE (`evidence/neg-be6.py`).
+
+The backend handler and rules fingerprints above are the ones A7's reuse clause refers to. The test files changed in BE6, so QA re-runs the suite and does not reuse the old result.

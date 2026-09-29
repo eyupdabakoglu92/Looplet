@@ -16,7 +16,7 @@ project-authority/platform.md and each feature's architecture.md — unchanged.
 
 ## Setup Authority
 
-project-authority/setup-manifest.md — 2026-09-29: added the Firebase emulator-suite command with Java 21 (firebase-tools 15.29 needs Java 21+; `openjdk@21` is installed keg-only with the user's approval, and the system Java is unchanged). Everything else is unchanged.
+project-authority/setup-manifest.md — 2026-09-29: added the Firebase emulator-suite command with Java 21 (firebase-tools 15.29 needs Java 21+; `openjdk@21` is installed keg-only with the user's approval, and the system Java is unchanged). Corrected the same day at the BE6 checkpoint: Java 21 must also be first on `PATH`. Everything else is unchanged.
 
 ## Release Authority
 
@@ -40,62 +40,53 @@ features/f08-offline-persistence-and-sync/orchestration.md
 
 ## Current Phase
 
-F08 local evidence — F08-BE6 (the emulator suite's invalid fixture), then the Tech Lead checkpoint → F08-QA-FUNCTIONAL
+F08 local evidence — F08-QA-FUNCTIONAL (functional stage, plan A7 / A8)
 
 ## Current Role
 
-Backend Developer
+QA
 
 ## Current Reason
 
-**The F08-FE13 checkpoint** was on 2026-09-29. Full record: F08 `architecture.md` → Activation → A6 (rulings) and A7 (QA plan).
+**The F08-BE6 checkpoint** was on 2026-09-29. Full record: F08 `architecture.md` → Activation → A8.
 
-* **Accepted:** F08-FE13 + F08-LOCAL-EVIDENCE (beb7bfe, `app/` `9de12e6a…`):
-  * the unreadable-DB recovery (AC8 / the Resilience row);
-  * the Retry reconnect;
-  * the debug-only emulator wiring and trigger;
-  * the storage-full harness (F08.STORAGE PASS);
-  * the local runtime evidence.
-* **Also accepted:** the migration `transaction` fix the developer found. Without it the locked row "Migration step throws → abort without partial apply" was false on a real connection.
-* **F08-BE6 (Open, Backend Developer):** the emulator rules / callable suite is 30 / 31.
-  * One test sends `moves` 8 < `optimalMoves` 9, and the handler rightly rejects it.
-  * The job: fix the fixture, run the negative N-OVERWRITE, get the suite green on Java 21.
-  * F08.EMULATOR cannot pass on a red suite.
-* **The F08-QA-FUNCTIONAL plan is locked** (A7): modules core, backend-security, client-ui, stateful-flow; regression depth full; evidence reuse invalidated for the app side.
+* **Accepted:** F08-BE6 (c70527a).
+  * The emulator suite's fixture is now a valid "better" replay; the suite is 31 / 31.
+  * N-OVERWRITE is caught.
+  * Only test code changed.
+* **Delivery Review: Accepted** — F08-FE13, F08-LOCAL-EVIDENCE and F08-BE6.
+* **F08-QA-FUNCTIONAL is active** under the plan locked in A7: modules core, backend-security, client-ui, stateful-flow; regression depth full; evidence reuse invalidated for the app side.
 * The offline Journey (AC2) waits for the user's no-network run.
 * Visual Scope `none`. The release stage stays blocked on F08.DEPLOY-AUTHORIZATION.
 
 ## Last Completed Action
 
-Tech Lead on 2026-09-29 — **the F08-FE13 checkpoint** (after the delivery in beb7bfe).
+Tech Lead on 2026-09-29 — **the F08-BE6 checkpoint** (after the delivery in c70527a).
 * **Reviewed:**
-  * `frontend.md` F08-FE13 / F08-LOCAL-EVIDENCE;
-  * the diff of the bootstrap, database, migration guard, emulator and sync providers;
-  * the migration-failure tests and the N-TXN mutation;
-  * the failing backend test against `validate.ts`.
-* **Re-ran** the recovery, storage-full and store-error tests: 29 / 29, exit 0. This is not a QA claim.
-* **Decided** (A6):
-  1. the migration transaction — accepted, inside the contract;
-  2. quarantining `-journal` — accepted;
-  3. the named emulator app and skipping App Check in emulator mode — accepted, debug only;
-  4. the debug kill switch — test tooling; the Remote Config wiring stays F07;
-  5. Java 21 — recorded in `setup-manifest.md`;
-  6. the backend fixture → F08-BE6;
-  7. `firebaseUid` survives a recreate — a note, no change;
-  8. the emulator keychain-reset procedure is part of the QA method.
-* **State:** F08-BE6 Open; F08-QA-FUNCTIONAL Queued (depends on F08-BE6); Delivery Review Pending; owner → Backend Developer.
-* Archived: history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-fe13-checkpoint.md.
+  * `backend.md` F08-BE6;
+  * the test diff against `validate.ts`;
+  * `neg-be6.py` and the logs BE6-00 to BE6-04;
+  * `firestore.rules`.
+* **Fingerprints** match the delivery (test `cf73770d…`, handler `bcda2662…`).
+* **Re-ran** the emulator suite at c70527a: 31 / 31, exit 0. This is not a QA claim.
+* **Decided** (A8):
+  1. F08-BE6 — accepted;
+  2. the setup-manifest command — corrected (Java 21 first on `PATH`);
+  3. the CI emulator step — A6 ruling 5's premise corrected. The step exists since F08-BE5 but CI has never run (0 GitHub Actions runs), and it needs Java 21 → CI-EMULATOR-JAVA21 (DevOps/Release Engineer). It does not block functional QA;
+  4. the Jest teardown warning — a note;
+  5. `firestore.rules` without `!exists` — equivalent, no change.
+* **State:** Delivery Review Accepted; F08-QA-FUNCTIONAL Open; QA Result None; owner → QA.
+* Archived: history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-be6-checkpoint.md.
 
 ## Next Expected Action
 
-Run Backend Developer on F08-BE6 (the F08 orchestration Current Brief; contract F08 `architecture.md` → Activation A6 ruling 6). Test code only:
-* the valid "better replay" fixture;
-* a scan of the suite for the same kind of defect;
-* N-OVERWRITE;
-* `JAVA_HOME=/opt/homebrew/opt/openjdk@21 npm run test:emulator` green;
-* the evidence in `backend.md`.
+Run QA on F08-QA-FUNCTIONAL (the F08 orchestration Current Brief; plan F08 `architecture.md` → Activation A7, corrected by A8). Functional stage:
+* the eight critical journeys and the misuse checks;
+* re-run the named negatives, including N-OVERWRITE;
+* a result per Pending Evidence record;
+* the verdict in `qa.md`.
 
-Then the Tech Lead checkpoint activates F08-QA-FUNCTIONAL (A7). Optional and at any time: the user runs `ai-system/features/f08-offline-persistence-and-sync/evidence/offline-journey.sh <udid>` for AC2. It turns the Mac's Wi-Fi off and back on. No deployment or billing action.
+Then the Tech Lead checkpoint on the verdict. Optional and at any time: the user runs `ai-system/features/f08-offline-persistence-and-sync/evidence/offline-journey.sh <udid>` for AC2. It turns the Mac's Wi-Fi off and back on. No deployment or billing action.
 
 ## Portfolio Summary
 
@@ -131,10 +122,11 @@ F08.DEPLOY-AUTHORIZATION is OPEN with Blocking Scope = release. The old deferral
   * RESULT-F00-COMPONENT-ALIGN — the `EN İYİ` ★ offset and the pressed-pill brightness.
   * Release-build pacing was not measured (debug video only); it belongs to FIRST-APP-DISTRIBUTION — for the result (D2) and the Home entrance (D3, F05-QA-D3 N1).
 * **Post-D3 follow-ups (non-blocking, in workflow-follow-ups.md):** FIRST-APP-DISTRIBUTION (the profile / release store-error capture, moved from the F05 ledger); F08-RETRY-STORE-CONNECTION (+ the one-frame Retry feedback, N2); RESULT-F00-COMPONENT-ALIGN (+ the `LimePill` arrow at AX5, N3); OPTIONAL-QUALITY-NOTES (N4, N5); RELEASE-SCOPED-EVIDENCE (process).
-* **Commits:** the D1 rework, its closure and the D2 activation are in 489606d — its tracked `app/` diff from 5798c70 hashes to QA's `88f1dca3…` and the two changed sources match QA's SHA-1s (re-verified at the D2 checkpoint); the F03-UI-D2 handoff is in 6352a75; the F03-FE-D2 delivery is in 67d9ecb (`app/` tree `f5641d2f…`, QA's evidence-reuse fingerprint); the F03-QA-D2 verdict is in f28aedb; the reconciliation in 3cd4a3b; the F03-FE-D2R rework in 77c33b9 (`app/` tree `5298c81a…`, the re-QA fingerprint); the F03-QA-D2R verdict in 5677471. The D2 closure and the D3 activation are in 171f0c1; the PO revision in 230ce0c; its resync in 9a36147; the F05-UI-D3 handoff in 981b807; the visual-gate checkpoint in 7c1a946; the F05-FE-D3 delivery in af5aec8 (`app/` `b4ad263e…`, the D3 QA fingerprint); the implementation checkpoint in 078c926; the F05-QA-D3 verdict in e46f384. The D3 closure is in b7493d6. The F08 activation is in 1d373d7; the F08-FE13 / LOCAL-EVIDENCE delivery in beb7bfe (`app/` `9de12e6a…`). The FE13 checkpoint is uncommitted (documents only).
+* **Commits:** the D1 rework, its closure and the D2 activation are in 489606d — its tracked `app/` diff from 5798c70 hashes to QA's `88f1dca3…` and the two changed sources match QA's SHA-1s (re-verified at the D2 checkpoint); the F03-UI-D2 handoff is in 6352a75; the F03-FE-D2 delivery is in 67d9ecb (`app/` tree `f5641d2f…`, QA's evidence-reuse fingerprint); the F03-QA-D2 verdict is in f28aedb; the reconciliation in 3cd4a3b; the F03-FE-D2R rework in 77c33b9 (`app/` tree `5298c81a…`, the re-QA fingerprint); the F03-QA-D2R verdict in 5677471. The D2 closure and the D3 activation are in 171f0c1; the PO revision in 230ce0c; its resync in 9a36147; the F05-UI-D3 handoff in 981b807; the visual-gate checkpoint in 7c1a946; the F05-FE-D3 delivery in af5aec8 (`app/` `b4ad263e…`, the D3 QA fingerprint); the implementation checkpoint in 078c926; the F05-QA-D3 verdict in e46f384. The D3 closure is in b7493d6. The F08 activation is in 1d373d7; the F08-FE13 / LOCAL-EVIDENCE delivery in beb7bfe (`app/` `9de12e6a…`); the FE13 checkpoint in b8e37ab; the F08-BE6 delivery in c70527a. The BE6 checkpoint is uncommitted (documents only).
 * **F08 unreadable-DB gap (found 2026-09-29):** fixed in F08-FE13 (beb7bfe) and accepted at the checkpoint; the runtime and automated evidence awaits independent QA (F08.UNREADABLE-DB). The Retry reconnect is delivered too. The one-frame Retry feedback (N2) stays a follow-up.
 * **Migration partial-apply (found by F08-FE13, 2026-09-29):** Drift does not wrap `onUpgrade` in a transaction, so a failing step could leave a partial apply. It is fixed and accepted (F08 A6 ruling 1). The first real schema step must add its own real-file migration test.
-* **Emulator suite red (F08-BE6):** 30 / 31 because of a contract-invalid fixture, not a handler defect. It needs Java 21 (setup-manifest).
+* **Emulator suite (F08-BE6):** was 30 / 31 because of a contract-invalid fixture, not a handler defect; fixed in c70527a and accepted — 31 / 31 on Java 21 (first on `PATH`; setup-manifest).
+* **CI never executed (CI-EMULATOR-JAVA21, found 2026-09-29):** the GitHub Actions API reports 0 runs, and `origin/main` is still the bootstrap commit. Every CI job in `ci.yml` is CI-wired only. The emulator step needs Java 21 before its first run. Owner: DevOps/Release Engineer; non-blocking for F08 functional QA.
 
 ## Contract Version
 
