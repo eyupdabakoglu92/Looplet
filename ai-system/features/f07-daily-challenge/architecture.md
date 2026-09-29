@@ -313,3 +313,61 @@
   * **Visual Quality Gate → Ready for Implementation:** the Foundation is Selected; the exploration, handoff and selection record are complete.
 * **Routing:** F07-TOOL is activated (Frontend/Mobile Developer, the Current Brief). F07-FE follows F07-TOOL through the Tech Lead reconciliation. The selection no longer blocks anything.
 * Nothing else in the contract changes.
+
+---
+
+## A3. F07-TOOL checkpoint (Tech Lead, 2026-09-29)
+
+**Reconciliation of F07-TOOL** (`frontend.md`, F07-TOOL section; commit 209daf1):
+
+* **Task coverage:** all six Current Brief items are delivered.
+  1. `DailyPack` and one validator, `DailyPack.validate`: a named `DailyPackRule` for every D2 (2) rule, plus `format` for the envelope. `fromJson` throws `DailyPackFormatException` with every violation.
+  2. `pack-daily`: the default output is `<repo-root>/build/daily/daily_pack_<lang>.json` (ignored by git). The output is deterministic (golden bytes), it refuses to write into the source, and it writes nothing on a failure.
+  3. `check` runs the same build on every Daily manifest.
+  4. Named negatives: one per rule at the pack level and at the source level.
+  5. The dev pack fixture (2026-10-01 … 10-22, #1 … #22), outside `content/`, and a generator that shifts it to any "today".
+  6. The delivery report.
+* **Contract compliance:** D2 (1) / (2) / (6), D4 (calendar arithmetic, via `CalendarDate`), D9 and A1 ruling 1 are preserved. No app code, no F08 change, no dependency change. `Puzzle` is unchanged.
+* **Preserved:**
+  * every F06 `check` rule, including the id-based 30-day window and the duplicate-definition rule;
+  * the other commands;
+  * the 25 F06 tool tests;
+  * `content:check` over `content/` (no Daily manifest yet).
+* **Evidence read, not only listed:**
+  * The test bodies assert each negative's rule set exactly, `== {rule}`, and the clean baseline is asserted first. The delivery records that the duplicate-date negative caught its own no-op edit.
+  * **Re-run by the Tech Lead on 209daf1:** `looplet_content` 44 / 44, `looplet_authoring` 54 / 54.
+  * **Independent negatives, on scratch copies:**
+    * a 5-day source → `check: OK`, exit 0;
+    * a pool day copying Journey 20's definition → `duplicate puzzle definition` (Journey ↔ Daily, product PRD F06), exit 1;
+    * `numberingEpoch` after the first two days → two `[dailyNumber] … before numberingEpoch`, `nothing written`, exit 1.
+  * The workspace gates reported in `frontend.md` §17 (format, analyze, test with app 588, content:check) are the delivery's host runs. Nothing touching the app changed between them and 209daf1.
+* **Delivery Review:** Accepted.
+
+**Rulings:**
+
+1. **The served-as-is pool model — accepted; it clarifies D2 (6).**
+   * A pool file is exactly one day's puzzle: `type: daily`, `dailyDate` = the assigned date, `id` = `daily-{lang}-{date}`, at `content/daily/{lang}/pool/daily-{lang}-{date}.json`.
+   * `pack-daily` assembles, numbers and validates; it never rewrites a puzzle.
+   * The manifest is locked as `{schemaVersion: 1, lang, contentVersion, numberingEpoch, assignments: {date: id | file}}` at `content/daily/{lang}/daily_manifest_{lang}.json`. The pack's `contentVersion` comes from the manifest.
+   * Definition files for the pool live outside `content/`, at `tools/looplet_authoring/drafts/daily/{lang}/_defs/`: `check` reads every `.json` under `content/`.
+2. **Readings of D2 (2) — accepted as contract:**
+   * a day before `numberingEpoch` fails `dailyNumber`;
+   * an empty `days` fails `format`;
+   * the window counts calendar days: 29 days apart is a repeat, 30 is allowed;
+   * `datesSorted` is a pack-level rule. A source cannot break it: the pack is sorted by construction, and a test proves it.
+3. **Daily reuse (`frontend.md` §16) → no definition repeats anywhere in the pool for the MVP.**
+   * The duplicate-definition rule stays as it is. It is stricter than, and compatible with, the product rule ("must not duplicate Journey puzzles or repeat within a defined rolling window").
+   * About 60 puzzles cover about 60 days.
+   * Reuse after the window is a later decision (workflow-follow-ups DAILY-POOL-REUSE). Nothing is built for it now.
+4. **`CalendarDate` is the one date implementation.** F07-FE uses it for D4 (the start date, rollover) and D6 (the streak arithmetic). No second date helper is added.
+5. **The pool calendar — Technical decision:**
+   * F07-CONTENT uses a **provisional calendar**: `numberingEpoch` 2026-11-01, 60 contiguous days 2026-11-01 … 2026-12-30 (#1 … #60).
+   * The live first day is fixed at **F07's release gate** (F07-DEVOPS, with the Tech Lead). If it differs, the pool is re-dated as a block before the first publish. The re-date keeps the order and moves the ids, dates, file names and manifest together (a toolchain task opened then — DAILY-POOL-CALENDAR).
+   * **After the first publish,** `numberingEpoch` and every published day never change (D2 (2): `#N` stable).
+   * **Cadence:** the next batch must be published at least 8 days before the last covered day, because the client prefetches today … today + 7 (D3). Otherwise the Daily becomes `unavailable` — calm, never a crash. This is tracked as DAILY-POOL-CALENDAR.
+
+**Routing:**
+
+* **F07-CONTENT → Open** (Content Designer, Current Brief). Its dependency, F07-TOOL, is Done and accepted.
+* **F07-FE stays Queued.** It is activated at the F07-CONTENT checkpoint, where the Tech Lead also opens the sign-off gate F07.DAILY-POOL-SIGNOFF. The user's review of the pool can then run while F07-FE builds.
+* The contract is otherwise unchanged.

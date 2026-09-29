@@ -10,17 +10,17 @@ In Progress
 
 ## Current Owner
 
-Content Designer
+Tech Lead
 
 ## Next Role
 
-Content Designer
+Tech Lead
 
 ## Active Task Ledger
 
 - [x] Task ID: F07-UI | Assigned Role: UI Designer | Status: Done | Summary: The Daily surfaces on the Selected Foundation (architecture D8): the Home Daily entry (secondary; available / done today / needs connection), the Daily screen states (`loading`, `ready`, `doneToday`, `needsConnection`, `unavailable`), the daily Play header, and the daily result variant (official vs replay; Current + Best Streak; the reserved Share place for F13). At least two materially different rendered directions on identical content, then `ui-design.md` with the screen / state / viewport matrix and a Visual Evidence Manifest. Brief: Current Brief | Depends On: -
 - [x] Task ID: F07-TOOL | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: The daily pack (architecture D2): a `DailyPack` model in `looplet_content`; `looplet_authoring pack-daily` (manifest + pool → the served `daily_pack_{lang}.json`); `check` extended to every D2 (2) rule with named negative cases; a small dev pack from existing smoke / Journey-shaped definitions for delivery and tests (not product content). Brief: Current Brief | Depends On: -
-- [ ] Task ID: F07-CONTENT | Assigned Role: Content Designer | Status: Open | Summary: The Turkish Daily pool (workflow-follow-ups F06-CONTENT-DAILY): 60 solved daily puzzles under `content/daily/tr/pool/` on the provisional calendar 2026-11-01 … 12-30 (architecture A3 ruling 5), `daily_manifest_tr.json`, `content-design.md`; `check` + `pack-daily` exit 0. The Tech Lead opens the sign-off gate F07.DAILY-POOL-SIGNOFF at its checkpoint. Brief: Current Brief | Depends On: F07-TOOL
+- [ ] Task ID: F07-CONTENT | Assigned Role: Content Designer | Status: Queued | Summary: The Turkish Daily pool (workflow-follow-ups F06-CONTENT-DAILY): about 60 solved daily puzzles under `content/daily/tr/pool/`, `daily_manifest_tr.json` (numbering epoch + assignments, 30-day no-repeat), `content-design.md`; `check` + `pack-daily` exit 0. Opens the sign-off gate F07.DAILY-POOL-SIGNOFF on delivery | Depends On: F07-TOOL
 - [ ] Task ID: F07-FE | Assigned Role: Frontend/Mobile Developer | Status: Queued | Summary: The app (architecture D3–D8): `DailyContentSource` + the debug pack override; cache population / prefetch / eviction; the D3 states; D4 dates and rollover; D5 transactional completion (entry + streak + enqueue); D6 streak; D7 Remote Config + kill-switch (`firebase_remote_config`, `http`); `/daily`, the Home entry, the daily Play header and result per `ui-design.md`; tests + named negatives; Visual Parity Evidence against the selected Direction A (`F07-A-*`); emulator sync evidence; architecture A1 rulings | Depends On: F07-UI, F07-TOOL
 - [ ] Task ID: F07-QA-FUNCTIONAL | Assigned Role: QA | Status: Queued | Summary: Functional + visual QA on the emulator and the canonical simulator (architecture D10); the plan is locked at activation | Depends On: F07-FE, F07-CONTENT
 - [ ] Task ID: F07-DEVOPS | Assigned Role: DevOps/Release Engineer | Status: Blocked | Summary: F07's release (architecture D11): pack hosting, publishing `daily_manifest_url`, rollback by repointing, the release smoke. Blocked on F08's deploy (F08.DEPLOY-RESUME → F08-DEVOPS) and F07's functional QA | Depends On: F07-QA-FUNCTIONAL
@@ -28,10 +28,9 @@ Content Designer
 
 ## Open Tasks
 
-* **F07-CONTENT — Open** (Content Designer): the Turkish Daily pool, manifest and `content-design.md` (Current Brief).
-* F07-TOOL — Done, accepted at A3 (2026-09-29).
+* F07-TOOL — Done (2026-09-29), delivery in `frontend.md` (F07-TOOL section); awaiting the Tech Lead reconciliation.
 * F07-UI — Done, accepted at A1; **Direction A selected** by the user (A2).
-* Queued: F07-FE (activated at the F07-CONTENT checkpoint, A3), F07-QA-FUNCTIONAL, F07-QA-FINAL. Blocked: F07-DEVOPS (F08's deploy).
+* Queued: F07-CONTENT (after F07-TOOL), F07-FE (after F07-TOOL), F07-QA-FUNCTIONAL, F07-QA-FINAL. Blocked: F07-DEVOPS (F08's deploy).
 
 ## Handoff Plan
 
@@ -39,7 +38,7 @@ None
 
 ## Delivery Review
 
-Accepted
+Pending
 
 ## QA Scope
 
@@ -163,26 +162,21 @@ None
 
 ## Next Action
 
-Run Content Designer — F07-CONTENT (Current Brief): the 60-day Turkish Daily pool, `daily_manifest_tr.json` and `content-design.md`; `check` + `pack-daily` exit 0. Then owner → Tech Lead (the content checkpoint: open F07.DAILY-POOL-SIGNOFF, activate F07-FE).
+Run Tech Lead — reconcile the F07-TOOL delivery (`frontend.md`, F07-TOOL section: `DailyPack` + validator, `pack-daily`, `check` over D2 (2) with named negatives, the dev pack; §14 assumptions, §16 the non-blocking Daily-reuse note), then activate F07-CONTENT and F07-FE.
 
 ## Last Decision
 
-2026-09-29 — the F07-TOOL checkpoint (architecture A3).
+2026-09-29 — Decision F07.DIRECTION-SELECT — A (the user; architecture A2).
 
-* **F07-TOOL accepted** (209daf1): the tests re-run (44 / 54), plus three independent negatives on scratch copies.
-* **Rulings:**
-  1. the served-as-is pool model, with the manifest shape locked;
-  2. the readings of D2 (2);
-  3. no definition repeats in the MVP pool (DAILY-POOL-REUSE);
-  4. `CalendarDate` is the one date implementation;
-  5. the provisional calendar 2026-11-01 … 12-30; the re-date and cadence at the release gate (DAILY-POOL-CALENDAR).
-* **Routing:** F07-CONTENT Open (Content Designer); F07-FE after the content checkpoint.
+* **Direction A "Hafta döngüsü" selected;** B is not built. The `F07-A-*` renders are the selected source; the A1 checkpoint rulings bind Frontend and QA.
+* **Visual Quality Gate → Ready for Implementation.**
+* **Routing:** F07-TOOL Open (Frontend/Mobile Developer); F07-FE follows after the F07-TOOL reconciliation.
 
 ## Last Update
 
-* Updated By: Tech Lead
+* Updated By: Frontend/Mobile Developer
 * Timestamp: 2026-09-29
-* Summary: The F07-TOOL checkpoint (A3) — accepted; rulings 1–5; F07-CONTENT Open; owner → Content Designer.
+* Summary: F07-TOOL Done — `DailyPack` + `CalendarDate` (`looplet_content`), `pack-daily`, `check` extended to D2 (2), named negatives, the dev pack fixture; gates green; Delivery Review Pending; owner → Tech Lead.
 
 ## Context & Follow-ups
 
@@ -204,56 +198,21 @@ Run Content Designer — F07-CONTENT (Current Brief): the 60-day Turkish Daily p
 * 2026-09-29 — Tech Lead: F07-UI checkpoint (architecture A1) — accepted; rulings 1–6; F07.DIRECTION-SELECT opened; F07-TOOL briefed; owner Tech Lead (awaiting the decision). [Orchestration at the UI delivery](../../history/f07-daily-challenge-2026-09-29/orchestration-at-ui-delivery.md) (the F07-UI brief).
 * 2026-09-29 — Tech Lead: Decision F07.DIRECTION-SELECT — A (architecture A2) — Direction A selected; gate Ready for Implementation; F07-TOOL Open; owner → Frontend/Mobile Developer.
 * 2026-09-29 — Frontend/Mobile Developer: F07-TOOL Done — `DailyPack` / validator, `pack-daily`, `check` D2 (2), dev pack; content 44 / authoring 54 / app 588 tests green, `content:check` exit 0; Delivery Review Pending; owner → Tech Lead. [frontend.md](frontend.md) (F07-TOOL).
-* 2026-09-29 — Tech Lead: F07-TOOL checkpoint (architecture A3) — accepted; rulings 1–5 (pool model, D2 readings, no reuse, `CalendarDate`, the provisional calendar); F07-CONTENT Open; owner → Content Designer. [Orchestration at the TOOL delivery](../../history/f07-daily-challenge-2026-09-29/orchestration-at-tool-delivery.md) (the F07-TOOL brief).
 
 ## Current Brief
 
-**F07-CONTENT — the Turkish Daily pool** (Content Designer; architecture D2, D9, A3 rulings 1, 3 and 5; workflow-follow-ups F06-CONTENT-DAILY)
+**F07-TOOL — the daily pack tooling** (architecture D2, D9; Frontend/Mobile Developer — the F06 toolchain owner role)
 
-**Read first:**
-* `architecture.md` D2 and A3;
-* `frontend.md`, F07-TOOL section, "Notes for the Content Designer" — the manifest, the commands, the pool rules;
-* `prd.md` AC2 / AC3;
-* the F06 [content-authoring brief](../f06-puzzle-content-and-solver-tooling/content-authoring-brief.md) §5 (Turkish target words), §6 (the per-puzzle workflow) and §11 (solver cost);
-* the dev fixture `tools/looplet_authoring/test/fixtures/daily_dev/` as a shape example. It is **not** content: do not copy its definitions, which are Journey / smoke copies and fail the dedup rule.
+**Read first:** `architecture.md` D2 (the pack format and its rules), D9 (validation responsibility), A1 ruling 1 (the day envelope the app will cache — the same `{dailyNumber, puzzle}` shape as a pack `days[]` entry); `packages/looplet_content` (`Puzzle`); `tools/looplet_authoring` (`cli.dart`, `content_check.dart` — `check` already reads a manifest's `assignments` and enforces the 30-day no-repeat window); `melos.yaml` `content:check`; `project-authority/setup-manifest.md`.
 
 **Deliver:**
-1. **60 pool puzzles:** `content/daily/tr/pool/daily-tr-YYYY-MM-DD.json` for **2026-11-01 … 2026-12-30** (the provisional calendar, A3 ruling 5). Each is produced by `looplet_authoring export`, never written by hand, with:
-   * `puzzleType: daily`, `dailyDate`, `id: daily-tr-<date>`, `language: tr`;
-   * one `contentVersion` for the batch: `2026-11-01.1`.
-2. **The definition files** at `tools/looplet_authoring/drafts/daily/tr/_defs/` (outside `content/`, A3 ruling 1), so that the pool can be re-exported or re-dated.
-3. **`content/daily/tr/daily_manifest_tr.json`:** `schemaVersion 1`, `lang tr`, `contentVersion 2026-11-01.1`, `numberingEpoch 2026-11-01`, and 60 contiguous `assignments` by id.
-4. **`features/f07-daily-challenge/content-design.md`:**
-   * a per-day table: date, `#N`, id, target word, mechanic class (open / locked / frozen / locked + frozen), `optimalMoves`, `difficultyLabel`;
-   * how each editorial target below was met, or why not;
-   * the tools and exact commands run, with exit codes;
-   * which puzzles are AI-drafted and not yet human-playtested (the sign-off covers the playtest);
-   * known gaps.
+1. **`DailyPack` in `looplet_content`** (pure Dart): `schemaVersion`, `contentVersion`, `lang`, `numberingEpoch`, `days` (`dailyDate`, `dailyNumber`, `puzzle`); `fromJson` / `toJson` (lowerCamelCase, optional fields omitted); a validator returning **named** violations for every D2 (2) rule — sorted, contiguous and unique dates; `puzzle.dailyDate == dailyDate`; `type == daily`; `id == "daily-{lang}-{dailyDate}"`; parses with `optimalMoves ≥ 1`; `dailyNumber == days since numberingEpoch + 1` (calendar-date arithmetic, D4); the 30-day no-repeat over the puzzle definitions; `lang` matches every puzzle. The app (F07-FE) will reuse this validator at fetch time.
+2. **`looplet_authoring pack-daily`**: `content/daily/{lang}/daily_manifest_{lang}.json` + `pool/` → `daily_pack_{lang}.json` in a build-output path that is not the source (name it; ignored by git); non-zero exit with the named violation on any rule failure; deterministic output (the same inputs give the same bytes).
+3. **`check`** extended so every D2 (2) rule fails on the source manifest + pool, not only the no-repeat window.
+4. **Tests with named negative cases** — one per D2 (2) rule, plus a positive pack round-trip; each negative shown failing for the intended reason.
+5. **A dev pack** for F07-FE delivery and tests, built from existing smoke / Journey-shaped definitions as `type: daily` copies (a fixture, **not** product content; keep it out of `content/daily/tr/pool/`, which F07-CONTENT owns), covering today − 14 … today + 7 relative to a fixed test date and a variant that the D3 date logic can shift.
+6. **`frontend.md` (F07-TOOL section):** task-to-code traceability, the commands run with their exit codes (`melos run analyze`, the package / tool tests, `melos run content:check`, `pack-daily` on the dev fixture), preserved behaviour of existing `check` rules, and anything the Content Designer needs to know (the manifest shape, how to run `pack-daily`).
 
-**Rules — gate-enforced** (`check` / `pack-daily`; each must hold):
-* every D2 (2) rule;
-* the stored `optimalMoves` equals a fresh solve, and is ≥ 1;
-* the target is `isEligibleTarget` (F01);
-* no definition duplicates a Journey, smoke or other pool puzzle (A3 ruling 3);
-* the grid is 5×5 and the target 5 letters (AC3).
+**Rules:** no app code (F07-FE); no F08 change; no product Daily content (F07-CONTENT); no Flutter or dependency upgrade; a contract gap goes to the Tech Lead.
 
-**Editorial targets** (not gate-enforced; report them in the table):
-* `difficultyLabel` is `medium` or `hard`, and never `expert` (the F06 recommendation). `optimalMoves` is about 3–6: above about 6 with column moves, solving costs minutes (F06 brief §11).
-* Columns are on: a rows-only puzzle is capped at 2 moves.
-* The mechanic classes vary. In every 7-day window, at least three of the four classes appear, and no class appears on more than 2 consecutive days.
-* 60 distinct target words: common, recognisable Turkish words, none equal to a Journey target.
-* A fair difficulty rhythm across the week. Nothing needs to ramp: every day is someone's first Daily.
-
-**Verification:**
-* `melos run content:check` → exit 0 with the pool committed.
-* From `tools/looplet_authoring`: `dart run bin/looplet_authoring.dart pack-daily ../../content/daily/tr --repo-root ../..` → exit 0, `60 days 2026-11-01 … 2026-12-30, #1 … #60`. The output under `build/` is not committed.
-* **One recorded negative run on a scratch copy** (not committed): for example, a gap in the assignments → `[datesContiguous]`, exit 1.
-* Record the `content:check` duration: 60 more solves lengthen the CI content step.
-
-**Rules:**
-* No code or tool change. A tool defect → a blocker to the Tech Lead (a Developer fixes it).
-* No product criterion change.
-* The app, F08 and `content/journey/` are untouched.
-* If a target proves infeasible (for example, not enough eligible words or solver time), report it with evidence; do not relax a rule.
-
-**Then:** close F07-CONTENT → owner Tech Lead → `Run Tech Lead`. The Tech Lead's content checkpoint reconciles the pool and opens **F07.DAILY-POOL-SIGNOFF**, the user's review and playtest; the sign-off itself is not part of this task. That checkpoint then activates F07-FE.
+**Then:** close F07-TOOL; owner → Tech Lead; `Run Tech Lead` (reconciliation; then F07-CONTENT and F07-FE).
