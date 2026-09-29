@@ -1,0 +1,8 @@
+2026-09-29T14:23:57Z
+installed app: /Users/eyupcandabakoglu/Library/Developer/CoreSimulator/Devices/D0011CE7-6E50-4367-93FA-B323E81270BE/data/Containers/Bundle/Application/BF8368F3-715A-4DCA-81D8-927D277C7D78/Runner.app
+installed bundle journey assets: 31 files
+byte-identical to app/assets/journey/tr: 31, differing/missing: 0
+app/assets == content/journey/tr: 31 / 31
+manifest mode strict levels 30 n 1 .. 30
+grep in installed flutter_assets for network hosts in journey assets:
+       0

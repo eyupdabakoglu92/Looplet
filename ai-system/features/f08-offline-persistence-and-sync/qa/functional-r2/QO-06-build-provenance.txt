@@ -1,0 +1,14 @@
+2026-09-29T14:25:57Z
+app/ios/Flutter/Generated.xcconfig DART_DEFINES (decoded):
+  FLUTTER_VERSION=3.32.8
+  FLUTTER_CHANNEL=stable
+  FLUTTER_GIT_URL=https://github.com/flutter/flutter.git
+  FLUTTER_FRAMEWORK_REVISION=edada7c56e
+  FLUTTER_ENGINE_REVISION=ef0cd00091
+  FLUTTER_DART_VERSION=3.8.1
+LOOPLET_FIREBASE_EMULATOR present: 0
+installed Runner.app 2026-09-29T17:05:34+0300
+built    Runner.app 2026-09-29T17:05:34+0300
+kernel_blob identical to build: yes
+store firebase_uid (R1 emulator uids were hX97…, VPdN…): m8r3…
+emulator ports not listening

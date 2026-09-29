@@ -637,3 +637,107 @@ Blocking finding yok. **F1 — kapandı** (QB-R1-06 P3 / P6 DENIED, QE-R1-00, QB
 ```text
 Run Tech Lead
 ```
+
+---
+
+# F08-QA-FUNCTIONAL-R2 — AC2 / J8, kullanıcının ağsız koşusu (2026-09-29)
+
+> Plan: `architecture.md` → A11 ruling 4, A12'de düzeltildi ve aktive edildi. Brief: `orchestration.md` → Current Brief. Kanıt: `qa/functional-r2/` (`qa/functional-r2/README.md`); girdi `evidence/runtime/offline/`. Yukarıdaki bölümler değiştirilmedi.
+
+## 0. QA Execution Plan
+
+* **Stage / Scope:** functional / end-to-end. Bu tur yalnız F08.OFFLINE-JOURNEY'yi (AC2 / J8) yeni kanıtla değerlendiriyor; geri kalan fonksiyonel kapsam R1 fingerprint'iyle reuse.
+* **Modüller:** `core`; `backend-security` (scope end-to-end — A12 ruling 4; backend R1'den beri değişmedi → kanıt reuse); `client-ui` (Home / sonuç ekranı / Devam et ağsız); `stateful-flow` (persistence, ağsız cold relaunch). Preflight PASS. Visual Scope `none`.
+* **Regression Depth:** `targeted` — R1'den (695f783) beri `ai-system/` dışında değişiklik yok (e55176f yalnız doküman). Yeni olan yalnız AC2 kanıtı.
+* **Evidence Reuse:** `allowed` — fingerprint bu turda yeniden hesaplandı: `app/` `9de12e6a…`, `packages/` `ffae8965…`, `tools/` `43eb1a47…`, `content/` `580cd577…`; rules `aa4c5dc2…`, rules test `2c7df84a…`, handler `bcda2662…`, `validate.ts` `8f0398ea…`, callable test `cf73770d…`; `package-lock.json` `97187c5f…`, `app/pubspec.lock` `defec859…`. Hepsi R1 ile aynı.
+* **Canonical target:** iPhone 16 simülatörü `D0011CE7-…` (iOS 18.6), emülatör define'sız debug build (production-shaped Firebase yolu); ağsızlık = Mac Wi-Fi kapalı (simülatör host ağını paylaşır; A4'ün kabul ettiği yöntem); host Flutter 3.32.8.
+* **Fail-fast:** önce kullanıcı koşusunun geçerliliği (ağsızlık kaydı, build provenance), sonra store ve zaman çizelgesi, sonra 30 seviye probu.
+
+## 1. Evidence Ledger
+
+**Girdi (kullanıcının runtime koşusu — QA tarafından doğrulandı, körlemesine kopyalanmadı):** `evidence/runtime/offline/01…06`, 14:07:49–14:09:45Z.
+
+**EXECUTED THIS RUN** (QA, 2026-09-29 14:20–14:26Z):
+
+| Evidence ID | Claim / Scenario | Class | Command / Action | Target | Result / Counts | Provenance / Fingerprint | Isolation |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| QO-00 | Kullanıcı koşusu geçerli bir ağsız koşu | runtime (kullanıcı) + review | `01` / `06` okundu; `03` / `05` ekran görüntüleri incelendi | simülatör, host ağı | `01` 14:07:49Z Wi-Fi `en0` off + `curl` "Could not resolve host" → offline; `06` 14:09:45Z hâlâ offline. `03`: seviye 2 sonucu (BADEM, 2 hamle, optimal 2, EN İYİ 2★, "Sonraki bölüm"). `05`: ağsız cold relaunch sonrası Home "YOLCULUK · 2 / 30", 1–2 tamam, 3 sıradaki, "Devam et · Seviye 3" | `evidence/runtime/offline/`; dosya zamanları 17:07:49–17:09:45 +0300 | ağsızlık host Wi-Fi ile; simülatör status bar'ındaki Wi-Fi ikonu simüle — ağ durumu değil |
+| QO-06 | Koşu production-shaped build ile yapıldı | static + review | `Generated.xcconfig` `DART_DEFINES` decode; kurulu vs build `Runner.app` zaman + `kernel_blob.bin` `cmp`; store `firebase_uid`; emülatör portları | kurulu app | `LOOPLET_FIREBASE_EMULATOR` **yok**; kurulu = build (17:05:34 +0300, kernel_blob aynı); `firebase_uid` `m8r3…` (R1 emülatör uid'leri `hX97…`, `VPdN…` değil); 9099 / 8080 / 5001 / 5002 dinlemiyor | `QO-06-build-provenance.txt` | — |
+| QO-01 | İlerleme + en iyi skorlar ağsızken kalıcı yazıldı; zaman çizelgesi | runtime (store) | canlı store `sqlite3 -readonly .backup`; zaman damgaları UTC'ye çevrildi | simülatör store | player 14:07:24.651Z (çevrimiçi açılış, script'ten önce); `journey-tr-01` first completed **14:08:24.071Z** (3 hamle, 2★); `journey-tr-02` **14:08:56.952Z** (2 hamle, 3★, perfect); `journey_progress` highest 3, completed `1,2`; `active_session` `journey-tr-03` 0 hamle, başladı **14:09:09.951Z** — `05` (14:09:08Z) ağsız relaunch'tan **sonra**, yani seviye 3 yeniden başlatılan süreçte ağsız açıldı; `sync_queue` 0, `daily_entry` 0 (Journey sync üretmez) | `QO-01-live-store-copy.sqlite` | salt-okunur kopya |
+| QO-02 | Kurulu uygulama 30 seviyenin hepsini taşıyor | static | kurulu `flutter_assets/assets/journey/tr/` ↔ `app/assets` ↔ `content/journey` `cmp` | kurulu app | 31 / 31 bayt-özdeş (30 seviye + manifest); `app/assets == content` 31 / 31; manifest `strict`, n 1…30; varlıklarda URL yok | `QO-02-installed-bundle-assets.txt` | — |
+| QO-03 | **Seviye 1–30 üretim açılış yoluyla açılır** | automated functional | `qa_probe_all_levels_test.dart` — `playSessionSetupProvider(journey, n)` (gerçek `rootBundle` + gerçek sözlük validator + in-memory store) → `GridEngine(toEngineConfig(puzzle))`, `isSolved == false` | host `flutter test` | exit 0 — **30 / 30 açıldı** (`journey-tr-01 … journey-tr-30`), id şeması, motor kuruldu | `QO-03-all-levels-probe.log`; `app/` `9de12e6a…` | store in-memory (yalnız dil okuması); prob dosyası koşu sonrası silindi, `app/` temiz |
+| QO-04 | Prob kırık bir seviyeyi yakalar | negatif | aynı prob, `QA_BREAK_LEVEL=17` | aynı | exit 1 — tam seviye 17'de `JourneyContentException: asset "tr/journey-tr-17.json" not found` | `QO-04-all-levels-probe-control.log` | kontrol override'ı |
+| QO-05 | Journey gate / içerik testleri (gerçek bundle) | automated functional | `flutter test` `journey_manifest_gate_test`, `journey_content_repo_test`, `journey_manifest_strict_test` | host | 30 / 30 passed ("All tests passed!") | `QO-05-journey-gate-tests.log` | — |
+| QO-07 | Seviye açılış yolunda ağ bağımlılığı yok | static inspection | `play_session_providers.dart` (`playSessionSetupProvider`), `journey_content.dart` (`RootBundleJourneyAssetSource`), `engine_providers.dart`, `bootstrap.dart` okundu; `lib/` içinde ağ çağrısı taraması | kaynak `9de12e6a…` | açılış yolu = sözlük (`rootBundle`) + dil (yerel DB) + seviye (`rootBundle`); `lib/`'de tek ağ çağrısı `callable_sync_sender.dart` (Daily sync); Firebase init `unawaited`, hatası yakalanır, fatal değil (`bootstrap.dart` `_bootstrapFirebase`) | kaynak | yardımcı kanıt; tek başına runtime değil |
+
+**REUSED — fingerprint valid:** § F08-QA-FUNCTIONAL-R1 ve § F08-QA-FUNCTIONAL'daki bütün diğer kayıtlar (QB-R1-01…07, QE-R1-00, QE-R1-A; QA-01…05, QJ1, QJ2, QJ4, QJ7, QE-B…E, QE-M, QL1, QL2, QR) — yukarıdaki fingerprint'ler birebir aynı, toolchain aynı.
+
+**INVALIDATED:** yok. **PENDING:** yok (fonksiyonel stage).
+
+## 2. Acceptance & Critical Journey Coverage
+
+| AC / Journey | Expected | Evidence IDs | Result |
+| --- | --- | --- | --- |
+| **AC2** ağ yokken Journey oynanır → **tüm seviyeler yüklenir** ve ilerleme kaydolur | ağsız: seviyeler açılır, tamamlanır, ilerleme + en iyi kalıcı | QO-00, QO-01 (1, 2, 3 ağsız açıldı; 1, 2 ağsız tamamlandı ve kalıcı), QO-02 + QO-03 + QO-04 + QO-05 + QO-07 (1–30 aynı ağsız yoldan açılır) | **PASS** |
+| **J8** QA Focus → Offline Journey: airplane mode → 30 seviye yüklenir, bir seviye tamamlanır, ilerleme + en iyi kalır, ağsız relaunch → sağlam | — | QO-00 (`05`), QO-01, QO-03 | **PASS** |
+| Ağsız cold relaunch → Home ilerlemeyi gösterir, Devam et sıradaki seviyeyi açar | "2 / 30", Seviye 3, oturum açılır | QO-00 (`05`), QO-01 (`active_session` 14:09:09.95Z) | PASS |
+| Production-shaped başlangıç ağsız (Firebase init ağsız fatal değil) | Home render, oyun oynanır | QO-00, QO-06, QO-07 | PASS |
+| AC1, AC4–AC12, J1–J7, misuse satırları | — | § R1 §2 — REUSED | PASS |
+| AC3 | — | — | F07 kapsamı (known limit) |
+
+"Tüm seviyeler yüklenir" kararı: ağsız runtime'da 3 seviye (1, 2, 3) açıldı; 4–30 ağsız runtime'da açılmadı. Yine de PASS, çünkü: (a) seviye açılış yolu seviyeden bağımsız ve ağ kullanmıyor (QO-07); (b) bu yolun ağsız çalıştığı runtime'da gözlendi (QO-00 / QO-01); (c) aynı üretim yolu 30 seviyenin 30'unu açıyor ve motoru kuruyor (QO-03), prob kırık seviyeyi yakalıyor (QO-04); (d) kurulu uygulamadaki 30 varlık kaynakla bayt-özdeş (QO-02). Seviyeler arasındaki tek fark veri; veri de bayt düzeyinde doğrulandı. Sınır Non-blocking Notes N1'de açıkça yazılı.
+
+## Backend & Security Compliance
+
+* Backend R1'den beri değişmedi (fingerprint §0). Canonical build/test ve bütün contract / security kontrolleri § F08-QA-FUNCTIONAL-R1 "Backend & Security Compliance" — **REUSED** (QB-R1-01…07, QE-R1-00, QE-R1-A; F1 kapalı). Fail-fast gerekmedi.
+* Bu tura özgü: ağsız Journey hiçbir backend çağrısı üretmedi (`sync_queue` 0, `daily_entry` 0 — QO-01); Journey ilerlemesi yalnız yerel (kontrata uygun).
+
+## Client & UI Compliance
+
+| Check | Evidence | Result |
+| --- | --- | --- |
+| Ağsız sonuç ekranı (seviye 2: hamle, optimal, en iyi, yıldız, "Sonraki bölüm") | QO-00 (`03`) | PASS |
+| Ağsız cold relaunch → Home "YOLCULUK · 2 / 30", loop track 1–2 tamam, 3 sıradaki, "Devam et · Seviye 3" | QO-00 (`05`) | PASS |
+| Devam et → seviye 3 ağsız açılır | QO-01 (`active_session`) | PASS |
+| Diğer client kontrolleri | § R1 — REUSED | PASS |
+
+## Stateful Flow & Integration
+
+| Boundary / Transition | Actor / Start State | Expected | Evidence IDs | Result |
+| --- | --- | --- | --- | --- |
+| cold boot ağsız, mevcut store | 0 / 30, çevrimiçi oluşturulmuş guest | Home, init hatası yok | QO-00, QO-06 | PASS |
+| seviye tamamla → write-through (ağsız) | seviye 1, 2 | `personal_best` + `journey_progress` kalıcı, zaman damgaları ağsız pencerede | QO-01 | PASS |
+| kill → ağsız cold relaunch | 2 / 30 | Home ilerlemeyi gösterir | QO-00 (`05`) | PASS |
+| relaunch sonrası yeni oturum (ağsız) | Devam et | `active_session` seviye 3 | QO-01 | PASS |
+| Diğer satırlar | — | — | § R1 / § F08-QA-FUNCTIONAL — REUSED | PASS |
+
+## 5. Regression & Evidence Reuse
+
+* **Etkilenen yüzey:** yok — R1'den beri kod / içerik / lockfile değişmedi; bu tur yalnız yeni runtime kanıtını değerlendirdi. Targeted depth yeterli.
+* **Bağımsız QA probe'ları:** QO-01 (canlı store + zaman çizelgesi — kullanıcının koşusunu store düzeyinde bağımsız doğruladı, seviye 3'ün ağsız açıldığını ortaya çıkardı), QO-02 (kurulu bundle), QO-03 / QO-04 (30 seviye üretim yolu + kontrol), QO-06 (build provenance).
+* **Kullanıcının plandan sapmaları** (A12): Wi-Fi'ın script'ten önce elle de kapatılması, bir yerine iki seviye, uygulamanın elle kapatılmaması — hiçbiri geçerliliği etkilemiyor: ağsızlık `01` / `06` ile kanıtlı, çevrimiçi açılış (14:07:24Z) script başlamadan önce, script ağsız açılıştan önce uygulamayı sonlandırıyor; iki seviye kapsamı genişletiyor.
+
+## 6. Final Verdict
+
+* **QA Result: Functional Approved**
+* **Blocking Issues:** None.
+* **Required Fixes:** None.
+* **Pending Evidence (functional):** None. F08.OFFLINE-JOURNEY → PASS. Bütün fonksiyonel kayıtlar PASS (EMULATOR, LOCAL-RESUME, LIFECYCLE, OFFLINE-JOURNEY, STORAGE, COLD-BOOT-REVIEW, UNREADABLE-DB). F08.DEPLOY-SMOKE release stage'e ait, bu verdict'in kapsamında değil.
+* **Non-blocking Notes:**
+  * **N1-R2 — 4–30 ağsız runtime'da açılmadı:** "tüm seviyeler yüklenir" 3 ağsız runtime seviyesi + 30 seviyelik üretim yolu probu + bundle bayt eşitliği + ağsız yol analizi ile karşılandı (§2). Tam 30 seviyelik ağsız cihaz turu istenirse ilk dağıtım / cihaz koşusunda (FIRST-APP-DISTRIBUTION) eklenebilir; F08 kabulü için gerekli görülmedi.
+  * **N2-R2 — ağsız başlangıç log'u yok:** koşuda app log'u tutulmadı; Firebase init'in ağsız hata yolunu log'dan görmedik. Görünür sonuç (Home, oyun, kalıcılık) ve kaynak (`unawaited`, yakalanan hata) yeterli; ağ geri gelince anonim girişin tamamlanması bu kapsamda değil.
+  * **N3-R2 — simülatör status bar'ı:** ekran görüntülerindeki Wi-Fi ikonu simülatörün sabit göstergesi; ağ durumu `01` / `06` kayıtlarından okunur.
+  * Önceki notlar (N1 zamanlayıcı yok, N3 Jest teardown, N4 / CI-EMULATOR-JAVA21, F08-EVIDENCE-PROXY-ERRORS) açık ve non-blocking.
+
+## 7. Tech Lead Note
+
+* **Root-cause alanı:** yok.
+* **Routing:** Functional Approved → release stage. F08-DEVOPS F08.DEPLOY-AUTHORIZATION (Blocking Scope release) ile bloklu; karar kullanıcıda. Final QA (F08-QA-FINAL) release kanıtıyla çalışır; functional kanıt fingerprint geçerliyse reuse edilebilir.
+* **Workflow notu:** simülatörde şu an define'sız debug build ve kullanıcının koşusundan kalan store var (2 / 30, seviye 3 oturumu).
+
+## Sonraki Komut
+
+```text
+Run Tech Lead
+```
+
