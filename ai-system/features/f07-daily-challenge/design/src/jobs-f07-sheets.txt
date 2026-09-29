@@ -1,0 +1,4 @@
+F07-sheet-1-directions-A-vs-B 1898 1394 1
+F07-sheet-2-A-home-and-daily-states 1898 1394 1
+F07-sheet-3-A-play-result-motion 1898 1394 1
+F07-sheet-4-A-text-scale-and-devices 1898 1394 1
