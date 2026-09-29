@@ -1,0 +1,120 @@
+openjdk version "21.0.12.1" 2026-08-18
+15.29.0
+1d373d786ee416adc6863dc51717860fe5dab646
+
+> looplet-functions@0.1.0 build
+> tsc
+
+
+> looplet-functions@0.1.0 test:emulator
+> firebase --config ../firebase.json emulators:exec --only firestore,auth --project demo-looplet "jest --passWithNoTests"
+
+i  emulators: Starting emulators: auth, firestore
+i  emulators: Detected demo project ID "demo-looplet", emulated services will use a demo configuration and attempts to access non-emulated services for this project will fail.
+i  firestore: downloading cloud-firestore-emulator-v1.22.0.jar...
+
+i  firestore: Firestore Emulator logging to firestore-debug.log
+✔  firestore: Firestore Emulator was started in standard edition.
+✔  firestore: Firestore Emulator UI websocket is running on 9150.
+i  Running script: jest --passWithNoTests
+PASS test/skeleton.test.ts
+  ● Console
+
+    console.warn
+      {"uid":"u1","severity":"WARNING","message":"submitDailyResultV1: missing App Check token (soft-enforce)"}
+
+      39 |   // `platform.md` §6/§13): a missing/failed token is logged, not rejected.
+      40 |   if (request.app === undefined) {
+    > 41 |     logger.warn("submitDailyResultV1: missing App Check token (soft-enforce)", {
+         |            ^
+      42 |       uid,
+      43 |     });
+      44 |   }
+
+      at write (node_modules/firebase-functions/lib/logger/index.js:81:74)
+      at Object.warn (node_modules/firebase-functions/lib/logger/index.js:121:5)
+      at handleSubmitDailyResult (src/submitDailyResult.ts:41:12)
+      at Object.<anonymous> (test/skeleton.test.ts:48:30)
+
+FAIL test/submitDailyResult.test.ts
+  ● submitDailyResultV1 › ALREADY_SUBMITTED on a repeat — first run stays authoritative
+
+    moves must be >= 9
+
+      49 |   } catch (error) {
+      50 |     if (error instanceof PayloadError) {
+    > 51 |       throw new HttpsError("invalid-argument", error.message, {
+         |             ^
+      52 |         code: error.code,
+      53 |       });
+      54 |     }
+
+      at handleSubmitDailyResult (src/submitDailyResult.ts:51:13)
+      at call (test/submitDailyResult.test.ts:37:26)
+      at Object.<anonymous> (test/submitDailyResult.test.ts:82:26)
+
+PASS test/rules.test.ts
+  ● Console
+
+    console.warn
+      [2026-09-29T08:27:47.775Z]  @firebase/firestore: Firestore (12.18.0): GrpcConnection RPC 'Write' stream 0x89fd8a02 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+      false for 'create' @ L18, false for 'create' @ L25, false for 'update' @ L20, false for 'update' @ L25
+
+      at Logger.defaultLogHandler [as _logHandler] (node_modules/@firebase/logger/src/logger.ts:110:57)
+      at Logger.warn (node_modules/@firebase/logger/src/logger.ts:201:10)
+      at logWarn (node_modules/@firebase/firestore/src/util/log.ts:69:15)
+      at ClientDuplexStreamImpl.<anonymous> (node_modules/@firebase/firestore/src/platform/node/grpc_connection.ts:337:9)
+      at Object.onReceiveStatus (node_modules/@grpc/grpc-js/src/client.ts:705:18)
+      at Object.onReceiveStatus (node_modules/@grpc/grpc-js/src/client-interceptors.ts:419:48)
+      at node_modules/@grpc/grpc-js/src/resolving-call.ts:132:24
+
+    console.warn
+      [2026-09-29T08:27:48.457Z]  @firebase/firestore: Firestore (12.18.0): GrpcConnection RPC 'Write' stream 0x89fd8a03 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+      false for 'create' @ L18, false for 'create' @ L25, false for 'update' @ L20, false for 'update' @ L25
+
+      at Logger.defaultLogHandler [as _logHandler] (node_modules/@firebase/logger/src/logger.ts:110:57)
+      at Logger.warn (node_modules/@firebase/logger/src/logger.ts:201:10)
+      at logWarn (node_modules/@firebase/firestore/src/util/log.ts:69:15)
+      at ClientDuplexStreamImpl.<anonymous> (node_modules/@firebase/firestore/src/platform/node/grpc_connection.ts:337:9)
+      at Object.onReceiveStatus (node_modules/@grpc/grpc-js/src/client.ts:705:18)
+      at Object.onReceiveStatus (node_modules/@grpc/grpc-js/src/client-interceptors.ts:419:48)
+      at node_modules/@grpc/grpc-js/src/resolving-call.ts:132:24
+
+    console.warn
+      [2026-09-29T08:27:48.592Z]  @firebase/firestore: Firestore (12.18.0): GrpcConnection RPC 'Write' stream 0x89fd8a05 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+      false for 'update' @ L20, false for 'update' @ L25
+
+      at Logger.defaultLogHandler [as _logHandler] (node_modules/@firebase/logger/src/logger.ts:110:57)
+      at Logger.warn (node_modules/@firebase/logger/src/logger.ts:201:10)
+      at logWarn (node_modules/@firebase/firestore/src/util/log.ts:69:15)
+      at ClientDuplexStreamImpl.<anonymous> (node_modules/@firebase/firestore/src/platform/node/grpc_connection.ts:337:9)
+      at Object.onReceiveStatus (node_modules/@grpc/grpc-js/src/client.ts:705:18)
+      at Object.onReceiveStatus (node_modules/@grpc/grpc-js/src/client-interceptors.ts:419:48)
+      at node_modules/@grpc/grpc-js/src/resolving-call.ts:132:24
+
+    console.warn
+      [2026-09-29T08:27:48.704Z]  @firebase/firestore: Firestore (12.18.0): GrpcConnection RPC 'Write' stream 0x89fd8a07 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+      false for 'delete' @ L20, false for 'delete' @ L25
+
+      at Logger.defaultLogHandler [as _logHandler] (node_modules/@firebase/logger/src/logger.ts:110:57)
+      at Logger.warn (node_modules/@firebase/logger/src/logger.ts:201:10)
+      at logWarn (node_modules/@firebase/firestore/src/util/log.ts:69:15)
+      at ClientDuplexStreamImpl.<anonymous> (node_modules/@firebase/firestore/src/platform/node/grpc_connection.ts:337:9)
+      at Object.onReceiveStatus (node_modules/@grpc/grpc-js/src/client.ts:705:18)
+      at Object.onReceiveStatus (node_modules/@grpc/grpc-js/src/client-interceptors.ts:419:48)
+      at node_modules/@grpc/grpc-js/src/resolving-call.ts:132:24
+
+
+Test Suites: 1 failed, 2 passed, 3 total
+Tests:       1 failed, 30 passed, 31 total
+Snapshots:   0 total
+Time:        4.225 s
+Ran all test suites.
+⚠  Script exited unsuccessfully (code 1)
+i  emulators: Shutting down emulators.
+i  firestore: Stopping Firestore Emulator
+i  auth: Stopping Authentication Emulator
+i  hub: Stopping emulator hub
+i  logging: Stopping Logging Emulator
+
+Error: Script "jest --passWithNoTests" exited with code 1

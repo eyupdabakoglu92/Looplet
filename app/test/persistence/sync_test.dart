@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:drift/native.dart';
@@ -26,23 +27,25 @@ class _Harness {
   final List<Map<String, Object?>> sent = <Map<String, Object?>>[];
   late SyncSendResult Function(Map<String, Object?>) reply;
 
-  DailyResultSyncService service() => DailyResultSyncService(
-    db: db,
-    queue: queue,
-    daily: daily,
-    player: player,
-    clock: () => now,
-    jitterRandom: Random(0),
-    isSyncEnabled: () async => syncEnabled,
-    sender: (payload) async {
-      sent.add(payload);
-      return reply(payload);
-    },
-    attemptCap: 3,
-    baseDelay: const Duration(seconds: 30),
-    maxDelay: const Duration(hours: 6),
-    staleInFlightAfter: const Duration(seconds: 20),
-  );
+  DailyResultSyncService service({Stream<bool>? regained}) =>
+      DailyResultSyncService(
+        connectivityRegained: regained,
+        db: db,
+        queue: queue,
+        daily: daily,
+        player: player,
+        clock: () => now,
+        jitterRandom: Random(0),
+        isSyncEnabled: () async => syncEnabled,
+        sender: (payload) async {
+          sent.add(payload);
+          return reply(payload);
+        },
+        attemptCap: 3,
+        baseDelay: const Duration(seconds: 30),
+        maxDelay: const Duration(hours: 6),
+        staleInFlightAfter: const Duration(seconds: 20),
+      );
 }
 
 void main() {
@@ -316,5 +319,24 @@ void main() {
         expect(await h.queue.all(), hasLength(1)); // no second enqueue
       },
     );
+  });
+
+  test('a connectivity-regain event drains the queue — the listener is the '
+      "service's own, no screen involved (F08.LIFECYCLE)", () async {
+    final regained = StreamController<bool>();
+    h.reply = (_) => SyncSendResult.created;
+    final s = h.service(regained: regained.stream);
+    h.syncEnabled = true;
+
+    await s.enqueueFirstRun(payload());
+    expect(h.sent, isEmpty, reason: 'enqueue alone does not send');
+
+    regained.add(true);
+    await pumpEventQueue();
+
+    expect(h.sent, hasLength(1));
+    expect((await h.queue.all()).single.state, SyncQueueState.synced);
+    await s.dispose();
+    await regained.close();
   });
 }

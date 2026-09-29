@@ -10,29 +10,27 @@ In Progress
 
 ## Current Owner
 
-Frontend/Mobile Developer
+Tech Lead
 
 ## Next Role
 
-Frontend/Mobile Developer
+Tech Lead
 
 ## Active Task Ledger
 
-- [ ] Task ID: F08-FE13 | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: Close the unreadable-DB gap (Resilience row, AC8: classify, quarantine + recreate, `db_reinitialized`, loop guard), make Retry reopen the database connection (F08-RETRY-STORE-CONNECTION), add the debug-only emulator wiring and fake-producer trigger, and the storage-full fault-injection harness (architecture Activation A1–A4). Brief: Current Brief | Depends On: -
-- [ ] Task ID: F08-LOCAL-EVIDENCE | Assigned Role: Frontend/Mobile Developer | Status: Queued | Summary: On the F08-FE13 build, capture the local evidence of architecture Activation A4 — resume fidelity incl. restart / thaw / tamper; exactly-once and lifecycle against the Firebase emulator; the emulator rules / callable suite; storage-full; the unreadable-DB runtime; the production-shaped cold boot; offline Journey only on a real no-network runtime. No deploy; no product-semantics change. Brief: Current Brief | Depends On: F08-FE13
+- [x] Task ID: F08-FE13 | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: Close the unreadable-DB gap (Resilience row, AC8: classify, quarantine + recreate, `db_reinitialized`, loop guard), make Retry reopen the database connection (F08-RETRY-STORE-CONNECTION), add the debug-only emulator wiring and fake-producer trigger, and the storage-full fault-injection harness (architecture Activation A1–A4). Brief: Current Brief | Depends On: -
+- [x] Task ID: F08-LOCAL-EVIDENCE | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: On the F08-FE13 build, capture the local evidence of architecture Activation A4 — resume fidelity incl. restart / thaw / tamper; exactly-once and lifecycle against the Firebase emulator; the emulator rules / callable suite; storage-full; the unreadable-DB runtime; the production-shaped cold boot; offline Journey only on a real no-network runtime. No deploy; no product-semantics change. Brief: Current Brief | Depends On: F08-FE13
 - [ ] Task ID: F08-QA-FUNCTIONAL | Assigned Role: QA | Status: Queued | Summary: Independently review local/emulator/boot evidence, preserve unresolved scenarios, then issue functional-stage verdict | Depends On: F08-LOCAL-EVIDENCE
 - [ ] Task ID: F08-DEVOPS | Assigned Role: DevOps/Release Engineer | Status: Blocked | Summary: Resume release readiness only after explicit billing/target approval; retain runbook and remaining smoke | Depends On: F08-QA-FUNCTIONAL
 - [ ] Task ID: F08-QA-FINAL | Assigned Role: QA | Status: Queued | Summary: Final acceptance of reviewed release proof and any affected functional scope | Depends On: F08-DEVOPS
 
 ## Open Tasks
 
-* F08-FE13 (Frontend/Mobile Developer) — Open.
+* None open for a delivery role — F08-QA-FUNCTIONAL stays Queued until the Tech Lead checkpoint.
 
 ## Handoff Plan
 
-| After Tasks | Next Role | Activate Tasks |
-| --- | --- | --- |
-| F08-FE13 | Frontend/Mobile Developer | F08-LOCAL-EVIDENCE |
+None
 
 ## Delivery Review
 
@@ -85,6 +83,7 @@ None
   * Re-evaluation Trigger: Evidence captured or existing evidence reviewed against the current scope
   * Blocks: F08 functional acceptance
   * Result: PENDING
+  * Delivery Evidence: 2026-09-29 (LE-03, LE-04): suite 30/31 — one backend test sends an invalid payload (frontend.md F08-FE13 §16.1); client ↔ emulator cases A–E. Tooling: firebase-tools 15.29 needs JDK 21 (installed, not linked).
 
 - Evidence ID: F08.LOCAL-RESUME
   * Scenario: Kill/relaunch exact restore, undo/restart/thaw state and untrusted cached thaw re-derivation
@@ -95,6 +94,7 @@ None
   * Re-evaluation Trigger: Evidence captured or existing evidence reviewed against the current scope
   * Blocks: F08 functional acceptance; F03/F05 shared persistence
   * Result: PENDING
+  * Delivery Evidence: 2026-09-29 (LE-02): level 21 moves + restart + undo + thaw, kill / relaunch exact; tampered thaw re-derived.
 
 - Evidence ID: F08.LIFECYCLE
   * Scenario: Session-owned sync survives screen disposal; pause/resume and connectivity regain drain correctly
@@ -105,6 +105,7 @@ None
   * Re-evaluation Trigger: Evidence captured or existing evidence reviewed against the current scope
   * Blocks: F08 functional acceptance
   * Result: PENDING
+  * Delivery Evidence: 2026-09-29 (LE-05): screen disposed mid-sync, paused / resumed drains; connectivity regain automated only (+ N-REGAIN).
 
 - Evidence ID: F08.OFFLINE-JOURNEY
   * Scenario: Offline Journey through actual F03/F05 screens and persisted state
@@ -115,6 +116,7 @@ None
   * Re-evaluation Trigger: Evidence captured or existing evidence reviewed against the current scope
   * Blocks: F08/F05 functional acceptance
   * Result: PENDING
+  * Delivery Evidence: Not run 2026-09-29: user runtime needed; `evidence/offline-journey.sh` prepared for the user.
 
 - Evidence ID: F08.STORAGE
   * Scenario: AC7 storage-full/disk-write-failure remains non-destructive and keeps last-good state
@@ -124,7 +126,8 @@ None
   * Prerequisite / External Decision: Prepare/verify an appropriate failure-injection method; no paid deployment required
   * Re-evaluation Trigger: Evidence captured or existing evidence reviewed against the current scope
   * Blocks: F08 functional acceptance; applicable F03/F04/F05 persistence
-  * Result: PENDING
+  * Result: PASS
+  * Delivery Evidence: 2026-09-29, `app/test/persistence/storage_full_test.dart` (real file DB, production connection, `max_page_count` → `SQLITE_FULL`; active session + a multi-row transaction), negatives N-FULL / N-FULL-FATAL caught; no runtime hook (frontend.md → F08-FE13 §17, LE-06)
 
 - Evidence ID: F08.DEPLOY-SMOKE
   * Scenario: Authorized real-project deploy, post-deploy create-only submission and rollback/smoke checks
@@ -145,6 +148,7 @@ None
   * Re-evaluation Trigger: Evidence captured or existing evidence reviewed against the current scope
   * Blocks: F08 functional acceptance and shared app startup
   * Result: PENDING
+  * Delivery Evidence: 2026-09-29 (LE-07): FE13 final build, empty + existing store, no light frame.
 
 - Evidence ID: F08.UNREADABLE-DB
   * Scenario: AC8 / the Resilience row — an unreadable store file (NOTADB / CORRUPT) on launch → quarantine, recreate, `db_reinitialized` log, Home "new", no error loop; a migration failure still → the store-error screen with data intact; a recreate failure → the error screen, no second recreate
@@ -155,6 +159,7 @@ None
   * Re-evaluation Trigger: F08-FE13 delivery; F08-QA-FUNCTIONAL
   * Blocks: F08 functional acceptance
   * Result: PENDING
+  * Delivery Evidence: complete 2026-09-29: runtime LE-01 / LE-01c / LE-01d + automated tests + N-CLASS / N-LOOP / N-RETRY / N-QUAR (frontend.md → F08-LOCAL-EVIDENCE)
 
 ## Open Decision Gates
 
@@ -172,7 +177,7 @@ None
 
 ## Next Action
 
-Run Frontend/Mobile Developer on F08-FE13 (Current Brief; contract architecture → Activation 2026-09-29 A1–A3), then F08-LOCAL-EVIDENCE directly (Handoff Plan; A4). Then the Tech Lead checkpoint (delivery reconciliation, QA plan) → F08-QA-FUNCTIONAL. The release stage stays blocked (F08.DEPLOY-AUTHORIZATION OPEN); no deployment or billing action.
+Run Tech Lead — checkpoint on the F08-FE13 / F08-LOCAL-EVIDENCE delivery (frontend.md → both sections): accept or rework the migration-transaction fix and the other reconciliation items (§4), route the backend test-data defect and the JDK 21 tooling note (§16), then the QA plan for F08-QA-FUNCTIONAL. F08.OFFLINE-JOURNEY waits for the user's run of `evidence/offline-journey.sh`. The release stage stays blocked (F08.DEPLOY-AUTHORIZATION OPEN); no deployment or billing action.
 
 ## Last Decision
 
@@ -195,9 +200,9 @@ The pre-activation orchestration is archived as history/f08-offline-persistence-
 
 ## Last Update
 
-* Updated By: Tech Lead
+* Updated By: Frontend/Mobile Developer
 * Timestamp: 2026-09-29
-* Summary: F08 activation — F08-FE13 Open (owner Frontend/Mobile Developer), F08-LOCAL-EVIDENCE Queued behind it; F08.UNREADABLE-DB added; Visual Scope none; release unchanged.
+* Summary: F08-FE13 and F08-LOCAL-EVIDENCE Done (frontend.md); F08.STORAGE PASS, F08.UNREADABLE-DB delivery evidence complete (QA review pending); Delivery Review Pending; owner → Tech Lead.
 
 ## Context & Follow-ups
 
@@ -220,6 +225,7 @@ F08 implementation/runbook and the F08-FE12 fix are retained. Exact old tasks an
   * **Found:** the unreadable-DB dead end (Resilience row / AC8 not implemented).
   * **Decided:** architecture Activation A1–A5 — recovery rules, Retry reconnect, debug emulator wiring, the evidence plan, Visual Scope `none`.
   * **Next:** F08-FE13 Open; owner → Frontend/Mobile Developer.
+* 2026-09-29 — Frontend/Mobile Developer: F08-FE13 + F08-LOCAL-EVIDENCE Done (frontend.md). Found + fixed: `onUpgrade` ran without a transaction (partial apply). Needs the Tech Lead: that fix, a backend test-data defect (emulator suite 30/31), JDK 21. Owner → Tech Lead.
 
 
 ## Release Constraints

@@ -1,0 +1,90 @@
+i  emulators: Starting emulators: auth, functions, firestore
+i  emulators: Detected demo project ID "demo-looplet", emulated services will use a demo configuration and attempts to access non-emulated services for this project will fail.
+(node:49298) MetadataLookupWarning: received unexpected error = Invalid response from metadata service: incorrect Metadata-Flavor header. Expected 'Google', got no header code = UNKNOWN
+(Use `node --trace-warnings ...` to show where the warning was created)
+MetadataLookupWarning: received unexpected error = Invalid response from metadata service: incorrect Metadata-Flavor header. Expected 'Google', got no header code = UNKNOWN
+    at Object.isAvailable (/opt/homebrew/lib/node_modules/firebase-tools/node_modules/gcp-metadata/build/src/index.js:356:25)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async GoogleAuth._checkIsGCE (/opt/homebrew/lib/node_modules/firebase-tools/node_modules/google-auth-library/build/src/auth/googleauth.js:300:51)
+    at async GoogleAuth.getApplicationDefaultAsync (/opt/homebrew/lib/node_modules/firebase-tools/node_modules/google-auth-library/build/src/auth/googleauth.js:283:13)
+    at async hasDefaultCredentials (/opt/homebrew/lib/node_modules/firebase-tools/lib/defaultCredentials.js:84:9)
+    at async getCredentialsEnvironment (/opt/homebrew/lib/node_modules/firebase-tools/lib/emulator/env.js:49:9)
+    at async FunctionsEmulator.start (/opt/homebrew/lib/node_modules/firebase-tools/lib/emulator/functionsEmulator.js:251:31)
+    at async EmulatorRegistry.start (/opt/homebrew/lib/node_modules/firebase-tools/lib/emulator/registry.js:19:9)
+    at async Object.startAll (/opt/homebrew/lib/node_modules/firebase-tools/lib/emulator/controller.js:425:9)
+    at async /opt/homebrew/lib/node_modules/firebase-tools/lib/commands/emulators-start.js:34:43
+i  firestore: Firestore Emulator logging to firestore-debug.log
+✔  firestore: Firestore Emulator was started in standard edition.
+✔  firestore: Firestore Emulator UI websocket is running on 9150.
+⚠  emulators: The Emulator UI is not starting because none of the running emulators have a UI component.
+i  functions: Watching "/private/tmp/claude-501/-Users-eyupcandabakoglu-Projects-Looplet/6374e8e1-6ee1-4fcb-9aa7-1fc33d283b36/scratchpad/fbproj/functions" for Cloud Functions...
+⚠  functions: package.json indicates an outdated version of firebase-functions. Please upgrade using npm install --save firebase-functions@latest in your functions directory.
+⚠  functions: Please note that there will be breaking changes when you upgrade.
+⚠  functions: Your requested "node" version "20" doesn't match your global version "24". Using node@24 from host.
+Serving at port 8987
+
+✔  functions: Loaded functions definitions from source: submitDailyResultV1.
+✔  functions[us-central1-submitDailyResultV1]: http function initialized (http://127.0.0.1:5002/demo-looplet/us-central1/submitDailyResultV1).
+
+┌─────────────────────────────────────────────────────────────┐
+│ ✔  All emulators ready! It is now safe to connect your app. │
+└─────────────────────────────────────────────────────────────┘
+
+┌────────────────┬────────────────┐
+│ Emulator       │ Host:Port      │
+├────────────────┼────────────────┤
+│ Authentication │ 127.0.0.1:9099 │
+├────────────────┼────────────────┤
+│ Functions      │ 127.0.0.1:5002 │
+├────────────────┼────────────────┤
+│ Firestore      │ 127.0.0.1:8080 │
+└────────────────┴────────────────┘
+  Emulator Hub host: 127.0.0.1 port: 4400
+  Other reserved ports: 4500, 9150
+
+Issues? Report them at https://github.com/firebase/firebase-tools/issues and attach the *-debug.log files.
+ 
+i  functions: Beginning execution of "us-central1-submitDailyResultV1"
+>  {"verifications":{"app":"VALID","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+i  functions: Finished "us-central1-submitDailyResultV1" in 259.946083ms
+i  functions: Beginning execution of "us-central1-submitDailyResultV1"
+>  {"verifications":{"app":"VALID","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+i  functions: Finished "us-central1-submitDailyResultV1" in 48.215083ms
+i  functions: Beginning execution of "us-central1-submitDailyResultV1"
+>  {"verifications":{"app":"VALID","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+i  functions: Finished "us-central1-submitDailyResultV1" in 72.176083ms
+i  functions: Beginning execution of "us-central1-submitDailyResultV1"
+>  {"verifications":{"app":"VALID","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+i  functions: Finished "us-central1-submitDailyResultV1" in 38.985042ms
+i  functions: Beginning execution of "us-central1-submitDailyResultV1"
+>  {"verifications":{"app":"VALID","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+i  functions: Finished "us-central1-submitDailyResultV1" in 18.136875ms
+i  functions: Beginning execution of "us-central1-submitDailyResultV1"
+>  {"verifications":{"app":"VALID","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+i  functions: Finished "us-central1-submitDailyResultV1" in 41.0575ms
+i  functions: Beginning execution of "us-central1-submitDailyResultV1"
+>  {"verifications":{"app":"VALID","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+i  functions: Finished "us-central1-submitDailyResultV1" in 101.393916ms
+i  functions: Beginning execution of "us-central1-submitDailyResultV1"
+>  {"verifications":{"app":"VALID","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+i  functions: Finished "us-central1-submitDailyResultV1" in 37.851916ms
+i  functions: Beginning execution of "us-central1-submitDailyResultV1"
+>  {"verifications":{"app":"VALID","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+i  functions: Finished "us-central1-submitDailyResultV1" in 16.614875ms
+i  functions: Beginning execution of "us-central1-submitDailyResultV1"
+>  {"verifications":{"app":"VALID","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+i  functions: Finished "us-central1-submitDailyResultV1" in 30.531834ms
+i  functions: Beginning execution of "us-central1-submitDailyResultV1"
+>  {"verifications":{"app":"VALID","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+i  functions: Finished "us-central1-submitDailyResultV1" in 51.658041ms
+ 
+i  emulators: Received SIGINT (Ctrl-C) for the first time. Starting a clean shutdown.
+i  emulators: Please wait for a clean shutdown or send the SIGINT (Ctrl-C) signal again to stop right now.
+i  emulators: Shutting down emulators.
+i  functions: Stopping Functions Emulator
+i  firestore: Stopping Firestore Emulator
+i  auth: Stopping Authentication Emulator
+i  eventarc: Stopping Eventarc Emulator
+i  tasks: Stopping Cloud Tasks Emulator
+i  hub: Stopping emulator hub
+i  logging: Stopping Logging Emulator

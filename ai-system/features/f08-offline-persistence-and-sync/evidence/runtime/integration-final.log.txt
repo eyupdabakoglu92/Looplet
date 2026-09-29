@@ -1,0 +1,232 @@
+00:00 +0: loading /Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart                                                                                                 00:01 +0: loading /Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart                                                                                                 00:02 +0: loading /Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart                                                                                                 00:03 +0: loading /Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart                                                                                                 00:04 +0: loading /Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart                                                                                                 00:05 +0: loading /Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart                                                                                                 Running Xcode build...                                          00:06 +0: loading /Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart                                                                                                 00:07 +0: loading /Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart                                                                                                 00:08 +0: loading /Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart                                                                                                 00:09 +0: loading /Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart                                                                                                 00:10 +0: loading /Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart                                                                                                 00:11 +0: loading /Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart                                                                                                 00:12 +0: loading /Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart                                                                                                 00:13 +0: loading /Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart                                                                                                 00:14 +0: loading /Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart                                                                                                 00:15 +0: loading /Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart                                                                                                 00:16 +0: loading /Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart                                                                                                 00:17 +0: loading /Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart                                                                                                 00:18 +0: loading /Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart                                                                                                 00:19 +0: loading /Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart                                                                                                 00:20 +0: loading /Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart                                                                                                 00:21 +0: loading /Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart                                                                                                 00:22 +0: loading /Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart                                                                                                 00:23 +0: loading /Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart                                                                                                 00:24 +0: loading /Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart                                                                                                 00:25 +0: loading /Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart                                                                                                 00:26 +0: loading /Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart                                                                                                 00:27 +0: loading /Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart                                                                                                 00:28 +0: loading /Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart                                                                                                 00:29 +0: loading /Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart                                                                                                 00:30 +0: loading /Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart                                                                                                 00:31 +0: loading /Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart                                                                                                 
+Xcode build done.                                           26.1s
+00:32 +0: loading /Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart                                                                                                 00:33 +0: loading /Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart                                                                                                 00:34 +0: loading /Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart                                                                                                 00:35 +0: loading /Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart                                                                                                 00:36 +0: loading /Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart                                                                                                 00:36 +0: 1 — gesture → shift wiring at 2 surface sizes (AC2/AC3/AC4) 360x780 — a row-0 right swipe forms the target → completion                                                                      00:37 +0: 1 — gesture → shift wiring at 2 surface sizes (AC2/AC3/AC4) 360x780 — a row-0 right swipe forms the target → completion                                                                      00:38 +0: 1 — gesture → shift wiring at 2 surface sizes (AC2/AC3/AC4) 360x780 — a row-0 right swipe forms the target → completion                                                                      00:39 +0: 1 — gesture → shift wiring at 2 surface sizes (AC2/AC3/AC4) 360x780 — a row-0 right swipe forms the target → completion                                                                      00:39 +1: 1 — gesture → shift wiring at 2 surface sizes (AC2/AC3/AC4) 360x780 — a row-0 right swipe forms the target → completion                                                                      00:39 +1: 1 — gesture → shift wiring at 2 surface sizes (AC2/AC3/AC4) 360x780 — a sub-threshold drag does not move (AC4)                                                                               00:39 +1: 1 — gesture → shift wiring at 2 surface sizes (AC2/AC3/AC4) 360x780 — a sub-threshold drag does not move (AC4)                                                                               
+WARNING (drift): It looks like you've created the database class AppDatabase multiple times. When these two databases use the same QueryExecutor, race conditions will occur and might corrupt the database. 
+Try to follow the advice at https://drift.simonbinder.eu/faq/#using-the-database or, if you know what you're doing, set driftRuntimeOptions.dontWarnAboutMultipleDatabases = true
+Here is the stacktrace from when the database was opened a second time:
+#0      GeneratedDatabase._handleInstantiated (package:drift/src/runtime/api/db_base.dart:96:30)
+#1      GeneratedDatabase._whenConstructed (package:drift/src/runtime/api/db_base.dart:73:12)
+#2      new GeneratedDatabase (package:drift/src/runtime/api/db_base.dart:64:5)
+#3      new _$AppDatabase (package:looplet_app/persistence/app_database.g.dart:4086:36)
+#4      new AppDatabase.forTesting (package:looplet_app/persistence/app_database.dart)
+#5      _freshDb (file:///Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart:59:39)
+#6      main.<anonymous closure>.<anonymous closure> (file:///Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart:131:31)
+<asynchronous suspension>
+#7      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:193:15)
+<asynchronous suspension>
+#8      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1064:5)
+<asynchronous suspension>
+#9      StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:42)
+<asynchronous suspension>
+This warning will only appear on debug builds.
+00:39 +2: 1 — gesture → shift wiring at 2 surface sizes (AC2/AC3/AC4) 360x780 — a sub-threshold drag does not move (AC4)                                                                               00:39 +2: 1 — gesture → shift wiring at 2 surface sizes (AC2/AC3/AC4) 360x780 — a rejected column move → MOVES unchanged                                                                               00:39 +2: 1 — gesture → shift wiring at 2 surface sizes (AC2/AC3/AC4) 360x780 — a rejected column move → MOVES unchanged                                                                               
+WARNING (drift): It looks like you've created the database class AppDatabase multiple times. When these two databases use the same QueryExecutor, race conditions will occur and might corrupt the database. 
+Try to follow the advice at https://drift.simonbinder.eu/faq/#using-the-database or, if you know what you're doing, set driftRuntimeOptions.dontWarnAboutMultipleDatabases = true
+Here is the stacktrace from when the database was opened a second time:
+#0      GeneratedDatabase._handleInstantiated (package:drift/src/runtime/api/db_base.dart:96:30)
+#1      GeneratedDatabase._whenConstructed (package:drift/src/runtime/api/db_base.dart:73:12)
+#2      new GeneratedDatabase (package:drift/src/runtime/api/db_base.dart:64:5)
+#3      new _$AppDatabase (package:looplet_app/persistence/app_database.g.dart:4086:36)
+#4      new AppDatabase.forTesting (package:looplet_app/persistence/app_database.dart)
+#5      _freshDb (file:///Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart:59:39)
+#6      main.<anonymous closure>.<anonymous closure> (file:///Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart:145:31)
+<asynchronous suspension>
+#7      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:193:15)
+<asynchronous suspension>
+#8      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1064:5)
+<asynchronous suspension>
+#9      StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:42)
+<asynchronous suspension>
+This warning will only appear on debug builds.
+00:40 +3: 1 — gesture → shift wiring at 2 surface sizes (AC2/AC3/AC4) 360x780 — a rejected column move → MOVES unchanged                                                                               00:40 +3: 1 — gesture → shift wiring at 2 surface sizes (AC2/AC3/AC4) 430x932 — a row-0 right swipe forms the target → completion                                                                      00:40 +3: 1 — gesture → shift wiring at 2 surface sizes (AC2/AC3/AC4) 430x932 — a row-0 right swipe forms the target → completion                                                                      
+WARNING (drift): It looks like you've created the database class AppDatabase multiple times. When these two databases use the same QueryExecutor, race conditions will occur and might corrupt the database. 
+Try to follow the advice at https://drift.simonbinder.eu/faq/#using-the-database or, if you know what you're doing, set driftRuntimeOptions.dontWarnAboutMultipleDatabases = true
+Here is the stacktrace from when the database was opened a second time:
+#0      GeneratedDatabase._handleInstantiated (package:drift/src/runtime/api/db_base.dart:96:30)
+#1      GeneratedDatabase._whenConstructed (package:drift/src/runtime/api/db_base.dart:73:12)
+#2      new GeneratedDatabase (package:drift/src/runtime/api/db_base.dart:64:5)
+#3      new _$AppDatabase (package:looplet_app/persistence/app_database.g.dart:4086:36)
+#4      new AppDatabase.forTesting (package:looplet_app/persistence/app_database.dart)
+#5      _freshDb (file:///Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart:59:39)
+#6      main.<anonymous closure>.<anonymous closure> (file:///Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart:115:33)
+<asynchronous suspension>
+#7      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:193:15)
+<asynchronous suspension>
+#8      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1064:5)
+<asynchronous suspension>
+#9      StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:42)
+<asynchronous suspension>
+This warning will only appear on debug builds.
+00:42 +4: 1 — gesture → shift wiring at 2 surface sizes (AC2/AC3/AC4) 430x932 — a row-0 right swipe forms the target → completion                                                                      00:42 +4: 1 — gesture → shift wiring at 2 surface sizes (AC2/AC3/AC4) 430x932 — a sub-threshold drag does not move (AC4)                                                                               00:42 +4: 1 — gesture → shift wiring at 2 surface sizes (AC2/AC3/AC4) 430x932 — a sub-threshold drag does not move (AC4)                                                                               
+WARNING (drift): It looks like you've created the database class AppDatabase multiple times. When these two databases use the same QueryExecutor, race conditions will occur and might corrupt the database. 
+Try to follow the advice at https://drift.simonbinder.eu/faq/#using-the-database or, if you know what you're doing, set driftRuntimeOptions.dontWarnAboutMultipleDatabases = true
+Here is the stacktrace from when the database was opened a second time:
+#0      GeneratedDatabase._handleInstantiated (package:drift/src/runtime/api/db_base.dart:96:30)
+#1      GeneratedDatabase._whenConstructed (package:drift/src/runtime/api/db_base.dart:73:12)
+#2      new GeneratedDatabase (package:drift/src/runtime/api/db_base.dart:64:5)
+#3      new _$AppDatabase (package:looplet_app/persistence/app_database.g.dart:4086:36)
+#4      new AppDatabase.forTesting (package:looplet_app/persistence/app_database.dart)
+#5      _freshDb (file:///Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart:59:39)
+#6      main.<anonymous closure>.<anonymous closure> (file:///Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart:131:31)
+<asynchronous suspension>
+#7      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:193:15)
+<asynchronous suspension>
+#8      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1064:5)
+<asynchronous suspension>
+#9      StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:42)
+<asynchronous suspension>
+This warning will only appear on debug builds.
+00:43 +5: 1 — gesture → shift wiring at 2 surface sizes (AC2/AC3/AC4) 430x932 — a sub-threshold drag does not move (AC4)                                                                               00:43 +5: 1 — gesture → shift wiring at 2 surface sizes (AC2/AC3/AC4) 430x932 — a rejected column move → MOVES unchanged                                                                               00:43 +5: 1 — gesture → shift wiring at 2 surface sizes (AC2/AC3/AC4) 430x932 — a rejected column move → MOVES unchanged                                                                               
+WARNING (drift): It looks like you've created the database class AppDatabase multiple times. When these two databases use the same QueryExecutor, race conditions will occur and might corrupt the database. 
+Try to follow the advice at https://drift.simonbinder.eu/faq/#using-the-database or, if you know what you're doing, set driftRuntimeOptions.dontWarnAboutMultipleDatabases = true
+Here is the stacktrace from when the database was opened a second time:
+#0      GeneratedDatabase._handleInstantiated (package:drift/src/runtime/api/db_base.dart:96:30)
+#1      GeneratedDatabase._whenConstructed (package:drift/src/runtime/api/db_base.dart:73:12)
+#2      new GeneratedDatabase (package:drift/src/runtime/api/db_base.dart:64:5)
+#3      new _$AppDatabase (package:looplet_app/persistence/app_database.g.dart:4086:36)
+#4      new AppDatabase.forTesting (package:looplet_app/persistence/app_database.dart)
+#5      _freshDb (file:///Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart:59:39)
+#6      main.<anonymous closure>.<anonymous closure> (file:///Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart:145:31)
+<asynchronous suspension>
+#7      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:193:15)
+<asynchronous suspension>
+#8      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1064:5)
+<asynchronous suspension>
+#9      StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:42)
+<asynchronous suspension>
+This warning will only appear on debug builds.
+00:44 +6: 1 — gesture → shift wiring at 2 surface sizes (AC2/AC3/AC4) 430x932 — a rejected column move → MOVES unchanged                                                                               00:44 +6: 2 — no double-registered moves during the animation window (AC5) a second drag during the ~190 ms shift is dropped                                                                           00:44 +6: 2 — no double-registered moves during the animation window (AC5) a second drag during the ~190 ms shift is dropped                                                                           
+WARNING (drift): It looks like you've created the database class AppDatabase multiple times. When these two databases use the same QueryExecutor, race conditions will occur and might corrupt the database. 
+Try to follow the advice at https://drift.simonbinder.eu/faq/#using-the-database or, if you know what you're doing, set driftRuntimeOptions.dontWarnAboutMultipleDatabases = true
+Here is the stacktrace from when the database was opened a second time:
+#0      GeneratedDatabase._handleInstantiated (package:drift/src/runtime/api/db_base.dart:96:30)
+#1      GeneratedDatabase._whenConstructed (package:drift/src/runtime/api/db_base.dart:73:12)
+#2      new GeneratedDatabase (package:drift/src/runtime/api/db_base.dart:64:5)
+#3      new _$AppDatabase (package:looplet_app/persistence/app_database.g.dart:4086:36)
+#4      new AppDatabase.forTesting (package:looplet_app/persistence/app_database.dart)
+#5      _freshDb (file:///Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart:59:39)
+#6      main.<anonymous closure>.<anonymous closure> (file:///Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart:162:29)
+<asynchronous suspension>
+#7      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:193:15)
+<asynchronous suspension>
+#8      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1064:5)
+<asynchronous suspension>
+#9      StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:42)
+<asynchronous suspension>
+This warning will only appear on debug builds.
+00:45 +7: 2 — no double-registered moves during the animation window (AC5) a second drag during the ~190 ms shift is dropped                                                                           00:45 +7: 2 — no double-registered moves during the animation window (AC5) rapid same-row swipes each count only after the previous settles                                                            00:45 +7: 2 — no double-registered moves during the animation window (AC5) rapid same-row swipes each count only after the previous settles                                                            
+WARNING (drift): It looks like you've created the database class AppDatabase multiple times. When these two databases use the same QueryExecutor, race conditions will occur and might corrupt the database. 
+Try to follow the advice at https://drift.simonbinder.eu/faq/#using-the-database or, if you know what you're doing, set driftRuntimeOptions.dontWarnAboutMultipleDatabases = true
+Here is the stacktrace from when the database was opened a second time:
+#0      GeneratedDatabase._handleInstantiated (package:drift/src/runtime/api/db_base.dart:96:30)
+#1      GeneratedDatabase._whenConstructed (package:drift/src/runtime/api/db_base.dart:73:12)
+#2      new GeneratedDatabase (package:drift/src/runtime/api/db_base.dart:64:5)
+#3      new _$AppDatabase (package:looplet_app/persistence/app_database.g.dart:4086:36)
+#4      new AppDatabase.forTesting (package:looplet_app/persistence/app_database.dart)
+#5      _freshDb (file:///Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart:59:39)
+#6      main.<anonymous closure>.<anonymous closure> (file:///Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart:178:31)
+<asynchronous suspension>
+#7      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:193:15)
+<asynchronous suspension>
+#8      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1064:5)
+<asynchronous suspension>
+#9      StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:42)
+<asynchronous suspension>
+This warning will only appear on debug builds.
+00:46 +8: 2 — no double-registered moves during the animation window (AC5) rapid same-row swipes each count only after the previous settles                                                            00:46 +8: 3 — kill / relaunch resume (AC10) MOVES + restart survive a dispose + remount on the same DB                                                                                                 00:46 +8: 3 — kill / relaunch resume (AC10) MOVES + restart survive a dispose + remount on the same DB                                                                                                 
+WARNING (drift): It looks like you've created the database class AppDatabase multiple times. When these two databases use the same QueryExecutor, race conditions will occur and might corrupt the database. 
+Try to follow the advice at https://drift.simonbinder.eu/faq/#using-the-database or, if you know what you're doing, set driftRuntimeOptions.dontWarnAboutMultipleDatabases = true
+Here is the stacktrace from when the database was opened a second time:
+#0      GeneratedDatabase._handleInstantiated (package:drift/src/runtime/api/db_base.dart:96:30)
+#1      GeneratedDatabase._whenConstructed (package:drift/src/runtime/api/db_base.dart:73:12)
+#2      new GeneratedDatabase (package:drift/src/runtime/api/db_base.dart:64:5)
+#3      new _$AppDatabase (package:looplet_app/persistence/app_database.g.dart:4086:36)
+#4      new AppDatabase.forTesting (package:looplet_app/persistence/app_database.dart)
+#5      _freshDb (file:///Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart:59:39)
+#6      main.<anonymous closure>.<anonymous closure> (file:///Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart:196:18)
+<asynchronous suspension>
+#7      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:193:15)
+<asynchronous suspension>
+#8      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1064:5)
+<asynchronous suspension>
+#9      StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:42)
+<asynchronous suspension>
+This warning will only appear on debug builds.
+00:49 +9: 3 — kill / relaunch resume (AC10) MOVES + restart survive a dispose + remount on the same DB                                                                                                 00:49 +9: 3 — kill / relaunch resume (AC10) a tampered thawedFrozenCells cache is re-derived, not trusted                                                                                              00:49 +9: 3 — kill / relaunch resume (AC10) a tampered thawedFrozenCells cache is re-derived, not trusted                                                                                              
+WARNING (drift): It looks like you've created the database class AppDatabase multiple times. When these two databases use the same QueryExecutor, race conditions will occur and might corrupt the database. 
+Try to follow the advice at https://drift.simonbinder.eu/faq/#using-the-database or, if you know what you're doing, set driftRuntimeOptions.dontWarnAboutMultipleDatabases = true
+Here is the stacktrace from when the database was opened a second time:
+#0      GeneratedDatabase._handleInstantiated (package:drift/src/runtime/api/db_base.dart:96:30)
+#1      GeneratedDatabase._whenConstructed (package:drift/src/runtime/api/db_base.dart:73:12)
+#2      new GeneratedDatabase (package:drift/src/runtime/api/db_base.dart:64:5)
+#3      new _$AppDatabase (package:looplet_app/persistence/app_database.g.dart:4086:36)
+#4      new AppDatabase.forTesting (package:looplet_app/persistence/app_database.dart)
+#5      _freshDb (file:///Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart:59:39)
+#6      main.<anonymous closure>.<anonymous closure> (file:///Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart:227:20)
+<asynchronous suspension>
+#7      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:193:15)
+<asynchronous suspension>
+#8      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1064:5)
+<asynchronous suspension>
+#9      StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:42)
+<asynchronous suspension>
+This warning will only appear on debug builds.
+00:50 +10: 3 — kill / relaunch resume (AC10) a tampered thawedFrozenCells cache is re-derived, not trusted                                                                                             00:50 +10: 4 — app lifecycle (architecture.md §12) paused mid-drag cancels the gesture, no move                                                                                                        00:50 +10: 4 — app lifecycle (architecture.md §12) paused mid-drag cancels the gesture, no move                                                                                                        
+WARNING (drift): It looks like you've created the database class AppDatabase multiple times. When these two databases use the same QueryExecutor, race conditions will occur and might corrupt the database. 
+Try to follow the advice at https://drift.simonbinder.eu/faq/#using-the-database or, if you know what you're doing, set driftRuntimeOptions.dontWarnAboutMultipleDatabases = true
+Here is the stacktrace from when the database was opened a second time:
+#0      GeneratedDatabase._handleInstantiated (package:drift/src/runtime/api/db_base.dart:96:30)
+#1      GeneratedDatabase._whenConstructed (package:drift/src/runtime/api/db_base.dart:73:12)
+#2      new GeneratedDatabase (package:drift/src/runtime/api/db_base.dart:64:5)
+#3      new _$AppDatabase (package:looplet_app/persistence/app_database.g.dart:4086:36)
+#4      new AppDatabase.forTesting (package:looplet_app/persistence/app_database.dart)
+#5      _freshDb (file:///Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart:59:39)
+#6      main.<anonymous closure>.<anonymous closure> (file:///Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart:273:20)
+<asynchronous suspension>
+#7      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:193:15)
+<asynchronous suspension>
+#8      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1064:5)
+<asynchronous suspension>
+#9      StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:42)
+<asynchronous suspension>
+This warning will only appear on debug builds.
+00:50 +11: 4 — app lifecycle (architecture.md §12) paused mid-drag cancels the gesture, no move                                                                                                        00:50 +11: 4 — app lifecycle (architecture.md §12) an OS pointer cancel mid-drag aborts, then the app pauses — no move (F03-QA-03)                                                                     00:50 +11: 4 — app lifecycle (architecture.md §12) an OS pointer cancel mid-drag aborts, then the app pauses — no move (F03-QA-03)                                                                     
+WARNING (drift): It looks like you've created the database class AppDatabase multiple times. When these two databases use the same QueryExecutor, race conditions will occur and might corrupt the database. 
+Try to follow the advice at https://drift.simonbinder.eu/faq/#using-the-database or, if you know what you're doing, set driftRuntimeOptions.dontWarnAboutMultipleDatabases = true
+Here is the stacktrace from when the database was opened a second time:
+#0      GeneratedDatabase._handleInstantiated (package:drift/src/runtime/api/db_base.dart:96:30)
+#1      GeneratedDatabase._whenConstructed (package:drift/src/runtime/api/db_base.dart:73:12)
+#2      new GeneratedDatabase (package:drift/src/runtime/api/db_base.dart:64:5)
+#3      new _$AppDatabase (package:looplet_app/persistence/app_database.g.dart:4086:36)
+#4      new AppDatabase.forTesting (package:looplet_app/persistence/app_database.dart)
+#5      _freshDb (file:///Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart:59:39)
+#6      main.<anonymous closure>.<anonymous closure> (file:///Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart:302:20)
+<asynchronous suspension>
+#7      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:193:15)
+<asynchronous suspension>
+#8      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1064:5)
+<asynchronous suspension>
+#9      StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:42)
+<asynchronous suspension>
+This warning will only appear on debug builds.
+00:51 +12: 4 — app lifecycle (architecture.md §12) an OS pointer cancel mid-drag aborts, then the app pauses — no move (F03-QA-03)                                                                     00:51 +12: 4 — app lifecycle (architecture.md §12) paused mid-animation commits a settled move (never torn)                                                                                            00:51 +12: 4 — app lifecycle (architecture.md §12) paused mid-animation commits a settled move (never torn)                                                                                            
+WARNING (drift): It looks like you've created the database class AppDatabase multiple times. When these two databases use the same QueryExecutor, race conditions will occur and might corrupt the database. 
+Try to follow the advice at https://drift.simonbinder.eu/faq/#using-the-database or, if you know what you're doing, set driftRuntimeOptions.dontWarnAboutMultipleDatabases = true
+Here is the stacktrace from when the database was opened a second time:
+#0      GeneratedDatabase._handleInstantiated (package:drift/src/runtime/api/db_base.dart:96:30)
+#1      GeneratedDatabase._whenConstructed (package:drift/src/runtime/api/db_base.dart:73:12)
+#2      new GeneratedDatabase (package:drift/src/runtime/api/db_base.dart:64:5)
+#3      new _$AppDatabase (package:looplet_app/persistence/app_database.g.dart:4086:36)
+#4      new AppDatabase.forTesting (package:looplet_app/persistence/app_database.dart)
+#5      _freshDb (file:///Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart:59:39)
+#6      main.<anonymous closure>.<anonymous closure> (file:///Users/eyupcandabakoglu/Projects/Looplet/app/integration_test/play_session_test.dart:333:20)
+<asynchronous suspension>
+#7      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:193:15)
+<asynchronous suspension>
+#8      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1064:5)
+<asynchronous suspension>
+#9      StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:42)
+<asynchronous suspension>
+This warning will only appear on debug builds.
+00:53 +13: 4 — app lifecycle (architecture.md §12) paused mid-animation commits a settled move (never torn)                                                                                            00:53 +13: (tearDownAll)                                                                                                                                                                               00:54 +13: (tearDownAll)                                                                                                                                                                               00:54 +13: All tests passed!                                                                                                                                                                           
+exit 0

@@ -10,6 +10,20 @@ class MigrationDataLossError extends StateError {
   MigrationDataLossError(super.message);
 }
 
+/// Any other exception thrown by a forward migration step, rethrown under this
+/// type so the bootstrap classifies it as a migration failure (keep the old DB,
+/// the store-error screen — never a recreate), even when its cause is a SQLite
+/// error that would otherwise read as an unreadable store (F08 `architecture.md`
+/// → Resilience "Migration step throws … Never silently wipe"; Activation A1
+/// rule 1).
+class MigrationStepError extends StateError {
+  MigrationStepError(this.cause, {required this.fromVersion})
+    : super('migration step from v$fromVersion failed: $cause');
+
+  final Object cause;
+  final int fromVersion;
+}
+
 /// Guards forward migrations against player-data loss.
 abstract final class MigrationGuard {
   /// Tables whose row count must never shrink across a migration.

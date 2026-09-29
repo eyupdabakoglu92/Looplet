@@ -1,8 +1,10 @@
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'bootstrap.dart';
+import 'debug/debug_sync_screen.dart';
 import 'home_screen.dart';
 import 'play/play_session_args.dart';
 import 'play/play_session_screen.dart';
@@ -15,6 +17,9 @@ export 'shell/store_error_screen.dart' show StoreErrorScreen;
 abstract final class Routes {
   static const String home = '/';
   static const String play = '/play';
+
+  /// Debug builds only: the fake daily-result trigger (F08 Activation A3).
+  static const String debugSync = '/debug/sync';
 }
 
 /// The app router. `'/'` renders the local-bootstrap gate (splash → home /
@@ -41,6 +46,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           return PlaySessionScreen(args: args);
         },
       ),
+      if (kDebugMode)
+        GoRoute(
+          path: Routes.debugSync,
+          builder: (context, state) => const DebugSyncScreen(),
+        ),
     ],
   );
 });
@@ -65,7 +75,7 @@ class _BootstrapGate extends ConsumerWidget {
       ),
       data: (result) => switch (result) {
         AppBootstrapReady() => const HomeScreen(),
-        AppBootstrapMigrationError(:final message) => StoreErrorScreen(
+        AppBootstrapStoreError(:final message) => StoreErrorScreen(
           message: message,
           onRetry: () => ref.invalidate(appBootstrapProvider),
         ),

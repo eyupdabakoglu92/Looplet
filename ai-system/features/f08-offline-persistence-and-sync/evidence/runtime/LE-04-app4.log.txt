@@ -1,0 +1,9 @@
+getpwuid_r did not find a match for uid 501
+Filtering the log data using "process == "Runner" AND composedMessage CONTAINS "flutter:""
+Timestamp               Ty Process[PID:TID]
+2026-09-29 11:39:03.661 Df Runner[51928:4571f80] (Flutter) flutter: The Dart VM service is listening on http://127.0.0.1:63917/g6Br9AVAcgg=/
+2026-09-29 11:39:04.630 Df Runner[51928:4571f52] (Flutter) flutter: firebase: emulators at 127.0.0.1 (auth 9099, firestore 8080, functions 5001, project demo-looplet)
+2026-09-29 11:39:32.331 Df Runner[51928:4571f52] (Flutter) flutter: debug-sync: produced 2026-09-29 → DailyCompletionOutcome.firstRun
+2026-09-29 11:39:32.383 Df Runner[51928:4571f52] (Flutter) flutter: sync: submitDailyResultV1 failed — unknown: The network connection was lost.
+2026-09-29 11:39:32.386 Df Runner[51928:4571f52] (Flutter) flutter: debug-sync: drain after produce 2026-09-29 done
+Child process terminated with signal 15: Terminated

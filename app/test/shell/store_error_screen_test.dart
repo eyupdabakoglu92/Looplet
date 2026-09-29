@@ -14,6 +14,7 @@ import 'package:looplet_app/app_router.dart';
 import 'package:looplet_app/bootstrap.dart';
 import 'package:looplet_app/design/design.dart';
 import 'package:looplet_app/home_screen.dart';
+import 'package:looplet_app/persistence/store_recovery.dart';
 import 'package:looplet_app/shell/splash_screen.dart';
 import 'package:looplet_app/shell/shell_wordmark.dart';
 
@@ -192,7 +193,7 @@ void main() {
             calls++;
             if (calls == 1) {
               return Future<AppBootstrap>.value(
-                const AppBootstrapMigrationError(raw),
+                const AppBootstrapStoreError(StoreFailureKind.migration, raw),
               );
             }
             return retry.future;
@@ -213,7 +214,9 @@ void main() {
     expect(find.byType(StoreErrorScreen), findsNothing);
     expect(find.byType(LoopSplashScreen), findsOneWidget);
 
-    retry.complete(const AppBootstrapMigrationError(raw));
+    retry.complete(
+      const AppBootstrapStoreError(StoreFailureKind.migration, raw),
+    );
     await tester.pumpAndSettle();
     expect(find.byType(StoreErrorScreen), findsOneWidget);
   });

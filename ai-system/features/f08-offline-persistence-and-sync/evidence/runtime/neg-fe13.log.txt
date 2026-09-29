@@ -1,0 +1,21 @@
+N-CLASS: 3 failing — Some tests failed.
+    test/persistence/store_recovery_test.dart: bootstrap recovery (A1 rules 2–5) CORRUPT (a malformed first page) → recovered the same way [E]
+    test/persistence/store_recovery_test.dart: bootstrap recovery (A1 rules 2–5) NOTADB (the seed-d3.sh corrupt bytes) → quarantined, recreated, db_reinitialized, ready as a new guest [E]
+    test/persistence/store_recovery_test.dart: the loop guard (A1 rule 3) the recreated store fails too → the error state; one recreate, one quarantine [E]
+N-LOOP: 1 failing — Some tests failed.
+    test/persistence/store_recovery_test.dart: the loop guard (A1 rule 3) the recreated store fails too → the error state; one recreate, one quarantine [E]
+N-RETRY: 2 failing — Some tests failed.
+    test/persistence/store_recovery_test.dart: Retry reconnects (A2, F08-RETRY-STORE-CONNECTION) a store fixed between attempts recovers on Retry, without a relaunch [E]
+    test/persistence/store_recovery_test.dart: the loop guard (A1 rule 3) the recreated store fails too → the error state; one recreate, one quarantine [E]
+N-FULL: 1 failing — Some tests failed.
+    test/persistence/storage_full_test.dart: a durable multi-row write: a full store rolls the whole transaction back — no partial write (the queue item and the daily_entry mirror) [E]
+N-FULL-FATAL: 1 failing — Some tests failed.
+    test/persistence/storage_full_test.dart: the active session: a full store rolls the write back, keeps the last good snapshot, logs persist_failed, play continues from memory, and the next boundary retries [E]
+N-TXN: 1 failing — Some tests failed.
+    test/persistence/store_recovery_test.dart: bootstrap recovery (A1 rules 2–5) a MigrationDataLossError → the error screen, the file untouched, no recreate [E]
+N-QUAR: 1 failing — Some tests failed.
+    test/persistence/store_recovery_test.dart: quarantineStoreFile (A1 rule 2) keeps only the newest quarantined copy [E]
+N-GATE: 1 failing — Some tests failed.
+    test/persistence/store_recovery_test.dart: the emulator gate (A3) off in non-debug builds whatever the define says [E]
+N-REGAIN: 1 failing — Some tests failed.
+    a connectivity-regain event drains the queue — the listener is the service's own, no screen involved (F08.LIFECYCLE) [E]

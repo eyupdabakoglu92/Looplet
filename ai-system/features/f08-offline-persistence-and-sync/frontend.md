@@ -375,3 +375,185 @@ SyncSender callableSyncSender(FirebaseFunctions Function() functions) {
 ```
 Run Tech Lead
 ```
+
+---
+
+# F08-FE13 — Bozuk store kurtarma, Retry yeniden bağlanma, emülatör araçları, storage-full harness (2026-09-29)
+
+> Kontrat: `architecture.md` → "Activation 2026-09-29" A1–A5 + kilitli "Resilience", "App Init Sequence", "Ownership & Lifecycle", "QA Focus". Brief: `orchestration.md` → Current Brief. Taban: HEAD `1d373d7` + commit'lenmemiş çalışma ağacı; teslim edilen `app/` ağacı `9de12e6a82077a19178bb4e4cae2398d110c3e7d` (`git write-tree --prefix=app/`, geçici index). Kanıt dosyaları: `evidence/` (`evidence/README.md`).
+
+## 1. Feature Summary
+
+* **Bozuk store artık çıkmaz sokak değil (A1, AC8):** bootstrap açılış/ilk sorgu hatasını sınıflandırıyor. `SQLITE_NOTADB` (26) / `SQLITE_CORRUPT` (11) → bağlantı kapanır, dosya (+ `-wal` / `-shm` / `-journal`) `looplet.sqlite.corrupt-<utcMs>` olarak karantinaya alınır (yalnız en yeni kopya tutulur), store yeniden oluşturulur (yeni misafir), `store: db_reinitialized — <kod>` log'u, Home. Aynı launch'ta ikinci bozukluk → hata ekranı, ikinci recreate yok (loop guard). Migration hatası → bugünkü hata ekranı, veri korunur. Diğer her hata → hata ekranı.
+* **Retry yeni bağlantı açıyor (A2):** hatayla biten bir bootstrap bağlantıyı "stale" işaretler; Retry'ın başlattığı yeniden çalıştırma önce eski bağlantıyı kapatır (await), `appDatabaseProvider`'ı invalidate eder, taze bağlantıyla açar. Hata ekranı ve splash görsel olarak değişmedi.
+* **Debug-only emülatör bağlantısı + sahte üretici tetikleyicisi (A3):** `--dart-define=LOOPLET_FIREBASE_EMULATOR=<host>` yalnız `kDebugMode`'da; adlandırılmış bir Firebase app (`looplet-emulator`, proje `demo-looplet`) auth 9099 / firestore 8080 / functions 5001'e bağlanır. Home debug satırında `sync` → `/debug/sync` (yalnız debug'da kayıtlı route): produce, produce + leave, drain, tarih ±1 gün, `daily_sync_enabled` anahtarı, canlı `sync_queue` listesi. Release binary'sinde hiçbiri yok (LE-08).
+* **Storage-full harness (A4, AC7):** gerçek dosya DB'si + üretim bağlantısı üzerinde `PRAGMA max_page_count` ile `SQLITE_FULL`; rollback, son iyi durum, `persist_failed`, bellekten devam, sonraki sınırda yeniden deneme ve çok satırlı transaction'da kısmi yazım olmaması test ediliyor.
+* **Bulunan ve düzeltilen gizli hata:** Drift `onUpgrade`'i transaction'a sarmıyordu — başarısız bir migration adımı veya never-drop guard ihlali **kısmi uygulanmış** kalıyordu (test: `personal_best` 1 → 0 satır). Guard'lı adımlar artık bir `transaction` içinde (bkz. §4).
+
+## 2. Impacted Files
+
+**Oluşturulan:** `app/lib/persistence/store_recovery.dart`, `app/lib/firebase_emulator.dart`, `app/lib/debug/debug_sync_screen.dart`, `app/test/persistence/store_recovery_test.dart`, `app/test/persistence/storage_full_test.dart`; kanıt araçları `evidence/*.sh|*.py|*.json|README.md`, kanıtlar `evidence/runtime/**`.
+
+**Güncellenen:** `app/lib/bootstrap.dart`, `app/lib/persistence/app_database.dart`, `app/lib/persistence/migration_guard.dart`, `app/lib/persistence/persistence_providers.dart`, `app/lib/persistence/sync_providers.dart`, `app/lib/persistence/callable_sync_sender.dart`, `app/lib/app_router.dart`, `app/lib/home_screen.dart`, `app/test/shell/store_error_screen_test.dart`, `app/test/persistence/sync_test.dart`.
+
+## 3. Task-to-Code Traceability
+
+* **Task ID:** F08-FE13 — **Durum: Complete**
+  * **A1 sınıflandırma:** `store_recovery.dart` `classifyStoreFailure` — drift sarmalayıcılarını açar (`DriftRemoteException.remoteCause`: üretim bağlantısı arka plan isolate'inde; `CouldNotRollBackException.cause`: SQLite `SQLITE_FULL`'da transaction'ı kendisi geri alır), `extendedResultCode & 0xff` ile 26 / 11 → `unreadable`; `MigrationDataLossError` / `MigrationStepError` → `migration`; gerisi → `other`.
+  * **A1 kurtarma + loop guard:** `bootstrap.dart` `appBootstrapProvider` → `_openStore` (player + active_session ilk sorguları) → `_recoverStore`: kapat → `quarantineStoreFile` → `ref.invalidate(appDatabaseProvider)` → yeniden aç → `store: db_reinitialized — SQLITE_NOTADB (26); quarantined as …`. `StoreLaunchState.recreatedThisLaunch` (`storeLaunchStateProvider`, hiç invalidate edilmez) ikinci recreate'i engeller. Hata durumu `AppBootstrapStoreError(kind, message)` (eski `AppBootstrapMigrationError`'ın yerini aldı; router eşlemesi aynı: `StoreErrorScreen`).
+  * **A1 kural 4 (migration):** `app_database.dart` — adımlar `upgradeStep(m, from)`'da; guard'lı döngü `transaction` içinde; atılan her hata `MigrationStepError` olarak yeniden fırlatılır (bozuk bir sayfaya çarpan bir adım asla recreate'e yol açmaz). `store: migration_failed — …` log'u.
+  * **A2:** `bootstrap.dart` — `finally` bloğu Ready olmayan her çalışmada `connectionStale = true`; sonraki çalışma `_replaceConnection` (await `close`, `invalidate`). Store sağlayıcıları bootstrap içinde `ref.read` ile okunuyor ki bağlantı değişimi bootstrap'ı kendi içinde yeniden başlatmasın.
+  * **A3:** `firebase_emulator.dart` (`firebaseEmulatorHost`, `initializeEmulatorFirebaseApp`, `loopletFirebaseApp`); `bootstrap.dart` `_bootstrapFirebase` emülatör modunda adlandırılmış app'i başlatır, App Check'i atlar, `FirebaseAuth.instanceFor(app: loopletFirebaseApp())`; `sync_providers.dart` `firebaseFunctionsProvider` → `FirebaseFunctions.instanceFor(app: loopletFirebaseApp())` (varsayılan app için birebir `FirebaseFunctions.instance`; getter hâlâ lazy — FE12 korunuyor). Tetikleyici: `debug/debug_sync_screen.dart`, `app_router.dart` `if (kDebugMode) GoRoute('/debug/sync')`, `home_screen.dart` `_DebugRow` → `sync`. Kill-switch: `sync_providers.dart` `debugSyncDisabledProvider` (yalnız `kDebugMode`).
+  * **A4 harness:** `test/persistence/storage_full_test.dart`.
+  * **Teşhis log'u:** `callable_sync_sender.dart` — callable hatası artık `sync: submitDailyResultV1 failed — <kod>: <mesaj>` olarak loglanıyor (eşleme değişmedi). Emülatör kablolamasındaki iki sorunu bu log ortaya çıkardı (§16).
+* **Task ID:** F08-LOCAL-EVIDENCE — **Durum: Complete** (F08.OFFLINE-JOURNEY kullanıcı runtime'ı bekliyor — ayrı bölüm).
+
+## 4. Authority Reconciliation
+
+| Konu | Kazanan authority | Uygulanan karar | Downstream etki |
+| --- | --- | --- | --- |
+| Migration transaction'sız (gizli hata, A1 kapsamı dışında bulundu) | Kilitli Resilience "Migration step throws → abort without partial apply; keep old DB" + A1 kural 4 ("Store error copy stays true") | Guard'lı `onUpgrade` döngüsü `transaction` içine alındı; şema, adım ve guard semantiği değişmedi (bugün adım yok, `schemaVersion = 1`). N-TXN negatifi yakalıyor. | Tech Lead doğrulamalı: A1 listesinde olmayan ama A1 kural 4'ün doğruluğu için gerekli bir düzeltme. F08-FE2'nin "no partial apply" iddiası gerçek bağlantıda bugüne dek doğrulanmamıştı. |
+| Karantinada `-journal` | A1 kural 2 (`-wal` / `-shm`) | `-journal` da taşınıyor: store varsayılan rollback-journal modunda; yeni store'un yanında kalan sıcak bir journal ona geri sarılırdı. | Yok. |
+| Retry'ın bağlantıyı yenileme yeri | A2 ("Retry invalidates the connection provider … closed first") | Sıfırlama buton handler'ında değil, Retry'ın tetiklediği bootstrap çalışmasının başında yapılıyor (splash hemen görünür, kapatma await edilir). Hatadan sonra bootstrap'ı yalnız Retry yeniden çalıştırır. | Yok; N-RETRY yakalıyor. |
+| Emülatör: varsayılan app yerine adlandırılmış app | A3 ("after `Firebase.initializeApp` … project `demo-looplet`") | iOS'ta varsayılan app `GoogleService-Info.plist` projesinde kalıyor (Dart `copyWith(projectId:)` etkisiz, callable yolu `/looplet-712e5/…` oldu). Adlandırılmış app `demo-looplet` ile doğru yolu kullanıyor. | Yok; üretim yolu varsayılan app. |
+| Emülatör modunda App Check atlanıyor | App Init step 3 (best-effort, soft-enforce) | Emülatörler attest etmez; debug-token değişimi gerçek App Check backend'ine giderdi. Yalnız debug + define. | Yok. |
+| Debug ekranında tarih ±1 gün ve kill-switch anahtarı | A3 (tetikleyici) / A4 (`daily_sync_enabled=false` vakası) | A4 vakaları için debug-only araç; release'de derlenmiyor (LE-08). | Yok. |
+
+## 7. State Management
+
+* `appDatabaseProvider` artık `appStoreFileProvider`'dan (varsayılan `<Documents>/looplet.sqlite`) `AppDatabase.at(locate)` kuruyor; testler dosya yolunu geçici dizine çevirerek gerçek bağlantıyı çalıştırıyor. In-memory override kullanan mevcut testler değişmedi.
+* `storeLaunchStateProvider` — launch ömürlü `StoreLaunchState` (`recreatedThisLaunch`, `connectionStale`).
+* `debugSyncDisabledProvider` (`StateProvider<bool>`) — yalnız debug'da `dailySyncEnabledProvider`'ı etkiler (`!(kDebugMode && …)`; release'de sabit `true`).
+
+## 8. API / Event Integration
+
+* `submitDailyResultV1` kontratı, istek/yanıt ve hata eşlemesi değişmedi (`mapCallableSuccess` / `mapCallableErrorCode` aynı). Yalnız log satırları eklendi.
+* Emülatörde doğrulanan uçtan uca eşleme: CREATED → `synced`; ALREADY_SUBMITTED → `synced` + sunucu değişmez; bağlantı kopması / yanıt kaybı → retryable + backoff (LE-04).
+
+## 9. Contract Compliance Check
+
+* **Screen / route contract:** Preserved — `/`, `/play` aynı; `/debug/sync` yalnız debug'da (Extended, test tooling).
+* **Backend response / event mapping:** Preserved.
+* **Error mapping:** Extended — bootstrap hata sınıflandırması (A1); oyuncuya gösterilen kopya ve ekran aynı.
+* **UI state / store state consistency:** Preserved — kurtarma normal `onCreate` tohumuna iner (Home "new"); `AppBootstrapStoreError` tüm hata yollarını tek ekrana eşler (exhaustive `switch`).
+* **Navigation / back / header behavior:** Preserved — hata ekranı / splash / Home değişmedi; debug ekranı standart AppBar geri oku (yalnız debug).
+* **Async authority / lifecycle / boundary semantics:** Preserved — sync servisi session-level; ekran dispose'u senkronu durdurmuyor (LE-05); Retry eski bağlantıyı kapatıp yenisini açıyor.
+
+## 10. Behavior Preserved
+
+* İyi store ve boş store yolları: aynı guest, aynı veri, karantina yok (`store_recovery_test` "a good store opens untouched", "no store → created"); cold boot'larda açık kare yok (LE-07).
+* Bozuk `active_session` JSON'u: `save_corrupt_recovered` yolu dokunulmadan (`ActiveSessionRepo`, `session_restore_test`).
+* FE12 tembel `FirebaseFunctions` erişimi: `sync_providers_test` aynen geçiyor (getter hâlâ gönderim anında çözülüyor).
+* `StoreErrorScreen` / splash / Home görünümü ve D3 Retry davranışı (splash karesi): `store_error_screen_test` aynen geçiyor (yalnız sınıf adı güncellendi).
+* Play write-through ve `persist_failed` yolu değişmedi; harness şimdi bunu gerçek bir disk-dolu hatasıyla doğruluyor.
+
+## 12. Implemented Files
+
+* `lib/persistence/store_recovery.dart` — `StoreFailureKind`, `StoreFailure`, `classifyStoreFailure`, `quarantineStoreFile`, `StoreLaunchState`.
+* `lib/bootstrap.dart` — sınıflandır / kurtar / loop guard / stale bağlantı; `AppBootstrapStoreError`; emülatör init dalı; App Check emülatörde atlanır.
+* `lib/firebase_emulator.dart` — define kapısı, portlar, `demo-looplet`, adlandırılmış app, `loopletFirebaseApp()`.
+* `lib/persistence/app_database.dart` — `AppDatabase.at`, `storeFileName`, `defaultStoreFile`, `upgradeStep`, guard'lı döngü `transaction` + `MigrationStepError`.
+* `lib/persistence/migration_guard.dart` — `MigrationStepError`.
+* `lib/persistence/persistence_providers.dart` — `appStoreFileProvider`, `storeLaunchStateProvider`.
+* `lib/persistence/sync_providers.dart` — `instanceFor(app: loopletFirebaseApp())`; `debugSyncDisabledProvider`.
+* `lib/persistence/callable_sync_sender.dart` — hata log'u.
+* `lib/debug/debug_sync_screen.dart`, `lib/app_router.dart`, `lib/home_screen.dart` — debug tetikleyici.
+* Testler: `store_recovery_test.dart` (20), `storage_full_test.dart` (2), `sync_test.dart` (+1 regain), `store_error_screen_test.dart` (sınıf adı).
+
+## 14. Assumptions
+
+* Kurtarma sonrası oyuncuya bildirim yok (A1 kural 6; DB-REINIT-NOTICE takipte).
+* Keychain'deki Firebase Auth kullanıcısı store silinince / yeniden oluşturulunca **kalır**: yeni `guestId` aynı `firebaseUid`'i alır (LE-04 hazırlığında görüldü). İdempotency anahtarı `firebaseUid|lang|date` olduğundan kurtarma sonrası aynı güne ait yeni bir koşu sunucuda `ALREADY_SUBMITTED` olur — first-run-authoritative ile tutarlı; not olarak kaydedildi, davranış değiştirilmedi.
+
+## 16. Needs Tech Lead Clarification
+
+1. **Backend test verisi hatası (F08.EMULATOR):** `infra/functions/test/submitDailyResult.test.ts` "ALREADY_SUBMITTED on a repeat" testi `moves: 8`, `optimalMoves: 9` gönderiyor; kontrat (`optimalMoves <= moves`) gereği handler doğru olarak `INVALID_PAYLOAD` dönüyor. Suite 30/31. Kod değil test hatası; sahibi Backend Developer (kapsamım dışı, dokunmadım). Aynı davranış client ↔ emülatör seviyesinde LE-04 D ile kanıtlandı.
+2. **Araç ön koşulu:** kurulu `firebase-tools` 15.29.0 **Java 21+** istiyor (Activation'daki "JDK 17 yeterli" notu geçersiz). Kullanıcı onayıyla `brew install openjdk@21` kuruldu (keg-only, link edilmedi; sistem Java'sı değişmedi). `test:emulator` için `JAVA_HOME=/opt/homebrew/opt/openjdk@21`. `setup-manifest.md` / CI emülatör işi için Tech Lead / DevOps kararı.
+3. **Migration transaction düzeltmesi** (§4) — A1 listesinde yoktu; Tech Lead kabulü gerekiyor.
+4. **Emülatör çalıştırma prosedürü:** simülatör daha önce gerçek projeye bağlandıysa `xcrun simctl keychain <udid> reset` gerekiyor (aksi halde gerçek projenin anonim kullanıcısı geri yüklenir, auth emülatörü token'ı reddeder). QA re-run'ı için kayıt.
+
+## 17. Test Evidence by Task
+
+**Suite'ler (final kod, 2026-09-29 ~09:00–09:05Z, macOS host, Flutter 3.32.8):**
+
+| Komut | Sonuç |
+| --- | --- |
+| `melos run analyze` | exit 0 |
+| `dart format --output=none --set-exit-if-changed app packages tools` | exit 0 (193 dosya, 0 değişiklik) |
+| `melos run test` | exit 0 — app **588/588**, core 22, content 17, dictionary 32, solver 23, authoring 25, engine 83; skip 0 |
+| `flutter test integration_test -d <iPhone 16>` | **13/13**, exit 0 (`evidence/runtime/integration-final.log.txt`) |
+
+**Davranış bazında (unit / widget / repeatable integration — `flutter test`, host sqlite3):**
+
+| Task / davranış | Test | Kanıtlanan | İzolasyon |
+| --- | --- | --- | --- |
+| A1 sınıflandırma | `store_recovery_test` "classifyStoreFailure" (4) | 26/11/779 → unreadable; **gerçek üretim bağlantısının** `DriftRemoteException`'ları (NOTADB, CORRUPT, CANTOPEN); migration tipleri; `CouldNotRollBackException(FULL)` → other | yok (gerçek dosya, arka plan isolate) |
+| A1 karantina | "quarantineStoreFile" (2) | isimlendirme, companion'lar, baytlar silinmez; yalnız en yeni kopya | geçici dizin |
+| A1 kurtarma | "bootstrap recovery" (7) | NOTADB (seed-d3 baytları) ve CORRUPT → Ready, yeni guest, log; iyi store ve boş store dokunulmaz; `MigrationDataLossError` ve CORRUPT nedenli adım → hata, dosya satırları korunur (1 player, 1 best, `user_version` 1), karantina yok; CANTOPEN → other, karantina yok | `ProviderContainer`; sync sender / connectivity override (ağ yok) |
+| A1 loop guard | "the loop guard" (1) | recreate de bozuk → hata; tam 1 recreate / 1 karantina; aynı launch'ta Retry → yine hata, recreate yok | dosyayı her bağlantıda bozan override |
+| A2 Retry | "Retry reconnects" (3) | CANTOPEN → sebep kalkınca Retry → Ready, yeni bağlantı örneği; eski bağlantı kapalı; Ready iken bağlantı korunur | — |
+| A3 kapı | "the emulator gate" (3) | `debugBuild: false` → define ne olursa olsun null | — |
+| A4 storage-full | `storage_full_test` (2) | Active session: `SQLITE_FULL` → tek `persist_failed (code 13)`, `moveCount` 2 bellekte, DB'de son iyi snapshot birebir, `integrity_check` ok; hâlâ dolu → ikinci deneme de başarısız; yer açılınca sonraki sınır 4 hamlenin tamamını yazar. Çok satırlı transaction (queue insert + `daily_entry` mirror): hiçbiri kalıcı değil, first-run alanları aynı | gerçek dosya + üretim bağlantısı; sayfa doldurma `max_page_count` + filler |
+| Lifecycle regain | `sync_test` "a connectivity-regain event drains the queue" | servis kendi listener'ı ile drain eder | sahte sender, stream |
+
+**Named negative runs** (`evidence/neg-fe13.py`, final kod, her biri dosyayı bayt kopyasından geri yükler; `evidence/runtime/neg-fe13.log.txt`):
+
+| Run | Mutasyon | Yakalayan testler |
+| --- | --- | --- |
+| N-CLASS | unreadable da hata ekranına | 3 (NOTADB, CORRUPT, loop guard) |
+| N-LOOP | loop guard kaldırıldı | 1 (loop guard: Retry'da ikinci recreate) |
+| N-RETRY | stale bağlantı yenilenmiyor | 2 (Retry recovery, loop guard) |
+| N-FULL | `enqueueFirstRun` transaction'ı bypass | 1 (çok satırlı yazım: kısmi queue satırı kalıyor) |
+| N-FULL-FATAL | `persist_failed` catch'i daraltıldı | 1 (active session harness) |
+| N-TXN | migration transaction'ı kaldırıldı | 1 (`MigrationDataLossError` → satır kaybı) |
+| N-QUAR | eski karantina silinmiyor | 1 |
+| N-GATE | `if (!debugBuild) return null;` kaldırıldı | 1 |
+| N-REGAIN | connectivity listener kaldırıldı | 1 |
+
+**Release derleme kapısı (LE-08):** `flutter build ios --release --no-codesign --dart-define=LOOPLET_FIREBASE_EMULATOR=127.0.0.1` exit 0; `App.framework/App` (sha256 `dc9ae88b…`) içinde `demo-looplet`, `looplet-emulator`, `firebase: emulators at`, `debug-sync:`, `/debug/sync`, `produce + leave`, `+ 1 day` = 0; kontrol dizgileri (`submitDailyResultV1` 2, `looplet.sqlite` 1, `active_session` 4, `.corrupt-` 1) mevcut. Kontrol: debug `kernel_blob.bin`'de `demo-looplet` 3, `/debug/sync` 2. (Em dash içeren dizgiler iki baytlı saklandığı için `strings` ile görünmez — yalnız ASCII dizgiler karşılaştırıldı.)
+
+---
+
+# F08-LOCAL-EVIDENCE — Yerel / emülatör / runtime kanıtı (2026-09-29, A4)
+
+> Hedef: iPhone 16 simülatörü `D0011CE7-…`, iOS 18.6, debug build'ler. Resume koşusu (LE-02) FE13'ün ilk build'inde (bootstrap store yolu final ile aynı; sonraki değişiklikler Firebase kablolaması, log ve debug ekranı); emülatör vakaları (LE-04/05) final `lib/` ile; cold boot ve bozuk store final build'de yeniden koşuldu (LE-07c/d, LE-01d). **QA-owned kayıtlar PASS işaretlenmedi** — aşağıdaki teslim kanıtı F08-QA-FUNCTIONAL incelemesi içindir.
+
+## Evidence Ledger
+
+| ID | Senaryo (ledger) | Sınıf | Komut / aksiyon | Sonuç | Kanıt |
+| --- | --- | --- | --- | --- | --- |
+| LE-01 | Bozuk store (AC8, F08.UNREADABLE-DB) | runtime | `seed-d3.sh <udid> corrupt` → launch; log stream; Documents listesi | Home "new" (0/30, Seviye 1); `store: db_reinitialized — SQLITE_NOTADB (26); quarantined as …/looplet.sqlite.corrupt-1790669966380`; 392 baytlık karantina + yeni 86016 baytlık store; yeni guest, `journey_progress` 1. İkinci bozukluk → yalnız en yeni karantina (`…-1790669991538`). Final build'de tekrar (LE-01d) aynı. | `LE-01-*`, `LE-01b-*`, `LE-01d-*`, `LE-notes.txt` |
+| LE-01c | Retry yeniden bağlanma (A2) | runtime | Documents'ta `looplet.sqlite` dizini (CANTOPEN) → launch → hata ekranı → dizin silindi → "Tekrar dene" | Hata ekranı (debug kutusu `SqliteException(14)`), `store: bootstrap_failed` log'u; Retry → Home, yeni store; relaunch yok | `LE-01c-store-error.png`, `LE-01c-after-retry-home.png`, `LE-01c-retry-reconnect.log.txt` |
+| — | Migration hatası runtime | — | — | Debug'da güvenle zorlanamıyor (v2 binary gerekir); gerçek dosya + arka plan bağlantıyla otomatik testler kapsıyor (FE13 §17) | — |
+| LE-02 | Resume fidelity (AC1/AC6, F08.LOCAL-RESUME) | runtime | Seviye 21 (donmuş 0,1): L1 → restart → L1 U3 R4 → undo → L0 D0 (erime: satır 0 "AYNA"; dizi `looplet_authoring` motoruyla BFS ile bulundu); kill → relaunch → "Devam et" | Snapshot kill öncesi ve sonrası birebir: `appliedMoves [L1,U3,L0,D0]`, `moveCount 4`, `undosRemaining 2`, `restartCount 1`, `elapsedMsAccumulated 64457`, `thawedFrozenCells ["0,1"]`; ızgara, HAMLE 4, 2 undo noktası, erimiş Y ekranda birebir | `LE-02a-*`, `LE-02b/c-*` |
+| LE-02d | Tamper (thaw yeniden türetme) | runtime | kill → `thawedFrozenCells` `[]` yapıldı → relaunch | Y yine erimiş gösteriliyor (önbellek değil replay); sonraki hamlede (R2) snapshot `thawedFrozenCells ["0,1"]` yeniden yazıldı, `restartCount 1`, `undosRemaining 2`, `elapsed 84509` (ölü süre sayılmadı: duvar saati farkı 91.8 s, elapsed +20.1 s) | `LE-02d-*`, `LE-02e-*`, `LE-02f-*` |
+| LE-03 | Emülatör kurallar / callable suite (F08.EMULATOR) | repeatable integration | `cd infra/functions && npm ci && npm run build && npm run test:emulator` (JDK 21, `demo-looplet`) | **1 failed, 30 passed / 31**; `rules.test.ts` PASS, `skeleton.test.ts` PASS; `submitDailyResult` "ALREADY_SUBMITTED on a repeat" FAIL — test verisi kontratı ihlal ediyor (§16.1) | `LE-03-emulator-suite.log.txt` |
+| LE-04 | Exactly-once client ↔ emülatör (AC4/AC5/AC11) | runtime + repeatable integration | `firebase emulators:start --only auth,firestore,functions --project demo-looplet`; app `--dart-define=LOOPLET_FIREBASE_EMULATOR=127.0.0.1`; `fn-proxy.py` :5001 → :5002; "offline" = proxy `down` (functions ulaşılamaz — **uçak modu değil**) | A: offline → 1 kuyruk öğesi (pending, 0 doc); proxy pass + drain → `synced`, **1 doc** (CREATED). B: `drop` (sunucu yazdı, yanıt kayboldu) → pending; retry → ALREADY_SUBMITTED, **1 doc**, `recordedAt` aynı. C: `hold` → `inFlight` iken kill → >20 s sonra relaunch → stale sweep + başlangıç drain'i → ALREADY_SUBMITTED, **1 doc**. D: sunucuya önceki koşu (9 hamle, 3★) tohumlandı → yerel sonraki koşu (12 hamle) → ALREADY_SUBMITTED, sunucu **değişmedi**, kuyruk `synced`, yerel first-run 12; ikinci yerel tamamlanma → `daily_attempt` #2, yeni kuyruk öğesi yok. E: `daily_sync_enabled=false` → öğe `pending a=0`, drain dahil **hiç istek yok**. | `LE-04-cases.txt`, `LE-04-proxy.log.txt`, `LE-04-emulators.log.txt`, `LE-04-app*.log.txt` |
+| LE-05 | Ownership / lifecycle (F08.LIFECYCLE) | runtime | L1: proxy `slow` (4 s) + "produce + leave" (ekran hemen pop). L2: proxy down → öğe; HOME (paused) → drain denemesi; arka planda due; foreground (resumed, aynı PID) → drain | L1: 08:52:26Z'de Home görünür (debug ekranı dispose edilmiş), öğe `inFlight`, 0 doc → 08:52:27.3Z doc yazıldı, `synced`. L2: HOME'da istek 08:54:33Z (paused drain); foreground'da 08:56:40Z CREATED → `synced` (Runner[54932] boyunca aynı). Connectivity regain: simülatörde host ağı değişmeden tetiklenemiyor — otomatik test + N-REGAIN (FE13 §17) | `LE-05*`, `LE-04-cases.txt` (L1b, L2a–c) |
+| LE-06 | Storage-full runtime (F08.STORAGE) | repeatable integration | Debug hook eklenmedi; kanıt Part 1 harness'ı (gerçek dosya DB, üretim bağlantısı) + N-FULL / N-FULL-FATAL | PASS (harness) | FE13 §17 |
+| LE-07 | Production-shaped cold boot (startup impact) | runtime-video | emülatör define'sız debug build; `ev-f08.sh coldrec`; `video-d2.swift trace` tam kare luma | Boş store (final, 07c): iOS açılış zoom'undan sonra (2.45 s) ilk Home karesine (4.63 s) kadar maks. ortalama luma **18.0**; Home dinlenmede 45.2; yeni guest + `firebaseUid` alındı. Mevcut store (final, 07d, 20/30 + seviye 21 oturumu): maks **17.9** (ilk Home karesi 3.59 s), dinlenmede 49.1, "Seviye 21 · sürüyor". İlk FE13 build'i (07a/07b): 18.4 / 17.9. Açık kare yok; init hatası log'u yok. | `LE-07*`, `raw/*.mov`, `raw/*-trace.csv` |
+| — | Offline Journey (AC2, F08.OFFLINE-JOURNEY) | runtime | **Koşulmadı.** Gerçek ağsız runtime gerekiyor; ağ ayarını değiştiremem. Kullanıcı için `evidence/offline-journey.sh <udid>` hazır (Wi-Fi kapat → offline doğrula → oyna → store oku → offline relaunch → Wi-Fi aç; define'sız debug build) | PENDING | — |
+| — | Clock (AC10) | automated | değişmedi — yalnız otomatik (host saati sistem ayarı) | — | mevcut `elapsed_timer_test` |
+
+**İzolasyon / sınırlar:** tüm runtime debug build (profile/release capture FIRST-APP-DISTRIBUTION'da); "offline" sync yolu için proxy ile simüle; emülatör vakaları öncesi simülatör keychain'i sıfırlandı; `firestore.rules` bayt-özdeş kopya ile koşuldu; hiçbir gerçek Firebase projesine yazma, deploy, billing veya Remote Config değişikliği yok (production-shaped cold boot'un anonim girişi FE12'den beri mevcut davranış).
+
+## Pending Evidence güncellemesi (kendi kayıtlarım)
+
+* **F08.UNREADABLE-DB:** teslim kanıtı tam (LE-01, LE-01c, LE-01d + otomatik testler + N-CLASS / N-LOOP / N-RETRY / N-QUAR). QA incelemesi bekliyor → Result: PENDING (QA review).
+* **F08.STORAGE:** PASS — repeatable integration harness + negatifler; runtime hook yok (brief'in izin verdiği biçimde).
+* QA-owned kayıtlara (F08.EMULATOR, F08.LOCAL-RESUME, F08.LIFECYCLE, F08.COLD-BOOT-REVIEW, F08.OFFLINE-JOURNEY) yalnız teslim kanıtı notu eklendi.
+
+---
+
+# WORKFLOW HANDOFF SUGGESTION (NON-AUTHORITATIVE)
+
+* **Completed Tasks:** F08-FE13, F08-LOCAL-EVIDENCE.
+* **Remaining Tasks:** Tech Lead checkpoint (delivery reconciliation: §4 migration transaction, §16 bulguları) → F08-QA-FUNCTIONAL planı; F08.OFFLINE-JOURNEY kullanıcı runtime'ı bekliyor; backend test verisi düzeltmesi (Backend Developer).
+* **Blockers:** yok (release stage F08.DEPLOY-AUTHORIZATION ile ayrıca bekliyor).
+* **Status Suggestion:** Needs Tech Lead Review.
+
+## 19. Sonraki Komut
+
+```
+Run Tech Lead
+```

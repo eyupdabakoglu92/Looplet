@@ -1,0 +1,127 @@
+== A1 2026-09-29T08:42:22Z proxy=down (functions unreachable = 'offline' for the sync path, not airplane mode); produce 2026-09-29; uid from the auth emulator (keychain reset, named app demo-looplet)
+queue|1|pending|1|cPZGXbSSz4rVlUqQAULt8wxaV93g|tr|2026-09-29|1790671391520|retryable
+entry|2026-09-29|queued|12
+docs=0
+-- proxy
+2026-09-29T08:42:13.471Z down /demo-looplet/us-central1/submitDailyResultV1 -> closed without forwarding
+-- app
+flutter: debug-sync: produced 2026-09-29 → DailyCompletionOutcome.firstRun
+flutter: sync: submitDailyResultV1 failed — unknown: The network connection was lost.
+flutter: debug-sync: drain after produce 2026-09-29 done
+== A2 2026-09-29T08:43:28Z proxy=pass (reconnect); manual drain once the backoff is due
+queue|1|synced|1|cPZGXbSSz4rVlUqQAULt8wxaV93g|tr|2026-09-29|1790671391520|
+entry|2026-09-29|synced|12
+docs=1
+  cPZGXbSSz4rVlUqQAULt8wxaV93g moves 12 stars 2 recordedAtUtcMs 1790671399505 completedAtUtcMs 1790671333417
+-- proxy
+2026-09-29T08:43:18.309Z pass /demo-looplet/us-central1/submitDailyResultV1 upstream 200 b'{"result":{"status":"CREATED","recordedAt":1790671399505}}'
+== B1 2026-09-29T08:45:17Z proxy=drop (server runs + writes, the response is dropped mid-request); produce 2026-09-28
+queue|2|pending|1|cPZGXbSSz4rVlUqQAULt8wxaV93g|tr|2026-09-28|1790671560433|retryable
+entry|2026-09-28|queued|12
+docs=1
+  cPZGXbSSz4rVlUqQAULt8wxaV93g moves 12 stars 2 recordedAtUtcMs 1790671506917 completedAtUtcMs 1790671506759
+-- proxy
+2026-09-29T08:45:06.864Z drop /demo-looplet/us-central1/submitDailyResultV1 upstream 200 b'{"result":{"status":"CREATED","recordedAt":1790671506917}}'
+-- app
+flutter: sync: submitDailyResultV1 failed — unknown: The network connection was lost.
+== B2 2026-09-29T08:46:17Z proxy=pass; drain when due → retry of the same key
+queue|2|synced|1|cPZGXbSSz4rVlUqQAULt8wxaV93g|tr|2026-09-28|1790671560433|
+entry|2026-09-28|synced|12
+docs=1
+  cPZGXbSSz4rVlUqQAULt8wxaV93g moves 12 stars 2 recordedAtUtcMs 1790671506917 completedAtUtcMs 1790671506759
+-- proxy
+2026-09-29T08:46:08.056Z pass /demo-looplet/us-central1/submitDailyResultV1 upstream 200 b'{"result":{"status":"ALREADY_SUBMITTED","recordedAt":1790671506917}}'
+== C1 2026-09-29T08:46:39Z proxy=hold (the request reaches the server, the response is held); produce 2026-09-27; then kill the app while inFlight
+queue|3|inFlight|0|cPZGXbSSz4rVlUqQAULt8wxaV93g|tr|2026-09-27|0|
+entry|2026-09-27|queued|12
+docs=1
+  cPZGXbSSz4rVlUqQAULt8wxaV93g moves 12 stars 2 recordedAtUtcMs 1790671586978 completedAtUtcMs 1790671586929
+2026-09-29T08:46:26.956Z hold /demo-looplet/us-central1/submitDailyResultV1 upstream 200 b'{"result":{"status":"CREATED","recordedAt":1790671586978}}'
+terminated
+-- after kill
+queue|3|inFlight|0|cPZGXbSSz4rVlUqQAULt8wxaV93g|tr|2026-09-27|0|
+entry|2026-09-27|queued|12
+== C2 2026-09-29T08:47:03Z proxy=pass; relaunch > 20 s after the inFlight mark (the stale-inFlight sweep) — the start-up drain
+queue|3|synced|0|cPZGXbSSz4rVlUqQAULt8wxaV93g|tr|2026-09-27|1790671614391|
+entry|2026-09-27|synced|12
+docs=1
+  cPZGXbSSz4rVlUqQAULt8wxaV93g moves 12 stars 2 recordedAtUtcMs 1790671586978 completedAtUtcMs 1790671586929
+2026-09-29T08:46:54.795Z pass /demo-looplet/us-central1/submitDailyResultV1 upstream 200 b'{"result":{"status":"ALREADY_SUBMITTED","recordedAt":1790671586978}}'
+== D0 2026-09-29T08:47:13Z seeded an earlier server run for 2026-09-26 (admin REST, moves 9 stars 3)
+docs=1
+  cPZGXbSSz4rVlUqQAULt8wxaV93g moves 9 stars 3 recordedAtUtcMs 1790500001000 completedAtUtcMs 1790500000000
+== D1 2026-09-29T08:48:04Z proxy=pass; local later run produced for 2026-09-26 (moves 12 stars 2)
+docs=1
+  cPZGXbSSz4rVlUqQAULt8wxaV93g moves 9 stars 3 recordedAtUtcMs 1790500001000 completedAtUtcMs 1790500000000
+2026-09-29T08:47:52.802Z pass /demo-looplet/us-central1/submitDailyResultV1 upstream 200 b'{"result":{"status":"CREATED","recordedAt":1790671672843}}'
+-- note: the D1 block above recorded 2026-09-26 before the produce landed; that produce ran on 2026-09-23 (a fresh key: CREATED, queue #4 synced) — see the D2 block
+== D2 2026-09-29T08:48:55Z proxy=pass; the local later run for 2026-09-26 (moves 12 stars 2) against the seeded earlier server run
+queue|4|synced|0|cPZGXbSSz4rVlUqQAULt8wxaV93g|tr|2026-09-23|0|
+queue|5|synced|0|cPZGXbSSz4rVlUqQAULt8wxaV93g|tr|2026-09-26|0|
+entry|2026-09-23|synced|12
+entry|2026-09-26|synced|12
+docs=1
+  cPZGXbSSz4rVlUqQAULt8wxaV93g moves 9 stars 3 recordedAtUtcMs 1790500001000 completedAtUtcMs 1790500000000
+docs=1
+  cPZGXbSSz4rVlUqQAULt8wxaV93g moves 12 stars 2 recordedAtUtcMs 1790671672843 completedAtUtcMs 1790671672735
+2026-09-29T08:48:45.148Z pass /demo-looplet/us-central1/submitDailyResultV1 upstream 200 b'{"result":{"status":"ALREADY_SUBMITTED","recordedAt":1790500001000}}'
+== D3 2026-09-29T08:49:13Z a second local completion for 2026-09-26 → a daily_attempt row, no new queue item
+queue rows|5
+attempt|2026-09-26|2|12
+entry|2026-09-26|12|synced
+flutter: debug-sync: produced 2026-09-26 → DailyCompletionOutcome.replay
+docs=1
+  cPZGXbSSz4rVlUqQAULt8wxaV93g moves 9 stars 3 recordedAtUtcMs 1790500001000 completedAtUtcMs 1790500000000
+== E1 2026-09-29T08:49:55Z daily_sync_enabled=false (debug kill-switch); produce 2026-09-25 + its drain
+queue|6|pending|0|cPZGXbSSz4rVlUqQAULt8wxaV93g|tr|2026-09-25|0|
+entry|2026-09-25|queued|12
+docs=0
+proxy requests since the last case: 2026-09-29T08:48:45.148Z (last line; no new request expected)
+== E2 2026-09-29T08:50:10Z manual drain with the switch off
+queue|6|pending|0|cPZGXbSSz4rVlUqQAULt8wxaV93g|tr|2026-09-25|0|
+entry|2026-09-25|queued|12
+last proxy line: 2026-09-29T08:48:45.148Z
+== L1 08:51:00.7Z (the tap; completedAtUtcMs 1790671860719) 'produce + leave' on 2026-09-24 with proxy=slow (the request is held 4 s at the proxy, then forwarded)
+-- right after the tap (the debug screen already popped, Home shown — LE-05a-left-screen-in-flight.png):
+queue|7|synced|0|cPZGXbSSz4rVlUqQAULt8wxaV93g|tr|2026-09-24|0|
+entry|2026-09-24|synced|12
+-- 7 s later:
+queue|6|synced|0|cPZGXbSSz4rVlUqQAULt8wxaV93g|tr|2026-09-25|0|
+queue|7|synced|0|cPZGXbSSz4rVlUqQAULt8wxaV93g|tr|2026-09-24|0|
+entry|2026-09-25|synced|12
+entry|2026-09-24|synced|12
+docs=1
+  cPZGXbSSz4rVlUqQAULt8wxaV93g moves 12 stars 2 recordedAtUtcMs 1790671868921 completedAtUtcMs 1790671860719
+docs=1
+  cPZGXbSSz4rVlUqQAULt8wxaV93g moves 12 stars 2 recordedAtUtcMs 1790671864875 completedAtUtcMs 1790671784733
+-- proxy
+2026-09-29T08:51:00.835Z slow /demo-looplet/us-central1/submitDailyResultV1 upstream 200 b'{"result":{"status":"CREATED","recordedAt":1790671864875}}'
+2026-09-29T08:51:04.898Z slow /demo-looplet/us-central1/submitDailyResultV1 upstream 200 b'{"result":{"status":"CREATED","recordedAt":1790671868921}}'
+-- app
+flutter: debug-sync: produced 2026-09-24 → DailyCompletionOutcome.firstRun
+flutter: debug-sync: drain after produce 2026-09-24 done
+== L1b (repeat, timed) 08:52:23Z 'produce + leave' on 2026-09-30, proxy=slow
+   mid: shot-at 08:52:26
+   mid: queue|8|inFlight|0|cPZGXbSSz4rVlUqQAULt8wxaV93g|tr|2026-09-30|0|
+   mid: entry|2026-09-30|queued|12
+   mid: docs=0
+   (LE-05b-home-while-in-flight.png: Home shown — the debug screen is disposed — while the item is inFlight)
+   after: queue #8 synced, docs=1 recordedAtUtcMs 1790671947327 (08:52:27.3Z), 1 s after the screen was gone
+== L2a 2026-09-29T08:53:38Z proxy=down; produce 2026-10-01 → pending (attempt 1 failed)
+queue|9|pending|1|cPZGXbSSz4rVlUqQAULt8wxaV93g|tr|2026-10-01|1790672064573|retryable
+entry|2026-10-01|queued|12
+== L2b 2026-09-29T08:54:42Z HOME pressed (app → paused) with the item due, proxy=down → the paused drain attempts it
+queue|9|pending|2|cPZGXbSSz4rVlUqQAULt8wxaV93g|tr|2026-10-01|1790672196276|retryable
+entry|2026-10-01|queued|12
+2026-09-29T08:54:33.677Z down /demo-looplet/us-central1/submitDailyResultV1 -> closed without forwarding
+== L2c 08:56:39 (UTC) proxy=pass; the item due while the app is in the background; bring the app to the foreground (resumed)
+-- before (in background, not sent):
+queue|9|pending|2|cPZGXbSSz4rVlUqQAULt8wxaV93g|tr|2026-10-01|1790672196276|retryable
+entry|2026-10-01|queued|12
+-- after the foreground:
+queue|9|synced|2|cPZGXbSSz4rVlUqQAULt8wxaV93g|tr|2026-10-01|1790672196276|
+entry|2026-10-01|synced|12
+docs=1
+  cPZGXbSSz4rVlUqQAULt8wxaV93g moves 12 stars 2 recordedAtUtcMs 1790672200402 completedAtUtcMs 1790672009896
+2026-09-29T08:56:40.328Z pass /demo-looplet/us-central1/submitDailyResultV1 upstream 200 b'{"result":{"status":"CREATED","recordedAt":1790672200402}}'
+   (same process Runner[54932] throughout — a resume, not a relaunch)

@@ -1,0 +1,6 @@
+getpwuid_r did not find a match for uid 501
+Filtering the log data using "process == "Runner" AND composedMessage CONTAINS "flutter:""
+Timestamp               Ty Process[PID:TID]
+2026-09-29 12:01:11.710 Df Runner[62024:4581738] (Flutter) flutter: The Dart VM service is listening on http://127.0.0.1:64369/ikzXSd_hbwU=/
+2026-09-29 12:01:12.602 Df Runner[62024:4581706] (Flutter) flutter: store: db_reinitialized — SQLITE_NOTADB (26); quarantined as /Users/eyupcandabakoglu/Library/Developer/CoreSimulator/Devices/D0011CE7-6E50-4367-93FA-B323E81270BE/data/Containers/Data/Application/D4B88780-F99F-4808-97B9-9B6461FFE944/Documents/looplet.sqlite.corrupt-1790672472486
+Child process terminated with signal 15: Terminated

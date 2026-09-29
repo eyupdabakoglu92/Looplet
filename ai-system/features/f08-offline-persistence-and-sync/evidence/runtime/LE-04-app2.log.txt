@@ -1,0 +1,8 @@
+getpwuid_r did not find a match for uid 501
+Filtering the log data using "process == "Runner" AND composedMessage CONTAINS "flutter:""
+Timestamp               Ty Process[PID:TID]
+2026-09-29 11:35:36.725 Df Runner[50644:456f2ec] (Flutter) flutter: The Dart VM service is listening on http://127.0.0.1:63874/_1wgROD4vkA=/
+2026-09-29 11:35:38.158 Df Runner[50644:456f296] (Flutter) flutter: firebase: emulators at 127.0.0.1 (auth 9099, firestore 8080, functions 5001, project demo-looplet)
+2026-09-29 11:36:57.408 Df Runner[50644:456f296] (Flutter) flutter: sync: submitDailyResultV1 failed — unknown
+2026-09-29 11:36:57.411 Df Runner[50644:456f296] (Flutter) flutter: debug-sync: manual drain done
+Child process terminated with signal 15: Terminated

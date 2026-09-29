@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import 'package:flutter/foundation.dart' show visibleForOverriding;
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
@@ -195,7 +196,13 @@ class KvRows extends Table {
 class AppDatabase extends _$AppDatabase {
   /// Opens (or creates) the on-device store at
   /// `<app-documents>/looplet.sqlite`.
-  AppDatabase() : super(_openConnection());
+  AppDatabase() : this.at(defaultStoreFile);
+
+  /// Opens (or creates) the store at the file [locate] resolves, on a
+  /// background isolate — the production connection. The bootstrap needs the
+  /// path to quarantine an unreadable store (F08 Activation A1).
+  AppDatabase.at(Future<File> Function() locate)
+    : super(_openConnection(locate));
 
   /// In-memory database for tests.
   AppDatabase.forTesting(super.executor);
@@ -205,6 +212,9 @@ class AppDatabase extends _$AppDatabase {
   /// §6).
   @override
   int get schemaVersion => 1;
+
+  /// File name of the on-device store.
+  static const String storeFileName = 'looplet.sqlite';
 
   /// Meta `kv` key holding `{ "guestId": ..., "createdAtUtcMs": ... }`.
   static const String storeMetaKey = 'store_meta';
@@ -218,18 +228,38 @@ class AppDatabase extends _$AppDatabase {
     onUpgrade: (Migrator m, int from, int to) async {
       // Forward-only. Each future step MUST live inside this guard so a
       // release can never drop personal_best / daily_entry / daily_streak
-      // rows (F08 architecture → Persistence Schema; F08 AC9).
-      await MigrationGuard.guardPlayerData(this, () async {
-        for (var v = from; v < to; v++) {
-          switch (v) {
-            // case 1: await _migrateV1toV2(m); break;
-            default:
-              break;
+      // rows (F08 architecture → Persistence Schema; F08 AC9). Drift does not
+      // wrap `onUpgrade` in a transaction itself: this one makes a throwing
+      // step or a guard violation roll everything back — the old DB is kept,
+      // with no partial apply (Resilience "Migration step throws").
+      await transaction(() async {
+        await MigrationGuard.guardPlayerData(this, () async {
+          for (var v = from; v < to; v++) {
+            try {
+              await upgradeStep(m, v);
+            } on MigrationDataLossError {
+              rethrow;
+            } catch (error) {
+              // Typed so the bootstrap never mistakes a failing step for an
+              // unreadable store (no recreate; keep the old DB).
+              throw MigrationStepError(error, fromVersion: v);
+            }
           }
-        }
+        });
       });
     },
   );
+
+  /// One forward step v[from] → v[from]+1. Every future step lands here, inside
+  /// the guard above.
+  @visibleForOverriding
+  Future<void> upgradeStep(Migrator m, int from) async {
+    switch (from) {
+      // case 1: await _migrateV1toV2(m); break;
+      default:
+        break;
+    }
+  }
 
   Future<void> _seedDefaults() async {
     final guestId = newGuestId();
@@ -258,10 +288,14 @@ class AppDatabase extends _$AppDatabase {
   }
 }
 
-LazyDatabase _openConnection() {
-  return LazyDatabase(() async {
-    final dir = await getApplicationDocumentsDirectory();
-    final file = File(p.join(dir.path, 'looplet.sqlite'));
-    return NativeDatabase.createInBackground(file);
-  });
+/// `<app-documents>/looplet.sqlite`.
+Future<File> defaultStoreFile() async {
+  final dir = await getApplicationDocumentsDirectory();
+  return File(p.join(dir.path, AppDatabase.storeFileName));
+}
+
+LazyDatabase _openConnection(Future<File> Function() locate) {
+  return LazyDatabase(
+    () async => NativeDatabase.createInBackground(await locate()),
+  );
 }

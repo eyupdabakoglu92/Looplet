@@ -457,8 +457,9 @@ class _Enter extends StatelessWidget {
   }
 }
 
-/// Dev-only shortcut to the debug smoke set (C2: `kDebugMode` only, outside
-/// the content column; Material buttons allowed because players never see it).
+/// Dev-only shortcut to the debug smoke set and the debug sync screen (C2:
+/// `kDebugMode` only, outside the content column; Material buttons allowed
+/// because players never see it).
 class _DebugRow extends StatelessWidget {
   const _DebugRow();
 
@@ -489,6 +490,11 @@ class _DebugRow extends StatelessWidget {
             ),
             child: Text(id.replaceFirst('smoke-tr-', 'L')),
           ),
+        // F08 Activation A3: the fake daily-result trigger.
+        OutlinedButton(
+          onPressed: () => context.push(Routes.debugSync),
+          child: const Text('sync'),
+        ),
       ],
     );
   }

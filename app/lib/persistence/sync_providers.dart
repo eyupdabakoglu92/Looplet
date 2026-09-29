@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../firebase_emulator.dart';
 import 'callable_sync_sender.dart';
 import 'daily_result_sync_service.dart';
 import 'persistence_providers.dart';
@@ -20,9 +22,13 @@ import 'persistence_providers.dart';
 /// send-time — by then Firebase init has normally finished, and if it hasn't,
 /// that closure's existing catch-all already treats "no Firebase app" as
 /// transient/retryable. Overridable in tests.
+///
+/// The app is [loopletFirebaseApp] — the default app, or the debug-only
+/// emulator app (`firebase_emulator.dart`); for the default app this is
+/// exactly `FirebaseFunctions.instance`.
 final firebaseFunctionsProvider = Provider<FirebaseFunctions Function()>(
   (ref) =>
-      () => FirebaseFunctions.instance,
+      () => FirebaseFunctions.instanceFor(app: loopletFirebaseApp()),
 );
 
 /// The real callable-backed [SyncSender].
@@ -31,11 +37,18 @@ final syncSenderProvider = Provider<SyncSender>(
 );
 
 /// Remote-Config `daily_sync_enabled` kill-switch (`release.md` §6). F07 wires
-/// the real Remote Config read; until then the switch is on.
+/// the real Remote Config read; until then the switch is on — except in a
+/// debug build whose debug sync screen turned it off ([debugSyncDisabledProvider]).
 final dailySyncEnabledProvider = Provider<Future<bool> Function()>(
   (ref) =>
-      () async => true,
+      () async => !(kDebugMode && ref.read(debugSyncDisabledProvider)),
 );
+
+/// Debug builds only (the debug sync screen): stands in for
+/// `daily_sync_enabled = false`, so the kill-switch case can be run against the
+/// Firebase emulator (F08 `architecture.md` Activation A3 / A4). Ignored
+/// outside `kDebugMode`.
+final debugSyncDisabledProvider = StateProvider<bool>((ref) => false);
 
 /// Emits `true` whenever connectivity is (re)gained — the trigger for a queue
 /// drain. `connectivity_plus` 6.x reports a `List<ConnectivityResult>`.

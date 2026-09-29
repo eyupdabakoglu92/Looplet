@@ -1,4 +1,5 @@
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:flutter/foundation.dart' show debugPrint;
 
 import 'daily_result_sync_service.dart';
 
@@ -23,9 +24,13 @@ SyncSender callableSyncSender(FirebaseFunctions Function() functions) {
       final result = await callable.call<Object?>(payload);
       return mapCallableSuccess(result.data);
     } on FirebaseFunctionsException catch (error) {
+      debugPrint(
+        'sync: submitDailyResultV1 failed — ${error.code}: ${error.message}',
+      );
       return mapCallableErrorCode(error.code);
-    } catch (_) {
+    } catch (error) {
       // Transport / plugin / no-Firebase-app — transient, keep the item.
+      debugPrint('sync: submitDailyResultV1 failed (transient) — $error');
       return SyncSendResult.retryable;
     }
   };

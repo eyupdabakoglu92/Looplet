@@ -1,0 +1,6 @@
+getpwuid_r did not find a match for uid 501
+Filtering the log data using "process == "Runner" AND composedMessage CONTAINS "flutter:""
+Timestamp               Ty Process[PID:TID]
+2026-09-29 11:20:09.028 Df Runner[42809:4563732] (Flutter) flutter: The Dart VM service is listening on http://127.0.0.1:60111/7COxyUv61-0=/
+2026-09-29 11:20:09.822 Df Runner[42809:45636f2] (Flutter) flutter: store: bootstrap_failed — SqliteException(14): while opening the database, unable to open database file, unable to open database file (code 14)
+Child process terminated with signal 15: Terminated

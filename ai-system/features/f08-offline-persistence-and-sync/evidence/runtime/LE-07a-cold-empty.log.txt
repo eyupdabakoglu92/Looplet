@@ -1,0 +1,5 @@
+getpwuid_r did not find a match for uid 501
+Filtering the log data using "process == "Runner" AND composedMessage CONTAINS "flutter:""
+Timestamp               Ty Process[PID:TID]
+2026-09-29 11:18:57.075 Df Runner[42295:456276a] (Flutter) flutter: The Dart VM service is listening on http://127.0.0.1:60108/rKEiIxSjWfg=/
+Child process terminated with signal 15: Terminated
