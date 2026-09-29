@@ -21,3 +21,6 @@
 * **`orchestration-before-offline-run-intake.md`** — the F08 orchestration right before the Tech Lead intake of the user's no-network run on 2026-09-29, byte for byte (SHA-1 `da2b1880…`).
   * State: Blocked; owner Tech Lead; F08-QA-FUNCTIONAL-R2 Blocked on the user's run; F08.OFFLINE-JOURNEY PENDING; the A11 Current Brief with the user's steps.
   * Taken right before the intake (F08 `architecture.md` → Activation 2026-09-29 → A12), which activated F08-QA-FUNCTIONAL-R2.
+* **`orchestration-before-functional-closure.md`** — the F08 orchestration right before the Tech Lead checkpoint on the F08-QA-FUNCTIONAL-R2 verdict of 2026-09-29, byte for byte (SHA-1 `b04358f1…`).
+  * State: In QA; owner Tech Lead; F08-QA-FUNCTIONAL-R2 Done with **Functional Approved** (QA, commit 0d65c73); every functional evidence record PASS; F08-DEVOPS Blocked on F08.DEPLOY-AUTHORIZATION; the F08-QA-FUNCTIONAL-R2 Current Brief.
+  * Taken right before the checkpoint (F08 `architecture.md` → Activation 2026-09-29 → A13), which closed the functional stage and set F08 Blocked on the user's release decisions (F08-DEVOPS-PREP defined, Blocked).

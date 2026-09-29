@@ -8,6 +8,7 @@
 > **Amended 2026-09-29 (Tech Lead — the F08-BE7 checkpoint):** "Activation 2026-09-29 → A10" added — F08-BE7 accepted (the rules now match the corrected Rules row); F08-QA-FUNCTIONAL-R1 activated under A9 ruling 4. No semantic change to the locked sections.
 > **Amended 2026-09-29 (Tech Lead — the checkpoint on the F08-QA-FUNCTIONAL-R1 verdict, Runtime Validation Pending):** "Activation 2026-09-29 → A11" added — F1 closed; F08 Blocked only on the user's no-network run (AC2). The `sync_queue` **Backoff** line is clarified to the delivered schedule (first retry ≈ 60 s; QA note N1-R1). No product criterion changes.
 > **Amended 2026-09-29 (Tech Lead — intake of the user's no-network run):** "Activation 2026-09-29 → A12" added — the run is valid; F08-QA-FUNCTIONAL-R2 activated under A11 ruling 4. No contract change.
+> **Amended 2026-09-29 (Tech Lead — the checkpoint on the F08-QA-FUNCTIONAL-R2 verdict, Functional Approved):** "Activation 2026-09-29 → A13" added — the functional stage is closed; the release stage waits on the user's decisions (F08.DEPLOY-AUTHORIZATION, and the new gate F08.CI-FIRST-PUSH); F08-DEVOPS-PREP is defined and Blocked. No contract change.
 > `orchestration.md` is execution authority; `platform.md` / `release.md` are project authority.
 
 ---
@@ -667,4 +668,47 @@ The backend handler and rules fingerprints above are the ones A7's reuse clause 
    * Narrowing the scope to the client is rejected. R2's verdict closes the whole functional stage, which is end-to-end.
    * The backend is unchanged since R1: the rules, handler, validator and callable test fingerprints are the same. So the module's build/test prerequisite and its compliance tables are met by reusing R1's backend evidence by fingerprint (QB-R1-01…07, QE-R1-00, QE-R1-A). QA re-runs it only if a backend fingerprint differs.
    * Depth stays `targeted`.
+
+### A13. QA checkpoint 2026-09-29 (F08-QA-FUNCTIONAL-R2 — verdict Functional Approved, commit 0d65c73)
+
+**Verdict reviewed:** `qa.md` → "F08-QA-FUNCTIONAL-R2" and `qa/functional-r2/`. The Tech Lead read the probe log (30 / 30 levels opened), its control (it fails at level 17 exactly), the gate tests (30 / 30), the bundle comparison (31 / 31 byte-identical) and the build provenance (no emulator define). No probe file is left in `app/test/`. The fingerprints are unchanged: `app/` `9de12e6a…`, rules `aa4c5dc2…`, handler `bcda2662…`, `validate.ts` `8f0398ea…`.
+
+**Assessment:**
+* **AC2 is met.** The user's offline run shows levels 1–2 completed and level 3 opened offline, and the progress intact after an offline cold relaunch. QA checked this at store level, including the timestamps.
+* **"All 30 levels load"** is covered by a sound argument, not only by a sample:
+  * the level-open path is the same for every level and uses no network;
+  * that path ran offline at runtime;
+  * the same production path opens all 30 levels;
+  * the 30 installed assets are byte-identical to the source.
+* **N1-R2** is an honest limit, not a gap: levels 4–30 were not opened at the offline runtime. A full offline device tour can ride FIRST-APP-DISTRIBUTION; F08 does not need it.
+
+**Rulings:**
+1. **F08-QA-FUNCTIONAL-R2 — accepted. The functional stage is closed.**
+   * **QA Result:** Functional Approved.
+   * **Evidence:** every functional record is PASS — F08.EMULATOR, LOCAL-RESUME, LIFECYCLE, OFFLINE-JOURNEY, STORAGE, COLD-BOOT-REVIEW, UNREADABLE-DB.
+   * **Not Done yet.** Release Scope is `production-readiness`, so F08 still needs release readiness and final QA.
+2. **The release stage waits on the user. `F08-DEVOPS` is split, and both parts are Blocked.**
+   * Contract §5.3: an OPEN release-scoped decision gate does not stop developer work or functional QA, but **DevOps activation, final QA and Done wait**. F08.DEPLOY-AUTHORIZATION is such a gate. The workflow audit enforces this.
+     * This checkpoint first opened a local prep task for DevOps. The audit refused it, and the rule is right: a release-scoped gate holds every DevOps activation, not only the deploy. That draft was not kept.
+   * F08 has no other executable work, so F08 is **Blocked**, and the owner and next role are Tech Lead.
+   * **F08-DEVOPS-PREP** (DevOps/Release Engineer, **Blocked**) is the local release work that needs neither a deploy nor a push. It runs first once the gates allow a DevOps activation.
+     * **(a) CI on Java 21.** Put Java 21 on `PATH` for the `infra` job's emulator step in `.github/workflows/ci.yml` (CI-EMULATOR-JAVA21), with any new action pinned to a commit SHA (`release.md` §10). Verify locally: the workflow file parses, and the same command passes on Java 21.
+     * **(b) Refresh the feature `release.md` to the current contract.**
+       * The rules rollback check and smoke S1 become "a direct client create is denied; the callable creates" (A9 ruling 6).
+       * The storage-full residual test-debt line is out of date (F08.STORAGE PASS).
+       * The gate evidence points to the functional QA records (R1 / R2).
+       * Re-check the deploy runbook and the smoke list against the current rules and code.
+     * **(c) Record a readiness verdict** in `release.md` and in the Release Result field.
+     * **Non-goals:** no deploy, no billing, no Remote Config change, no push without the user's approval, no app or rules change.
+   * **F08-DEVOPS** (Blocked, after the prep) covers the first real CI run, the authorized deploy per the runbook, and the post-deploy smoke (F08.DEPLOY-SMOKE).
+3. **New decision gate — F08.CI-FIRST-PUSH** (Blocking Scope: release). CI has never run: `origin/main` is still the bootstrap commit b1a65a0. The first real run needs the local `main` pushed to `origin` (`github.com/eyupdabakoglu92/Looplet`). That publishes the whole working history, including `ai-system/`, to that repository. It is the user's call.
+   * Options: (1) push `main` once F08-DEVOPS-PREP is done; (2) push only a branch; (3) keep CI local-only for now, and the CI evidence stays PENDING.
+   * Recommendation: option 1 or 2, if the repository's visibility is what the user intends.
+4. **F08.DEPLOY-AUTHORIZATION stays OPEN**; nothing changes without the user's decision.
+   * The user answers with `Run Tech Lead. Decision: F08.DEPLOY-AUTHORIZATION — <karar>` and `Run Tech Lead. Decision: F08.CI-FIRST-PUSH — <karar>`.
+   * If both are approved, the next Tech Lead turn activates F08-DEVOPS-PREP, then F08-DEVOPS.
+   * If the deploy stays deferred, F08 stays Blocked with its functional acceptance intact. The Tech Lead then chooses the next executable feature (feature-selection rules: Blocked features are skipped). F09 depends only on F03; F07 depends on F08's release too.
+5. **Final QA (F08-QA-FINAL)** stays Queued behind F08-DEVOPS. The functional evidence can be reused there by fingerprint.
+
+**Delivery Review:** Accepted (unchanged).
 

@@ -6,7 +6,7 @@ F08
 
 ## Current Status
 
-Blocked
+In QA
 
 ## Current Owner
 
@@ -25,13 +25,12 @@ Tech Lead
 - [x] Task ID: F08-BE7 | Assigned Role: Backend Developer | Status: Done | Summary: DONE 2026-09-29 (backend.md § F08-BE7): rules `aa4c5dc2…`, rules test `2c7df84a…`; emulator suite 33 / 33; N-DIRECT-CREATE caught (3 / 3 expected fails). QA finding F1 (architecture A9 ruling 1): `infra/firestore.rules` denies all client access to `dailyResults/**` (only the callable writes, Admin SDK); `rules.test.ts` flips "create own entry" to denied and adds the invalid-payload and non-date-bucket direct creates; named negative N-DIRECT-CREATE; emulator suite green on Java 21; `infra/README.md` rules row. Rules + test + docs only. Brief: Current Brief | Depends On: -
 - [x] Task ID: F08-QA-FUNCTIONAL-R1 | Assigned Role: QA | Status: Done | Summary: DONE 2026-09-29 — verdict **Runtime Validation Pending** (qa.md § F08-QA-FUNCTIONAL-R1; HEAD 695f783, rules `aa4c5dc2…`, `app/` 9de12e6a…). F1 closed: QA probe P3 / P6 DENIED, emulator suite 33 / 33, N-OVERWRITE + N-DIRECT-CREATE caught, client ↔ emulator exactly-once PASS under the new rules; F08.OFFLINE-JOURNEY (AC2) PENDING. Evidence: qa/functional-r1/. Plan: Functional re-run after F08-BE7 under the plan locked in architecture A9 ruling 4 — emulator suite + N-OVERWRITE + the BE7 negative, the QA rules probe P1–P6 (P3 / P6 now denied), one client ↔ emulator exactly-once case under the new rules, AC2 if the user has run it; other functional evidence reused by fingerprint | Depends On: F08-BE7
 - [x] Task ID: F08-QA-FUNCTIONAL-R2 | Assigned Role: QA | Status: Done | Summary: DONE 2026-09-29 — verdict **Functional Approved** (qa.md § F08-QA-FUNCTIONAL-R2; HEAD e55176f, `app/` 9de12e6a…). AC2 / J8 PASS: the user's offline run validated at store level (levels 1–2 completed and 3 opened offline, timestamps inside the offline window; offline cold relaunch → Home 2 / 30); all 30 levels open through the production path (QA probe + control), installed bundle byte-identical; define-less build confirmed. F08.OFFLINE-JOURNEY → PASS. Evidence: qa/functional-r2/. Plan: Targeted functional re-run for F08.OFFLINE-JOURNEY (AC2 / J8) only, on the user's real no-network run of 2026-09-29 14:07:49–14:09:45Z (`evidence/runtime/offline/`), under the plan of architecture A11 ruling 4 as corrected at A12 ruling 4 (core, backend-security, client-ui, stateful-flow; targeted; reuse allowed by the R1 fingerprints). Activated at the intake A12. Brief: Current Brief | Depends On: F08-QA-FUNCTIONAL-R1
-- [ ] Task ID: F08-DEVOPS-PREP | Assigned Role: DevOps/Release Engineer | Status: Blocked | Summary: Blocked until the release gates allow a DevOps activation (contract §5.3; architecture A13 ruling 2). Local release prep, no deploy / billing / push: (a) Java 21 on PATH for the CI `infra` emulator step, SHA-pinned (CI-EMULATOR-JAVA21), verified locally; (b) refresh the feature `release.md` to the current contract — rules rollback check + smoke S1 → "a direct client create is denied; the callable creates" (A9 ruling 6), the storage-full debt line, gate evidence → the functional QA records; (c) record the release readiness verdict (expected Release Validation Pending with the exact remaining items). Brief: Current Brief | Depends On: F08-QA-FUNCTIONAL-R2
-- [ ] Task ID: F08-DEVOPS | Assigned Role: DevOps/Release Engineer | Status: Blocked | Summary: After F08.DEPLOY-AUTHORIZATION and F08.CI-FIRST-PUSH: the first real CI run (the emulator step green on Java 21), the authorized deploy per the runbook, the post-deploy smoke (F08.DEPLOY-SMOKE) incl. "a direct client create is denied; the callable creates"; the release readiness verdict | Depends On: F08-DEVOPS-PREP
+- [ ] Task ID: F08-DEVOPS | Assigned Role: DevOps/Release Engineer | Status: Blocked | Summary: Resume release readiness only after explicit billing/target approval; retain runbook and remaining smoke; the existing CI emulator step (F08-BE5) must run on Java 21 and show a real green run (CI-EMULATOR-JAVA21; architecture A8 ruling 3); update the rules rollback check to "a direct client create is denied; the callable creates" (A9 ruling 6) | Depends On: F08-QA-FUNCTIONAL-R2
 - [ ] Task ID: F08-QA-FINAL | Assigned Role: QA | Status: Queued | Summary: Final acceptance of reviewed release proof and any affected functional scope | Depends On: F08-DEVOPS
 
 ## Open Tasks
 
-* None open. F08-DEVOPS-PREP and F08-DEVOPS (DevOps/Release Engineer) are Blocked on the release-scoped gates F08.DEPLOY-AUTHORIZATION and F08.CI-FIRST-PUSH; F08-QA-FINAL Queued.
+* None open for a delivery role — F08-QA-FUNCTIONAL-R2 returned Functional Approved (qa.md). F08-DEVOPS stays Blocked on F08.DEPLOY-AUTHORIZATION.
 
 ## Handoff Plan
 
@@ -205,37 +204,30 @@ None
   * Blocking Scope: release
   * Status: OPEN
 
-- Decision ID: F08.CI-FIRST-PUSH
-  * Question: May the local `main` (or a branch) be pushed to `origin` (`github.com/eyupdabakoglu92/Looplet`) so that CI runs for the first time? `origin/main` is still the bootstrap commit b1a65a0, so a push publishes the whole working history, `ai-system/` included, to that repository.
-  * Options / Trade-offs: (1) push `main` after F08-DEVOPS-PREP — the real CI evidence, the whole history published; (2) push only a branch — CI on that branch, `main` untouched on origin; (3) keep CI local-only for now — the CI evidence stays PENDING and F08 cannot reach Release Ready
-  * Recommendation: 1 or 2, if the repository's visibility is what the user intends (A13 ruling 3)
-  * Blocks: DevOps activation (F08-DEVOPS-PREP, F08-DEVOPS), final QA and Done (contract §5.3)
-  * Blocking Scope: release
-  * Status: OPEN
-
 ## Blockers
 
-* The release stage waits on the user's decisions F08.DEPLOY-AUTHORIZATION and F08.CI-FIRST-PUSH (Open Decision Gates). A release-scoped gate holds every DevOps activation (contract §5.3), and F08 has no other executable work. The functional stage is closed (A13).
+None
 
 ## Next Action
 
-The user decides: `Run Tech Lead. Decision: F08.DEPLOY-AUTHORIZATION — …` and `Run Tech Lead. Decision: F08.CI-FIRST-PUSH — …`. If both are approved, the Tech Lead activates F08-DEVOPS-PREP. If the deploy stays deferred, F08 stays Blocked and `Run Tech Lead` chooses the next executable feature.
+Run Tech Lead — reconcile F08-QA-FUNCTIONAL-R2 (Functional Approved; qa.md § F08-QA-FUNCTIONAL-R2): every functional record PASS; the release stage waits on F08.DEPLOY-AUTHORIZATION.
 
 ## Last Decision
 
-2026-09-29 — Tech Lead checkpoint on the F08-QA-FUNCTIONAL-R2 verdict (Functional Approved, commit 0d65c73). Full record: architecture → Activation 2026-09-29 → A13.
+2026-09-29 — Tech Lead intake of the user's no-network run (`Incident:` — a status report, not a defect). Full record: architecture → Activation 2026-09-29 → A12.
 
-* **Accepted:** Functional Approved. Every functional evidence record is PASS; AC2 met (N1-R2 is a recorded limit — levels 4–30 were not opened at the offline runtime).
-* **Release stage waits on the user:** a release-scoped gate holds every DevOps activation (contract §5.3; the audit refused an Open prep task). F08-DEVOPS split — **F08-DEVOPS-PREP** (CI on Java 21, `release.md` refresh, readiness verdict) and F08-DEVOPS — both Blocked. F08 → Blocked.
-* **Opened:** the decision gate F08.CI-FIRST-PUSH (the first push to `origin` for a real CI run). F08.DEPLOY-AUTHORIZATION stays OPEN.
+* **Classified:** Insufficient Evidence (no defect; the report completes A11's prerequisite). **Workflow Impact:** Continue Current Flow.
+* **Checked:** all six outputs present; offline confirmed at the start and at the relaunch; a define-less build installed; fingerprints of A11 hold (`app/` `9de12e6a…`, rules / handler / validator / callable test unchanged).
+* **Deviations noted for QA:** the Wi-Fi was also switched off by hand before the script; two levels were played, not one.
+* **Activated:** F08-QA-FUNCTIONAL-R2 under A11 ruling 4, corrected: `backend-security` added (the scope is end-to-end; the QA preflight requires it), its evidence reused from R1 by fingerprint. QA Result None; Blockers None.
 
-The pre-checkpoint orchestration is archived as history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-functional-closure.md.
+The pre-intake orchestration is archived as history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-offline-run-intake.md.
 
 ## Last Update
 
-* Updated By: Tech Lead
+* Updated By: QA
 * Timestamp: 2026-09-29
-* Summary: checkpoint on F08-QA-FUNCTIONAL-R2 (A13) — Functional Approved accepted; F08 Blocked on the user's release decisions; F08-DEVOPS-PREP and F08-DEVOPS Blocked; F08.CI-FIRST-PUSH opened; owner Tech Lead.
+* Summary: F08-QA-FUNCTIONAL-R2 Done — verdict Functional Approved; F08.OFFLINE-JOURNEY PASS (user's offline run validated at store level; all 30 levels open through the production path); owner → Tech Lead.
 
 ## Context & Follow-ups
 
@@ -250,7 +242,6 @@ F08 implementation/runbook and the F08-FE12 fix are retained. Exact old tasks an
 * [Orchestration before the activation of 2026-09-29](../../history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-activation.md).
 * [Orchestration before the QA R1 checkpoint](../../history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-qa-r1-checkpoint.md) — incl. the F08-QA-FUNCTIONAL-R1 brief.
 * [Orchestration before the offline-run intake](../../history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-offline-run-intake.md) — incl. the user's run steps (A11).
-* [Orchestration before the functional closure](../../history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-functional-closure.md) — incl. the F08-QA-FUNCTIONAL-R2 brief.
 
 ## Change Log
 
@@ -297,44 +288,46 @@ F08 implementation/runbook and the F08-FE12 fix are retained. Exact old tasks an
   * **Activated:** F08-QA-FUNCTIONAL-R2; Status → In QA.
   * **Next:** owner → QA.
 * 2026-09-29 — QA: F08-QA-FUNCTIONAL-R2 Done — **Functional Approved** (qa.md). AC2 / J8 PASS: the user's offline run validated at store level; all 30 levels open through the production path (probe + control). F08.OFFLINE-JOURNEY → PASS; every functional record PASS. Owner → Tech Lead.
-* 2026-09-29 — Tech Lead: checkpoint on the F08-QA-FUNCTIONAL-R2 verdict (A13).
-  * **Accepted:** Functional Approved; the functional stage is closed.
-  * **Defined:** F08-DEVOPS-PREP (split from F08-DEVOPS, Blocked); **opened** the gate F08.CI-FIRST-PUSH.
-  * **Next:** Status → Blocked (release gates, contract §5.3); owner Tech Lead; the user decides.
 
 ## Release Constraints
 
 The 2026-09-06 user decision to defer billing/deploy is preserved. In Progress now reflects still-available validation work, not renewed deploy permission. F08-DEVOPS remains Blocked. Environment/JDK/device availability has not been freshly probed; use current evidence, not the old environment assumptions.
 ## Current Brief
 
-**Waiting on the user — two release decisions** (architecture → A13). The functional stage is closed (Functional Approved; every functional evidence record PASS). A release-scoped gate holds every DevOps activation (contract §5.3), so nothing runs until the user decides:
-* **F08.DEPLOY-AUTHORIZATION** — enable Blaze / billing on `looplet-712e5` and deploy `submitDailyResultV1`, the rules and Remote Config? Or keep deferring.
-* **F08.CI-FIRST-PUSH** — push `main` (or a branch) to `origin` so that CI runs for the first time? Or keep CI local.
+**F08-QA-FUNCTIONAL-R2 — AC2 / J8 on the user's no-network run** (plan: architecture → A11 ruling 4, corrected and activated at A12; stage functional; scope end-to-end; modules core, backend-security, client-ui, stateful-flow; regression depth targeted; evidence reuse allowed by the R1 fingerprints)
 
-Answer with `Run Tech Lead. Decision: <id> — <karar>`. If both are approved, the brief below is the first DevOps task.
+**`backend-security`** is selected because the scope is end-to-end (A12 ruling 4). The backend is unchanged since R1. Reuse R1's backend evidence — QB-R1-01…07, QE-R1-00 and QE-R1-A — by fingerprint for the module's build/test prerequisite and its compliance tables. Re-run it only if a backend fingerprint differs.
 
-**F08-DEVOPS-PREP — local release prep, no deploy** (architecture → A13 ruling 2; Release Scope `production-readiness`; Blocked until the gates allow it)
+**What is under test:** F08.OFFLINE-JOURNEY — the Journey plays and persists with no network, and a cold relaunch while still offline shows the progress. Nothing else changed since R1: `app/` tree `9de12e6a…`; rules `aa4c5dc2…`, handler `bcda2662…`, `validate.ts` `8f0398ea…`, callable test `cf73770d…`. Record what you actually test. If any differs, say so and re-run what depends on it.
 
-**Inputs:** the feature `release.md` (your 2026-09-06 readiness artifact; out of date since A9); `project-authority/release.md` (§4 CI, §6 rollback, §8 smoke, §10 action pinning); `.github/workflows/ci.yml` (`infra` job); `project-authority/setup-manifest.md` (the Java 21 emulator command); `architecture.md` A8 ruling 3, A9 ruling 6, A13; `qa.md` § F08-QA-FUNCTIONAL-R1 / R2; `workflow-follow-ups.md` → CI-EMULATOR-JAVA21.
+**Input — the user's run, 2026-09-29 14:07:49–14:09:45Z** (`evidence/runtime/offline/`; the user's evidence, not a QA PASS):
+* `01-offline-check.txt` — Wi-Fi `en0` off; `curl` failed ("offline confirmed");
+* `02-store-before.txt` — highest unlocked 1, nothing completed;
+* `03-result.png` — the result of `journey-tr-02` (2 moves, 3★);
+* `04-store-after.txt` — highest unlocked 3, completed 1,2; bests `journey-tr-01` 3 / 2★, `journey-tr-02` 2 / 3★;
+* `05-relaunch-offline-home.png` — after an offline kill + cold relaunch: Home "YOLCULUK · 2 / 30", Seviye 3;
+* `06-still-offline.txt` — still offline at the relaunch.
+* The simulator's live store is still there (read-only access is fine): `sync_queue` empty, the guest created just before the run.
 
-**Scope:**
-1. **CI on Java 21 (CI-EMULATOR-JAVA21).** Make the `infra` job's emulator step run with Java 21 first on `PATH`. firebase-tools 15 needs Java 21+; the `ubuntu-latest` default is probably older (*Needs verification* — say what you find). Pin any new action to a commit SHA (`release.md` §10).
-   * Verify what can be verified locally: the workflow file parses, and the step's command passes locally on Java 21 (the setup-manifest command).
-   * Do not claim "CI verified": no run has happened (F08.CI-FIRST-PUSH).
-2. **Refresh the feature `release.md` to the current contract:**
-   * Rollback table "Bad rules shipped" and smoke S1 → "a direct client create is denied (own entry, invalid payload, non-date bucket, another user, unauthenticated); update / delete / read denied; the callable creates" (A9 ruling 6).
-   * The storage-full "residual test-debt" line → covered (F08.STORAGE PASS, `storage_full_test.dart`).
-   * The gate evidence → the functional QA records (R1 / R2).
-   * Re-check the deploy runbook and the smoke list against the current rules and code. Keep them; change only what is out of date, and say what changed.
-3. **Readiness verdict** in `release.md` and the orchestration `Release Result`. Expected: **Release Validation Pending**, listing exactly what remains — F08.DEPLOY-AUTHORIZATION, F08.CI-FIRST-PUSH + the real CI run, F08.DEPLOY-SMOKE. Use `Release Blocked` only for a real failed gate.
+**Deviations from the steps (the user's report):** the Wi-Fi was switched off by hand before the script (the script then confirmed offline itself); two levels were played instead of one; the app was not quit by hand (the script terminates it before its offline launch). Judge whether any of this affects validity.
 
-**Non-goals:** no deploy, no billing or plan change, no Remote Config change, no `git push` (F08.CI-FIRST-PUSH is the user's decision), no app / rules / function change. If a needed change touches product code or the rules, stop and hand back to the Tech Lead.
+**Judge against:** PRD AC2 and architecture "QA Focus → Offline Journey" (airplane mode → all 30 levels load, a level completes, progress + best persist, relaunch still offline → intact).
+* "All 30 levels load": only two were played. Decide from the evidence whether the bundled-content path covers it — for example the Journey content source, the existing tests, or a read of the level assets. A decision the evidence cannot support is a pending item, not a PASS.
+* Claude cannot turn the network off. If you need another no-network run, name exactly what it must capture. That makes the verdict Runtime Validation Pending.
 
-**Then:** close F08-DEVOPS-PREP, owner → Tech Lead, `Run Tech Lead`.
+**Non-goals:** no product, test or rules changes; no network or system-setting change; no deploy.
+
+**Output:** append "F08-QA-FUNCTIONAL-R2" to `qa.md`; update the F08.OFFLINE-JOURNEY record.
+
+**Verdict:**
+* Functional Approved — only if AC2 passes and every in-scope record is PASS;
+* Runtime Validation Pending — if the run does not suffice and another user run is needed;
+* Rejected — with findings.
+
+Then `Run Tech Lead`.
 
 ## Earlier briefs
 
-* The F08-QA-FUNCTIONAL-R2 brief (2026-09-29) — in history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-functional-closure.md.
 * The user's no-network run steps (A11, 2026-09-29) — in history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-offline-run-intake.md.
 * The F08-QA-FUNCTIONAL-R1 brief (2026-09-29) — in history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-qa-r1-checkpoint.md.
 * The F08-BE7 brief (2026-09-29) — in history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-be7-checkpoint.md.
