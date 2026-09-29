@@ -930,3 +930,35 @@ The backend handler and rules fingerprints above are the ones A7's reuse clause 
      * **(3)** authorize the function deploy (Blaze) and finish F08 first.
    * The Tech Lead puts these to the user at that checkpoint.
 
+### A20. DevOps checkpoint 2026-09-29 (F08-DEVOPS-RULES — held by the user, commit b2873cc)
+
+**Delivery reviewed:** feature `release.md` → "F08-DEVOPS-RULES" and `evidence/deploy-rules/` DR-01…06. Steps 1–4 are done. They were all read-only or a dry-run: the database list, the rules releases and rulesets through the CLI's own session, unauthenticated REST GETs, the emulator suite and a compile-only dry-run. At step 5 the user answered "Hayır, bekle" (wait) to the deploy confirmation. **Nothing on `looplet-712e5` changed.** The evidence files hold no account data or token.
+
+**Finding — option B's premise did not hold:**
+* A17 ruling 7 and A19 assumed the `(default)` database had unknown console rules since 2026-09-06, possibly open.
+* The live project has **no rules release and no ruleset** (DR-02 / DR-03). Unauthenticated reads on `dailyResults` → **403** (DR-04): with no release, Firestore applies its implicit lock.
+* *Limit:* writes were not probed, correctly, since a successful probe would have written to production. The implicit lock is the documented behaviour of a database with no rules release, and the read result is consistent with it.
+* So there is no exposure to close. A rules-only deploy now would add only explicit, versioned rules — and the function deploy's runbook deploys the same rules anyway (feature `release.md` §6 step 3).
+
+**Rulings:**
+1. **F08-DEVOPS-RULES — Cancelled (folded into F08-DEVOPS).** This follows the user's "wait" and the finding, and it is reversible: the user can ask for a rules-only deploy at any time.
+   * Steps 1–4 and their evidence are kept.
+   * F08.LIVE-RULES stays PENDING and moves to F08-DEVOPS, which deploys rules + Remote Config + the function together and runs F08.LIVE-RULES, S2–S4.
+   * Delivery Review: Accepted — the held delivery is accurate and complete up to the hold.
+2. **F08 has no executable work left. New decision gate F08.FUNCTION-DEPLOY-GO** (Blocking Scope: release), as A19 ruling 3 planned. It also carries the next-feature choice that A19 ruling 6 promised:
+   * **(A) Deploy now.** The user enables Blaze with a budget alert. F08-DEVOPS then:
+     * reads the live state;
+     * pins Node 22 in the CI `infra` job;
+     * gets a green CI at the deploy revision with its logs read;
+     * dry-runs, then deploys rules + Remote Config + `submitDailyResultV1` (`nodejs22`);
+     * runs F08.LIVE-RULES and S2–S4.
+     * Then F08-QA-FINAL and Done. F07 then becomes selectable.
+   * **(B) Defer the deploy; start F09** (onboarding-tutorial, P1; depends only on F03). It is fully executable and needs no dependency exception.
+   * **(C) Defer the deploy; start F07 development on the emulator.**
+     * This needs a Tech Lead dependency ruling: F07 may start on F08's functional acceptance, and F07's release waits on the function deploy.
+     * F07 also needs the Daily content pool (F06-CONTENT-DAILY, about 60 puzzles plus human sign-off) and the Remote Config kill-switch (F07-KILL-SWITCH).
+     * Larger and not releasable until (A).
+   * **Recommendation: (B)** while billing stays deferred. The product PRD lists the P1 launch set as F04, F09, F10, F07, F12, and F09 is the next one with every dependency met. Choose (C) if the Daily matters more to you now; (A) once billing is acceptable.
+   * With B or C, F08 stays Blocked with its functional acceptance, PREP, BE8 and the evidence intact (pause record); it resumes at F08-DEVOPS when the user answers (A) later.
+3. **F08 → Blocked;** Current Owner = Next Role = Tech Lead. F08-DEVOPS Blocked on the gate; F08-QA-FINAL Queued.
+

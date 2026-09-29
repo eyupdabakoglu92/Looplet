@@ -40,31 +40,30 @@ features/f08-offline-persistence-and-sync/orchestration.md
 
 ## Current Phase
 
-F08 release stage — F08-DEVOPS-RULES (the rules-only production deploy; F08.DEPLOY-GO — B, A19)
+F08 release stage — waiting on the user's decision F08.FUNCTION-DEPLOY-GO (A20)
 
 ## Current Role
 
-DevOps/Release Engineer
+Tech Lead
 
 ## Current Reason
 
-**The user decided F08.DEPLOY-GO — B** on 2026-09-29. Full record: F08 `architecture.md` → A19.
+**F08 waits on the user's decision F08.FUNCTION-DEPLOY-GO** (A20).
 
-* **Now:** the committed deny-all Firestore rules go to `looplet-712e5` (Spark, no billing) — F08-DEVOPS-RULES. The Tech Lead's approval is given. DevOps confirms with the user in chat right before the real deploy command.
-* **Still deferred:** Blaze, billing, the function and Remote Config deploy. F08.FUNCTION-DEPLOY-GO opens at the rules checkpoint.
-* **F07** was not skipped. It depends on F08, which is not Done, and its own release needs the deferred backend. The next-feature choice (F09 / F07 on the emulator / the function deploy) comes at the rules checkpoint (A19 ruling 6).
-* Every push needs the user's approval in chat.
+* The rules-only deploy (option B of F08.DEPLOY-GO) was held by the user at the confirmation step. DevOps found that the live project has **no rules release**, and client reads are already denied (Firestore's implicit lock). So there was no exposure to close.
+* The rules step is cancelled and folded into the function deploy. Nothing on the project changed.
+* Options: (A) deploy now with Blaze → F08 Done → F07 selectable; (B) defer and start F09 (onboarding tutorial); (C) defer and start F07 on the emulator under a dependency ruling. Recommended: B.
 
 ## Last Completed Action
 
-Tech Lead on 2026-09-29 — **the decision F08.DEPLOY-GO — B** (A19).
-* **Resolved:** exactly one OPEN gate matched; option B as defined at A17.
-* **Activated:** F08-DEVOPS-RULES; F08 → In Release; owner → DevOps/Release Engineer; new evidence record F08.LIVE-RULES (PENDING).
-* Archived: history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-deploy-go-decision.md.
+Tech Lead on 2026-09-29 — **the rules-hold checkpoint** (A20).
+* **Cancelled:** F08-DEVOPS-RULES (folded into F08-DEVOPS); F08.LIVE-RULES moves with it.
+* **Opened:** F08.FUNCTION-DEPLOY-GO (+ the next-feature choice). F08 → Blocked.
+* Archived: history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-rules-hold-checkpoint.md.
 
 ## Next Expected Action
 
-Run DevOps/Release Engineer on F08-DEVOPS-RULES (the F08 orchestration Current Brief): the rules-only production deploy and its smoke (F08.LIVE-RULES); no function / Remote Config deploy, no billing. Then the Tech Lead checkpoint.
+The user answers `Run Tech Lead. Decision: F08.FUNCTION-DEPLOY-GO — A / B / C`. The intake activates F08-DEVOPS (A), or records the deferral and activates F09 (B) or F07 (C).
 
 ## Portfolio Summary
 
@@ -73,12 +72,12 @@ Run DevOps/Release Engineer on F08-DEVOPS-RULES (the F08 orchestration Current B
 * F00: Done again (2026-09-27) — Phase C is complete (the conformance audit was accepted). Its design-system layer closed 2026-09-26: Foundation Selected (Direction C), 90/100, Visual Quality Gate Passed via the scoped exception F00.VISUAL-93-THRESHOLD.
 * F05: Done (2026-09-29) — Design Adoption Phase D3 (Home + app shell, `new-surface`, architecture §18) closed: F05-QA-D3 Approved with Notes, 94 / 100, gate Passed (§18.9). The user's N1 decision is live (PO-REV-2026-09-29-F05-CONTINUE). Previously Done 2026-09-27 (F05-QA-STRICT2 Approved with Notes).
 * F04: Done — the panel is now the full-screen result (D2, F03 carrier, closed 2026-09-29; F04 §7 / §8 amended 2026-09-28; ACs unchanged and passed on the result).
-* F08: **In Release — the active feature.** **Functional Approved** (F08-QA-FUNCTIONAL-R2, accepted at A13): every functional evidence record PASS, F1 closed. Release stage: PREP accepted with a green CI run #2 (A17); F08-BE8 (Node.js 22) accepted (A18); **F08.DEPLOY-GO — B (A19): F08-DEVOPS-RULES active** (the rules-only production deploy); F08-DEVOPS (function + Remote Config) Blocked; F08-QA-FINAL Queued. Its `StoreErrorScreen` uses the Foundation (D3, F08 App Init step 1 amended).
+* F08: **Blocked — the active feature, waiting on the user's F08.FUNCTION-DEPLOY-GO.** **Functional Approved** (F08-QA-FUNCTIONAL-R2, accepted at A13): every functional evidence record PASS, F1 closed. Release stage: PREP accepted with a green CI run #2 (A17); F08-BE8 (Node.js 22) accepted (A18); the rules-only deploy held by the user and cancelled (A20); Release Validation Pending. F08-DEVOPS Blocked on the gate; F08-QA-FINAL Queued. Its `StoreErrorScreen` uses the Foundation (D3, F08 App Init step 1 amended).
 * F07, F09–F13: Not Started. Pending follow-ons are in workflow-follow-ups.md.
 
 ## Release Decision
 
-F08.DEPLOY-GO is RESOLVED — option B (2026-09-29, A19): the committed deny-all Firestore rules are deployed to `looplet-712e5` now (Spark, no billing; Tech Lead approval given). The function (`nodejs22`) and Remote Config deploy stay deferred; they need F08.FUNCTION-DEPLOY-GO, which the Tech Lead opens at the F08-DEVOPS-RULES checkpoint. No Blaze or billing change is authorized. F08.DEPLOY-AUTHORIZATION (A16) and F08.CI-FIRST-PUSH (A14) are RESOLVED. Every push needs the user's approval.
+F08.FUNCTION-DEPLOY-GO is **OPEN** (2026-09-29, A20): (A) the first Firebase deploy now — Blaze with a budget alert, rules + Remote Config + the `nodejs22` function; (B) defer and start F09; (C) defer and start F07 on the emulator. Recommended: B while billing stays deferred. F08.DEPLOY-GO (B, A19) is RESOLVED; its rules-only step was held by the user and cancelled at A20 — nothing was deployed. No Blaze, billing, deploy or console change is authorized. Every push needs the user's approval.
 
 ## Global Risks
 
@@ -99,7 +98,7 @@ F08.DEPLOY-GO is RESOLVED — option B (2026-09-29, A19): the committed deny-all
   * RESULT-F00-COMPONENT-ALIGN — the `EN İYİ` ★ offset and the pressed-pill brightness.
   * Release-build pacing was not measured (debug video only); it belongs to FIRST-APP-DISTRIBUTION — for the result (D2) and the Home entrance (D3, F05-QA-D3 N1).
 * **Post-D3 follow-ups (non-blocking, in workflow-follow-ups.md):** FIRST-APP-DISTRIBUTION (the profile / release store-error capture, moved from the F05 ledger); F08-RETRY-STORE-CONNECTION (+ the one-frame Retry feedback, N2); RESULT-F00-COMPONENT-ALIGN (+ the `LimePill` arrow at AX5, N3); OPTIONAL-QUALITY-NOTES (N4, N5); RELEASE-SCOPED-EVIDENCE (process).
-* **Commits:** the D1 rework, its closure and the D2 activation are in 489606d — its tracked `app/` diff from 5798c70 hashes to QA's `88f1dca3…` and the two changed sources match QA's SHA-1s (re-verified at the D2 checkpoint); the F03-UI-D2 handoff is in 6352a75; the F03-FE-D2 delivery is in 67d9ecb (`app/` tree `f5641d2f…`, QA's evidence-reuse fingerprint); the F03-QA-D2 verdict is in f28aedb; the reconciliation in 3cd4a3b; the F03-FE-D2R rework in 77c33b9 (`app/` tree `5298c81a…`, the re-QA fingerprint); the F03-QA-D2R verdict in 5677471. The D2 closure and the D3 activation are in 171f0c1; the PO revision in 230ce0c; its resync in 9a36147; the F05-UI-D3 handoff in 981b807; the visual-gate checkpoint in 7c1a946; the F05-FE-D3 delivery in af5aec8 (`app/` `b4ad263e…`, the D3 QA fingerprint); the implementation checkpoint in 078c926; the F05-QA-D3 verdict in e46f384. The D3 closure is in b7493d6. The F08 activation is in 1d373d7; the F08-FE13 / LOCAL-EVIDENCE delivery in beb7bfe (`app/` `9de12e6a…`); the FE13 checkpoint in b8e37ab; the F08-BE6 delivery in c70527a; the BE6 checkpoint in 84430c9; the F08-QA-FUNCTIONAL verdict in d882211; the QA checkpoint (A9) in 8f26243; the F08-BE7 delivery in cb96719; the BE7 checkpoint (A10) in 695f783; the F08-QA-FUNCTIONAL-R1 verdict in 4cb836a; the A11 checkpoint, the offline run and the A12 intake in e55176f; the F08-QA-FUNCTIONAL-R2 verdict in 0d65c73; the A13 checkpoint in 8a0522f — pushed to `origin/main` by the user (CI run #1); the A14–A16 records in 6b31195; the F08-DEVOPS-PREP delivery in c592081 — pushed by the user (CI run #2, green); the A17 checkpoint in ebe59ce; the F08-BE8 delivery in 9f6b6e6 (not pushed). The A18 checkpoint and the A19 intake are uncommitted (documents only).
+* **Commits:** the D1 rework, its closure and the D2 activation are in 489606d — its tracked `app/` diff from 5798c70 hashes to QA's `88f1dca3…` and the two changed sources match QA's SHA-1s (re-verified at the D2 checkpoint); the F03-UI-D2 handoff is in 6352a75; the F03-FE-D2 delivery is in 67d9ecb (`app/` tree `f5641d2f…`, QA's evidence-reuse fingerprint); the F03-QA-D2 verdict is in f28aedb; the reconciliation in 3cd4a3b; the F03-FE-D2R rework in 77c33b9 (`app/` tree `5298c81a…`, the re-QA fingerprint); the F03-QA-D2R verdict in 5677471. The D2 closure and the D3 activation are in 171f0c1; the PO revision in 230ce0c; its resync in 9a36147; the F05-UI-D3 handoff in 981b807; the visual-gate checkpoint in 7c1a946; the F05-FE-D3 delivery in af5aec8 (`app/` `b4ad263e…`, the D3 QA fingerprint); the implementation checkpoint in 078c926; the F05-QA-D3 verdict in e46f384. The D3 closure is in b7493d6. The F08 activation is in 1d373d7; the F08-FE13 / LOCAL-EVIDENCE delivery in beb7bfe (`app/` `9de12e6a…`); the FE13 checkpoint in b8e37ab; the F08-BE6 delivery in c70527a; the BE6 checkpoint in 84430c9; the F08-QA-FUNCTIONAL verdict in d882211; the QA checkpoint (A9) in 8f26243; the F08-BE7 delivery in cb96719; the BE7 checkpoint (A10) in 695f783; the F08-QA-FUNCTIONAL-R1 verdict in 4cb836a; the A11 checkpoint, the offline run and the A12 intake in e55176f; the F08-QA-FUNCTIONAL-R2 verdict in 0d65c73; the A13 checkpoint in 8a0522f — pushed to `origin/main` by the user (CI run #1); the A14–A16 records in 6b31195; the F08-DEVOPS-PREP delivery in c592081 — pushed by the user (CI run #2, green); the A17 checkpoint in ebe59ce; the F08-BE8 delivery in 9f6b6e6 (not pushed). The A18 checkpoint and the A19 intake are in dfccce3; the held F08-DEVOPS-RULES in b2873cc. The A20 checkpoint is uncommitted (documents only).
 * **F08 unreadable-DB gap (found 2026-09-29):** fixed in F08-FE13 (beb7bfe) and accepted at the checkpoint; the runtime and automated evidence awaits independent QA (F08.UNREADABLE-DB). The Retry reconnect is delivered too. The one-frame Retry feedback (N2) stays a follow-up.
 * **Migration partial-apply (found by F08-FE13, 2026-09-29):** Drift does not wrap `onUpgrade` in a transaction, so a failing step could leave a partial apply. It is fixed and accepted (F08 A6 ruling 1). The first real schema step must add its own real-file migration test.
 * **Emulator suite (F08-BE6):** was 30 / 31 because of a contract-invalid fixture, not a handler defect; fixed in c70527a and accepted — 31 / 31 on Java 21 (first on `PATH`; setup-manifest).
@@ -107,7 +106,7 @@ F08.DEPLOY-GO is RESOLVED — option B (2026-09-29, A19): the committed deny-all
 * **CI is green (2026-09-29, F08 A17):** run `36597006854` on c592081 — all three jobs succeeded after the F08-DEVOPS-PREP repair (Java 21, format scope, Flutter 3.32.8, Xcode 16.4). Run #1's three causes are closed. **Limit:** the best-effort integration step failed inside the green `verify` job; it has no device target on CI and is not a gate until the first app-build release (CI-INTEGRATION-TARGET). The step logs need a GitHub sign-in and were not read.
 * **Cloud Functions runtime (2026-09-29, F08 A17):** Node.js 20 is decommissioned on 2026-10-30 — no create / update after that date. The runtime moved to Node.js 22 in F08-BE8 (9f6b6e6, accepted at A18). The CI `infra` job pins Node 22 in F08-DEVOPS.
 * **Host toolchain (2026-09-29, F08 A18):** installing `node@22` upgraded Homebrew's `simdjson` and broke the system `node` 24.7.0; with the user's choice the system `node` is now `node@24` 24.21.0, and `node@22` is keg-only. On this host an npm script runs the system Node whatever is first on `PATH`; local Node 22 checks start the tools directly (setup-manifest).
-* **Public repository (2026-09-29, F08 A14):** `github.com/eyupdabakoglu92/Looplet` is public, with its whole history including `ai-system/`. No private key or token is tracked. The Firebase client configs (`google-services.json`, `GoogleService-Info.plist`) are public by design but now world-readable: restrict the API keys and plan App Check enforcement (F08 `release.md` §5; F08-PLATFORM-ATTESTATION). The live Firestore rules are unknown until F08-DEVOPS-RULES reads them and deploys the committed deny-all rules (F08.DEPLOY-GO — B, A19).
+* **Public repository (2026-09-29, F08 A14):** `github.com/eyupdabakoglu92/Looplet` is public, with its whole history including `ai-system/`. No private key or token is tracked. The Firebase client configs (`google-services.json`, `GoogleService-Info.plist`) are public by design but now world-readable: restrict the API keys and plan App Check enforcement (F08 `release.md` §5; F08-PLATFORM-ATTESTATION). The live project has no Firestore rules release; client reads are denied by Firestore's implicit lock (read on 2026-09-29, F08 A20). The committed deny-all rules ship with the function deploy.
 
 ## Contract Version
 
