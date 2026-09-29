@@ -9,6 +9,9 @@
 > **Amended 2026-09-29 (Tech Lead — the checkpoint on the F08-QA-FUNCTIONAL-R1 verdict, Runtime Validation Pending):** "Activation 2026-09-29 → A11" added — F1 closed; F08 Blocked only on the user's no-network run (AC2). The `sync_queue` **Backoff** line is clarified to the delivered schedule (first retry ≈ 60 s; QA note N1-R1). No product criterion changes.
 > **Amended 2026-09-29 (Tech Lead — intake of the user's no-network run):** "Activation 2026-09-29 → A12" added — the run is valid; F08-QA-FUNCTIONAL-R2 activated under A11 ruling 4. No contract change.
 > **Amended 2026-09-29 (Tech Lead — the checkpoint on the F08-QA-FUNCTIONAL-R2 verdict, Functional Approved):** "Activation 2026-09-29 → A13" added — the functional stage is closed; the release stage waits on the user's decisions (F08.DEPLOY-AUTHORIZATION, and the new gate F08.CI-FIRST-PUSH); F08-DEVOPS-PREP is defined and Blocked. No contract change.
+> **Amended 2026-09-29 (Tech Lead — decision F08.CI-FIRST-PUSH):** "Activation 2026-09-29 → A14" added — the user pushed `main`; CI's first run is recorded (the emulator step failed); F08 stays Blocked on F08.DEPLOY-AUTHORIZATION. No contract change.
+> **Amended 2026-09-29 (Tech Lead — incident: CI run #1 logs):** "Activation 2026-09-29 → A15" added — the three CI root causes confirmed; Technical Decisions on the format scope and CI toolchain parity; the F08.DEPLOY-AUTHORIZATION options refined. No product or runtime contract change.
+> **Amended 2026-09-29 (Tech Lead — decision F08.DEPLOY-AUTHORIZATION — B):** "Activation 2026-09-29 → A16" added — the deploy stays deferred; the non-deploy release work (F08-DEVOPS-PREP) is activated; F08.DEPLOY-GO is opened at the PREP checkpoint. No contract change.
 > `orchestration.md` is execution authority; `platform.md` / `release.md` are project authority.
 
 ---
@@ -711,4 +714,102 @@ The backend handler and rules fingerprints above are the ones A7's reuse clause 
 5. **Final QA (F08-QA-FINAL)** stays Queued behind F08-DEVOPS. The functional evidence can be reused there by fingerprint.
 
 **Delivery Review:** Accepted (unchanged).
+
+### A14. Decision F08.CI-FIRST-PUSH (2026-09-29) — the user pushed `main`
+
+**Input:** `Run Tech Lead. Decision: F08.CI-FIRST-PUSH — Ben push işlemini yaptım` ("I did the push").
+* Exactly one OPEN gate matched. Classified as option (1), push `main`.
+* The user ran the push, not Claude.
+
+**Tech Lead verification (read-only):**
+* **Remote:** `git ls-remote origin` → `refs/heads/main` = `8a0522f` (the A13 checkpoint) = the local `main`. The working tree is clean.
+* **Visibility:** the repository `github.com/eyupdabakoglu92/Looplet` is **public**. The whole history, `ai-system/` included, is now published.
+* **Tracked-file scan:** no private key, service-account file, token or `.env` is tracked. The Firebase client configs `app/android/app/google-services.json` and `app/ios/Runner/GoogleService-Info.plist` are public by design (Firebase client identifiers), but they are now world-readable.
+* **CI run #1** — GitHub Actions run `36590316947` (workflow CI, event push, head `8a0522f`, 2026-09-29T15:27:22Z):
+  * **`infra · functions build + test` — failure** (57 s). Checkout, Node, `npm ci`, `tsc` and the offline tests passed. **"Test functions (Firebase emulator — rules + callable behaviour)" failed**: "Process completed with exit code 1".
+  * The step log needs a signed-in GitHub account ("Sign in to view logs"); the Tech Lead did not sign in. **The cause is not verified.** A failure right after the step starts fits the known risk CI-EMULATOR-JAVA21: firebase-tools 15 needs Java 21, and the runner's default is probably older.
+  * The same suite passes locally on Java 21 (QB-R1-03, 33 / 33). This is a CI environment defect, not a functional regression.
+  * `format · analyze · test` — **failure at "Format check"**, as CI-FORMAT-GATE predicted (a pre-existing F00 QA probe file). `iOS release build (no codesign)` was still running at the time of this record.
+  * Notices: Node 20 actions are forced onto Node 24 (the pinned `actions/checkout`); `ubuntu-latest` moves to Ubuntu 26 from 2026-10-19.
+
+**Rulings:**
+1. **F08.CI-FIRST-PUSH — RESOLVED:** the user pushed `main` (option 1) to the public `origin`. CI now runs on every push to `main`.
+2. **The CI evidence is no longer "never run" — it is FAIL.** CI-EMULATOR-JAVA21 is confirmed as a real failing gate, cause pending verification. It stays in **F08-DEVOPS-PREP**, which also gains:
+   * **(d) the first run's other results** — read the full run, including the format gate (CI-FORMAT-GATE) and the iOS build, and fix or route each red step. Reading the logs needs a signed-in account: the DevOps role uses the user's `gh` / browser session only if the user provides it; otherwise it asks the user for the log text;
+   * **(e) public-repository hygiene** — check that the Firebase API keys are restricted (application / API restrictions) and note App Check's monitor mode for a public client config. Any console change is an account-settings change: recommend it, and the user approves or makes it;
+   * **(f)** the Node 20 → 24 action notice and the Ubuntu 26 migration: pin or update the affected actions.
+3. **F08 stays Blocked.** F08.DEPLOY-AUTHORIZATION is still OPEN with Blocking Scope release, and it holds every DevOps activation (contract §5.3). The CI fix waits on the same gate.
+   * This means a red CI stays red until the user decides the deploy. That is the contract's rule for a release-scoped gate, and it is recorded here so the user can see the trade-off.
+   * If the user wants the CI fixed first without deciding the deploy, the gate's scope is the thing to change — by a new user decision, not a Tech Lead shortcut.
+4. **Global risk added:** the public repository (ruling 2 (e)); CI's first run is red.
+
+### A15. Incident 2026-09-29 — CI run #1 logs (the user pasted them)
+
+**Input:** `Run Tech Lead. Incident:` — the step logs of the three failed jobs of run `36590316947`. The user pasted them; they are data. They give the causes that A14 could not verify.
+
+* **Classified Scope:** Existing Active Feature Rework — the F08 release stage (CI is `release.md` §4 scope; it sits in F08-DEVOPS-PREP since A13 / A14).
+* **Affected feature:** F08 (release stage). The CI pipeline is shared, so every later feature inherits a red `main` until this is fixed.
+* **Workflow Impact:** Continue Current Flow. F08 stays Blocked on F08.DEPLOY-AUTHORIZATION; the fixes are defined now and run in F08-DEVOPS-PREP.
+
+**Root causes (from the logs; reproduced locally where possible):**
+
+1. **`infra` — the emulator step: Java.**
+   * The log reads "firebase-tools no longer supports Java version before 21".
+   * **Confirmed:** CI-EMULATOR-JAVA21 is the cause. The code is not at fault: the same suite passes locally on Java 21 (QB-R1-03).
+2. **`format · analyze · test` — Format check: two QA evidence files under `ai-system/`.**
+   * `melos run format:check` runs `dart format … .` over the whole repository. It flags exactly `ai-system/features/f00-design-foundation/qa/src/qa_probe_main.dart` (since 3647cef, known as CI-FORMAT-GATE) and `ai-system/features/f08-offline-persistence-and-sync/qa/functional-r2/qa_probe_all_levels_test.dart`.
+     * The second file was added by F08-QA-FUNCTIONAL-R2 (0d65c73). That QA turn stored an unformatted probe under `ai-system/` and made the known red gate worse. Recorded as a process note; the probe's content is correct.
+   * **Reproduced locally** with Dart 3.8.1: over `.` the same two files change; over `app packages tools`, 194 files and 0 changed.
+   * The "Package resolution error … `package:lints/recommended.yaml`" lines are warnings. The root `analysis_options.yaml` cannot resolve `lints` for files outside a package. They are not the failure.
+3. **iOS release build: toolchain drift. The code is not at fault.**
+   * Swift errors in `firebase-ios-sdk/FirebaseSharedSwift/.../FirebaseDataEncoder.swift:288`: "Cannot find type 'sending' in scope". `sending` is Swift 6 syntax.
+   * The failing path is `app/build/ios/SourcePackages/checkouts/firebase-ios-sdk`, so CI resolved the Firebase iOS SDK through **Swift Package Manager**.
+   * Locally the app builds through **CocoaPods** (`Podfile.lock`: `FirebaseSharedSwift 11.15.0`), with Flutter **3.32.8**, Xcode **16.4** and Swift 6.1.2. SPM is not enabled locally.
+   * CI installs **unpinned** Flutter (`subosito/flutter-action` with `channel: stable` and no version), so CI builds with a newer Flutter than the canonical local one. The `ios-build` job runs on **`macos-14`**, whose default Xcode predates Swift 6. So:
+     * a newer Flutter plus SPM resolved a newer Firebase iOS SDK;
+     * that SDK needs Swift 6;
+     * the runner's Xcode cannot compile it.
+   * *Inferred:* the exact Flutter / SDK / Xcode versions on the runner are not in the pasted log. The cause chain is consistent with every observed fact.
+   * The same unpinned Flutter also runs the `format · analyze · test` job.
+
+**Rulings (Technical Decisions — setup / CI authority; no product change):**
+1. **TD-FORMAT-SCOPE — `format` / `format:check` cover only the Dart code the workspace owns: `app`, `packages`, `tools`.** This resolves CI-FORMAT-GATE.
+   * Evidence under `ai-system/` is a record. It must not be rewritten to satisfy a formatter: the QA reports cite these files, and formatting them would change bytes that later turns may compare.
+   * Future probes stored as evidence cannot break CI again.
+   * `melos.yaml` and `setup-manifest.md` (the canonical command) change together, in F08-DEVOPS-PREP. `analyze` already runs per package, so no change there.
+2. **TD-CI-TOOLCHAIN — CI uses the canonical local toolchain.**
+   * **Flutter:** pinned to **3.32.8** in every CI job (`flutter-version`), matching the local environment every QA verdict was produced on.
+   * **iOS job:** a runner / Xcode with Swift 6 support, at least Xcode 16.4, matching local. DevOps chooses between a newer macOS runner and an SHA-pinned Xcode selection. It verifies the Xcode version in the job log, and keeps the iOS dependency manager consistent with local (CocoaPods; SPM not enabled) unless a later Tech Lead decision changes it.
+   * **`infra` job:** Java 21 first on `PATH` (CI-EMULATOR-JAVA21).
+   * **A Flutter upgrade is a separate decision** — a dependency / toolchain change with full regression. It is not part of this fix.
+3. **F08-DEVOPS-PREP scope updated** to these confirmed causes; (d)'s "read the logs" is done. A CI fix is proven only by a green run after a push; the push needs the user's approval in chat.
+4. **F08.DEPLOY-AUTHORIZATION — options refined.** The fixes are ready to run, but the gate holds every DevOps activation (contract §5.3). The user now decides between:
+   * **(A)** authorize the deploy — Blaze / billing and the named target. DevOps runs PREP, then the deploy.
+   * **(B)** keep deferring the deploy, but allow the non-deploy release work now — PREP: the CI fixes, the `release.md` refresh, a readiness verdict. The Tech Lead records the deferral, resolves this gate, and opens a narrower gate, **F08.DEPLOY-GO**, that holds only F08-DEVOPS (deploy + smoke), final QA and Done.
+   * **(C)** defer everything. F08 stays Blocked, and `main` stays red for every later feature.
+   * **Recommendation: (B).** A green CI is needed whatever the deploy date, and it costs no billing.
+5. **Process note (QA):** QA probe files stored as `.dart` under `ai-system/` are fine after TD-FORMAT-SCOPE. Until then, a QA turn that adds one worsens the red format gate. No retroactive change to the R2 evidence.
+
+### A16. Decision F08.DEPLOY-AUTHORIZATION — B (2026-09-29)
+
+**Input:** `Run Tech Lead. Decision: F08.DEPLOY-AUTHORIZATION — B`. Exactly one OPEN gate matched; option (B) as defined at A15 ruling 4.
+
+**Decision recorded:**
+* **The deploy stays deferred.** This is the 2026-09-06 deferral, confirmed by the user today. No Blaze plan, no billing, no Firebase deploy, no Remote Config change, no production action.
+* **The non-deploy release work runs now:** F08-DEVOPS-PREP. That is the CI repair (TD-FORMAT-SCOPE, TD-CI-TOOLCHAIN, Java 21), the feature `release.md` refresh, public-repo hygiene recommendations, and a readiness verdict.
+* No product criterion changes, so no Product Owner revision.
+
+**Rulings:**
+1. **F08.DEPLOY-AUTHORIZATION — RESOLVED (B).**
+2. **F08-DEVOPS-PREP is activated.** F08 → In Release; Current Owner = Next Role = DevOps/Release Engineer; Blockers None. Its dependency F08-QA-FUNCTIONAL-R2 is Done.
+3. **When F08.DEPLOY-GO opens — a correction to A15 ruling 4, which said "opens" at this turn.**
+   * An OPEN release-scoped gate holds every DevOps activation (contract §5.3; the workflow audit enforces it). Opening F08.DEPLOY-GO now would block the very prep that option (B) releases.
+   * So the Tech Lead opens F08.DEPLOY-GO at the **PREP checkpoint**, when F08 has no DevOps work left. Its question: may the first Firebase deploy run now, for which target and with which billing? It holds F08-DEVOPS (deploy + smoke), F08-QA-FINAL and Done.
+   * **The deploy stays held in the meantime by four independent records:**
+     * this recorded deferral;
+     * F08-DEVOPS stays **Blocked**;
+     * F08-DEVOPS-PREP's non-goals forbid any deploy, billing, Remote Config or console change;
+     * project `release.md` §3: production requires approval.
+4. **Push:** a CI fix is proven only by a green run after a push. Each push needs the user's explicit approval in chat for that push. The user may also push.
+5. **Release Result** stays Release Validation Pending until the PREP verdict. `Release Ready` is impossible without the deploy smoke (F08.DEPLOY-SMOKE).
 

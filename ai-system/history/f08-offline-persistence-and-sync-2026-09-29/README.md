@@ -24,3 +24,12 @@
 * **`orchestration-before-functional-closure.md`** — the F08 orchestration right before the Tech Lead checkpoint on the F08-QA-FUNCTIONAL-R2 verdict of 2026-09-29, byte for byte (SHA-1 `b04358f1…`).
   * State: In QA; owner Tech Lead; F08-QA-FUNCTIONAL-R2 Done with **Functional Approved** (QA, commit 0d65c73); every functional evidence record PASS; F08-DEVOPS Blocked on F08.DEPLOY-AUTHORIZATION; the F08-QA-FUNCTIONAL-R2 Current Brief.
   * Taken right before the checkpoint (F08 `architecture.md` → Activation 2026-09-29 → A13), which closed the functional stage and set F08 Blocked on the user's release decisions (F08-DEVOPS-PREP defined, Blocked).
+* **`orchestration-before-ci-push-decision.md`** — the F08 orchestration right before the Tech Lead intake of the decision F08.CI-FIRST-PUSH on 2026-09-29, byte for byte (SHA-1 `befd78a3…`).
+  * State: Blocked; owner Tech Lead; functional stage closed (Functional Approved); F08-DEVOPS-PREP and F08-DEVOPS Blocked; F08.DEPLOY-AUTHORIZATION and F08.CI-FIRST-PUSH OPEN.
+  * Taken right before the decision intake (F08 `architecture.md` → Activation 2026-09-29 → A14), which resolved F08.CI-FIRST-PUSH.
+* **`orchestration-before-ci-incident.md`** — the F08 orchestration right before the Tech Lead intake of the CI-failure incident on 2026-09-29, byte for byte (SHA-1 `a36c8e3b…`).
+  * State: Blocked; owner Tech Lead; F08.CI-FIRST-PUSH RESOLVED (A14); F08.DEPLOY-AUTHORIZATION OPEN; F08-DEVOPS-PREP (a)–(f) and F08-DEVOPS Blocked.
+  * Taken right before the incident intake (F08 `architecture.md` → Activation 2026-09-29 → A15), which confirmed the three CI root causes and refined the deploy gate's options.
+* **`orchestration-before-deploy-decision.md`** — the F08 orchestration right before the Tech Lead intake of the decision F08.DEPLOY-AUTHORIZATION — B on 2026-09-29, byte for byte (SHA-1 `35008bc2…`).
+  * State: Blocked; owner Tech Lead; F08.DEPLOY-AUTHORIZATION OPEN (options A / B / C, A15); F08-DEVOPS-PREP and F08-DEVOPS Blocked; the A15 Current Brief.
+  * Taken right before the decision intake (F08 `architecture.md` → Activation 2026-09-29 → A16), which activated F08-DEVOPS-PREP.

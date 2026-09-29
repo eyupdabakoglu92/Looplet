@@ -50,7 +50,7 @@ Target directory: repo root — `/Users/eyupcandabakoglu/Projects/Looplet/` (the
 
 ### Global constraints (apply to every step)
 
-* Flutter: stable channel. Dart SDK constraint for every package: `sdk: '>=3.4.0 <4.0.0'`.
+* Flutter: stable channel. Dart SDK constraint for every package: `sdk: '>=3.4.0 <4.0.0'`. **CI pins the canonical local toolchain — Flutter 3.32.8; iOS on Xcode ≥ 16.4 (Swift 6); CocoaPods, SPM not enabled** (F08 `architecture.md` A15, TD-CI-TOOLCHAIN — implementation pending in F08-DEVOPS-PREP; a Flutter upgrade is a separate decision). **`format` / `format:check` cover `app packages tools` only** (TD-FORMAT-SCOPE; the command lines below change with that implementation).
 * Pure-Dart packages (`looplet_core`, `looplet_dictionary`, `looplet_engine`, `looplet_content`, `looplet_solver`, `tools/looplet_authoring`) must **not** depend on `flutter`, Firebase, or each other beyond the dependency edges in Workspace Targets.
 * Inter-package dependencies use `path:` references (melos resolves them locally).
 * Shared lints: root `analysis_options.yaml` includes `package:lints/recommended.yaml` plus `implicit-casts: false`, `implicit-dynamic: false`. Every package's `analysis_options.yaml` does `include: ../../analysis_options.yaml` (adjust depth for `app`).

@@ -6,15 +6,15 @@ F08
 
 ## Current Status
 
-In Release
+Blocked
 
 ## Current Owner
 
-DevOps/Release Engineer
+Tech Lead
 
 ## Next Role
 
-DevOps/Release Engineer
+Tech Lead
 
 ## Active Task Ledger
 
@@ -25,14 +25,13 @@ DevOps/Release Engineer
 - [x] Task ID: F08-BE7 | Assigned Role: Backend Developer | Status: Done | Summary: DONE 2026-09-29 (backend.md § F08-BE7): rules `aa4c5dc2…`, rules test `2c7df84a…`; emulator suite 33 / 33; N-DIRECT-CREATE caught (3 / 3 expected fails). QA finding F1 (architecture A9 ruling 1): `infra/firestore.rules` denies all client access to `dailyResults/**` (only the callable writes, Admin SDK); `rules.test.ts` flips "create own entry" to denied and adds the invalid-payload and non-date-bucket direct creates; named negative N-DIRECT-CREATE; emulator suite green on Java 21; `infra/README.md` rules row. Rules + test + docs only. Brief: Current Brief | Depends On: -
 - [x] Task ID: F08-QA-FUNCTIONAL-R1 | Assigned Role: QA | Status: Done | Summary: DONE 2026-09-29 — verdict **Runtime Validation Pending** (qa.md § F08-QA-FUNCTIONAL-R1; HEAD 695f783, rules `aa4c5dc2…`, `app/` 9de12e6a…). F1 closed: QA probe P3 / P6 DENIED, emulator suite 33 / 33, N-OVERWRITE + N-DIRECT-CREATE caught, client ↔ emulator exactly-once PASS under the new rules; F08.OFFLINE-JOURNEY (AC2) PENDING. Evidence: qa/functional-r1/. Plan: Functional re-run after F08-BE7 under the plan locked in architecture A9 ruling 4 — emulator suite + N-OVERWRITE + the BE7 negative, the QA rules probe P1–P6 (P3 / P6 now denied), one client ↔ emulator exactly-once case under the new rules, AC2 if the user has run it; other functional evidence reused by fingerprint | Depends On: F08-BE7
 - [x] Task ID: F08-QA-FUNCTIONAL-R2 | Assigned Role: QA | Status: Done | Summary: DONE 2026-09-29 — verdict **Functional Approved** (qa.md § F08-QA-FUNCTIONAL-R2; HEAD e55176f, `app/` 9de12e6a…). AC2 / J8 PASS: the user's offline run validated at store level (levels 1–2 completed and 3 opened offline, timestamps inside the offline window; offline cold relaunch → Home 2 / 30); all 30 levels open through the production path (QA probe + control), installed bundle byte-identical; define-less build confirmed. F08.OFFLINE-JOURNEY → PASS. Evidence: qa/functional-r2/. Plan: Targeted functional re-run for F08.OFFLINE-JOURNEY (AC2 / J8) only, on the user's real no-network run of 2026-09-29 14:07:49–14:09:45Z (`evidence/runtime/offline/`), under the plan of architecture A11 ruling 4 as corrected at A12 ruling 4 (core, backend-security, client-ui, stateful-flow; targeted; reuse allowed by the R1 fingerprints). Activated at the intake A12. Brief: Current Brief | Depends On: F08-QA-FUNCTIONAL-R1
-- [ ] Task ID: F08-DEVOPS-PREP | Assigned Role: DevOps/Release Engineer | Status: Open | Summary: Activated 2026-09-29 by the decision F08.DEPLOY-AUTHORIZATION — B (architecture A16). Local release prep, no deploy / billing; a push only with the user's approval. CI run #1 root causes are confirmed (A15): (a) `infra` — Java 21 first on PATH (CI-EMULATOR-JAVA21); (b) TD-FORMAT-SCOPE — `format` / `format:check` over `app packages tools` only (`melos.yaml` + `setup-manifest.md`), `ai-system/` evidence untouched; (c) TD-CI-TOOLCHAIN — pin Flutter 3.32.8 in every CI job; `ios-build` on a runner / Xcode ≥ 16.4 with Swift 6, CocoaPods as locally; (d) refresh the feature `release.md` to the current contract (rules rollback check + smoke S1 per A9 ruling 6; storage-full; gate evidence → the functional QA records); (e) public-repo hygiene — recommend Firebase API key restrictions, note App Check monitor mode (console changes need the user); (f) the Node 20 → 24 action / Ubuntu 26 notices; (g) a green run after an approved push, then the readiness verdict (expected Release Validation Pending). Brief: Current Brief | Depends On: F08-QA-FUNCTIONAL-R2
-- [ ] Task ID: F08-DEVOPS | Assigned Role: DevOps/Release Engineer | Status: Blocked | Summary: Deploy deferred (F08.DEPLOY-AUTHORIZATION — B, A16); runs only after the user's F08.DEPLOY-GO (opened at the PREP checkpoint): a green CI run of the `infra` job (the emulator step on Java 21), the authorized deploy per the runbook, the post-deploy smoke (F08.DEPLOY-SMOKE) incl. "a direct client create is denied; the callable creates"; the release readiness verdict | Depends On: F08-DEVOPS-PREP
+- [ ] Task ID: F08-DEVOPS-PREP | Assigned Role: DevOps/Release Engineer | Status: Blocked | Summary: Blocked until the release gate allows a DevOps activation (contract §5.3; architecture A13 ruling 2). Local release prep, no deploy / billing; a push only with the user's approval. CI run #1 root causes are confirmed (A15): (a) `infra` — Java 21 first on PATH (CI-EMULATOR-JAVA21); (b) TD-FORMAT-SCOPE — `format` / `format:check` over `app packages tools` only (`melos.yaml` + `setup-manifest.md`), `ai-system/` evidence untouched; (c) TD-CI-TOOLCHAIN — pin Flutter 3.32.8 in every CI job; `ios-build` on a runner / Xcode ≥ 16.4 with Swift 6, CocoaPods as locally; (d) refresh the feature `release.md` to the current contract (rules rollback check + smoke S1 per A9 ruling 6; storage-full; gate evidence → the functional QA records); (e) public-repo hygiene — recommend Firebase API key restrictions, note App Check monitor mode (console changes need the user); (f) the Node 20 → 24 action / Ubuntu 26 notices; (g) a green run after an approved push, then the readiness verdict (expected Release Validation Pending). Brief: Current Brief | Depends On: F08-QA-FUNCTIONAL-R2
+- [ ] Task ID: F08-DEVOPS | Assigned Role: DevOps/Release Engineer | Status: Blocked | Summary: After F08.DEPLOY-AUTHORIZATION: a green CI run of the `infra` job (the emulator step on Java 21), the authorized deploy per the runbook, the post-deploy smoke (F08.DEPLOY-SMOKE) incl. "a direct client create is denied; the callable creates"; the release readiness verdict | Depends On: F08-DEVOPS-PREP
 - [ ] Task ID: F08-QA-FINAL | Assigned Role: QA | Status: Queued | Summary: Final acceptance of reviewed release proof and any affected functional scope | Depends On: F08-DEVOPS
 
 ## Open Tasks
 
-* F08-DEVOPS-PREP — DevOps/Release Engineer (Open): CI repair and local release prep, no deploy (Current Brief).
-* F08-DEVOPS — Blocked (deploy deferred; needs F08.DEPLOY-GO, opened at the PREP checkpoint); F08-QA-FINAL Queued.
+* None open. F08-DEVOPS-PREP and F08-DEVOPS (DevOps/Release Engineer) are Blocked on the release-scoped gate F08.DEPLOY-AUTHORIZATION (F08.CI-FIRST-PUSH resolved, A14); F08-QA-FINAL Queued.
 
 ## Handoff Plan
 
@@ -204,9 +203,7 @@ None
   * Recommendation: (B) — a green CI is needed whatever the deploy date, and it costs no billing (A15)
   * Blocks: F08-DEVOPS activation, final QA and Done; not independent local/emulator validation
   * Blocking Scope: release
-  * Status: RESOLVED
-  * Resolution: Option (B) by the user — the deploy stays deferred (no Blaze / billing / deploy / Remote Config change); the non-deploy release work F08-DEVOPS-PREP runs now. The deploy itself needs the new gate F08.DEPLOY-GO, opened at the PREP checkpoint (architecture A16)
-  * Resolved At: 2026-09-29
+  * Status: OPEN
 
 - Decision ID: F08.CI-FIRST-PUSH
   * Question: May the local `main` (or a branch) be pushed to `origin` (`github.com/eyupdabakoglu92/Looplet`) so that CI runs for the first time? `origin/main` is still the bootstrap commit b1a65a0, so a push publishes the whole working history, `ai-system/` included, to that repository.
@@ -220,27 +217,31 @@ None
 
 ## Blockers
 
-None
+* The release stage waits on the user's decision F08.DEPLOY-AUTHORIZATION (options A / B / C, A15 ruling 4). A release-scoped gate holds every DevOps activation (contract §5.3), including the now-diagnosed CI fixes (A15). F08 has no other executable work. The functional stage is closed (A13).
 
 ## Next Action
 
-Run DevOps/Release Engineer — F08-DEVOPS-PREP (Current Brief; architecture A13 ruling 2, A15, A16). No deploy. Then the Tech Lead checkpoint, which opens F08.DEPLOY-GO.
+The user decides `Run Tech Lead. Decision: F08.DEPLOY-AUTHORIZATION — A / B / C` (recommended B: defer the deploy, run the CI fixes now). With A or B the Tech Lead activates F08-DEVOPS-PREP; with C, F08 stays Blocked and `Run Tech Lead` chooses the next executable feature.
 
 ## Last Decision
 
-2026-09-29 — Tech Lead intake of the decision F08.DEPLOY-AUTHORIZATION — B. Full record: architecture → Activation 2026-09-29 → A16.
+2026-09-29 — Tech Lead intake of the incident "CI hatalarını paylaşıyorum" (the step logs of CI run #1). Full record: architecture → Activation 2026-09-29 → A15.
 
-* **Resolved (B):** the deploy stays deferred; the non-deploy release work runs now.
-* **Activated:** F08-DEVOPS-PREP; F08 → In Release; owner → DevOps/Release Engineer; Blockers None.
-* **Correction to A15 ruling 4:** F08.DEPLOY-GO opens at the PREP checkpoint, not now — an OPEN release-scoped gate would block the prep itself (contract §5.3). The deploy stays held by the recorded deferral, the Blocked F08-DEVOPS, PREP's non-goals and project `release.md` §3 (production requires approval).
+* **Classified:** Existing Active Feature Rework (F08 release stage, CI). **Workflow Impact:** Continue Current Flow.
+* **Confirmed root causes:**
+  * `infra` — Java < 21 (CI-EMULATOR-JAVA21);
+  * format — two QA evidence files under `ai-system/` (the F00 probe, and the F08 R2 probe added by QA in 0d65c73), reproduced locally; `app packages tools` are clean;
+  * iOS — unpinned Flutter on CI → SPM → a newer Firebase iOS SDK that needs Swift 6, on `macos-14` (inferred from the path and the `sending` error; local: Flutter 3.32.8, CocoaPods, Xcode 16.4).
+* **Decided:** TD-FORMAT-SCOPE (format over `app packages tools`); TD-CI-TOOLCHAIN (Flutter 3.32.8 pinned; Xcode ≥ 16.4 for iOS; Java 21 for `infra`). F08-DEVOPS-PREP updated. F08.DEPLOY-AUTHORIZATION options refined — recommended (B).
+* **F08 stays Blocked** until the user decides.
 
-The pre-intake orchestration is archived as history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-deploy-decision.md.
+The pre-intake orchestration is archived as history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-ci-incident.md.
 
 ## Last Update
 
 * Updated By: Tech Lead
 * Timestamp: 2026-09-29
-* Summary: decision F08.DEPLOY-AUTHORIZATION — B (A16) — deploy deferred; F08-DEVOPS-PREP activated; In Release; owner → DevOps/Release Engineer.
+* Summary: incident intake — CI run #1 root causes confirmed (A15); TD-FORMAT-SCOPE, TD-CI-TOOLCHAIN; F08-DEVOPS-PREP updated; F08.DEPLOY-AUTHORIZATION options A / B / C (recommended B); F08 stays Blocked.
 
 ## Context & Follow-ups
 
@@ -258,7 +259,6 @@ F08 implementation/runbook and the F08-FE12 fix are retained. Exact old tasks an
 * [Orchestration before the functional closure](../../history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-functional-closure.md) — incl. the F08-QA-FUNCTIONAL-R2 brief.
 * [Orchestration before the CI-push decision](../../history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-ci-push-decision.md).
 * [Orchestration before the CI incident](../../history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-ci-incident.md).
-* [Orchestration before the deploy decision](../../history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-deploy-decision.md).
 
 ## Change Log
 
@@ -318,21 +318,22 @@ F08 implementation/runbook and the F08-FE12 fix are retained. Exact old tasks an
   * **Confirmed:** Java < 21 (`infra`); two `ai-system/` QA probes (format); unpinned Flutter → SPM → a Swift 6 SDK on `macos-14` (iOS).
   * **Decided:** TD-FORMAT-SCOPE, TD-CI-TOOLCHAIN; the deploy gate's options A / B / C.
   * **Next:** the user decides (recommended B).
-* 2026-09-29 — Tech Lead: decision F08.DEPLOY-AUTHORIZATION — B (A16).
-  * **Resolved:** deploy deferred; non-deploy release work allowed.
-  * **Activated:** F08-DEVOPS-PREP; Status → In Release.
-  * **Next:** owner → DevOps/Release Engineer; F08.DEPLOY-GO at the PREP checkpoint.
 
 ## Release Constraints
 
 The 2026-09-06 user decision to defer billing/deploy is preserved. In Progress now reflects still-available validation work, not renewed deploy permission. F08-DEVOPS remains Blocked. Environment/JDK/device availability has not been freshly probed; use current evidence, not the old environment assumptions.
 ## Current Brief
 
-**Decision F08.DEPLOY-AUTHORIZATION — B (A16):** the deploy stays deferred; this non-deploy release work runs now. Any deploy, billing, Remote Config or console change is out of scope; it needs the later gate F08.DEPLOY-GO.
+**Waiting on the user — F08.DEPLOY-AUTHORIZATION** (architecture → A13–A15). The functional stage is closed (Functional Approved). `main` is on the public origin, and CI run #1 is red on three diagnosed causes (A15). A release-scoped gate holds every DevOps activation (contract §5.3), so the fixes below wait for this decision:
+* **(A)** authorize the deploy (Blaze / billing, target `looplet-712e5`) — PREP, then the deploy;
+* **(B, recommended)** keep deferring the deploy, but run the non-deploy release work now (PREP) — the Tech Lead then opens the narrower gate F08.DEPLOY-GO for the deploy itself;
+* **(C)** defer everything — F08 stays Blocked, `main` stays red.
 
-**F08-DEVOPS-PREP — CI repair and local release prep, no deploy** (architecture → A13 ruling 2, A14, A15, A16; Release Scope `production-readiness`; activated at A16)
+Answer with `Run Tech Lead. Decision: F08.DEPLOY-AUTHORIZATION — <A / B / C>`. With A or B the brief below is the first DevOps task.
 
-**Inputs:** `architecture.md` A9 ruling 6, A13, A14, A15, A16; `.github/workflows/ci.yml`; `melos.yaml`; `project-authority/setup-manifest.md`; `project-authority/release.md` (§4 CI, §6 rollback, §8 smoke, §10 action pinning); the feature `release.md` (2026-09-06, out of date since A9); `qa.md` § F08-QA-FUNCTIONAL-R1 / R2; `workflow-follow-ups.md` → CI-EMULATOR-JAVA21, CI-FORMAT-GATE, CI-IOS-TOOLCHAIN.
+**F08-DEVOPS-PREP — CI repair and local release prep, no deploy** (architecture → A13 ruling 2, A14, A15; Release Scope `production-readiness`; Blocked until the gate allows it)
+
+**Inputs:** `architecture.md` A9 ruling 6, A13, A14, A15; `.github/workflows/ci.yml`; `melos.yaml`; `project-authority/setup-manifest.md`; `project-authority/release.md` (§4 CI, §6 rollback, §8 smoke, §10 action pinning); the feature `release.md` (2026-09-06, out of date since A9); `qa.md` § F08-QA-FUNCTIONAL-R1 / R2; `workflow-follow-ups.md` → CI-EMULATOR-JAVA21, CI-FORMAT-GATE, CI-IOS-TOOLCHAIN.
 
 **CI run #1** (`36590316947`, head 8a0522f). The logs were pasted by the user and are recorded in A15:
 * `infra` — "firebase-tools no longer supports Java version before 21";
@@ -355,7 +356,7 @@ The 2026-09-06 user decision to defer billing/deploy is preserved. In Progress n
    * re-check the runbook and the smoke list against the current rules and code.
 6. **Public-repository hygiene (A14 ruling 2 (e)):** recommend Firebase API key restrictions, and note App Check's monitor mode. Console or account changes are the user's.
 7. **Prove it:** a CI fix counts only after a green run. Ask the user in chat before any push; the user may also push. Record the run id, every job's conclusion, and the logged Flutter / Xcode / Java versions.
-8. **Readiness verdict** in `release.md` and the orchestration `Release Result` — expected **Release Validation Pending**, listing exactly what remains (the deploy decision F08.DEPLOY-GO, F08.DEPLOY-SMOKE; a green CI run if it did not happen).
+8. **Readiness verdict** in `release.md` and the orchestration `Release Result` — expected **Release Validation Pending**, listing exactly what remains (the deploy authorization, F08.DEPLOY-SMOKE; a green CI run if it did not happen).
 
 **Non-goals:** no deploy, billing, Remote Config or console change; no Flutter / Firebase dependency upgrade (a separate decision with full regression); no app, rules or function change; no change to `ai-system/` evidence. If a fix needs any of these, stop and hand back to the Tech Lead.
 
@@ -363,7 +364,6 @@ The 2026-09-06 user decision to defer billing/deploy is preserved. In Progress n
 
 ## Earlier briefs
 
-* The deploy-decision wait (A15) — in history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-deploy-decision.md.
 * The pre-A15 F08-DEVOPS-PREP brief — in history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-ci-incident.md.
 * The F08-QA-FUNCTIONAL-R2 brief (2026-09-29) — in history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-functional-closure.md.
 * The user's no-network run steps (A11, 2026-09-29) — in history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-offline-run-intake.md.
