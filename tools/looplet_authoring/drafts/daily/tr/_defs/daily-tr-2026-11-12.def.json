@@ -1,0 +1,17 @@
+{
+  "id": "daily-tr-2026-11-12",
+  "puzzleType": "daily",
+  "dailyDate": "2026-11-12",
+  "language": "tr",
+  "grid": [
+    "LNGON",
+    "UŞKÖO",
+    "OTTAN",
+    "MNIİO",
+    "BÇTMM"
+  ],
+  "target": "LİMON",
+  "locked": [],
+  "frozen": [],
+  "columns": true
+}

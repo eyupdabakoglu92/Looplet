@@ -1,0 +1,17 @@
+{
+  "id": "daily-tr-2026-11-26",
+  "puzzleType": "daily",
+  "dailyDate": "2026-11-26",
+  "language": "tr",
+  "grid": [
+    "YATNI",
+    "HMKBL",
+    "NNOSE",
+    "DYZÖG",
+    "ÜÖAÜP"
+  ],
+  "target": "YATAK",
+  "locked": [],
+  "frozen": [],
+  "columns": true
+}

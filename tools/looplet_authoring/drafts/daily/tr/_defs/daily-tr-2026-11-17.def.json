@@ -1,0 +1,19 @@
+{
+  "id": "daily-tr-2026-11-17",
+  "puzzleType": "daily",
+  "dailyDate": "2026-11-17",
+  "language": "tr",
+  "grid": [
+    "GMMNS",
+    "ZHNAD",
+    "MKANN",
+    "ÇHZRM",
+    "UHDAÖ"
+  ],
+  "target": "ZAMAN",
+  "locked": [
+    "1,3"
+  ],
+  "frozen": [],
+  "columns": true
+}

@@ -1,0 +1,23 @@
+{
+  "id": "daily-tr-2026-11-28",
+  "puzzleType": "daily",
+  "dailyDate": "2026-11-28",
+  "language": "tr",
+  "grid": [
+    "SIPZE",
+    "PÖEİP",
+    "ŞÇÇHM",
+    "GKZÇY",
+    "DSPTİ"
+  ],
+  "target": "SEPET",
+  "locked": [
+    "0,0",
+    "0,2"
+  ],
+  "frozen": [
+    "1,0",
+    "1,4"
+  ],
+  "columns": true
+}

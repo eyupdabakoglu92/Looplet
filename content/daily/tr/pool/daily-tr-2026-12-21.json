@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "2026-11-01.1",
+  "id": "daily-tr-2026-12-21",
+  "puzzleType": "daily",
+  "dailyDate": "2026-12-21",
+  "language": "tr",
+  "grid": [
+    "DINÖI",
+    "ŞIBLK",
+    "LAŞÖU",
+    "EITBO",
+    "OİNRF"
+  ],
+  "targetWord": "FIRIN",
+  "lockedCells": [],
+  "frozenCells": [],
+  "columnMovesEnabled": true,
+  "optimalMoves": 5,
+  "difficultyScore": 4.627,
+  "difficultyLabel": "medium",
+  "difficultyBreakdown": {
+    "o": 5,
+    "cNorm": 0.0006,
+    "tdDegree": 0,
+    "locked": 0,
+    "frozen": 0,
+    "firstMoves": 2,
+    "distinctOptimalSolutions": 3
+  }
+}

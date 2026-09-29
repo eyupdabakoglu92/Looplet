@@ -1,0 +1,19 @@
+{
+  "id": "daily-tr-2026-12-23",
+  "puzzleType": "daily",
+  "dailyDate": "2026-12-23",
+  "language": "tr",
+  "grid": [
+    "KGINT",
+    "SHZSK",
+    "LMTLY",
+    "İILIP",
+    "UİİAS"
+  ],
+  "target": "KİTAP",
+  "locked": [],
+  "frozen": [
+    "2,4"
+  ],
+  "columns": true
+}

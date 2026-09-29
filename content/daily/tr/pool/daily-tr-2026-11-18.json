@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "2026-11-01.1",
+  "id": "daily-tr-2026-11-18",
+  "puzzleType": "daily",
+  "dailyDate": "2026-11-18",
+  "language": "tr",
+  "grid": [
+    "NOROB",
+    "NTDYP",
+    "LÜAÖA",
+    "MHLLY",
+    "ÇUKKK"
+  ],
+  "targetWord": "ÇORAP",
+  "lockedCells": [],
+  "frozenCells": [
+    "1,2"
+  ],
+  "columnMovesEnabled": true,
+  "optimalMoves": 4,
+  "difficultyScore": 4.849,
+  "difficultyLabel": "medium",
+  "difficultyBreakdown": {
+    "o": 4,
+    "cNorm": 0.008,
+    "tdDegree": 0,
+    "locked": 0,
+    "frozen": 1,
+    "firstMoves": 2,
+    "distinctOptimalSolutions": 4
+  }
+}

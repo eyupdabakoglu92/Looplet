@@ -1,0 +1,17 @@
+{
+  "id": "daily-tr-2026-12-14",
+  "puzzleType": "daily",
+  "dailyDate": "2026-12-14",
+  "language": "tr",
+  "grid": [
+    "ZBUÇL",
+    "PIETU",
+    "TZPIİ",
+    "AÇDDT",
+    "TBUPI"
+  ],
+  "target": "BULUT",
+  "locked": [],
+  "frozen": [],
+  "columns": true
+}

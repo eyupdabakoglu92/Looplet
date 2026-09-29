@@ -1,0 +1,19 @@
+{
+  "id": "daily-tr-2026-12-15",
+  "puzzleType": "daily",
+  "dailyDate": "2026-12-15",
+  "language": "tr",
+  "grid": [
+    "AEKAL",
+    "İPLER",
+    "ŞAUSU",
+    "HGEİİ",
+    "OTYSA"
+  ],
+  "target": "ŞEKER",
+  "locked": [
+    "0,1"
+  ],
+  "frozen": [],
+  "columns": true
+}

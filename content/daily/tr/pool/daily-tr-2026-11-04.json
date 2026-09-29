@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "2026-11-01.1",
+  "id": "daily-tr-2026-11-04",
+  "puzzleType": "daily",
+  "dailyDate": "2026-11-04",
+  "language": "tr",
+  "grid": [
+    "IGŞMM",
+    "RBADL",
+    "PTELK",
+    "RDBUT",
+    "ÜSZGL"
+  ],
+  "targetWord": "BADEM",
+  "lockedCells": [],
+  "frozenCells": [
+    "4,3"
+  ],
+  "columnMovesEnabled": true,
+  "optimalMoves": 4,
+  "difficultyScore": 4.836,
+  "difficultyLabel": "medium",
+  "difficultyBreakdown": {
+    "o": 4,
+    "cNorm": 0.0036,
+    "tdDegree": 0,
+    "locked": 0,
+    "frozen": 1,
+    "firstMoves": 2,
+    "distinctOptimalSolutions": 5
+  }
+}

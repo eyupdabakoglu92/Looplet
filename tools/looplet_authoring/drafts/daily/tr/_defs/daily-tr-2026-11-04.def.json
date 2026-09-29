@@ -1,0 +1,19 @@
+{
+  "id": "daily-tr-2026-11-04",
+  "puzzleType": "daily",
+  "dailyDate": "2026-11-04",
+  "language": "tr",
+  "grid": [
+    "IGŞMM",
+    "RBADL",
+    "PTELK",
+    "RDBUT",
+    "ÜSZGL"
+  ],
+  "target": "BADEM",
+  "locked": [],
+  "frozen": [
+    "4,3"
+  ],
+  "columns": true
+}

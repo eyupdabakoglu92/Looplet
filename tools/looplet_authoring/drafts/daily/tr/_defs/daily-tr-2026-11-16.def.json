@@ -1,0 +1,17 @@
+{
+  "id": "daily-tr-2026-11-16",
+  "puzzleType": "daily",
+  "dailyDate": "2026-11-16",
+  "language": "tr",
+  "grid": [
+    "SHGVK",
+    "TŞUKE",
+    "AİMIT",
+    "TÜÜSİ",
+    "SSIMD"
+  ],
+  "target": "TAVUK",
+  "locked": [],
+  "frozen": [],
+  "columns": true
+}

@@ -1,0 +1,19 @@
+{
+  "id": "daily-tr-2026-12-08",
+  "puzzleType": "daily",
+  "dailyDate": "2026-12-08",
+  "language": "tr",
+  "grid": [
+    "ZUŞRU",
+    "DDÜÖD",
+    "SAOİG",
+    "ZŞSNS",
+    "EEMPE"
+  ],
+  "target": "ZEMİN",
+  "locked": [
+    "3,0"
+  ],
+  "frozen": [],
+  "columns": true
+}

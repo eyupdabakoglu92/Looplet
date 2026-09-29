@@ -1,0 +1,23 @@
+{
+  "id": "daily-tr-2026-12-05",
+  "puzzleType": "daily",
+  "dailyDate": "2026-12-05",
+  "language": "tr",
+  "grid": [
+    "OEİKT",
+    "EALÜM",
+    "ÜHIOR",
+    "GYTBK",
+    "ŞBÇKO"
+  ],
+  "target": "KALEM",
+  "locked": [
+    "1,2",
+    "1,4"
+  ],
+  "frozen": [
+    "3,3",
+    "3,4"
+  ],
+  "columns": true
+}

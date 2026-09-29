@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "2026-11-01.1",
+  "id": "daily-tr-2026-12-17",
+  "puzzleType": "daily",
+  "dailyDate": "2026-12-17",
+  "language": "tr",
+  "grid": [
+    "MMTSH",
+    "LIZÖM",
+    "NAÇAK",
+    "ÖKŞKO",
+    "ASLÖZ"
+  ],
+  "targetWord": "ZAMAN",
+  "lockedCells": [],
+  "frozenCells": [],
+  "columnMovesEnabled": true,
+  "optimalMoves": 5,
+  "difficultyScore": 4.815,
+  "difficultyLabel": "medium",
+  "difficultyBreakdown": {
+    "o": 5,
+    "cNorm": 0.001,
+    "tdDegree": 0,
+    "locked": 0,
+    "frozen": 0,
+    "firstMoves": 1,
+    "distinctOptimalSolutions": 2
+  }
+}

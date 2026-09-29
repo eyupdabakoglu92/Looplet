@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "2026-11-01.1",
+  "id": "daily-tr-2026-12-26",
+  "puzzleType": "daily",
+  "dailyDate": "2026-12-26",
+  "language": "tr",
+  "grid": [
+    "SAÇÜK",
+    "SPEÜY",
+    "ÇUARR",
+    "AŞDDT",
+    "YYAAM"
+  ],
+  "targetWord": "YATAK",
+  "lockedCells": [
+    "4,0",
+    "4,3"
+  ],
+  "frozenCells": [
+    "2,2",
+    "2,3"
+  ],
+  "columnMovesEnabled": true,
+  "optimalMoves": 4,
+  "difficultyScore": 7.884,
+  "difficultyLabel": "medium",
+  "difficultyBreakdown": {
+    "o": 4,
+    "cNorm": 0.0237,
+    "tdDegree": 0,
+    "locked": 2,
+    "frozen": 2,
+    "firstMoves": 1,
+    "distinctOptimalSolutions": 1
+  }
+}

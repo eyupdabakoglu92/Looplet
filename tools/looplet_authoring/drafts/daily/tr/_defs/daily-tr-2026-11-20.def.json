@@ -1,0 +1,20 @@
+{
+  "id": "daily-tr-2026-11-20",
+  "puzzleType": "daily",
+  "dailyDate": "2026-11-20",
+  "language": "tr",
+  "grid": [
+    "DDYAG",
+    "DGYMA",
+    "İBZSY",
+    "ÖAIMK",
+    "MRUHL"
+  ],
+  "target": "MASAL",
+  "locked": [
+    "4,0",
+    "4,4"
+  ],
+  "frozen": [],
+  "columns": true
+}

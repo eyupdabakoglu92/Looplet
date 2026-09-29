@@ -1,0 +1,19 @@
+{
+  "id": "daily-tr-2026-11-18",
+  "puzzleType": "daily",
+  "dailyDate": "2026-11-18",
+  "language": "tr",
+  "grid": [
+    "NOROB",
+    "NTDYP",
+    "LÜAÖA",
+    "MHLLY",
+    "ÇUKKK"
+  ],
+  "target": "ÇORAP",
+  "locked": [],
+  "frozen": [
+    "1,2"
+  ],
+  "columns": true
+}

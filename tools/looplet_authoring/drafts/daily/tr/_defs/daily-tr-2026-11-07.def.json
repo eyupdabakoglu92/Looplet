@@ -1,0 +1,23 @@
+{
+  "id": "daily-tr-2026-11-07",
+  "puzzleType": "daily",
+  "dailyDate": "2026-11-07",
+  "language": "tr",
+  "grid": [
+    "LBHSİ",
+    "BGGHE",
+    "HMUÖO",
+    "BYİÇG",
+    "TAYSE"
+  ],
+  "target": "BAHÇE",
+  "locked": [
+    "3,0",
+    "3,3"
+  ],
+  "frozen": [
+    "2,3",
+    "2,4"
+  ],
+  "columns": true
+}

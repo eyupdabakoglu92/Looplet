@@ -1,0 +1,19 @@
+{
+  "id": "daily-tr-2026-11-24",
+  "puzzleType": "daily",
+  "dailyDate": "2026-11-24",
+  "language": "tr",
+  "grid": [
+    "STKÇK",
+    "UİÇEM",
+    "ŞBŞHK",
+    "YRAŞD",
+    "ÖOSÇB"
+  ],
+  "target": "SOKAK",
+  "locked": [
+    "0,4"
+  ],
+  "frozen": [],
+  "columns": true
+}

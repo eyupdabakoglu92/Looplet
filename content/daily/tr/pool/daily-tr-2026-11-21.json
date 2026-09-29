@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "2026-11-01.1",
+  "id": "daily-tr-2026-11-21",
+  "puzzleType": "daily",
+  "dailyDate": "2026-11-21",
+  "language": "tr",
+  "grid": [
+    "PILMN",
+    "ŞHROO",
+    "SDNZY",
+    "FIIYU",
+    "AÜPIN"
+  ],
+  "targetWord": "FIRIN",
+  "lockedCells": [
+    "4,3",
+    "4,4"
+  ],
+  "frozenCells": [
+    "0,1",
+    "0,3"
+  ],
+  "columnMovesEnabled": true,
+  "optimalMoves": 4,
+  "difficultyScore": 7.519,
+  "difficultyLabel": "medium",
+  "difficultyBreakdown": {
+    "o": 4,
+    "cNorm": 0.0271,
+    "tdDegree": 0,
+    "locked": 2,
+    "frozen": 2,
+    "firstMoves": 3,
+    "distinctOptimalSolutions": 12
+  }
+}

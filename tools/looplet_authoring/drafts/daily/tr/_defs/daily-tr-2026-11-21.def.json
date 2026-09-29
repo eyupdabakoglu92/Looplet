@@ -1,0 +1,23 @@
+{
+  "id": "daily-tr-2026-11-21",
+  "puzzleType": "daily",
+  "dailyDate": "2026-11-21",
+  "language": "tr",
+  "grid": [
+    "PILMN",
+    "ŞHROO",
+    "SDNZY",
+    "FIIYU",
+    "AÜPIN"
+  ],
+  "target": "FIRIN",
+  "locked": [
+    "4,3",
+    "4,4"
+  ],
+  "frozen": [
+    "0,1",
+    "0,3"
+  ],
+  "columns": true
+}

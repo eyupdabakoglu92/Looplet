@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "2026-11-01.1",
+  "id": "daily-tr-2026-11-17",
+  "puzzleType": "daily",
+  "dailyDate": "2026-11-17",
+  "language": "tr",
+  "grid": [
+    "GMMNS",
+    "ZHNAD",
+    "MKANN",
+    "ÇHZRM",
+    "UHDAÖ"
+  ],
+  "targetWord": "ZAMAN",
+  "lockedCells": [
+    "1,3"
+  ],
+  "frozenCells": [],
+  "columnMovesEnabled": true,
+  "optimalMoves": 4,
+  "difficultyScore": 4.655,
+  "difficultyLabel": "medium",
+  "difficultyBreakdown": {
+    "o": 4,
+    "cNorm": 0.0143,
+    "tdDegree": 0,
+    "locked": 1,
+    "frozen": 0,
+    "firstMoves": 1,
+    "distinctOptimalSolutions": 2
+  }
+}

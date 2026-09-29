@@ -1,0 +1,17 @@
+{
+  "id": "daily-tr-2026-11-19",
+  "puzzleType": "daily",
+  "dailyDate": "2026-11-19",
+  "language": "tr",
+  "grid": [
+    "LKKAÇ",
+    "İÜOPA",
+    "BGÇHŞ",
+    "ŞAOBE",
+    "NADRA"
+  ],
+  "target": "KABAK",
+  "locked": [],
+  "frozen": [],
+  "columns": true
+}

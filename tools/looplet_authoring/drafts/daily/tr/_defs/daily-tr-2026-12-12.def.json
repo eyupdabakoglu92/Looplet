@@ -1,0 +1,23 @@
+{
+  "id": "daily-tr-2026-12-12",
+  "puzzleType": "daily",
+  "dailyDate": "2026-12-12",
+  "language": "tr",
+  "grid": [
+    "TİULO",
+    "ÜAZLU",
+    "EBIOB",
+    "LYMKU",
+    "İDMUN"
+  ],
+  "target": "LİMON",
+  "locked": [
+    "3,0",
+    "3,2"
+  ],
+  "frozen": [
+    "0,0",
+    "0,4"
+  ],
+  "columns": true
+}

@@ -1,0 +1,19 @@
+{
+  "id": "daily-tr-2026-11-03",
+  "puzzleType": "daily",
+  "dailyDate": "2026-11-03",
+  "language": "tr",
+  "grid": [
+    "ÇUYÖB",
+    "ÇÜMLA",
+    "ÜZÖPD",
+    "AYYOG",
+    "NAGDY"
+  ],
+  "target": "DAMLA",
+  "locked": [
+    "1,2"
+  ],
+  "frozen": [],
+  "columns": true
+}

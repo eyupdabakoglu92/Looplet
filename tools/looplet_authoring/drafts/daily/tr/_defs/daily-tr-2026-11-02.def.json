@@ -1,0 +1,17 @@
+{
+  "id": "daily-tr-2026-11-02",
+  "puzzleType": "daily",
+  "dailyDate": "2026-11-02",
+  "language": "tr",
+  "grid": [
+    "IŞERP",
+    "NUORM",
+    "RSENM",
+    "TSESŞ",
+    "ÖÜİSN"
+  ],
+  "target": "RESİM",
+  "locked": [],
+  "frozen": [],
+  "columns": true
+}

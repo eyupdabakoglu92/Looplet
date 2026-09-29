@@ -1,0 +1,20 @@
+{
+  "id": "daily-tr-2026-12-06",
+  "puzzleType": "daily",
+  "dailyDate": "2026-12-06",
+  "language": "tr",
+  "grid": [
+    "GLİSN",
+    "TUBYI",
+    "RHMZT",
+    "İOYLÖ",
+    "TKEOA"
+  ],
+  "target": "ROMAN",
+  "locked": [],
+  "frozen": [
+    "3,0",
+    "3,2"
+  ],
+  "columns": true
+}

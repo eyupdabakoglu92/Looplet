@@ -1,0 +1,20 @@
+{
+  "id": "daily-tr-2026-11-13",
+  "puzzleType": "daily",
+  "dailyDate": "2026-11-13",
+  "language": "tr",
+  "grid": [
+    "MİSIŞ",
+    "SMALN",
+    "OÖMLR",
+    "TMGÜS",
+    "NEKGG"
+  ],
+  "target": "ORMAN",
+  "locked": [
+    "2,0",
+    "2,2"
+  ],
+  "frozen": [],
+  "columns": true
+}

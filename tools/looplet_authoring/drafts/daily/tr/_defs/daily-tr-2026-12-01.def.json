@@ -1,0 +1,19 @@
+{
+  "id": "daily-tr-2026-12-01",
+  "puzzleType": "daily",
+  "dailyDate": "2026-12-01",
+  "language": "tr",
+  "grid": [
+    "KENKO",
+    "ÖNZÜİ",
+    "HNŞOL",
+    "AMMBB",
+    "YIAIL"
+  ],
+  "target": "BALIK",
+  "locked": [
+    "4,3"
+  ],
+  "frozen": [],
+  "columns": true
+}

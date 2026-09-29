@@ -1,0 +1,19 @@
+{
+  "id": "daily-tr-2026-12-22",
+  "puzzleType": "daily",
+  "dailyDate": "2026-12-22",
+  "language": "tr",
+  "grid": [
+    "AMRZO",
+    "KBABT",
+    "SHĞIS",
+    "İÜÖPÇ",
+    "ŞEUİH"
+  ],
+  "target": "KAĞIT",
+  "locked": [
+    "1,4"
+  ],
+  "frozen": [],
+  "columns": true
+}

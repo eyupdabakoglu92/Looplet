@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "2026-11-01.1",
+  "id": "daily-tr-2026-12-20",
+  "puzzleType": "daily",
+  "dailyDate": "2026-12-20",
+  "language": "tr",
+  "grid": [
+    "ÜZBNE",
+    "TAÇMG",
+    "GSKIM",
+    "ÖPALR",
+    "GSHYU"
+  ],
+  "targetWord": "MASAL",
+  "lockedCells": [],
+  "frozenCells": [
+    "4,0",
+    "4,1"
+  ],
+  "columnMovesEnabled": true,
+  "optimalMoves": 4,
+  "difficultyScore": 5.656,
+  "difficultyLabel": "medium",
+  "difficultyBreakdown": {
+    "o": 4,
+    "cNorm": 0.0021,
+    "tdDegree": 0,
+    "locked": 0,
+    "frozen": 2,
+    "firstMoves": 4,
+    "distinctOptimalSolutions": 4
+  }
+}

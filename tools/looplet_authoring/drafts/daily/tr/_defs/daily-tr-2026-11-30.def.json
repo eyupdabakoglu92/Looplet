@@ -1,0 +1,17 @@
+{
+  "id": "daily-tr-2026-11-30",
+  "puzzleType": "daily",
+  "dailyDate": "2026-11-30",
+  "language": "tr",
+  "grid": [
+    "ODGPG",
+    "ÇPNGO",
+    "AUNAT",
+    "UÖZÇS",
+    "NŞDAR"
+  ],
+  "target": "ÇANTA",
+  "locked": [],
+  "frozen": [],
+  "columns": true
+}

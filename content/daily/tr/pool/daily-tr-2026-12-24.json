@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "2026-11-01.1",
+  "id": "daily-tr-2026-12-24",
+  "puzzleType": "daily",
+  "dailyDate": "2026-12-24",
+  "language": "tr",
+  "grid": [
+    "AŞNMT",
+    "NKŞİI",
+    "AÜUKS",
+    "SUDAM",
+    "OTÜKO"
+  ],
+  "targetWord": "SOKAK",
+  "lockedCells": [],
+  "frozenCells": [],
+  "columnMovesEnabled": true,
+  "optimalMoves": 5,
+  "difficultyScore": 4.076,
+  "difficultyLabel": "medium",
+  "difficultyBreakdown": {
+    "o": 5,
+    "cNorm": 0.0046,
+    "tdDegree": 0,
+    "locked": 0,
+    "frozen": 0,
+    "firstMoves": 5,
+    "distinctOptimalSolutions": 27
+  }
+}

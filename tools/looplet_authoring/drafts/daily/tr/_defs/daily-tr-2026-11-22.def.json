@@ -1,0 +1,20 @@
+{
+  "id": "daily-tr-2026-11-22",
+  "puzzleType": "daily",
+  "dailyDate": "2026-11-22",
+  "language": "tr",
+  "grid": [
+    "ATEGP",
+    "RMBNS",
+    "TOLĞZ",
+    "ZKAKE",
+    "ÖNOOI"
+  ],
+  "target": "KAĞIT",
+  "locked": [],
+  "frozen": [
+    "3,0",
+    "3,3"
+  ],
+  "columns": true
+}

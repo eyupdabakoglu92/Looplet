@@ -1,0 +1,20 @@
+{
+  "id": "daily-tr-2026-11-27",
+  "puzzleType": "daily",
+  "dailyDate": "2026-11-27",
+  "language": "tr",
+  "grid": [
+    "NRGYI",
+    "EOTHÇ",
+    "SIKLH",
+    "BEPGT",
+    "PALOZ"
+  ],
+  "target": "SALON",
+  "locked": [
+    "4,1",
+    "4,3"
+  ],
+  "frozen": [],
+  "columns": true
+}

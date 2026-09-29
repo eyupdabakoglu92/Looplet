@@ -1,0 +1,20 @@
+{
+  "id": "daily-tr-2026-12-20",
+  "puzzleType": "daily",
+  "dailyDate": "2026-12-20",
+  "language": "tr",
+  "grid": [
+    "ÜZBNE",
+    "TAÇMG",
+    "GSKIM",
+    "ÖPALR",
+    "GSHYU"
+  ],
+  "target": "MASAL",
+  "locked": [],
+  "frozen": [
+    "4,0",
+    "4,1"
+  ],
+  "columns": true
+}

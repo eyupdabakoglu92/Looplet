@@ -1,0 +1,19 @@
+{
+  "id": "daily-tr-2026-12-02",
+  "puzzleType": "daily",
+  "dailyDate": "2026-12-02",
+  "language": "tr",
+  "grid": [
+    "TSŞİB",
+    "GİIUM",
+    "MEÇTL",
+    "ÜNŞZL",
+    "RDSMS"
+  ],
+  "target": "RESİM",
+  "locked": [],
+  "frozen": [
+    "3,1"
+  ],
+  "columns": true
+}

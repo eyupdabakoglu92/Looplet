@@ -1,0 +1,17 @@
+{
+  "id": "daily-tr-2026-12-17",
+  "puzzleType": "daily",
+  "dailyDate": "2026-12-17",
+  "language": "tr",
+  "grid": [
+    "MMTSH",
+    "LIZÖM",
+    "NAÇAK",
+    "ÖKŞKO",
+    "ASLÖZ"
+  ],
+  "target": "ZAMAN",
+  "locked": [],
+  "frozen": [],
+  "columns": true
+}

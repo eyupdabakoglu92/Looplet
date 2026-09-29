@@ -1,0 +1,17 @@
+{
+  "id": "daily-tr-2026-11-09",
+  "puzzleType": "daily",
+  "dailyDate": "2026-11-09",
+  "language": "tr",
+  "grid": [
+    "HKDKI",
+    "ABPAA",
+    "İTOTR",
+    "İAEÖŞ",
+    "İYGKÖ"
+  ],
+  "target": "TABAK",
+  "locked": [],
+  "frozen": [],
+  "columns": true
+}

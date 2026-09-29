@@ -1,0 +1,20 @@
+{
+  "id": "daily-tr-2026-11-15",
+  "puzzleType": "daily",
+  "dailyDate": "2026-11-15",
+  "language": "tr",
+  "grid": [
+    "ZZHPÜ",
+    "ŞBYŞA",
+    "ÇHKEG",
+    "BEŞTÖ",
+    "RLZHP"
+  ],
+  "target": "ŞEKER",
+  "locked": [],
+  "frozen": [
+    "1,2",
+    "1,4"
+  ],
+  "columns": true
+}

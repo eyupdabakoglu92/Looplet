@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "2026-11-01.1",
+  "id": "daily-tr-2026-12-09",
+  "puzzleType": "daily",
+  "dailyDate": "2026-12-09",
+  "language": "tr",
+  "grid": [
+    "ÜKIBÇ",
+    "NPADR",
+    "DTÜMA",
+    "AUÇKE",
+    "EKPIK"
+  ],
+  "targetWord": "TABAK",
+  "lockedCells": [],
+  "frozenCells": [
+    "1,3"
+  ],
+  "columnMovesEnabled": true,
+  "optimalMoves": 5,
+  "difficultyScore": 5.641,
+  "difficultyLabel": "medium",
+  "difficultyBreakdown": {
+    "o": 5,
+    "cNorm": 0.0011,
+    "tdDegree": 0,
+    "locked": 0,
+    "frozen": 1,
+    "firstMoves": 3,
+    "distinctOptimalSolutions": 7
+  }
+}

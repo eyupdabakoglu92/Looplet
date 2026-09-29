@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "2026-11-01.1",
+  "id": "daily-tr-2026-12-19",
+  "puzzleType": "daily",
+  "dailyDate": "2026-12-19",
+  "language": "tr",
+  "grid": [
+    "KKKTP",
+    "IBMÇY",
+    "ERENÜ",
+    "EUAŞA",
+    "OABTL"
+  ],
+  "targetWord": "KABAK",
+  "lockedCells": [
+    "4,1",
+    "4,2"
+  ],
+  "frozenCells": [
+    "2,1",
+    "2,2"
+  ],
+  "columnMovesEnabled": true,
+  "optimalMoves": 5,
+  "difficultyScore": 8.115,
+  "difficultyLabel": "hard",
+  "difficultyBreakdown": {
+    "o": 5,
+    "cNorm": 0.0174,
+    "tdDegree": 0,
+    "locked": 2,
+    "frozen": 2,
+    "firstMoves": 5,
+    "distinctOptimalSolutions": 49
+  }
+}

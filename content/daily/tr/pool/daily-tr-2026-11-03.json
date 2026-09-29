@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "2026-11-01.1",
+  "id": "daily-tr-2026-11-03",
+  "puzzleType": "daily",
+  "dailyDate": "2026-11-03",
+  "language": "tr",
+  "grid": [
+    "ÇUYÖB",
+    "ÇÜMLA",
+    "ÜZÖPD",
+    "AYYOG",
+    "NAGDY"
+  ],
+  "targetWord": "DAMLA",
+  "lockedCells": [
+    "1,2"
+  ],
+  "frozenCells": [],
+  "columnMovesEnabled": true,
+  "optimalMoves": 4,
+  "difficultyScore": 4.319,
+  "difficultyLabel": "medium",
+  "difficultyBreakdown": {
+    "o": 4,
+    "cNorm": 0.0271,
+    "tdDegree": 0,
+    "locked": 1,
+    "frozen": 0,
+    "firstMoves": 3,
+    "distinctOptimalSolutions": 9
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "2026-11-01.1",
+  "id": "daily-tr-2026-11-15",
+  "puzzleType": "daily",
+  "dailyDate": "2026-11-15",
+  "language": "tr",
+  "grid": [
+    "ZZHPÜ",
+    "ŞBYŞA",
+    "ÇHKEG",
+    "BEŞTÖ",
+    "RLZHP"
+  ],
+  "targetWord": "ŞEKER",
+  "lockedCells": [],
+  "frozenCells": [
+    "1,2",
+    "1,4"
+  ],
+  "columnMovesEnabled": true,
+  "optimalMoves": 4,
+  "difficultyScore": 6.051,
+  "difficultyLabel": "medium",
+  "difficultyBreakdown": {
+    "o": 4,
+    "cNorm": 0.0087,
+    "tdDegree": 0,
+    "locked": 0,
+    "frozen": 2,
+    "firstMoves": 2,
+    "distinctOptimalSolutions": 4
+  }
+}

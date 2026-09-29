@@ -1,0 +1,19 @@
+{
+  "id": "daily-tr-2026-12-30",
+  "puzzleType": "daily",
+  "dailyDate": "2026-12-30",
+  "language": "tr",
+  "grid": [
+    "BAÇÜO",
+    "ÇÖPÇR",
+    "IHZAD",
+    "RMMNT",
+    "ŞLAUK"
+  ],
+  "target": "ÇANTA",
+  "locked": [],
+  "frozen": [
+    "2,0"
+  ],
+  "columns": true
+}

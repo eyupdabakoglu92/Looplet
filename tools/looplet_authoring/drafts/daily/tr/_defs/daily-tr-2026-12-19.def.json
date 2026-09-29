@@ -1,0 +1,23 @@
+{
+  "id": "daily-tr-2026-12-19",
+  "puzzleType": "daily",
+  "dailyDate": "2026-12-19",
+  "language": "tr",
+  "grid": [
+    "KKKTP",
+    "IBMÇY",
+    "ERENÜ",
+    "EUAŞA",
+    "OABTL"
+  ],
+  "target": "KABAK",
+  "locked": [
+    "4,1",
+    "4,2"
+  ],
+  "frozen": [
+    "2,1",
+    "2,2"
+  ],
+  "columns": true
+}

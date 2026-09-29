@@ -1,0 +1,19 @@
+{
+  "id": "daily-tr-2026-12-29",
+  "puzzleType": "daily",
+  "dailyDate": "2026-12-29",
+  "language": "tr",
+  "grid": [
+    "HİÇOÇ",
+    "ÜBUMT",
+    "GSŞSİ",
+    "PHLAA",
+    "AŞÖSN"
+  ],
+  "target": "ASLAN",
+  "locked": [
+    "4,0"
+  ],
+  "frozen": [],
+  "columns": true
+}

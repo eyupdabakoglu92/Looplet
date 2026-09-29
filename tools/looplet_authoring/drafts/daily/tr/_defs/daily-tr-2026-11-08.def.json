@@ -1,0 +1,20 @@
+{
+  "id": "daily-tr-2026-11-08",
+  "puzzleType": "daily",
+  "dailyDate": "2026-11-08",
+  "language": "tr",
+  "grid": [
+    "NNEBİ",
+    "ANUMZ",
+    "OÜNTS",
+    "LESÖY",
+    "BAPGG"
+  ],
+  "target": "ZEMİN",
+  "locked": [],
+  "frozen": [
+    "2,1",
+    "2,4"
+  ],
+  "columns": true
+}

@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "2026-11-01.1",
+  "id": "daily-tr-2026-11-25",
+  "puzzleType": "daily",
+  "dailyDate": "2026-11-25",
+  "language": "tr",
+  "grid": [
+    "MZÜGR",
+    "MRATL",
+    "NOSAA",
+    "KKDÇO",
+    "ELKAS"
+  ],
+  "targetWord": "MAKAS",
+  "lockedCells": [],
+  "frozenCells": [
+    "3,1"
+  ],
+  "columnMovesEnabled": true,
+  "optimalMoves": 4,
+  "difficultyScore": 4.512,
+  "difficultyLabel": "medium",
+  "difficultyBreakdown": {
+    "o": 4,
+    "cNorm": 0.0207,
+    "tdDegree": 0,
+    "locked": 0,
+    "frozen": 1,
+    "firstMoves": 4,
+    "distinctOptimalSolutions": 15
+  }
+}

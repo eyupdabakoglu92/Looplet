@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "2026-11-01.1",
+  "id": "daily-tr-2026-12-12",
+  "puzzleType": "daily",
+  "dailyDate": "2026-12-12",
+  "language": "tr",
+  "grid": [
+    "TİULO",
+    "ÜAZLU",
+    "EBIOB",
+    "LYMKU",
+    "İDMUN"
+  ],
+  "targetWord": "LİMON",
+  "lockedCells": [
+    "3,0",
+    "3,2"
+  ],
+  "frozenCells": [
+    "0,0",
+    "0,4"
+  ],
+  "columnMovesEnabled": true,
+  "optimalMoves": 4,
+  "difficultyScore": 7.502,
+  "difficultyLabel": "medium",
+  "difficultyBreakdown": {
+    "o": 4,
+    "cNorm": 0.0214,
+    "tdDegree": 0,
+    "locked": 2,
+    "frozen": 2,
+    "firstMoves": 3,
+    "distinctOptimalSolutions": 16
+  }
+}

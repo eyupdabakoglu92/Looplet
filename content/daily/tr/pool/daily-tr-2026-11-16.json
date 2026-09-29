@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "2026-11-01.1",
+  "id": "daily-tr-2026-11-16",
+  "puzzleType": "daily",
+  "dailyDate": "2026-11-16",
+  "language": "tr",
+  "grid": [
+    "SHGVK",
+    "TŞUKE",
+    "AİMIT",
+    "TÜÜSİ",
+    "SSIMD"
+  ],
+  "targetWord": "TAVUK",
+  "lockedCells": [],
+  "frozenCells": [],
+  "columnMovesEnabled": true,
+  "optimalMoves": 5,
+  "difficultyScore": 4.069,
+  "difficultyLabel": "medium",
+  "difficultyBreakdown": {
+    "o": 5,
+    "cNorm": 0.0022,
+    "tdDegree": 0,
+    "locked": 0,
+    "frozen": 0,
+    "firstMoves": 5,
+    "distinctOptimalSolutions": 25
+  }
+}

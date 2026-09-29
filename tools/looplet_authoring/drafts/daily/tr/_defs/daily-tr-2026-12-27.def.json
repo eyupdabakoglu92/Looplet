@@ -1,0 +1,20 @@
+{
+  "id": "daily-tr-2026-12-27",
+  "puzzleType": "daily",
+  "dailyDate": "2026-12-27",
+  "language": "tr",
+  "grid": [
+    "GMATD",
+    "İİÇÖP",
+    "MULRŞ",
+    "İZBON",
+    "ÜSBEÇ"
+  ],
+  "target": "SALON",
+  "locked": [],
+  "frozen": [
+    "1,1",
+    "1,2"
+  ],
+  "columns": true
+}

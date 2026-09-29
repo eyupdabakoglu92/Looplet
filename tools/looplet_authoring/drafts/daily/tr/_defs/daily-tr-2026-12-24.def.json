@@ -1,0 +1,17 @@
+{
+  "id": "daily-tr-2026-12-24",
+  "puzzleType": "daily",
+  "dailyDate": "2026-12-24",
+  "language": "tr",
+  "grid": [
+    "AŞNMT",
+    "NKŞİI",
+    "AÜUKS",
+    "SUDAM",
+    "OTÜKO"
+  ],
+  "target": "SOKAK",
+  "locked": [],
+  "frozen": [],
+  "columns": true
+}

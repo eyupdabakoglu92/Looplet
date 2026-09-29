@@ -1,0 +1,19 @@
+{
+  "id": "daily-tr-2026-12-16",
+  "puzzleType": "daily",
+  "dailyDate": "2026-12-16",
+  "language": "tr",
+  "grid": [
+    "ZOZGZ",
+    "SKVEE",
+    "DUKTÜ",
+    "AYİSI",
+    "OUTDA"
+  ],
+  "target": "TAVUK",
+  "locked": [],
+  "frozen": [
+    "0,3"
+  ],
+  "columns": true
+}

@@ -1,0 +1,19 @@
+{
+  "id": "daily-tr-2026-11-10",
+  "puzzleType": "daily",
+  "dailyDate": "2026-11-10",
+  "language": "tr",
+  "grid": [
+    "İLNYZ",
+    "BZPAS",
+    "ÇİNED",
+    "AEHTD",
+    "MGLDI"
+  ],
+  "target": "DENİZ",
+  "locked": [
+    "2,2"
+  ],
+  "frozen": [],
+  "columns": true
+}

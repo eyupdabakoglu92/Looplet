@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "2026-11-01.1",
+  "id": "daily-tr-2026-12-04",
+  "puzzleType": "daily",
+  "dailyDate": "2026-12-04",
+  "language": "tr",
+  "grid": [
+    "İADİM",
+    "ÖLPŞO",
+    "MNZNE",
+    "MBEBK",
+    "DDBLŞ"
+  ],
+  "targetWord": "BADEM",
+  "lockedCells": [
+    "0,1",
+    "0,4"
+  ],
+  "frozenCells": [],
+  "columnMovesEnabled": true,
+  "optimalMoves": 5,
+  "difficultyScore": 8.347,
+  "difficultyLabel": "hard",
+  "difficultyBreakdown": {
+    "o": 5,
+    "cNorm": 0.0408,
+    "tdDegree": 1,
+    "locked": 2,
+    "frozen": 0,
+    "firstMoves": 2,
+    "distinctOptimalSolutions": 13
+  }
+}

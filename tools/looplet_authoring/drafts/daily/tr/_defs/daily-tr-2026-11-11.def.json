@@ -1,0 +1,19 @@
+{
+  "id": "daily-tr-2026-11-11",
+  "puzzleType": "daily",
+  "dailyDate": "2026-11-11",
+  "language": "tr",
+  "grid": [
+    "PRRUÇ",
+    "TKHÜN",
+    "AHRDZ",
+    "ÖEKDZ",
+    "ETŞİI"
+  ],
+  "target": "TARİH",
+  "locked": [],
+  "frozen": [
+    "1,3"
+  ],
+  "columns": true
+}

@@ -1,0 +1,20 @@
+{
+  "id": "daily-tr-2026-12-18",
+  "puzzleType": "daily",
+  "dailyDate": "2026-12-18",
+  "language": "tr",
+  "grid": [
+    "STDAÇ",
+    "KORAİ",
+    "ÇŞİZK",
+    "TÖKAB",
+    "ŞEİPE"
+  ],
+  "target": "ÇORAP",
+  "locked": [
+    "1,1",
+    "1,2"
+  ],
+  "frozen": [],
+  "columns": true
+}

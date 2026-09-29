@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "2026-11-01.1",
+  "id": "daily-tr-2026-12-11",
+  "puzzleType": "daily",
+  "dailyDate": "2026-12-11",
+  "language": "tr",
+  "grid": [
+    "PLGRR",
+    "GBRYN",
+    "TNEİP",
+    "SHTLL",
+    "NAPEİ"
+  ],
+  "targetWord": "TARİH",
+  "lockedCells": [
+    "2,0",
+    "2,3"
+  ],
+  "frozenCells": [],
+  "columnMovesEnabled": true,
+  "optimalMoves": 4,
+  "difficultyScore": 5.439,
+  "difficultyLabel": "medium",
+  "difficultyBreakdown": {
+    "o": 4,
+    "cNorm": 0.0088,
+    "tdDegree": 0,
+    "locked": 2,
+    "frozen": 0,
+    "firstMoves": 1,
+    "distinctOptimalSolutions": 2
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "2026-11-01.1",
+  "id": "daily-tr-2026-12-29",
+  "puzzleType": "daily",
+  "dailyDate": "2026-12-29",
+  "language": "tr",
+  "grid": [
+    "HİÇOÇ",
+    "ÜBUMT",
+    "GSŞSİ",
+    "PHLAA",
+    "AŞÖSN"
+  ],
+  "targetWord": "ASLAN",
+  "lockedCells": [
+    "4,0"
+  ],
+  "frozenCells": [],
+  "columnMovesEnabled": true,
+  "optimalMoves": 4,
+  "difficultyScore": 4.105,
+  "difficultyLabel": "medium",
+  "difficultyBreakdown": {
+    "o": 4,
+    "cNorm": 0.0183,
+    "tdDegree": 0,
+    "locked": 1,
+    "frozen": 0,
+    "firstMoves": 4,
+    "distinctOptimalSolutions": 14
+  }
+}

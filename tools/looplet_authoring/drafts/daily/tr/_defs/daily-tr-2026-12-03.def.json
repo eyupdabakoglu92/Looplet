@@ -1,0 +1,17 @@
+{
+  "id": "daily-tr-2026-12-03",
+  "puzzleType": "daily",
+  "dailyDate": "2026-12-03",
+  "language": "tr",
+  "grid": [
+    "AAUND",
+    "PMTMT",
+    "OMSAD",
+    "PÖÜRE",
+    "İPNLZ"
+  ],
+  "target": "DAMLA",
+  "locked": [],
+  "frozen": [],
+  "columns": true
+}

@@ -1,0 +1,20 @@
+{
+  "id": "daily-tr-2026-12-13",
+  "puzzleType": "daily",
+  "dailyDate": "2026-12-13",
+  "language": "tr",
+  "grid": [
+    "IRIIA",
+    "YÇRTN",
+    "ÜİYBT",
+    "IMARO",
+    "YIÜÇU"
+  ],
+  "target": "ORMAN",
+  "locked": [],
+  "frozen": [
+    "2,1",
+    "2,4"
+  ],
+  "columns": true
+}

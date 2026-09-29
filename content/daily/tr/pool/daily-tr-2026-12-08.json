@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "2026-11-01.1",
+  "id": "daily-tr-2026-12-08",
+  "puzzleType": "daily",
+  "dailyDate": "2026-12-08",
+  "language": "tr",
+  "grid": [
+    "ZUŞRU",
+    "DDÜÖD",
+    "SAOİG",
+    "ZŞSNS",
+    "EEMPE"
+  ],
+  "targetWord": "ZEMİN",
+  "lockedCells": [
+    "3,0"
+  ],
+  "frozenCells": [],
+  "columnMovesEnabled": true,
+  "optimalMoves": 4,
+  "difficultyScore": 4.448,
+  "difficultyLabel": "medium",
+  "difficultyBreakdown": {
+    "o": 4,
+    "cNorm": 0.0078,
+    "tdDegree": 0,
+    "locked": 1,
+    "frozen": 0,
+    "firstMoves": 2,
+    "distinctOptimalSolutions": 8
+  }
+}

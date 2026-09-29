@@ -1,0 +1,17 @@
+{
+  "id": "daily-tr-2026-12-28",
+  "puzzleType": "daily",
+  "dailyDate": "2026-12-28",
+  "language": "tr",
+  "grid": [
+    "BEESS",
+    "DOYÖI",
+    "NZLTL",
+    "NÇOET",
+    "PLPSB"
+  ],
+  "target": "SEPET",
+  "locked": [],
+  "frozen": [],
+  "columns": true
+}

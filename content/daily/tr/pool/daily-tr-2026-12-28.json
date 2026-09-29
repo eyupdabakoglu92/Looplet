@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "2026-11-01.1",
+  "id": "daily-tr-2026-12-28",
+  "puzzleType": "daily",
+  "dailyDate": "2026-12-28",
+  "language": "tr",
+  "grid": [
+    "BEESS",
+    "DOYÖI",
+    "NZLTL",
+    "NÇOET",
+    "PLPSB"
+  ],
+  "targetWord": "SEPET",
+  "lockedCells": [],
+  "frozenCells": [],
+  "columnMovesEnabled": true,
+  "optimalMoves": 5,
+  "difficultyScore": 4.457,
+  "difficultyLabel": "medium",
+  "difficultyBreakdown": {
+    "o": 5,
+    "cNorm": 0.0065,
+    "tdDegree": 0,
+    "locked": 0,
+    "frozen": 0,
+    "firstMoves": 3,
+    "distinctOptimalSolutions": 24
+  }
+}

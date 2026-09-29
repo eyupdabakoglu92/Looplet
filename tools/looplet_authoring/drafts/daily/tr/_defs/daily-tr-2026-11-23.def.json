@@ -1,0 +1,17 @@
+{
+  "id": "daily-tr-2026-11-23",
+  "puzzleType": "daily",
+  "dailyDate": "2026-11-23",
+  "language": "tr",
+  "grid": [
+    "ZGABL",
+    "IIKEN",
+    "İÖEMG",
+    "STAAB",
+    "KIMPŞ"
+  ],
+  "target": "KİTAP",
+  "locked": [],
+  "frozen": [],
+  "columns": true
+}

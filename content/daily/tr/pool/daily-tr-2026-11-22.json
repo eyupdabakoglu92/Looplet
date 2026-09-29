@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "2026-11-01.1",
+  "id": "daily-tr-2026-11-22",
+  "puzzleType": "daily",
+  "dailyDate": "2026-11-22",
+  "language": "tr",
+  "grid": [
+    "ATEGP",
+    "RMBNS",
+    "TOLĞZ",
+    "ZKAKE",
+    "ÖNOOI"
+  ],
+  "targetWord": "KAĞIT",
+  "lockedCells": [],
+  "frozenCells": [
+    "3,0",
+    "3,3"
+  ],
+  "columnMovesEnabled": true,
+  "optimalMoves": 5,
+  "difficultyScore": 5.904,
+  "difficultyLabel": "medium",
+  "difficultyBreakdown": {
+    "o": 5,
+    "cNorm": 0.0013,
+    "tdDegree": 0,
+    "locked": 0,
+    "frozen": 2,
+    "firstMoves": 8,
+    "distinctOptimalSolutions": 44
+  }
+}

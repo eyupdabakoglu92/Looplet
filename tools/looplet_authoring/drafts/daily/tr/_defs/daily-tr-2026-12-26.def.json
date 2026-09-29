@@ -1,0 +1,23 @@
+{
+  "id": "daily-tr-2026-12-26",
+  "puzzleType": "daily",
+  "dailyDate": "2026-12-26",
+  "language": "tr",
+  "grid": [
+    "SAÇÜK",
+    "SPEÜY",
+    "ÇUARR",
+    "AŞDDT",
+    "YYAAM"
+  ],
+  "target": "YATAK",
+  "locked": [
+    "4,0",
+    "4,3"
+  ],
+  "frozen": [
+    "2,2",
+    "2,3"
+  ],
+  "columns": true
+}

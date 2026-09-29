@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "2026-11-01.1",
+  "id": "daily-tr-2026-11-28",
+  "puzzleType": "daily",
+  "dailyDate": "2026-11-28",
+  "language": "tr",
+  "grid": [
+    "SIPZE",
+    "PÖEİP",
+    "ŞÇÇHM",
+    "GKZÇY",
+    "DSPTİ"
+  ],
+  "targetWord": "SEPET",
+  "lockedCells": [
+    "0,0",
+    "0,2"
+  ],
+  "frozenCells": [
+    "1,0",
+    "1,4"
+  ],
+  "columnMovesEnabled": true,
+  "optimalMoves": 4,
+  "difficultyScore": 7.669,
+  "difficultyLabel": "medium",
+  "difficultyBreakdown": {
+    "o": 4,
+    "cNorm": 0.0148,
+    "tdDegree": 0,
+    "locked": 2,
+    "frozen": 2,
+    "firstMoves": 2,
+    "distinctOptimalSolutions": 5
+  }
+}

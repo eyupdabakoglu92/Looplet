@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "2026-11-01.1",
+  "id": "daily-tr-2026-12-05",
+  "puzzleType": "daily",
+  "dailyDate": "2026-12-05",
+  "language": "tr",
+  "grid": [
+    "OEİKT",
+    "EALÜM",
+    "ÜHIOR",
+    "GYTBK",
+    "ŞBÇKO"
+  ],
+  "targetWord": "KALEM",
+  "lockedCells": [
+    "1,2",
+    "1,4"
+  ],
+  "frozenCells": [
+    "3,3",
+    "3,4"
+  ],
+  "columnMovesEnabled": true,
+  "optimalMoves": 4,
+  "difficultyScore": 7.402,
+  "difficultyLabel": "medium",
+  "difficultyBreakdown": {
+    "o": 4,
+    "cNorm": 0.0508,
+    "tdDegree": 0,
+    "locked": 2,
+    "frozen": 2,
+    "firstMoves": 4,
+    "distinctOptimalSolutions": 7
+  }
+}
