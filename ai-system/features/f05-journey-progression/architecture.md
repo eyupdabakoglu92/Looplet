@@ -9,6 +9,8 @@
 
 **Amended 2026-09-29 (Tech Lead — Design Adoption Phase D3 activation):** §18 added (Home + app shell, `new-surface`). The user decided N1: surface an in-progress replay after 30 / 30 (§18.3 (2)); it replaces the §8 terminal precedence. **Effective 2026-09-29:** the Product Owner revision PO-REV-2026-09-29-F05-CONTINUE was resynced the same day (feature PRD AC7 / AC9). §10 and §17 are superseded for the visual by §18.
 
+**Amended 2026-09-29 (Tech Lead — D3 implementation checkpoint):** §18.8 added. F05-FE-D3 was accepted, and the gate is Ready for QA. The render drift is ruled against the §6 numbers. The iOS launch cross-fade is accepted as platform behaviour. The profile / release store-error capture moves to FIRST-APP-DISTRIBUTION (this amends §18.6 / §18.7 for D3). The in-process Retry limit goes to F08. The F05-QA-D3 plan is set.
+
 Contract authority for F05. Execution state is in `orchestration.md`.
 
 ---
@@ -473,3 +475,48 @@ The F05-UI-D3 handoff (`ui-design.md`, commit 981b807) is **accepted**. The Visu
 * the store error forced in a **profile or release** build (no exception text) and in a debug build (the separated box), plus the `debugPrint` line in the log;
 * a component test over the window rule for every `window-d3.txt` row and the C1 cases (replay at 1, 2, 12 of 12, 29 and 30; frontier at 1–5 and 26–30; terminal); widget tests for the C1 copy rule and the §18.3 (2) CTA rule, warm and cold;
 * a named negative run for each new rule: the N1 CTA reverted to terminal precedence, the window's replay offset removed, the raw exception shown outside `kDebugMode`, and `NormalTheme` back on `?android:colorBackground` (a manifest / resource test) — each caught by a failing test.
+
+### 18.8 Implementation checkpoint rulings (Tech Lead, 2026-09-29)
+
+The F05-FE-D3 delivery (`frontend.md`, commit af5aec8) is **accepted**. Delivery Review is **Accepted**, the Visual Quality Gate is **Ready for QA**, and F05-QA-D3 is open.
+
+**Verified independently at the checkpoint** (HEAD af5aec8, clean tree):
+* **Provenance.** The `app/` fingerprint recomputed with the `frontend.md` command is `b4ad263e…`, the delivery's own. The delivery is committed in af5aec8 (108 files).
+* **Suites, re-run by the Tech Lead on the host.** `melos run analyze` exit 0; `dart format --set-exit-if-changed app packages tools` exit 0; `melos run test` exit 0 — app **565 passed**, core 22, content 17, dictionary 32, solver 23, authoring 25, engine 83. `integration_test` (13 / 13) was not re-run: it needs the simulator. It stays the Frontend's record, and QA runs it.
+* **Negative runs, re-run by the Tech Lead** with the delivery's `design/src/neg-d3.py`; each file was restored and the tree was clean afterwards:
+  * the N1 CTA reverted (`allComplete ? null : continueTarget`) → 5 failing (N1 warm, N1 cold, the CTA rule, replay 29 / 30 and the `termReplay` window row) — the same 5 as the delivery's NA;
+  * the details box forced on outside `kDebugMode` → 2 failing (the Turkish copy / no exception text, and the 1.0× layout) — the delivery's NC.
+* **Code read against the contract:**
+  * `JourneyHomeView` implements C1 exactly: the headline order complete → replay → first → next; the CTA and the terminal state on `continueTarget == null`; the caption; the window offset (`−2` iff a completed level above the current one exists; `26–30` when terminal).
+  * `HomeScreen` pushes `/play` with `ctaTarget`. The shipped `done ? 1 : continueTarget` override is gone. The entrance is guarded per process (C3). The debug row is `kDebugMode`-only and is re-measured on text-scale and size changes (C2).
+  * `StoreErrorScreen`: Turkish copy; `debugPrint` in every build; details only when `showDetails ?? kDebugMode`; Retry = `ref.invalidate(appBootstrapProvider)`.
+  * `_BootstrapGate` shows the splash while Retry runs. This is ui-design §4, and F08 AC9 is unchanged (accepted, see `frontend.md` §4).
+* **Evidence read:** `parity-measurements.txt` (every row), `PC-D3-07` (N1) and `PC-D3-20c` (the store error). Every Home row has a horizontal delta ≤ 0.5 pt. Every vertical delta is the render's constant drift (ruling 1).
+
+**Rulings on `frontend.md` §16:**
+1. **§6 numbers are the layout authority, not the render pixels.** `ui-design.md` §6 and the §11.1 (1) anchors (±2 pt) are a §11 "Must not break" item. The renders draw the card label at `line-height: 1.25`, so they sit about 4.8·s below their own §6 numbers. QA measures the vertical anchors against §6 (e.g. the CTA top at 486.3 pt on 393 × 852), and horizontal parity and composition against the renders. A constant vertical offset of 5–7.5 pt against a render is therefore not a parity defect. The renders are not regenerated.
+2. **The iOS launch cross-fade under Reduce Motion: accepted as platform behaviour (option a).** Flutter's iOS embedder removes the launch view with a fixed 0.2 s alpha fade. Dart code cannot change it. The two grounds are identical, so the only visible effect is the wordmark fading in over ~0.2 s. An opacity cross-fade without movement is the substitute Reduce Motion expects, so it does not breach the reduced path (ui-design §5). QA still judges it under the rubric, but not as a reduced-motion fail condition. Option (b), the wordmark in the native launch image, is not taken. It may come with the final drawn wordmark asset (design-foundation §18 consequence 4).
+3. **The profile / release capture of the store error is moved to the first device or distribution build.** The iOS Simulator cannot run profile or release builds, and no device is in scope.
+   * For D3, the rule "no exception text outside debug" is proven by: the compile-time `kDebugMode` constant (false in profile and release — a Flutter guarantee); the widget tests with `showDetails: false`; and the negative run NC, re-run at this checkpoint.
+   * The runtime capture is tracked as **F05.D3-RELEASE-ERROR-CAPTURE** with Blocking Scope **release**, under FIRST-APP-DISTRIBUTION. It does **not** block F05-QA-D3 or the F05 closure.
+   * This amends §18.6 (Frontend: "no raw exception in a release-mode or profile-mode capture") and §18.7 (Evidence expected from Frontend) for D3.
+4. **A store repaired while the app runs is not recovered by Retry: pre-existing F08 behaviour, outside D3** (§18.5).
+   * Retry invalidates `appBootstrapProvider` but not the open database connection, so a store fixed in place keeps failing until the next launch. A relaunch recovers.
+   * F08 AC9 (a migration failure → error → Retry, data intact) is unaffected.
+   * It is recorded as **F08-RETRY-STORE-CONNECTION** in `workflow-follow-ups.md`, for the F08 local-evidence stage (the next item after D3). In D3 QA, "Retry → splash → the error again while the store stays unreadable" is the expected behaviour, not a defect.
+
+**Also ruled:**
+* **Debug-only deviations.** The debug details box is solid-edged at runtime and dashed in `D3-20c`. It is debug-only (§18.3 (7)), players never see it, and it is not scored. Its height moves the centred error column: the runtime Retry pill sits 28–88 pt above the renders in the debug captures. The player layout (no box) is covered by the widget test at 1.0× and by the renders `D3-20` / `D3-20b`. QA scores the error screen from the debug runtime and lists the box as the only debug deviation, as C2 does for Home's debug row.
+* **Android** launch resources are asserted by `launch_resources_test.dart` (with the negative run ND) and were not run on a device. They stay a stated limit (ANDROID-CI-EVIDENCE).
+* **Not run at runtime:** the pressed and focused CTA (`simctl` limits) and VoiceOver. QA covers the pressed state from the shipped `LimePill` behaviour and the `Semantics` tree from the widget tests. These are gaps to state, not gaps to hide.
+
+**QA plan (F05-QA-D3):** final stage, client-only. Modules: core, client-ui, visual-quality, stateful-flow. Regression depth: full (startup, routing and the app theme changed). Evidence reuse: allowed, within limits:
+* reusable where the fingerprint holds: the D1 / D2 QA evidence for the Play and result screens (`app/lib/play/**` unchanged since F03-QA-D2R), and the F05-QA-STRICT2 behaviour evidence for the read-model, the unlock, the gate and `Next Level` (`journey_progress.dart`, the content and the router graph unchanged);
+* invalidated, to be re-run: Home, the splash, the store error, the cold start, the `MaterialApp` ground and the Home ⇄ `/play` round trip;
+* the Frontend's captures and self-check are inputs, not QA evidence.
+
+`git diff --stat 5677471 HEAD` (F03-QA-D2R → HEAD) shows no change under `app/lib/play`, in `journey_progress.dart`, `journey_content.dart`, `app/lib/persistence`, `content/` or the pubspecs. The 13 changed `app/lib` files are the D3 files. Two of them reach Play:
+* `journey_strings.dart` — the D1 `columnTutorialHint` is kept;
+* `main.dart` — the app ground.
+
+The round-trip regression covers both. The brief is the F05 orchestration Current Brief.

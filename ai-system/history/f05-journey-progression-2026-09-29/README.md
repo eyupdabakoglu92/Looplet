@@ -10,4 +10,7 @@
 * **`orchestration-at-ui-d3-delivery.md`** — the F05 orchestration right after the UI Designer delivered F05-UI-D3 (2026-09-29), byte for byte (SHA-1 `5ebb6856…`).
   * State: Rework; owner Tech Lead (visual-gate checkpoint); F05-UI-D3 Done, F05-FE-D3 and F05-QA-D3 Queued; F05.D3-HANDOFF PASS; Delivery Review Pending; Visual Quality Gate Pending; the F05-UI-D3 Current Brief.
   * Taken right before the Tech Lead's D3 visual-gate checkpoint (F05 `architecture.md` §18.7), which accepted the handoff, set the gate to Ready for Implementation and opened F05-FE-D3.
+* **`orchestration-at-fe-d3-delivery.md`** — the F05 orchestration right after the Frontend/Mobile Developer delivered F05-FE-D3 (2026-09-29), byte for byte (copied with `cp -p` and `cmp`-checked).
+  * State: Rework; owner Tech Lead (implementation checkpoint); F05-UI-D3 and F05-FE-D3 Done, F05-QA-D3 Queued; F05.D3-PARITY PASS, F05.D3-RELEASE-ERROR-CAPTURE PENDING; Delivery Review Pending; gate Ready for Implementation; the F05-FE-D3 Current Brief; the §18.7 visual-gate Last Decision.
+  * Taken right before the Tech Lead's D3 implementation checkpoint (F05 `architecture.md` §18.8). The checkpoint accepted the delivery, set the gate to Ready for QA and opened F05-QA-D3.
 * **`frontend-before-phase-d3.md`** — the whole F05 `frontend.md` before D3 (the F05-FE / F05-FE3 delivery reports, 2026-09-08 … 2026-09-27), byte for byte (SHA-1 `d32a5ad0…`). Moved by the Frontend/Mobile Developer on 2026-09-29, right before `frontend.md` was rewritten for F05-FE-D3.
