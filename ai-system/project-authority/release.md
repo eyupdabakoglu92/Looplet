@@ -1,6 +1,6 @@
 # Project Release Authority — LOOPLET
 
-Last Updated: 2026-09-06 (§2 — F08 fires the first Firebase-infra release gate)
+Last Updated: 2026-09-29 (F08 A17: §4 format scope = `app packages tools` (TD-FORMAT-SCOPE); §4 integration-test gate clarified (TD-CI-INTEGRATION-GATE); §2 F08 kill-switch note). 2026-09-06 (§2 — F08 fires the first Firebase-infra release gate)
 Owner: Tech Lead
 
 ---
@@ -20,6 +20,7 @@ Defines CI/CD gates, environments, store distribution, signing, privacy-manifest
   * **Release gate required** when a change produces a new distributable app build, or touches Cloud Functions, Firestore rules, Remote Config, or content packs served to clients.
 * F01 (`dictionary-service`), F02 (`grid-engine`), F06 (`puzzle-content-and-solver-tooling`) Release Scope: `none` — internal library / build-time tooling, no distributable surface (CI gates still run).
 * **F08 (`offline-persistence-and-sync`) Release Scope: `production-readiness`.** F08 is the **first Firebase deploy** for LOOPLET — it touches Cloud Functions (`submitDailyResultV1`), Firestore rules, and Remote Config, which per the §2 conditional rule requires a release gate. This is a **backend-only** gate (functions + rules + Remote Config to the Firebase project), separate from and earlier than the first **app-build** distribution gate (still expected around F03/F05). A `DevOps/Release Engineer` task opens after F08 QA passes; it must also cover rollback-readiness: functions redeploy-previous, the `daily_sync_enabled` kill-switch, and the fact that the Drift on-device forward migration has **no downgrade** (mitigation: migration tests + staged rollout + the never-drop guard).
+  * **2026-09-29 (F08 A17, N-2):** the `daily_sync_enabled` kill-switch is not read by release builds before F07 (`dailySyncEnabledProvider` is always on outside debug; the real Remote Config read is an F07 seam). The F08 deploy does not need it: release builds contain no daily-result producer (the fake producer is reachable only from the `kDebugMode` debug route), so they send the callable no traffic. The F08 rollback is function / rules redeploy or delete (feature `release.md` §7). **F07 must wire the Remote Config read before the Daily ships** — a release-blocking F07 obligation (workflow-follow-ups F07-KILL-SWITCH).
 
 ---
 
@@ -42,10 +43,11 @@ Defines CI/CD gates, environments, store distribution, signing, privacy-manifest
 Required gates (GitHub Actions, on every PR to `main`):
 
 * install / dependency restore — `melos bootstrap`
-* format — `dart format --set-exit-if-changed .`
+* format — `dart format --output=none --set-exit-if-changed app packages tools` (`melos run format:check`). Scope = the Dart code the workspace owns; evidence under `ai-system/` is a record and is never reformatted (F08 A15 TD-FORMAT-SCOPE; this line corrected at A17)
 * lint / analyze — `flutter analyze` + `dart analyze` for each package
 * unit tests — `flutter test` (app) + `dart test` (every package); `looplet_solver` optimality-vs-brute-force suite must pass
 * integration tests — `integration_test` on a CI emulator (best-effort gate for the MVP; failure is investigated, not auto-blocking until F03 lands)
+  * **Clarified 2026-09-29 (F08 A17, TD-CI-INTEGRATION-GATE):** F03 has landed, but CI has no emulator / simulator target — the `verify` step runs `flutter test integration_test/` headless on Ubuntu with `continue-on-error`, and it failed on its first run (`36597006854`). It is therefore **not a gate yet**: a green `verify` job never counts as an integration PASS. It becomes a **required gate at the first app-build release gate** (FIRST-APP-DISTRIBUTION), on a real emulator / simulator target. Until then the F03 play-session behaviour is gated by the required mirror `app/test/play/play_session_runtime_test.dart` (`melos run test`) and by runtime QA. Backend-only releases (F08) do not depend on it. Follow-up: CI-INTEGRATION-TARGET.
 * build — `flutter build appbundle --release` and `flutter build ios --release --no-codesign`
 * Firestore rules tests — `@firebase/rules-unit-testing` (when `infra/` changed)
 * Cloud Functions build + test — `npm ci && npm run build && npm test` in `infra/functions` (when changed)

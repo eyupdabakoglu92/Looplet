@@ -813,3 +813,60 @@ The backend handler and rules fingerprints above are the ones A7's reuse clause 
 4. **Push:** a CI fix is proven only by a green run after a push. Each push needs the user's explicit approval in chat for that push. The user may also push.
 5. **Release Result** stays Release Validation Pending until the PREP verdict. `Release Ready` is impossible without the deploy smoke (F08.DEPLOY-SMOKE).
 
+### A17. DevOps checkpoint 2026-09-29 (F08-DEVOPS-PREP — verdict Release Validation Pending, commit c592081)
+
+**Delivery reviewed:** `release.md` (refreshed), `evidence/devops-prep/` DP-01…13, and the diff of c592081. It changes only `.github/workflows/ci.yml`, `melos.yaml`, `setup-manifest.md`, `infra/README.md` and `ai-system/` documents; there is no app, package, rules or function change. So no functional evidence is invalidated.
+
+**CI run #2 — read by the Tech Lead through the public GitHub API and job page** (run `36597006854`, event push, head `c592081`, 16:20:36–16:40:12Z; the user pushed):
+* **`format · analyze · test` — success** (`ubuntu-24.04`, 10 m 30 s). Format check, analyze, test, content check and the AAB build each succeeded. This is the first time analyze, test, the content check and the AAB build have run on CI (run #1 stopped at format).
+* **`infra · functions build + test` — success** (`ubuntu-24.04`, 1 m 30 s). Set up Java 21, the offline tests and **the emulator step (rules + callable) succeeded**; CI-EMULATOR-JAVA21 is fixed.
+* **`iOS release build (no codesign)` — success** (`macos-15`, 19 m 27 s). Select Xcode 16.4, disable SPM and the iOS build each succeeded; CI-IOS-TOOLCHAIN is fixed.
+* **The integration step's own result: FAILED.** The `verify` job carries the annotation "Process completed with exit code 1". "Integration tests (play session — best-effort)" is the only `continue-on-error` step, and every other step succeeded, so the failure is that step. The job stays green by design. **The cause is not read:** step logs need a signed-in GitHub account. *Inferred:* `app/` has no `linux/` platform and the Ubuntu runner has no emulator, so `flutter test integration_test/` has no device to run on. This step has never run on CI before.
+* **Printed versions: not read**, for the same reason. The versions are enforced by construction: `flutter-action` with `flutter-version: 3.32.8` fails if that version cannot be installed; the Xcode step exits 1 unless `/Applications/Xcode_16.4.app` exists; `setup-java` installs Temurin 21. The printed text is read in F08-DEVOPS (S1 at the deploy revision requires the `infra` log anyway). *Correction to `release.md` §10 item 1:* a public run's summary, steps and annotations are readable without signing in; its logs are not.
+* **Annotations:** the Node 20 warning now names only `actions/cache@v4`, which `subosito/flutter-action` uses internally; the checkout warning and the Ubuntu 26 notice are gone.
+
+**Rulings:**
+1. **F08-DEVOPS-PREP — accepted. Delivery Review: Accepted.**
+   * The CI repair is proven by a green run.
+   * CI-FORMAT-GATE, CI-IOS-TOOLCHAIN and CI-EMULATOR-JAVA21 are **CLOSED**.
+   * **Release Result stays Release Validation Pending.** What remains: the deploy decision, the deploy, F08.DEPLOY-SMOKE (S1 at the deploy revision, S2–S4), and final QA.
+2. **TD-CI-INTEGRATION-GATE — the integration step is not a gate yet.**
+   * Project `release.md` §4 said "not auto-blocking until F03 lands". F03 has landed, but CI never had the emulator that §4 assumes, so a blocking gate would turn `main` red on a step that has no device and gives no signal.
+   * **Decision:** the step stays non-blocking. It becomes a **required gate at the first app-build release gate** (FIRST-APP-DISTRIBUTION), on a real emulator or simulator target. A green `verify` job never counts as an integration PASS (contract §9).
+   * F08 does not depend on it: it is a backend-only release. The F03 play session is gated by the required mirror `play_session_runtime_test.dart` and by F03's runtime QA.
+   * Project `release.md` §4 is amended. New follow-up **CI-INTEGRATION-TARGET** (DevOps/Release Engineer): read the step log, then give the step a real device target or remove it.
+3. **N-1 — done.** The project `release.md` §4 format line now reads `app packages tools`.
+4. **N-2 — accepted. The F08 deploy needs no kill-switch.** The Tech Lead checked the claim in the code:
+   * `dailySyncEnabledProvider` is always on outside debug (`app/lib/persistence/sync_providers.dart`);
+   * the debug sync route exists only under `kDebugMode` (`app_router.dart`);
+   * `FakeDailyResultProducer` asserts it never runs in release.
+   * So release builds send the callable no traffic before F07.
+   * New F07 obligation (release-blocking for F07): **wire the Remote Config read of `daily_sync_enabled` before the Daily ships** — follow-up F07-KILL-SWITCH. The project `release.md` §2 note is amended.
+5. **N-3 — TD-FUNCTIONS-RUNTIME: Cloud Functions move to Node.js 22.**
+   * **Source:** the Google Cloud runtime-support page, read 2026-09-29.
+     * Node.js 20: deprecated 2026-04-30; **decommissioned 2026-10-30**. "After the decommission date, you can no longer create new workloads or update existing workloads using the runtime."
+     * Node.js 22: deprecated 2027-04-30; decommissioned 2027-10-31.
+   * A Node 20 deploy after 2026-10-30 is impossible. A deploy before that date could never be updated. So the runtime changes **whatever the deploy date**.
+   * **Node 22, not 24:** Node 22 is the current LTS that the installed `firebase-functions` 6.6 / `firebase-admin` 13.10 line supports. The CI `infra` job pins it explicitly in F08-DEVOPS instead of relying on the runner's default Node (reported as 22 in `release.md` §3; not verified). Node 24 would lengthen the runway by one year but has not been checked against this toolchain; the Backend Developer reports if 22 is not viable.
+   * `platform.md` §3 and `setup-manifest.md` are amended. The implementation is **F08-BE8** (Backend Developer). This is developer work, so the release-scoped gate below does not hold it (contract §5.3).
+   * **Evidence impact:** the handler and validator are unchanged. The local suites ran on the host's Node 24, not on Node 20, so the functional PASS is not tied to the runtime. F08.EMULATOR stays PASS. F08-QA-FINAL re-runs the suite at the final revision (dependency / build-config change → Regression Depth `full`).
+6. **N-4 — the user's environment; not a gate.** The local Android build JDK is recorded in `setup-manifest.md`, with the non-global workaround. No global setting is changed here.
+7. **N-5 and the deploy — new decision gate F08.DEPLOY-GO** (Blocking Scope: release), opened now as A16 ruling 3 planned. F08 has no DevOps work left. The gate holds F08-DEVOPS, F08-QA-FINAL and Done. It does not hold F08-BE8.
+   * **(A) The full first deploy:** the Blaze plan with a budget alert; rules + Remote Config + the function (on Node 22, after F08-BE8) to `looplet-712e5`. F08-DEVOPS then:
+     * reads the live project state;
+     * pins Node 22 in the CI `infra` job;
+     * needs a green CI at the deploy revision, with its logs read (S1);
+     * deploys per the runbook and runs smoke S2–S4.
+     * Then F08-QA-FINAL, then Done. This is the only route to F08 Done and to F07.
+   * **(B) The rules only, now:** Spark, no billing.
+     * DevOps reads the live Firestore rules and deploys the committed deny-all rules, then runs smoke S2.
+     * The function and Remote Config deploys stay deferred. F08 stays in its release stage, and the Tech Lead narrows the remaining gate to the function deploy.
+     * This closes the unknown exposure of a public client config pointing at a database whose rules are unknown (release.md §5 item 3).
+   * **(C) Defer everything.** After F08-BE8, F08 is Blocked with its functional acceptance intact. The Tech Lead activates the next executable feature (F09 depends only on F03).
+   * **Recommendation: (B)** while billing stays deferred. It removes the only live risk at no cost, and it is reversible. Choose (A) once billing is acceptable.
+8. **Routing:**
+   * F08 stays **In Release**.
+   * **F08-BE8 Open:** Current Owner = Next Role = Backend Developer.
+   * F08-DEVOPS Blocked on F08.DEPLOY-GO and F08-BE8; F08-QA-FINAL Queued.
+   * The user can answer the gate while F08-BE8 runs. The Tech Lead checkpoint after F08-BE8 takes in the decision.
+

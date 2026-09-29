@@ -33,6 +33,9 @@
 * **`orchestration-before-deploy-decision.md`** — the F08 orchestration right before the Tech Lead intake of the decision F08.DEPLOY-AUTHORIZATION — B on 2026-09-29, byte for byte (SHA-1 `35008bc2…`).
   * State: Blocked; owner Tech Lead; F08.DEPLOY-AUTHORIZATION OPEN (options A / B / C, A15); F08-DEVOPS-PREP and F08-DEVOPS Blocked; the A15 Current Brief.
   * Taken right before the decision intake (F08 `architecture.md` → Activation 2026-09-29 → A16), which activated F08-DEVOPS-PREP.
+* **`orchestration-before-prep-checkpoint.md`** — the F08 orchestration right before the Tech Lead checkpoint on F08-DEVOPS-PREP on 2026-09-29, byte for byte (SHA-1 `78fe589a…`).
+  * State: In Release; owner Tech Lead; F08-DEVOPS-PREP Done (Release Validation Pending); F08-DEVOPS Blocked; the PREP Current Brief and the full 2026-09-29 Change Log.
+  * Taken right before the checkpoint (F08 `architecture.md` → Activation 2026-09-29 → A17), which accepted PREP, opened F08-BE8 and the gate F08.DEPLOY-GO.
 * **`release-before-devops-prep.md`** — the F08 feature `release.md` of 2026-09-06 (task F08-DEVOPS), byte for byte (SHA-1 `1584a953…`).
   * State: Release Validation Pending; the Spark → Blaze blocker; the rollback check "create-own allowed / create-other denied" and smoke S1 at the old rules; S7 storage-full as residual test-debt; the CI emulator suite PENDING.
   * Taken by the DevOps/Release Engineer right before the F08-DEVOPS-PREP refresh of 2026-09-29 (F08 `architecture.md` A13 ruling 2, A15, A16).

@@ -10,11 +10,11 @@ In Release
 
 ## Current Owner
 
-Backend Developer
+Tech Lead
 
 ## Next Role
 
-Backend Developer
+Tech Lead
 
 ## Active Task Ledger
 
@@ -25,15 +25,14 @@ Backend Developer
 - [x] Task ID: F08-BE7 | Assigned Role: Backend Developer | Status: Done | Summary: DONE 2026-09-29 (backend.md § F08-BE7): rules `aa4c5dc2…`, rules test `2c7df84a…`; emulator suite 33 / 33; N-DIRECT-CREATE caught (3 / 3 expected fails). QA finding F1 (architecture A9 ruling 1): `infra/firestore.rules` denies all client access to `dailyResults/**` (only the callable writes, Admin SDK); `rules.test.ts` flips "create own entry" to denied and adds the invalid-payload and non-date-bucket direct creates; named negative N-DIRECT-CREATE; emulator suite green on Java 21; `infra/README.md` rules row. Rules + test + docs only. Brief: Current Brief | Depends On: -
 - [x] Task ID: F08-QA-FUNCTIONAL-R1 | Assigned Role: QA | Status: Done | Summary: DONE 2026-09-29 — verdict **Runtime Validation Pending** (qa.md § F08-QA-FUNCTIONAL-R1; HEAD 695f783, rules `aa4c5dc2…`, `app/` 9de12e6a…). F1 closed: QA probe P3 / P6 DENIED, emulator suite 33 / 33, N-OVERWRITE + N-DIRECT-CREATE caught, client ↔ emulator exactly-once PASS under the new rules; F08.OFFLINE-JOURNEY (AC2) PENDING. Evidence: qa/functional-r1/. Plan: Functional re-run after F08-BE7 under the plan locked in architecture A9 ruling 4 — emulator suite + N-OVERWRITE + the BE7 negative, the QA rules probe P1–P6 (P3 / P6 now denied), one client ↔ emulator exactly-once case under the new rules, AC2 if the user has run it; other functional evidence reused by fingerprint | Depends On: F08-BE7
 - [x] Task ID: F08-QA-FUNCTIONAL-R2 | Assigned Role: QA | Status: Done | Summary: DONE 2026-09-29 — verdict **Functional Approved** (qa.md § F08-QA-FUNCTIONAL-R2; HEAD e55176f, `app/` 9de12e6a…). AC2 / J8 PASS: the user's offline run validated at store level (levels 1–2 completed and 3 opened offline, timestamps inside the offline window; offline cold relaunch → Home 2 / 30); all 30 levels open through the production path (QA probe + control), installed bundle byte-identical; define-less build confirmed. F08.OFFLINE-JOURNEY → PASS. Evidence: qa/functional-r2/. Plan: Targeted functional re-run for F08.OFFLINE-JOURNEY (AC2 / J8) only, on the user's real no-network run of 2026-09-29 14:07:49–14:09:45Z (`evidence/runtime/offline/`), under the plan of architecture A11 ruling 4 as corrected at A12 ruling 4 (core, backend-security, client-ui, stateful-flow; targeted; reuse allowed by the R1 fingerprints). Activated at the intake A12. Brief: Current Brief | Depends On: F08-QA-FUNCTIONAL-R1
-- [x] Task ID: F08-DEVOPS-PREP | Assigned Role: DevOps/Release Engineer | Status: Done | Summary: DONE 2026-09-29 (release.md, verdict **Release Validation Pending**; no deploy, billing or console change). CI repair (Java 21, TD-FORMAT-SCOPE, TD-CI-TOOLCHAIN, checkout v7.0.1, `ubuntu-24.04`), `release.md` refresh, hygiene recommendations; local proof DP-01…13. **Accepted at A17:** CI run #2 `36597006854` (c592081, pushed by the user) — all three jobs green; the best-effort integration step failed inside the green `verify` job (TD-CI-INTEGRATION-GATE). N-1…N-5 ruled at A17 | Depends On: F08-QA-FUNCTIONAL-R2
-- [ ] Task ID: F08-BE8 | Assigned Role: Backend Developer | Status: Open | Summary: TD-FUNCTIONS-RUNTIME (A17 ruling 5): Cloud Functions runtime Node.js 20 → 22 — `infra/functions/package.json` `engines.node` "22", `@types/node` ^22, the lockfile, `infra/README.md`; build, offline tests and the emulator suite (33 / 33) run on Node 22 locally. No handler, validator, rules or CI change; no deploy. Brief: Current Brief | Depends On: -
-- [ ] Task ID: F08-DEVOPS | Assigned Role: DevOps/Release Engineer | Status: Blocked | Summary: Waits on the user's F08.DEPLOY-GO (opened at A17) and F08-BE8. Scope by the chosen option: read the live project state (rules, plan, App Check); pin Node 22 in the CI `infra` job (SHA-pinned `setup-node`); a green CI run at the deploy revision with its logs read (S1: Java 21, Node 22, 0 skipped); the authorized deploy per the runbook; smoke S2–S4 (F08.DEPLOY-SMOKE) incl. "a direct client create is denied; the callable creates"; the release readiness verdict | Depends On: F08-DEVOPS-PREP, F08-BE8
-- [ ] Task ID: F08-QA-FINAL | Assigned Role: QA | Status: Queued | Summary: Final acceptance of the reviewed release proof and the affected functional scope; Regression Depth `full` (the Node 22 runtime change is a dependency / build-config change): the emulator suite re-run at the final revision, other functional evidence reused by fingerprint | Depends On: F08-DEVOPS
+- [x] Task ID: F08-DEVOPS-PREP | Assigned Role: DevOps/Release Engineer | Status: Done | Summary: DONE 2026-09-29 (release.md, verdict **Release Validation Pending**; no deploy, billing, console change or push). CI repair: `infra` Temurin 21 via SHA-pinned `setup-java` (a); TD-FORMAT-SCOPE in `melos.yaml` + `setup-manifest.md` (b); TD-CI-TOOLCHAIN — Flutter 3.32.8 pinned in `verify` / `ios-build`, `ios-build` on `macos-15` with Xcode 16.4 selected + printed, SPM disabled explicitly (c); `actions/checkout` v7.0.1 (node24), Ubuntu jobs pinned to `ubuntu-24.04` (f). `release.md` refreshed — rules rollback + smoke S1 / S2 per A9 ruling 6, storage-full covered, gate evidence → R1 / R2, runbook re-checked (d); hygiene recommendations (e). Every CI step passes locally with named negatives (`evidence/devops-prep/` DP-01…13; emulator 33 / 33 on Java 21). (g) **the CI run is PENDING** — the user pushes ("Ben push'layacağım"). Tech Lead items N-1…N-5 in release.md §10 | Depends On: F08-QA-FUNCTIONAL-R2
+- [ ] Task ID: F08-DEVOPS | Assigned Role: DevOps/Release Engineer | Status: Blocked | Summary: Deploy deferred (F08.DEPLOY-AUTHORIZATION — B, A16); runs only after the user's F08.DEPLOY-GO (opened at the PREP checkpoint): a green CI run of the `infra` job (the emulator step on Java 21), the authorized deploy per the runbook, the post-deploy smoke (F08.DEPLOY-SMOKE) incl. "a direct client create is denied; the callable creates"; the release readiness verdict | Depends On: F08-DEVOPS-PREP
+- [ ] Task ID: F08-QA-FINAL | Assigned Role: QA | Status: Queued | Summary: Final acceptance of reviewed release proof and any affected functional scope | Depends On: F08-DEVOPS
 
 ## Open Tasks
 
-* **F08-BE8 — Open** (Backend Developer): the Node.js 22 runtime (Current Brief).
-* F08-DEVOPS — Blocked (F08.DEPLOY-GO, F08-BE8); F08-QA-FINAL Queued.
+* None open. F08-DEVOPS-PREP Done (Release Validation Pending); the Tech Lead PREP checkpoint is next.
+* F08-DEVOPS — Blocked (deploy deferred; needs F08.DEPLOY-GO, opened at the PREP checkpoint); F08-QA-FINAL Queued.
 
 ## Handoff Plan
 
@@ -41,7 +40,7 @@ None
 
 ## Delivery Review
 
-Accepted
+Pending
 
 ## QA Scope
 
@@ -109,7 +108,6 @@ None
   * QA 2026-09-29 (F08-QA-FUNCTIONAL): suite 31 / 31 exit 0 (QB-03), N-OVERWRITE caught (QB-04), client ↔ emulator cases A–E + invalid payload → parked (QE-*); create-only, auth isolation and idempotency PASS. Separate finding F1 (direct client create bypasses validation) — qa.md §3.
   * Delivery Evidence (F08-BE7, 2026-09-29, HEAD 8f26243 + the rules change): suite **33 / 33**, exit 0 (`evidence/runtime/BE7-02-fixed-suite.log.txt`); N-DIRECT-CREATE — the old client create rule fails the own-entry, invalid-payload (P3) and non-date-bucket (P6) tests (`BE7-04-neg.log.txt`). Handler / validator / callable test unchanged. QA review pending.
   * Tech Lead 2026-09-29 (A9 ruling 3): **Result reset to PENDING.** F1 is resolved by denying all client access to `dailyResults/**`; F08-BE7 changes `firestore.rules` and `rules.test.ts`, so the rules part of this PASS is at old rules. The callable / idempotency part stays valid while the handler `bcda2662…` and `validate.ts` `8f0398ea…` are unchanged. QA re-runs the suite, the negatives and its rules probe (P3 / P6 must be DENIED) at the BE7 revision in F08-QA-FUNCTIONAL-R1.
-  * Tech Lead 2026-09-29 (A17 ruling 5): stays PASS through the Node.js 22 runtime change (F08-BE8) — the suites ran on the host's Node 24, not on Node 20; F08-QA-FINAL re-runs the suite at the final revision. CI run #2 ran the emulator step green (logs not read).
   * QA 2026-09-29 (F08-QA-FUNCTIONAL-R1, HEAD 695f783, rules `aa4c5dc2…`): suite **33 / 33** exit 0 (QB-R1-03); N-OVERWRITE and N-DIRECT-CREATE caught (QB-R1-04 / 05); QA rules probe P1–P8 8 / 8 — **P3 and P6 DENIED**, no doc written (QB-R1-06), and the same probe fails exactly P3 / P6 on the old rules (QB-R1-07); direct REST create on the running emulator → 403 (QE-R1-00); client ↔ emulator QE-A shape under the new rules → `CREATED`, 1 doc, `synced` (QE-R1-A). F1 closed.
 
 - Evidence ID: F08.LOCAL-RESUME
@@ -173,7 +171,6 @@ None
   * Re-evaluation Trigger: Evidence captured or existing evidence reviewed against the current scope
   * Blocks: F08 release/final acceptance
   * Result: PENDING
-  * Tech Lead 2026-09-29 (A17): CI run #2 `36597006854` at c592081 is green — S1 is shown at that revision only, not at the deploy revision; its logs were not read (sign-in). S1 is re-run in F08-DEVOPS with the logs read.
   * DevOps 2026-09-29 (F08-DEVOPS-PREP): not run — the deploy is deferred (A16). The smoke list is refreshed to the current rules and code in release.md §8 (S1 CI green at the deploy revision; S2 live rules deny every client path; S3 the callable creates exactly once; S4 the app smoke). The rollback is in release.md §7.
 
 - Evidence ID: F08.COLD-BOOT-REVIEW
@@ -202,15 +199,6 @@ None
 
 ## Open Decision Gates
 
-- Decision ID: F08.DEPLOY-GO
-  * Question: May the first Firebase deploy to `looplet-712e5` run now, and how much of it?
-  * Options / Trade-offs (A17 ruling 7): (A) the full deploy — the Blaze plan with a budget alert; rules + Remote Config + the function on Node 22 (after F08-BE8); F08-DEVOPS, then final QA and Done; the only route to F08 Done and F07. (B) the rules only, now — Spark, no billing; DevOps reads the live rules, deploys the committed deny-all rules, smoke S2; the function / Remote Config deploy stays deferred and the Tech Lead narrows this gate to it. (C) defer everything — after F08-BE8, F08 is Blocked with its functional acceptance intact; the Tech Lead activates the next feature (F09)
-  * Recommendation: (B) while billing stays deferred — it closes the unknown-live-rules exposure of the public client config at no cost; (A) once billing is acceptable
-  * Blocks: F08-DEVOPS, F08-QA-FINAL and Done; not F08-BE8
-  * Blocking Scope: release
-  * Status: OPEN
-  * Reply: `Run Tech Lead. Decision: F08.DEPLOY-GO — A` (or B, or C)
-
 - Decision ID: F08.DEPLOY-AUTHORIZATION
   * Question: Is the deferred paid-backend release now authorized, for which environment and scope?
   * Options / Trade-offs (refined 2026-09-29, A15 ruling 4): (A) authorize the deploy — Blaze / billing and the named target; DevOps runs PREP, then the deploy. (B) keep deferring the deploy, but allow the non-deploy release work now (F08-DEVOPS-PREP: the CI fixes, the `release.md` refresh, a readiness verdict); the Tech Lead records the deferral, resolves this gate and opens a narrower gate F08.DEPLOY-GO for F08-DEVOPS (deploy + smoke), final QA and Done. (C) defer everything — F08 stays Blocked and `main` stays red for later features
@@ -237,23 +225,23 @@ None
 
 ## Next Action
 
-Run Backend Developer — F08-BE8 (Current Brief): the Cloud Functions runtime Node.js 20 → 22, verified locally on Node 22; no deploy. Then the Tech Lead checkpoint. In parallel the user answers F08.DEPLOY-GO.
+Run Tech Lead — the F08-DEVOPS-PREP checkpoint: review release.md (Release Validation Pending) and the CI repair; read the CI run after the user's push (run id, every job's conclusion, the integration step's own result, the printed Flutter / Xcode / Java versions); rule on release.md §10 N-1…N-5; open F08.DEPLOY-GO for the user.
 
 ## Last Decision
 
-2026-09-29 — Tech Lead checkpoint on F08-DEVOPS-PREP. Full record: architecture → Activation 2026-09-29 → A17.
+2026-09-29 — Tech Lead intake of the decision F08.DEPLOY-AUTHORIZATION — B. Full record: architecture → Activation 2026-09-29 → A16.
 
-* **Accepted:** F08-DEVOPS-PREP; CI run #2 green (the three CI follow-ups closed); Release Result stays Release Validation Pending.
-* **Decided:** TD-CI-INTEGRATION-GATE (the integration step is not a gate until the first app-build release); TD-FUNCTIONS-RUNTIME (Node.js 22 — Node 20 is decommissioned 2026-10-30); N-1 / N-2 / N-4 recorded.
-* **Opened:** F08-BE8 (owner → Backend Developer); the gate F08.DEPLOY-GO (A / B / C; recommended B).
+* **Resolved (B):** the deploy stays deferred; the non-deploy release work runs now.
+* **Activated:** F08-DEVOPS-PREP; F08 → In Release; owner → DevOps/Release Engineer; Blockers None.
+* **Correction to A15 ruling 4:** F08.DEPLOY-GO opens at the PREP checkpoint, not now — an OPEN release-scoped gate would block the prep itself (contract §5.3). The deploy stays held by the recorded deferral, the Blocked F08-DEVOPS, PREP's non-goals and project `release.md` §3 (production requires approval).
 
-The pre-checkpoint orchestration is archived as history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-prep-checkpoint.md.
+The pre-intake orchestration is archived as history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-deploy-decision.md.
 
 ## Last Update
 
-* Updated By: Tech Lead
+* Updated By: DevOps/Release Engineer
 * Timestamp: 2026-09-29
-* Summary: PREP checkpoint (A17) — PREP accepted on a green CI run #2; F08-BE8 Open (Node.js 22); F08.DEPLOY-GO opened; owner → Backend Developer.
+* Summary: F08-DEVOPS-PREP Done — CI repair (Java 21, TD-FORMAT-SCOPE, TD-CI-TOOLCHAIN, node24 / Ubuntu pins) verified locally; release.md refreshed; verdict Release Validation Pending; the CI run waits on the user's push; owner → Tech Lead.
 
 ## Context & Follow-ups
 
@@ -272,46 +260,116 @@ F08 implementation/runbook and the F08-FE12 fix are retained. Exact old tasks an
 * [Orchestration before the CI-push decision](../../history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-ci-push-decision.md).
 * [Orchestration before the CI incident](../../history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-ci-incident.md).
 * [Orchestration before the deploy decision](../../history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-deploy-decision.md).
-* [Orchestration before the PREP checkpoint](../../history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-prep-checkpoint.md) — incl. the F08-DEVOPS-PREP brief and the full 2026-09-29 Change Log.
 
 ## Change Log
 
 * 2026-09-18 — migrated state; see the immutable pre-migration snapshot for all earlier tasks, decisions and evidence.
-* 2026-09-26 — Tech Lead: queue reordered (incident "the app still shows the old design"): F05 → design adoption → F08 local evidence.
-* 2026-09-29 — the F08 local-evidence and functional stage, in order (full entries in the archived orchestration-before-prep-checkpoint.md):
-  * Tech Lead activation (A1–A5) → Frontend/Mobile Developer F08-FE13 + LOCAL-EVIDENCE → Tech Lead (A6, A7) → Backend Developer F08-BE6 → Tech Lead (A8) → QA F08-QA-FUNCTIONAL (Decision Pending, F1) → Tech Lead (A9) → Backend Developer F08-BE7 → Tech Lead (A10) → QA R1 (Runtime Validation Pending) → Tech Lead (A11) → the user's offline run, intake (A12) → QA R2 (Functional Approved) → Tech Lead (A13).
-  * The release stage: F08.CI-FIRST-PUSH resolved (A14) → CI run #1 incident (A15) → F08.DEPLOY-AUTHORIZATION — B (A16) → DevOps/Release Engineer F08-DEVOPS-PREP (Release Validation Pending).
-* 2026-09-29 — Tech Lead: PREP checkpoint (A17).
-  * **Accepted:** F08-DEVOPS-PREP; CI run #2 `36597006854` green; the integration step failed inside it (not a gate yet, TD-CI-INTEGRATION-GATE).
-  * **Decided:** Node.js 22 for Cloud Functions (TD-FUNCTIONS-RUNTIME); N-1, N-2, N-4.
-  * **Opened:** F08-BE8; the gate F08.DEPLOY-GO.
+* 2026-09-26 — Tech Lead: queue reordered (incident "the app still shows the old design"): F05 → design adoption → F08 local evidence. No scope, evidence or release change.
+* 2026-09-29 — Tech Lead (at the F05 D3 closure): Phase D complete; F08 active again; activation by the next Tech Lead turn (new reusable inputs listed in Next Action). No scope, evidence or release change.
+* 2026-09-29 — Tech Lead: F08 activation.
+  * **Found:** the unreadable-DB dead end (Resilience row / AC8 not implemented).
+  * **Decided:** architecture Activation A1–A5 — recovery rules, Retry reconnect, debug emulator wiring, the evidence plan, Visual Scope `none`.
+  * **Next:** F08-FE13 Open; owner → Frontend/Mobile Developer.
+* 2026-09-29 — Frontend/Mobile Developer: F08-FE13 + F08-LOCAL-EVIDENCE Done (frontend.md). Found + fixed: `onUpgrade` ran without a transaction (partial apply). Needs the Tech Lead: that fix, a backend test-data defect (emulator suite 30/31), JDK 21. Owner → Tech Lead.
+* 2026-09-29 — Tech Lead: FE13 checkpoint.
+  * **Accepted:** FE13 + LOCAL-EVIDENCE and the migration transaction fix (A6).
+  * **Opened:** F08-BE6 (a backend fixture defect).
+  * **Locked:** the QA plan (A7).
+  * **Recorded:** Java 21 in setup-manifest.
   * **Next:** owner → Backend Developer.
+* 2026-09-29 — Backend Developer: F08-BE6 Done (backend.md). Test code only; suite 31 / 31 on Java 21; N-OVERWRITE caught. Needs the Tech Lead: the setup-manifest command (Java 21 on PATH), the existing CI emulator step (Java 21). Owner → Tech Lead.
+* 2026-09-29 — Tech Lead: BE6 checkpoint (A8).
+  * **Accepted:** F08-BE6; Delivery Review Accepted.
+  * **Corrected:** the Java 21 command (setup-manifest); A6 ruling 5's CI premise → CI-EMULATOR-JAVA21 (DevOps/Release Engineer, non-blocking).
+  * **Activated:** F08-QA-FUNCTIONAL (A7).
+  * **Next:** owner → QA.
+* 2026-09-29 — QA: F08-QA-FUNCTIONAL Done — **Decision Pending** (qa.md). PASS: F08.EMULATOR, LOCAL-RESUME, LIFECYCLE, COLD-BOOT-REVIEW, UNREADABLE-DB; PENDING: OFFLINE-JOURNEY. F1: the rules allow a direct client create that bypasses validation (authority conflict). Owner → Tech Lead.
+* 2026-09-29 — Tech Lead: checkpoint on the F08-QA-FUNCTIONAL verdict (A9).
+  * **Decided:** F1 — no client access to `dailyResults/**`; architecture + `platform.md` corrected.
+  * **Opened:** F08-BE7; **Queued:** F08-QA-FUNCTIONAL-R1 (plan A9 ruling 4).
+  * **Reset:** F08.EMULATOR → PENDING; Delivery Review → Pending; Status → Rework.
+  * **Next:** owner → Backend Developer.
+* 2026-09-29 — Backend Developer: F08-BE7 Done (backend.md). Rules + rules test + `infra/README.md` only; suite 33 / 33 on Java 21; N-DIRECT-CREATE caught; handler / validator / callable test unchanged. Owner → Tech Lead.
+* 2026-09-29 — Tech Lead: BE7 checkpoint (A10).
+  * **Accepted:** F08-BE7; Delivery Review Accepted.
+  * **Re-ran:** the suite (33 / 33) and N-DIRECT-CREATE at cb96719 — not a QA claim.
+  * **Activated:** F08-QA-FUNCTIONAL-R1 (A9 ruling 4).
+  * **Next:** owner → QA.
+* 2026-09-29 — QA: F08-QA-FUNCTIONAL-R1 Done — **Runtime Validation Pending** (qa.md). F1 closed (rules probe P3 / P6 DENIED; suite 33 / 33; both negatives caught; client ↔ emulator exactly-once under the new rules). F08.EMULATOR → PASS; F08.OFFLINE-JOURNEY PENDING. Other functional evidence reused by fingerprint. Owner → Tech Lead.
+* 2026-09-29 — Tech Lead: checkpoint on the F08-QA-FUNCTIONAL-R1 verdict (A11).
+  * **Closed:** F1; F08.EMULATOR PASS.
+  * **Clarified:** the Backoff line (N1-R1; no code change).
+  * **Added:** F08-QA-FUNCTIONAL-R2 (Blocked on the user's no-network run); F08-DEVOPS now depends on it.
+  * **Next:** Status → Blocked; owner Tech Lead; the user runs AC2.
+* 2026-09-29 — Tech Lead: intake of the user's no-network run (A12).
+  * **Checked:** a valid offline run (outputs 01–06; define-less build).
+  * **Activated:** F08-QA-FUNCTIONAL-R2; Status → In QA.
+  * **Next:** owner → QA.
+* 2026-09-29 — QA: F08-QA-FUNCTIONAL-R2 Done — **Functional Approved** (qa.md). AC2 / J8 PASS: the user's offline run validated at store level; all 30 levels open through the production path (probe + control). F08.OFFLINE-JOURNEY → PASS; every functional record PASS. Owner → Tech Lead.
+* 2026-09-29 — Tech Lead: checkpoint on the F08-QA-FUNCTIONAL-R2 verdict (A13).
+  * **Accepted:** Functional Approved; the functional stage is closed.
+  * **Defined:** F08-DEVOPS-PREP (split from F08-DEVOPS, Blocked); **opened** the gate F08.CI-FIRST-PUSH.
+  * **Next:** Status → Blocked (release gates, contract §5.3); owner Tech Lead; the user decides.
+* 2026-09-29 — Tech Lead: decision F08.CI-FIRST-PUSH (A14).
+  * **Resolved:** the user pushed `main` (public origin).
+  * **Recorded:** CI run #1 — the `infra` emulator step failed.
+  * **Extended:** F08-DEVOPS-PREP (d)–(f).
+  * **Next:** F08 stays Blocked on F08.DEPLOY-AUTHORIZATION.
+* 2026-09-29 — Tech Lead: incident — CI run #1 logs (A15).
+  * **Confirmed:** Java < 21 (`infra`); two `ai-system/` QA probes (format); unpinned Flutter → SPM → a Swift 6 SDK on `macos-14` (iOS).
+  * **Decided:** TD-FORMAT-SCOPE, TD-CI-TOOLCHAIN; the deploy gate's options A / B / C.
+  * **Next:** the user decides (recommended B).
+* 2026-09-29 — Tech Lead: decision F08.DEPLOY-AUTHORIZATION — B (A16).
+  * **Resolved:** deploy deferred; non-deploy release work allowed.
+  * **Activated:** F08-DEVOPS-PREP; Status → In Release.
+  * **Next:** owner → DevOps/Release Engineer; F08.DEPLOY-GO at the PREP checkpoint.
+* 2026-09-29 — DevOps/Release Engineer: F08-DEVOPS-PREP Done — **Release Validation Pending** (release.md).
+  * **Changed:** `ci.yml` (Java 21; Flutter 3.32.8; `macos-15` + Xcode 16.4; SPM off; checkout v7.0.1; `ubuntu-24.04`), `melos.yaml` (format scope), `setup-manifest.md`, `infra/README.md`. No app / rules / function change; no deploy; no push.
+  * **Verified locally:** every CI step (evidence/devops-prep/ DP-01…13), incl. the format-scope and Java 21 negatives.
+  * **Pending:** the CI run after the user's push.
+  * **Found:** no Remote Config kill-switch in release builds before F07; Node.js 20 runtime past end-of-life; live Firestore rules unknown; the local JBR 25 breaks `build:app` (release.md §10 N-1…N-5).
+  * **Next:** owner → Tech Lead (checkpoint).
 
 ## Release Constraints
 
 The 2026-09-06 user decision to defer billing/deploy is preserved. In Progress now reflects still-available validation work, not renewed deploy permission. F08-DEVOPS remains Blocked. Environment/JDK/device availability has not been freshly probed; use current evidence, not the old environment assumptions.
 ## Current Brief
 
-**F08-BE8 — Cloud Functions runtime Node.js 20 → 22** (architecture → A17 ruling 5, TD-FUNCTIONS-RUNTIME; `platform.md` §3 amended)
+**Decision F08.DEPLOY-AUTHORIZATION — B (A16):** the deploy stays deferred; this non-deploy release work runs now. Any deploy, billing, Remote Config or console change is out of scope; it needs the later gate F08.DEPLOY-GO.
 
-**Why:** Google decommissions the Node.js 20 runtime for Cloud Functions on **2026-10-30**; after that date no function can be created or updated on it. F08's first deploy is still open (F08.DEPLOY-GO), so the runtime must change whatever the deploy date. Node.js 22 is supported until 2027-10-31.
+**F08-DEVOPS-PREP — CI repair and local release prep, no deploy** (architecture → A13 ruling 2, A14, A15, A16; Release Scope `production-readiness`; activated at A16)
 
-**Inputs:** `infra/functions/package.json` (`engines.node: "20"`, `@types/node: ^20.0.0`), `infra/functions/package-lock.json`, `infra/README.md` (the `functions/` row "Node 20"; Deploy prerequisite 3 "the `nodejs20` runtime is still deployable"), `project-authority/setup-manifest.md` (the Java 21 emulator command), `backend.md` § F08-BE7 (the suite baseline, 33 / 33).
+**Inputs:** `architecture.md` A9 ruling 6, A13, A14, A15, A16; `.github/workflows/ci.yml`; `melos.yaml`; `project-authority/setup-manifest.md`; `project-authority/release.md` (§4 CI, §6 rollback, §8 smoke, §10 action pinning); the feature `release.md` (2026-09-06, out of date since A9); `qa.md` § F08-QA-FUNCTIONAL-R1 / R2; `workflow-follow-ups.md` → CI-EMULATOR-JAVA21, CI-FORMAT-GATE, CI-IOS-TOOLCHAIN.
+
+**CI run #1** (`36590316947`, head 8a0522f). The logs were pasted by the user and are recorded in A15:
+* `infra` — "firebase-tools no longer supports Java version before 21";
+* format — two `ai-system/` QA probes;
+* iOS — `sending` Swift 6 errors in an SPM-resolved `firebase-ios-sdk` on `macos-14`.
 
 **Scope:**
-1. `engines.node` → `"22"`; `@types/node` → `^22`. Update the lockfile with a scoped install of `@types/node` only — do not refresh other dependencies; report the lockfile diff (packages changed).
-2. Keep `firebase-functions` 6.x / `firebase-admin` 13.x. Confirm from their own `package.json` / docs that Node 22 is supported. If it is not, or if Node 24 is required, stop and report — do not upgrade them.
-3. Verify **on Node 22** (the host has Node 24; use a Node 22 binary without changing the system default — e.g. a keg-only `node@22`, first on `PATH` for the commands; any install needs the user's approval in chat): `node --version` in each log; `npm ci`, `npm run build`, `npm test` (offline), then the emulator suite with Java 21 first on `PATH` (setup-manifest command) → 3 / 3 suites, 33 / 33, exit 0.
-4. `infra/README.md`: the runtime row → Node 22; Deploy prerequisite 3 → Node 22 is supported until 2027-10-31 (source: the Google Cloud runtime-support page, read 2026-09-29).
-5. `backend.md` § F08-BE8: the diff, the Node 22 logs, and the evidence under `evidence/runtime/BE8-*`.
+1. **`infra`: Java 21** first on `PATH` for the emulator step (e.g. an SHA-pinned `actions/setup-java` with 21). Verify locally with the setup-manifest command.
+2. **TD-FORMAT-SCOPE:** `format` and `format:check` in `melos.yaml` run over `app packages tools`. Update the canonical command in `setup-manifest.md` to match. Do **not** reformat or move anything under `ai-system/`. Verify: `melos run format:check` exit 0 locally.
+3. **TD-CI-TOOLCHAIN:**
+   * pin Flutter **3.32.8** (`flutter-version`) in every job that sets up Flutter;
+   * move `ios-build` to a runner / Xcode ≥ 16.4 with Swift 6 (a newer macOS runner, or an SHA-pinned Xcode selection), and print `xcodebuild -version` and `flutter --version` in the log;
+   * keep CocoaPods as locally — do not enable SPM;
+   * if a pinned version cannot be installed on a runner, stop and report.
+4. **Action / runner notices:** the Node 20 → 24 notice for the pinned `actions/checkout`, and the `ubuntu-latest` → Ubuntu 26 migration (2026-10-19). Update or pin as `release.md` §10 requires.
+5. **Refresh the feature `release.md`:**
+   * rollback "Bad rules shipped" and smoke S1 → "a direct client create is denied (own entry, invalid payload, non-date bucket, another user, unauthenticated); update / delete / read denied; the callable creates" (A9 ruling 6);
+   * storage-full → covered (F08.STORAGE PASS);
+   * gate evidence → the functional QA records (R1 / R2);
+   * re-check the runbook and the smoke list against the current rules and code.
+6. **Public-repository hygiene (A14 ruling 2 (e)):** recommend Firebase API key restrictions, and note App Check's monitor mode. Console or account changes are the user's.
+7. **Prove it:** a CI fix counts only after a green run. Ask the user in chat before any push; the user may also push. Record the run id, every job's conclusion, and the logged Flutter / Xcode / Java versions.
+8. **Readiness verdict** in `release.md` and the orchestration `Release Result` — expected **Release Validation Pending**, listing exactly what remains (the deploy decision F08.DEPLOY-GO, F08.DEPLOY-SMOKE; a green CI run if it did not happen).
 
-**Non-goals:** no handler, validator, rules, test-logic, CI or Remote Config change; no deploy, billing or console action; no push without the user's approval. The CI `infra` job's Node pin is DevOps work in F08-DEVOPS.
+**Non-goals:** no deploy, billing, Remote Config or console change; no Flutter / Firebase dependency upgrade (a separate decision with full regression); no app, rules or function change; no change to `ai-system/` evidence. If a fix needs any of these, stop and hand back to the Tech Lead.
 
-**Exit:** the emulator suite 33 / 33 on Node 22 and `tsc` clean; `backend.md` updated; F08-BE8 Done; owner → Tech Lead; `Run Tech Lead`.
+**Then:** close F08-DEVOPS-PREP, owner → Tech Lead, `Run Tech Lead`.
 
 ## Earlier briefs
 
-* The F08-DEVOPS-PREP brief (A16) — in history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-prep-checkpoint.md.
 * The deploy-decision wait (A15) — in history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-deploy-decision.md.
 * The pre-A15 F08-DEVOPS-PREP brief — in history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-ci-incident.md.
 * The F08-QA-FUNCTIONAL-R2 brief (2026-09-29) — in history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-functional-closure.md.

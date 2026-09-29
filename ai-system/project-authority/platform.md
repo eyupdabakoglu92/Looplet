@@ -1,6 +1,6 @@
 # Project Platform Authority — LOOPLET
 
-Last Updated: 2026-09-29 (§6 + §8: no client access to `dailyResults/**` — the callable is the only write path, F08 A9; §14 visual capture / asset / motion baseline added for the Visual Quality Gate; §3 + §11 shared-enum carve-out extended at F06 close-out; §6 guest-identity decouple + §13 Drift-schema/App-Check notes at F08 contract finalization; §13 App Check provider selection + iOS-App-Attest-deferred at F08 Firebase-project incident)
+Last Updated: 2026-09-29 (§3: Cloud Functions runtime Node.js 20 → **22** — Node 20 is decommissioned on Cloud Functions 2026-10-30, F08 A17 TD-FUNCTIONS-RUNTIME; §6 + §8: no client access to `dailyResults/**` — the callable is the only write path, F08 A9; §14 visual capture / asset / motion baseline added for the Visual Quality Gate; §3 + §11 shared-enum carve-out extended at F06 close-out; §6 guest-identity decouple + §13 Drift-schema/App-Check notes at F08 contract finalization; §13 App Check provider selection + iOS-App-Attest-deferred at F08 Firebase-project incident)
 Owner: Tech Lead
 
 ---
@@ -26,7 +26,7 @@ Owner: Tech Lead
 
 ## Backend / Services
 
-* Language: TypeScript (Node.js 20) for Cloud Functions.
+* Language: TypeScript (**Node.js 22**) for Cloud Functions. Changed from Node.js 20 on 2026-09-29 (F08 `architecture.md` A17, TD-FUNCTIONS-RUNTIME): Google decommissions the Node.js 20 runtime on 2026-10-30, after which no function can be created or updated on it; Node.js 22 is supported until its decommission on 2027-10-31. A later runtime bump is a platform change with an emulator-suite regression run.
 * Runtime: Firebase (managed BaaS) — **[Assumption]** single-vendor choice for lowest ops on an MVP validation build.
 * Framework: Firebase Functions (2nd gen, HTTPS callable) + Firestore + Cloud Storage + Remote Config + Firebase Anonymous Auth + App Check + Crashlytics + Firebase Analytics (GA4).
 * Architecture Style: serverless functions over a managed BaaS. No long-running services. The MVP backend surface is intentionally three things only:

@@ -3,7 +3,7 @@
 > Status: OPERATIONAL. Project-specific scaffold/bootstrap recipe for the `Project Setup` role.
 > This file carries operation recipes and canonical commands only — no role or architecture authority.
 
-Last Updated: 2026-09-29 (F08-DEVOPS-PREP: TD-FORMAT-SCOPE and TD-CI-TOOLCHAIN implemented — the format commands and the CI toolchain lines; F08 A15); 2026-09-29 (the Java 21 emulator-suite command, F08 A6; Java 21 on `PATH` too, F08 A8); 2026-09-06 (added the `infra/` Firebase DURUM 0 recipe for F08)
+Last Updated: 2026-09-29 (F08 PREP checkpoint, A17: the Cloud Functions runtime line → Node.js 22 (TD-FUNCTIONS-RUNTIME; implementation in F08-BE8); the local Android-build JDK note (N-4)); 2026-09-29 (F08-DEVOPS-PREP: TD-FORMAT-SCOPE and TD-CI-TOOLCHAIN implemented — the format commands and the CI toolchain lines; F08 A15); 2026-09-29 (the Java 21 emulator-suite command, F08 A6; Java 21 on `PATH` too, F08 A8); 2026-09-06 (added the `infra/` Firebase DURUM 0 recipe for F08)
 Owner: Tech Lead
 
 ---
@@ -137,7 +137,7 @@ Target directory: `infra/` at the repo root (currently a stub `infra/README.md`)
 ### Global constraints
 
 * Firebase project: **one project for the MVP** (`looplet` or a name the user provides); a separate `production` project is a DevOps/Release Engineer decision at the release gate — do **not** create multiple projects here.
-* Cloud Functions language: **TypeScript, Node.js 20** (`platform.md` §3). 2nd-gen HTTPS callable.
+* Cloud Functions language: **TypeScript, Node.js 22** (`platform.md` §3; changed from 20 on 2026-09-29, F08 A17 TD-FUNCTIONS-RUNTIME — `engines.node` changes in F08-BE8, the CI `infra` job pins Node 22 in F08-DEVOPS). 2nd-gen HTTPS callable.
 * No secret values in the repo — only names (`release.md` §7). `FIREBASE_CI_TOKEN` is referenced by CI, not stored.
 * Do **not** implement `submitDailyResultV1` business logic — Project Setup produces a **compiling skeleton** (handler that validates nothing yet / returns `INTERNAL`), one passing emulator smoke test, and the wiring. Backend Developer (F08-BE2) fills the logic against `features/f08-.../architecture.md`.
 * Firebase **client** config files (`firebase_options.dart`, `google-services.json`, `GoogleService-Info.plist`) are not secret and are committed (`release.md` §7).
@@ -170,6 +170,8 @@ Target directory: `infra/` at the repo root (currently a stub `infra/README.md`)
 * Firebase emulator suite (rules + callable, project `demo-looplet`, no billing): `cd infra/functions && npm ci && npm run build && JAVA_HOME=/opt/homebrew/opt/openjdk@21 PATH=/opt/homebrew/opt/openjdk@21/bin:$PATH npm run test:emulator`  _(firebase-tools 15.29 needs **Java 21+** and uses the first `java` on `PATH`, so `JAVA_HOME` alone fails with "firebase-tools no longer supports Java version before 21". `openjdk@21` is installed keg-only and not linked, so the system Java is unchanged. Expected: Test Suites 3 / 3, Tests 31 / 31, exit 0. Added 2026-09-29, F08 `architecture.md` Activation A6 ruling 5; corrected at A8 ruling 2.)_
 
 ---
+
+* **Local Android build JDK (F08 A17, N-4 — the user's environment, not a gate).** On the workstation, `melos run build:app` fails when Flutter picks Android Studio's bundled JBR 25: Gradle 8.12 runs on Java ≤ 23. CI is unaffected (the runner's JDK 17). Local workaround without changing global settings: `cd app/android && JAVA_HOME=/opt/homebrew/opt/openjdk@17 ./gradlew --no-daemon bundleRelease` (F08-DEVOPS-PREP DP-08b; any JDK 17–23 works). A permanent fix — `flutter config --jdk-dir <JDK 17 or 21>` (a global Flutter setting, the user's call) or a Gradle / AGP upgrade (a build-config change with full regression) — is not decided.
 
 ## Canonical Containerization Commands
 
