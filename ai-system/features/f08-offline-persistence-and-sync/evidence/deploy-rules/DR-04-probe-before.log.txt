@@ -1,0 +1,21 @@
+Read-only unauthenticated probe BEFORE the deploy, 2026-09-29T17:11:58Z. No write is attempted before the deploy.
+$ curl -s -o body -w '%{http_code}' GET https://firestore.googleapis.com/v1/projects/looplet-712e5/databases/(default)/documents/dailyResults
+HTTP 403
+{
+  "error": {
+    "code": 403,
+    "message": "Missing or insufficient permissions.",
+    "status": "PERMISSION_DENIED"
+  }
+}
+
+$ curl -s -o body -w '%{http_code}' GET https://firestore.googleapis.com/v1/projects/looplet-712e5/databases/(default)/documents/dailyResults/tr_2026-09-29/entries/smoke-probe
+HTTP 403
+{
+  "error": {
+    "code": 403,
+    "message": "Missing or insufficient permissions.",
+    "status": "PERMISSION_DENIED"
+  }
+}
+

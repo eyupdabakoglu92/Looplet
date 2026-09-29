@@ -2,6 +2,7 @@
 
 > Task: `F08-DEVOPS-PREP` · Role: DevOps/Release Engineer · Date: 2026-09-29
 > Authority: project `release.md` (§2 F08 = `production-readiness`, §4 CI, §9 rollback, §10 pinning, §12 approval); `setup-manifest.md`; F08 `architecture.md` A9 ruling 6, A13 ruling 2, A14, A15, A16; `qa.md` § F08-QA-FUNCTIONAL-R1 / R2; `orchestration.md` → Current Brief.
+> **Update 2026-09-29 — task `F08-DEVOPS-RULES`** (F08.DEPLOY-GO — B, A19): pre-flight, live-state read, source verification and dry-run done; **the rules deploy was NOT executed — the user answered "wait" at the confirmation step.** See "F08-DEVOPS-RULES" before the handoff footer; evidence `evidence/deploy-rules/`.
 > Previous version (2026-09-06, task F08-DEVOPS): `history/f08-offline-persistence-and-sync-2026-09-29/release-before-devops-prep.md`.
 
 ---
@@ -90,7 +91,11 @@ Workflow `CI` (`.github/workflows/ci.yml`). Triggers: `pull_request` to `main` a
 
 ### Live project state
 
-The last observation is from 2026-09-06: Spark plan; a `(default)` Firestore database created as a side effect of the dry-run; no functions deployed; Anonymous Auth enabled; App Check in monitor. **It was not re-verified this turn**, because reading it needs the user's account session. It is re-read at the start of F08-DEVOPS.
+**Re-read 2026-09-29 17:11Z (F08-DEVOPS-RULES), read-only, through the signed-in Firebase CLI's session:**
+* the `(default)` database exists — Standard edition, Firestore Native (`DR-01`);
+* **no Firestore rules have ever been released:** 0 releases and 0 rulesets on the project (`DR-02`, `DR-03`);
+* unauthenticated REST reads on `dailyResults` and on an entry path → **403 `PERMISSION_DENIED`** (`DR-04`). With no release, Firestore applies its implicit lock. No write was attempted before a deploy.
+* Not re-read: plan (Spark per 2026-09-06), Anonymous Auth, App Check — not needed for a rules-only scope.
 
 ### Public-repository hygiene (A14 ruling 2 (e)) — recommendations; the console changes are the user's
 
@@ -101,7 +106,7 @@ The repository `github.com/eyupdabakoglu92/Looplet` is public. `google-services.
    * The iOS key → "iOS apps": bundle ID `com.looplet.loopletApp`.
 2. **Restrict each key by API** to the Firebase APIs the app uses today: Identity Toolkit, Token Service, Cloud Firestore, Firebase Installations, Firebase App Check. Add Remote Config (F07) and Google Analytics (F12) when those features land.
    * An API missing from the list breaks that feature at runtime. After the change, run a debug build once against the real project (not the emulator) — anonymous sign-in, App Check token — before relying on it.
-3. **Check the live Firestore rules.** The repository's rules (deny all client access, A9) have **never been deployed**. The `(default)` database on the project has had the console's rules since 2026-09-06, whatever they are. If they are not deny-by-default, the public config makes that database reachable.
+3. **Check the live Firestore rules.** *(Checked 2026-09-29, F08-DEVOPS-RULES: no rules release exists and unauthenticated reads are denied — the implicit lock, not the console's test mode. The exposure feared here did not exist for reads; writes were not probed.)* The repository's rules (deny all client access, A9) have **never been deployed**. The `(default)` database on the project has had the console's rules since 2026-09-06, whatever they are. If they are not deny-by-default, the public config makes that database reachable.
    * The fix is a rules-only deploy of the committed `firestore.rules`. That is a deploy, so it needs the user's decision. The Tech Lead can offer it at F08.DEPLOY-GO as a rules-only first step; it needs no Blaze plan.
 4. **App Check stays in monitor mode** (`platform.md`; `enforceAppCheck: false`). With a public config, anyone can call the callable once it is deployed and create anonymous users. The callable validates every payload and writes create-only, so the harm is bounded. Enforcement is planned in F08-PLATFORM-ATTESTATION; watch the App Check metrics after the deploy.
 
@@ -183,7 +188,12 @@ Local evidence: `evidence/devops-prep/` (README gives the revision and the host)
 | Workflow file | static inspection | Ruby YAML parse of `ci.yml` | local | 3 jobs (`verify` 11 steps, `infra` 7, `ios-build` 8); `env.FLUTTER_VERSION = 3.32.8` | this turn | parse only, not a run |
 | **CI run after the repair** | CI | workflow `CI` on push to `main` | GitHub Actions | **PENDING / NOT RUN** — the user pushes (asked in chat; answer: "Ben push'layacağım") | — | the fix counts only after a green run (A16 ruling 4) |
 | Functional acceptance | runtime + integration (QA) | F08-QA-FUNCTIONAL-R1 / R2 | emulator + simulator | Functional Approved; every functional record PASS | `qa.md` § R1 / R2; `qa/functional-r1/`, `qa/functional-r2/` | QA's limits: N1-R2 (levels 4–30 not opened offline) |
-| Deploy | — | runbook §6 | production | **NOT EXECUTED** — deferred (A16) | — | — |
+| Live state before the rules deploy | runtime (read-only) | `firebase firestore:databases:list`; `evidence/deploy-rules/read-live-rules.cjs` (the CLI's library + session); unauthenticated REST GET | production `looplet-712e5` | `(default)` exists; **0 releases, 0 rulesets**; GET → 403 ×2 | `DR-01`…`DR-04` (17:11Z) | read-only; no write attempted |
+| Rules source at the deploy revision | repeatable integration | `npm run test:emulator` (Java 21 first on `PATH`) | local emulator `demo-looplet`, HEAD dfccce3 | exit 0; 3 / 3, **33 / 33**; `firestore.rules` `aa4c5dc2…` and `rules.test.ts` `2c7df84a…` = CI-green c592081 | `DR-05` | — |
+| Rules deploy — dry-run | build (compile) | `firebase deploy --only firestore:rules --project looplet-712e5 --dry-run` | production (compile only) | exit 0; "compiled successfully" | `DR-06` | a dry-run is not a deploy |
+| **Rules deploy** | — | `firebase deploy --only firestore:rules --project looplet-712e5` | production | **NOT EXECUTED** — the user answered "wait" at the confirmation step (2026-09-29, after 17:12Z) | — | — |
+| F08.LIVE-RULES (post-deploy smoke) | runtime | brief step 6 | production | **NOT RUN** — no deploy | — | — |
+| Deploy (function + Remote Config) | — | runbook §6 | production | **NOT EXECUTED** — deferred (A16, A19) | — | — |
 | Post-deploy smoke S2–S4 (F08.DEPLOY-SMOKE) | runtime | §8 | production | **PENDING** | — | — |
 | Rollback plan | documented | §7 | — | written to the current rules and code | this file | not exercised |
 
@@ -236,12 +246,36 @@ Local evidence: `evidence/devops-prep/` (README gives the revision and the host)
 
 ---
 
+## F08-DEVOPS-RULES (2026-09-29) — the rules deploy is held by the user
+
+**Scope** (orchestration Current Brief; A19): the rules-only production deploy of the committed deny-all `firestore.rules`.
+
+| Brief step | Result | Evidence |
+| --- | --- | --- |
+| 1. Pre-flight | firebase-tools 15.29.0; the CLI is signed in to the user's account (no credential typed or printed); target `looplet-712e5`; `(default)` database exists | `DR-01` |
+| 2. Live rules before | **none: 0 releases, 0 rulesets.** Unauthenticated GET → 403 (implicit lock). There is no previous ruleset to save; the rollback reference is "no release" | `DR-02`…`DR-04` |
+| 3. Source | `aa4c5dc2…`; suite 33 / 33 at dfccce3; the rules and rules-test bytes match the CI-green run #2 (c592081) | `DR-05` |
+| 4. Dry-run | exit 0, compiles | `DR-06` |
+| 5. Confirmation + deploy | **asked in chat; the user answered "Hayır, bekle" (wait). Not deployed.** | — |
+| 6. Smoke F08.LIVE-RULES | not run (no deploy) | — |
+| 7. Rollback | not needed — nothing changed on the project | — |
+
+**What this turn changed on the project:** nothing. Every call was read-only (databases list, rules list, REST GET, dry-run compile).
+
+**Finding for the Tech Lead:** the premise of option B (A17 ruling 7, A19) was that the database had unknown console rules that might be open. It has none, and Firestore's implicit lock denies client reads. B's urgency is therefore lower. The deploy still has value: explicit, versioned rules identical to the repository, and a prerequisite of the function deploy. Whether and when to run it is the user's / Tech Lead's call.
+
+**Rollback, if the deploy runs later:** the pre-deploy state is "no release" (implicit lock), which denies at least as much as the committed rules. So rolling back is not a safety need; the committed file is the safe state.
+
+**Verdict: Release Validation Pending** (unchanged). No gate failed; the rules deploy and F08.LIVE-RULES are not executed, and the function deploy, S3 / S4 and final QA remain.
+
+---
+
 # WORKFLOW HANDOFF SUGGESTION (NON-AUTHORITATIVE)
 
-* **Completed Tasks:** F08-DEVOPS-PREP — brief items 1–6 and 8; item 7 locally (DP-01…13), with the CI run pending the user's push.
-* **Remaining Tasks:** the CI run after the push; F08.DEPLOY-GO; F08-DEVOPS (deploy + smoke); F08-QA-FINAL.
-* **Blockers:** none for the checkpoint. N-1…N-5 need Tech Lead rulings.
-* **Status Suggestion:** Ready for Tech Lead Review.
+* **Completed Tasks:** none closed. F08-DEVOPS-RULES steps 1–4 done (read-only + dry-run); step 5 held by the user.
+* **Remaining Tasks:** the rules deploy + F08.LIVE-RULES (if the user / Tech Lead still want it); then F08.FUNCTION-DEPLOY-GO; F08-DEVOPS; F08-QA-FINAL.
+* **Blockers:** the user's "wait" at the deploy confirmation.
+* **Status Suggestion:** Needs Tech Lead Review.
 
 ---
 

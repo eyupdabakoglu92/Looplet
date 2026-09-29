@@ -10,11 +10,11 @@ In Release
 
 ## Current Owner
 
-DevOps/Release Engineer
+Tech Lead
 
 ## Next Role
 
-DevOps/Release Engineer
+Tech Lead
 
 ## Active Task Ledger
 
@@ -27,14 +27,14 @@ DevOps/Release Engineer
 - [x] Task ID: F08-QA-FUNCTIONAL-R2 | Assigned Role: QA | Status: Done | Summary: DONE 2026-09-29 — verdict **Functional Approved** (qa.md § F08-QA-FUNCTIONAL-R2; HEAD e55176f, `app/` 9de12e6a…). AC2 / J8 PASS: the user's offline run validated at store level (levels 1–2 completed and 3 opened offline, timestamps inside the offline window; offline cold relaunch → Home 2 / 30); all 30 levels open through the production path (QA probe + control), installed bundle byte-identical; define-less build confirmed. F08.OFFLINE-JOURNEY → PASS. Evidence: qa/functional-r2/. Plan: Targeted functional re-run for F08.OFFLINE-JOURNEY (AC2 / J8) only, on the user's real no-network run of 2026-09-29 14:07:49–14:09:45Z (`evidence/runtime/offline/`), under the plan of architecture A11 ruling 4 as corrected at A12 ruling 4 (core, backend-security, client-ui, stateful-flow; targeted; reuse allowed by the R1 fingerprints). Activated at the intake A12. Brief: Current Brief | Depends On: F08-QA-FUNCTIONAL-R1
 - [x] Task ID: F08-DEVOPS-PREP | Assigned Role: DevOps/Release Engineer | Status: Done | Summary: DONE 2026-09-29 (release.md, verdict **Release Validation Pending**; no deploy, billing or console change). CI repair (Java 21, TD-FORMAT-SCOPE, TD-CI-TOOLCHAIN, checkout v7.0.1, `ubuntu-24.04`), `release.md` refresh, hygiene recommendations; local proof DP-01…13. **Accepted at A17:** CI run #2 `36597006854` (c592081, pushed by the user) — all three jobs green; the best-effort integration step failed inside the green `verify` job (TD-CI-INTEGRATION-GATE). N-1…N-5 ruled at A17 | Depends On: F08-QA-FUNCTIONAL-R2
 - [x] Task ID: F08-BE8 | Assigned Role: Backend Developer | Status: Done | Summary: DONE 2026-09-29 (backend.md § F08-BE8): `engines.node` "22", `@types/node` 20.19.43 → 22.20.4 (lockfile: root + `@types/node` only), `infra/README.md`; on Node 22.23.3 started directly (npm scripts put the host Node 24 first on PATH — backend.md §11): `tsc` exit 0, offline 18 passed / 15 skipped, emulator suite 3 / 3, **33 / 33** (`evidence/runtime/BE8-01`, `BE8-02`). Source, tests, rules, CI unchanged; no deploy. Host note: `node@22` install broke the system node via `simdjson`; restored as node@24 24.21.0 with the user's choice (backend.md §14) — **accepted at A18** (Tech Lead re-run at 9f6b6e6: 33 / 33 on Node 22) | Depends On: -
-- [ ] Task ID: F08-DEVOPS-RULES | Assigned Role: DevOps/Release Engineer | Status: Open | Summary: F08.DEPLOY-GO — B (A19): the rules-only production deploy — read the live Firestore rules, verify the source (`infra/firestore.rules` `aa4c5dc2…`, suite 33 / 33 at the deploy revision), dry-run, confirm with the user in chat, `firebase deploy --only firestore:rules --project looplet-712e5`, the rules-scope smoke (the live ruleset = the committed file; unauthenticated create / get / update / delete → 403), `release.md` updated. No function / Remote Config / index deploy, no billing. Brief: Current Brief | Depends On: F08-BE8
+- [ ] Task ID: F08-DEVOPS-RULES | Assigned Role: DevOps/Release Engineer | Status: Open | Summary: F08.DEPLOY-GO — B (A19): the rules-only production deploy — read the live Firestore rules, verify the source (`infra/firestore.rules` `aa4c5dc2…`, suite 33 / 33 at the deploy revision), dry-run, confirm with the user in chat, `firebase deploy --only firestore:rules --project looplet-712e5`, the rules-scope smoke (the live ruleset = the committed file; unauthenticated create / get / update / delete → 403), `release.md` updated. No function / Remote Config / index deploy, no billing. Brief: Current Brief — **2026-09-29: steps 1–4 done, the deploy HELD by the user** ("Hayır, bekle" at the confirmation step; nothing changed on the project). Found: the live project has **no rules release and no ruleset**; unauthenticated reads → 403 (implicit lock). release.md § F08-DEVOPS-RULES; `evidence/deploy-rules/` DR-01…06 | Depends On: F08-BE8
 - [ ] Task ID: F08-DEVOPS | Assigned Role: DevOps/Release Engineer | Status: Blocked | Summary: The function + Remote Config deploy, deferred (A19): needs the gate F08.FUNCTION-DEPLOY-GO (Blaze + the function deploy), opened at the F08-DEVOPS-RULES checkpoint. Scope then: pin Node 22 in the CI `infra` job (SHA-pinned `setup-node`); a green CI run at the deploy revision with its logs read (S1); deploy `submitDailyResultV1` (`nodejs22`) + Remote Config per the runbook; smoke S3 / S4 and the authenticated part of S2; the release readiness verdict | Depends On: F08-DEVOPS-RULES
 - [ ] Task ID: F08-QA-FINAL | Assigned Role: QA | Status: Queued | Summary: Final acceptance of the reviewed release proof and the affected functional scope; Regression Depth `full` (the Node 22 runtime change is a dependency / build-config change): the emulator suite re-run at the final revision, other functional evidence reused by fingerprint | Depends On: F08-DEVOPS
 
 ## Open Tasks
 
-* **F08-DEVOPS-RULES — Open** (DevOps/Release Engineer): the rules-only production deploy (Current Brief).
-* F08-DEVOPS — Blocked (the function deploy is deferred; F08.FUNCTION-DEPLOY-GO opens at the rules checkpoint); F08-QA-FINAL Queued.
+* F08-DEVOPS-RULES — Open, **held**: the user answered "wait" at the deploy confirmation; the Tech Lead decides the next step.
+* F08-DEVOPS — Blocked (the function deploy is deferred); F08-QA-FINAL Queued.
 
 ## Handoff Plan
 
@@ -186,6 +186,7 @@ None
   * Re-evaluation Trigger: F08-DEVOPS-RULES delivery
   * Blocks: F08 release / final acceptance
   * Result: PENDING
+  * DevOps 2026-09-29 (F08-DEVOPS-RULES): not run — the user held the deploy. Pre-deploy state read: 0 releases, 0 rulesets; unauthenticated GET → 403 ×2 (`evidence/deploy-rules/DR-02`…`DR-04`). Source verified (33 / 33, `DR-05`); dry-run compiles (`DR-06`).
 
 - Evidence ID: F08.COLD-BOOT-REVIEW
   * Scenario: QA reconciliation of F08-FE12 production-shaped cold-boot fix evidence
@@ -245,11 +246,11 @@ None
 
 ## Blockers
 
-None
+* The rules deploy (F08-DEVOPS-RULES step 5) is held: asked in chat on 2026-09-29, the user answered "Hayır, bekle" (wait). Steps 1–4 are done and nothing on `looplet-712e5` changed. It needs the Tech Lead: the live project has no rules release, and client reads are already denied by Firestore's implicit lock, so B's premise (unknown, possibly open console rules) did not hold.
 
 ## Next Action
 
-Run DevOps/Release Engineer — F08-DEVOPS-RULES (Current Brief): the rules-only production deploy, with the user's confirmation in chat right before the real deploy command. Then the Tech Lead checkpoint (opens F08.FUNCTION-DEPLOY-GO and the next-feature choice, A19 ruling 6).
+Run Tech Lead — F08-DEVOPS-RULES is held by the user at the deploy confirmation. Review release.md § F08-DEVOPS-RULES (the live project has no rules release; reads already denied) and decide with the user: run the rules deploy later, fold it into the function deploy, or drop it.
 
 ## Last Decision
 
@@ -263,9 +264,9 @@ The pre-intake orchestration is archived as history/f08-offline-persistence-and-
 
 ## Last Update
 
-* Updated By: Tech Lead
+* Updated By: DevOps/Release Engineer
 * Timestamp: 2026-09-29
-* Summary: Decision F08.DEPLOY-GO — B (A19): the rules-only deploy F08-DEVOPS-RULES activated; owner → DevOps/Release Engineer.
+* Summary: F08-DEVOPS-RULES — pre-flight, live-state read, source check and dry-run done; the rules deploy held by the user ("wait"); no project change; owner → Tech Lead.
 
 ## Context & Follow-ups
 
@@ -309,6 +310,7 @@ F08 implementation/runbook and the F08-FE12 fix are retained. Exact old tasks an
   * **Resolved:** rules-only production deploy authorized; function / Remote Config deploy deferred.
   * **Activated:** F08-DEVOPS-RULES; Status → In Release.
   * **Next:** owner → DevOps/Release Engineer.
+* 2026-09-29 — DevOps/Release Engineer: F08-DEVOPS-RULES held (release.md). Steps 1–4 done (read-only + dry-run); the user answered "wait" at the deploy confirmation; nothing deployed. Found: no rules release / ruleset on the project; unauthenticated reads → 403. Owner → Tech Lead.
 
 ## Release Constraints
 

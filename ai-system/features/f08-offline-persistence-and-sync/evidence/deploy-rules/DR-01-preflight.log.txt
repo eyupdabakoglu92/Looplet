@@ -1,0 +1,20 @@
+Pre-flight, 2026-09-29T17:14:37Z, read-only.
+$ firebase --version
+15.29.0
+$ firebase login:list   (account masked)
+Logged in as <account>
+$ cat .firebaserc
+{
+  "projects": {
+    "default": "looplet-712e5"
+  },
+  "targets": {},
+  "etags": {}
+}
+$ firebase firestore:databases:list --project looplet-712e5
+┌───────────────────────────────────────────────┬────────────────────┬────────────────────┐
+│ Database Name                                 │ Edition            │ Type               │
+├───────────────────────────────────────────────┼────────────────────┼────────────────────┤
+│ projects/looplet-712e5/databases/(default)    │ STANDARD           │ FIRESTORE_NATIVE   │
+└───────────────────────────────────────────────┴────────────────────┴────────────────────┘
+exit 0
