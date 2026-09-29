@@ -28,12 +28,12 @@ Tech Lead
 - [x] Task ID: F08-DEVOPS-PREP | Assigned Role: DevOps/Release Engineer | Status: Done | Summary: DONE 2026-09-29 (release.md, verdict **Release Validation Pending**; no deploy, billing or console change). CI repair (Java 21, TD-FORMAT-SCOPE, TD-CI-TOOLCHAIN, checkout v7.0.1, `ubuntu-24.04`), `release.md` refresh, hygiene recommendations; local proof DP-01…13. **Accepted at A17:** CI run #2 `36597006854` (c592081, pushed by the user) — all three jobs green; the best-effort integration step failed inside the green `verify` job (TD-CI-INTEGRATION-GATE). N-1…N-5 ruled at A17 | Depends On: F08-QA-FUNCTIONAL-R2
 - [x] Task ID: F08-BE8 | Assigned Role: Backend Developer | Status: Done | Summary: DONE 2026-09-29 (backend.md § F08-BE8): `engines.node` "22", `@types/node` 20.19.43 → 22.20.4 (lockfile: root + `@types/node` only), `infra/README.md`; on Node 22.23.3 started directly (npm scripts put the host Node 24 first on PATH — backend.md §11): `tsc` exit 0, offline 18 passed / 15 skipped, emulator suite 3 / 3, **33 / 33** (`evidence/runtime/BE8-01`, `BE8-02`). Source, tests, rules, CI unchanged; no deploy. Host note: `node@22` install broke the system node via `simdjson`; restored as node@24 24.21.0 with the user's choice (backend.md §14) — **accepted at A18** (Tech Lead re-run at 9f6b6e6: 33 / 33 on Node 22) | Depends On: -
 - [x] Task ID: F08-DEVOPS-RULES | Assigned Role: DevOps/Release Engineer | Status: Cancelled | Summary: CANCELLED at A20 (folded into F08-DEVOPS). The rules-only production deploy (F08.DEPLOY-GO — B, A19): steps 1–4 done 2026-09-29 (pre-flight, live-state read, source 33 / 33, dry-run; `evidence/deploy-rules/` DR-01…06); the user held the deploy ("wait"); nothing changed on the project. Found: no rules release / ruleset; unauthenticated reads → 403 (implicit lock) — B's premise did not hold | Depends On: F08-BE8
-- [ ] Task ID: F08-DEVOPS | Assigned Role: DevOps/Release Engineer | Status: Blocked | Summary: The first Firebase deploy — deferred by the user (F08.FUNCTION-DEPLOY-GO — C, A21); resumes on F08.DEPLOY-RESUME. Scope: read the live state (the pre-deploy rules state is recorded in DR-02…04); pin Node 22 in the CI `infra` job (SHA-pinned `setup-node`); a green CI run at the deploy revision with its logs read (S1); dry-run, then deploy rules + Remote Config + `submitDailyResultV1` (`nodejs22`) per the runbook; F08.LIVE-RULES and smoke S2–S4; the release readiness verdict | Depends On: F08-DEVOPS-PREP, F08-BE8
+- [ ] Task ID: F08-DEVOPS | Assigned Role: DevOps/Release Engineer | Status: Blocked | Summary: The first Firebase deploy — waits on the user's F08.FUNCTION-DEPLOY-GO (A20). Scope: read the live state (the pre-deploy rules state is recorded in DR-02…04); pin Node 22 in the CI `infra` job (SHA-pinned `setup-node`); a green CI run at the deploy revision with its logs read (S1); dry-run, then deploy rules + Remote Config + `submitDailyResultV1` (`nodejs22`) per the runbook; F08.LIVE-RULES and smoke S2–S4; the release readiness verdict | Depends On: F08-DEVOPS-PREP, F08-BE8
 - [ ] Task ID: F08-QA-FINAL | Assigned Role: QA | Status: Queued | Summary: Final acceptance of the reviewed release proof and the affected functional scope; Regression Depth `full` (the Node 22 runtime change is a dependency / build-config change): the emulator suite re-run at the final revision, other functional evidence reused by fingerprint | Depends On: F08-DEVOPS
 
 ## Open Tasks
 
-* None open. **F08 is paused** (A21): F08-DEVOPS — Blocked on F08.DEPLOY-RESUME (the user); F08-QA-FINAL Queued. The active feature is F07.
+* None open. F08-DEVOPS — Blocked on F08.FUNCTION-DEPLOY-GO (the user); F08-QA-FINAL Queued.
 
 ## Handoff Plan
 
@@ -213,24 +213,14 @@ None
 
 ## Open Decision Gates
 
-- Decision ID: F08.DEPLOY-RESUME
-  * Question: Authorize the first Firebase deploy now — the Blaze plan with a budget alert; rules + Remote Config + `submitDailyResultV1` (`nodejs22`) to `looplet-712e5`?
-  * Options / Trade-offs (A21 ruling 3): (A) authorize — F08-DEVOPS runs (ledger scope), then F08-QA-FINAL and F08 Done; F07's release can follow. (No answer = the deploy stays deferred; F08 stays paused, F07 continues on the emulator but cannot be released.)
-  * Recommendation: answer when billing is acceptable; at the latest before F07's release stage
-  * Blocks: F08-DEVOPS, F08-QA-FINAL and Done; F07-DEVOPS (F07's release)
-  * Blocking Scope: release
-  * Status: OPEN
-  * Reply: `Run Tech Lead. Decision: F08.DEPLOY-RESUME — A`
-
 - Decision ID: F08.FUNCTION-DEPLOY-GO
   * Question: May the first Firebase deploy (rules + Remote Config + the `nodejs22` function) run now with the Blaze plan — and if not, which feature starts meanwhile?
   * Options / Trade-offs (A20 ruling 2): (A) deploy now — Blaze with a budget alert; F08-DEVOPS, final QA, F08 Done; F07 becomes selectable. (B) defer the deploy; start F09 (onboarding-tutorial; depends only on F03) — fully executable. (C) defer the deploy; start F07 on the emulator under a dependency ruling (F07's release waits on (A); also needs the Daily content pool and the kill-switch wiring)
   * Recommendation: (B) while billing stays deferred; (C) if the Daily matters more now; (A) once billing is acceptable
   * Blocks: F08-DEVOPS, F08-QA-FINAL and Done
   * Blocking Scope: release
-  * Status: RESOLVED
-  * Resolution: Option (C) by the user — the deploy stays deferred; F07 starts on the emulator under a dependency ruling (F07 builds on F08's Functional Approved client surface; F07's release waits on the deployed callable). F08 paused; resume via F08.DEPLOY-RESUME (architecture A21)
-  * Resolved At: 2026-09-29
+  * Status: OPEN
+  * Reply: `Run Tech Lead. Decision: F08.FUNCTION-DEPLOY-GO — A` (or B, or C)
 
 - Decision ID: F08.DEPLOY-GO
   * Question: May the first Firebase deploy to `looplet-712e5` run now, and how much of it?
@@ -264,28 +254,27 @@ None
 
 ## Blockers
 
-* **Paused by the user's decision F08.FUNCTION-DEPLOY-GO — C** (A21): the first Firebase deploy is deferred, and F07 runs meanwhile. The release stage resumes at F08-DEVOPS when the user answers F08.DEPLOY-RESUME. F08 has no other executable work.
+* The release stage waits on the user's decision F08.FUNCTION-DEPLOY-GO (Open Decision Gates), which also carries the next-feature choice (A20 ruling 2). A release-scoped gate holds every DevOps activation (contract §5.3). F08 has no other executable work.
 
 ## Next Action
 
-F08 is paused (A21). The active feature is F07 (features/f07-daily-challenge/orchestration.md). F08 resumes at F08-DEVOPS when the user answers `Run Tech Lead. Decision: F08.DEPLOY-RESUME — A`.
+The user answers `Run Tech Lead. Decision: F08.FUNCTION-DEPLOY-GO — A / B / C` (Current Brief). The intake activates F08-DEVOPS (A), or records the deferral and activates F09 (B) or F07 under a dependency ruling (C).
 
 ## Last Decision
 
-2026-09-29 — Tech Lead intake of the decision F08.FUNCTION-DEPLOY-GO — C. Full record: architecture → Activation 2026-09-29 → A21.
+2026-09-29 — Tech Lead checkpoint on the held F08-DEVOPS-RULES. Full record: architecture → Activation 2026-09-29 → A20.
 
-* **Resolved (C):** the first Firebase deploy stays deferred; F07 starts on the emulator.
-* **Paused:** F08 (Blocked; everything kept; resume point F08-DEVOPS).
-* **Opened:** F08.DEPLOY-RESUME (also gates F07's release).
-* **Dependency ruling:** F07 builds on F08's Functional Approved client surface; the fake producer stays until F08 Done.
+* **Found:** no rules release on the project; client reads already denied (implicit lock) — option B's premise did not hold.
+* **Cancelled:** F08-DEVOPS-RULES, folded into F08-DEVOPS (the user's "wait"; reversible). F08.LIVE-RULES moves to F08-DEVOPS.
+* **Opened:** F08.FUNCTION-DEPLOY-GO (A deploy / B F09 / C F07 on the emulator; recommended B). F08 → Blocked.
 
-The pre-intake orchestration is archived as history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-function-deploy-decision.md.
+The pre-checkpoint orchestration is archived as history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-rules-hold-checkpoint.md.
 
 ## Last Update
 
 * Updated By: Tech Lead
 * Timestamp: 2026-09-29
-* Summary: Decision F08.FUNCTION-DEPLOY-GO — C (A21): F08 paused; F08.DEPLOY-RESUME opened; F07 activated.
+* Summary: Rules-hold checkpoint (A20) — F08-DEVOPS-RULES cancelled (folded into F08-DEVOPS); F08.FUNCTION-DEPLOY-GO opened; F08 → Blocked.
 
 ## Context & Follow-ups
 
@@ -308,7 +297,6 @@ F08 implementation/runbook and the F08-FE12 fix are retained. Exact old tasks an
 * [Orchestration before the BE8 checkpoint](../../history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-be8-checkpoint.md) — incl. the F08-BE8 brief.
 * [Orchestration before the F08.DEPLOY-GO decision](../../history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-deploy-go-decision.md).
 * [Orchestration before the rules-hold checkpoint](../../history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-rules-hold-checkpoint.md) — incl. the F08-DEVOPS-RULES brief.
-* [Orchestration before the F08.FUNCTION-DEPLOY-GO decision](../../history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-function-deploy-decision.md).
 
 ## Change Log
 
@@ -336,30 +324,22 @@ F08 implementation/runbook and the F08-FE12 fix are retained. Exact old tasks an
   * **Cancelled:** F08-DEVOPS-RULES (folded into F08-DEVOPS).
   * **Opened:** F08.FUNCTION-DEPLOY-GO (+ the next-feature choice).
   * **Next:** Status → Blocked; the user decides.
-* 2026-09-29 — Tech Lead: decision F08.FUNCTION-DEPLOY-GO — C (A21).
-  * **Paused:** F08 (resume point F08-DEVOPS).
-  * **Opened:** F08.DEPLOY-RESUME.
-  * **Next:** F07 active.
 
 ## Release Constraints
 
 The 2026-09-06 user decision to defer billing/deploy is preserved. In Progress now reflects still-available validation work, not renewed deploy permission. F08-DEVOPS remains Blocked. Environment/JDK/device availability has not been freshly probed; use current evidence, not the old environment assumptions.
 ## Current Brief
 
-**F08 is paused** (A21 — the user's decision F08.FUNCTION-DEPLOY-GO — C). No F08 work runs.
+**Waiting on the user — F08.FUNCTION-DEPLOY-GO** (A20 ruling 2). Nothing runs until the answer; no deploy, billing or console change.
 
-**Resume:** `Run Tech Lead. Decision: F08.DEPLOY-RESUME — A` → the Tech Lead activates F08-DEVOPS in its ledger scope:
-1. read the live state;
-2. pin Node 22 in the CI `infra` job;
-3. a green CI at the deploy revision, with its logs read;
-4. dry-run, then deploy rules + Remote Config + the `nodejs22` function;
-5. F08.LIVE-RULES and S2–S4.
+* **A — deploy now.** The user enables Blaze with a budget alert. The intake activates F08-DEVOPS (ledger scope). Then F08-QA-FINAL (Regression Depth `full`), then Done, and F07 becomes selectable.
+* **B — defer; start F09** (onboarding-tutorial). The intake records the deferral (F08 stays Blocked, everything kept) and activates F09 through the normal feature-activation path: PRD, architecture, orchestration, Visual Scope — a `new-surface` on the selected Foundation, so UI Designer first.
+* **C — defer; start F07 on the emulator.** The intake records a dependency ruling (F07 starts on F08's functional acceptance; F07's release waits on (A)) and activates F07. It brings in F06-CONTENT-DAILY (the Daily pool + human sign-off) and F07-KILL-SWITCH.
 
-Then F08-QA-FINAL. **Meanwhile F08's client contract is frozen for F07** (A21 ruling 4).
+**Reply:** `Run Tech Lead. Decision: F08.FUNCTION-DEPLOY-GO — B` (or A, or C). Recommendation: **B** while billing stays deferred.
 
 ## Earlier briefs
 
-* The F08.FUNCTION-DEPLOY-GO decision wait (A20) — in history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-function-deploy-decision.md.
 * The F08-DEVOPS-RULES brief (A19) — in history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-rules-hold-checkpoint.md.
 * The F08.DEPLOY-GO decision wait (A18) — in history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-deploy-go-decision.md.
 * The F08-BE8 brief (A17) — in history/f08-offline-persistence-and-sync-2026-09-29/orchestration-before-be8-checkpoint.md.

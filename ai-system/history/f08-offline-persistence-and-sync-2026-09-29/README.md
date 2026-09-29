@@ -45,6 +45,9 @@
 * **`orchestration-before-rules-hold-checkpoint.md`** — the F08 orchestration right before the Tech Lead checkpoint on the held F08-DEVOPS-RULES on 2026-09-29, byte for byte (SHA-1 `f8f215f8…`).
   * State: In Release; owner Tech Lead; F08-DEVOPS-RULES Open and held by the user; F08.LIVE-RULES PENDING; the F08-DEVOPS-RULES Current Brief.
   * Taken right before the checkpoint (F08 `architecture.md` → Activation 2026-09-29 → A20), which cancelled the rules-only step and opened F08.FUNCTION-DEPLOY-GO.
+* **`orchestration-before-function-deploy-decision.md`** — the F08 orchestration right before the Tech Lead intake of the decision F08.FUNCTION-DEPLOY-GO — C on 2026-09-29, byte for byte (SHA-1 `45a86a1b…`).
+  * State: Blocked; owner Tech Lead; F08.FUNCTION-DEPLOY-GO OPEN (A / B / C); F08-DEVOPS Blocked; the decision-wait Current Brief.
+  * Taken right before the intake (F08 `architecture.md` → Activation 2026-09-29 → A21), which paused F08 and activated F07.
 * **`release-before-devops-prep.md`** — the F08 feature `release.md` of 2026-09-06 (task F08-DEVOPS), byte for byte (SHA-1 `1584a953…`).
   * State: Release Validation Pending; the Spark → Blaze blocker; the rollback check "create-own allowed / create-other denied" and smoke S1 at the old rules; S7 storage-full as residual test-debt; the CI emulator suite PENDING.
   * Taken by the DevOps/Release Engineer right before the F08-DEVOPS-PREP refresh of 2026-09-29 (F08 `architecture.md` A13 ruling 2, A15, A16).

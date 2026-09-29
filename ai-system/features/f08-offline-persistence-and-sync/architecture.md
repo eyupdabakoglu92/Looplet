@@ -962,3 +962,28 @@ The backend handler and rules fingerprints above are the ones A7's reuse clause 
    * With B or C, F08 stays Blocked with its functional acceptance, PREP, BE8 and the evidence intact (pause record); it resumes at F08-DEVOPS when the user answers (A) later.
 3. **F08 → Blocked;** Current Owner = Next Role = Tech Lead. F08-DEVOPS Blocked on the gate; F08-QA-FINAL Queued.
 
+### A21. Decision F08.FUNCTION-DEPLOY-GO — C (2026-09-29): deploy deferred; F07 starts on the emulator
+
+**Input:** `Run Tech Lead. Decision: F08.FUNCTION-DEPLOY-GO — C`. Exactly one OPEN gate matched; option (C) as defined at A20 ruling 2.
+
+**Decision recorded:**
+* **The first Firebase deploy stays deferred:** no Blaze, billing, rules, Remote Config or function deploy.
+* **F07 (daily-challenge) starts now, on the Firebase emulator,** under the dependency ruling below. No product criterion changes, so no Product Owner revision.
+
+**Rulings:**
+1. **F08.FUNCTION-DEPLOY-GO — RESOLVED (C).**
+2. **F08 is paused — Blocked; pause record:**
+   * everything is kept: Functional Approved (A13), PREP (A17), BE8 (A18), the rules-hold findings (A20), every evidence record;
+   * F08-DEVOPS stays Blocked, F08-QA-FINAL Queued;
+   * **resume point: F08-DEVOPS**, when the user authorizes the deploy.
+3. **New gate F08.DEPLOY-RESUME** (Blocking Scope: release) keeps that channel open: "Authorize the first Firebase deploy now (Blaze with a budget alert; rules + Remote Config + the `nodejs22` function)?"
+   * Its answer activates F08-DEVOPS.
+   * It is safe to open now because F08 has no DevOps work in flight.
+   * **It also gates F07's release:** F07's official results reach the server only through the deployed callable.
+4. **Dependency ruling for F07** (feature-selection rules; contract §5.3):
+   * F07 depends on F08 in two ways. The first is the **client surface**: storage, `DailyPuzzleCache`, `DailyResultSyncService`, the callable contract. That surface is implemented and **Functional Approved**, so F07's delivery work may start on it.
+   * The second is the **deployed backend**: the callable. F07's **release** waits on it — F07-DEVOPS depends on F08-DEVOPS.
+   * Until then, F07's sync evidence runs against the emulator, as F08's did.
+   * F08 must not change its client contract while F07 builds on it. Any change goes through the Tech Lead.
+5. **The fake producer** (`FakeDailyResultProducer`, debug-only) stays until F08 is Done. F07 does not remove it, because F08's final QA may reuse the client ↔ emulator path (F08 `architecture.md` → Scope Boundary; amended here).
+

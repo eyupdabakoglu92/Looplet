@@ -563,3 +563,11 @@ F05-QA-D3 (`qa.md`, commit e46f384) is **accepted: Approved with Notes, 94 / 100
 **Resume point:** F08 local evidence (F08-LOCAL-EVIDENCE, then F08-QA-FUNCTIONAL; Design Adoption Route). The next Tech Lead turn activates it.
 * It reviews what F08.LOCAL-RESUME can reuse: F03 final QA E4–E15 / R1–R7; F05-QA-STRICT QS-10 / QS-11; and now F05-QA-D3 E09 — exact resume of a replay across a real kill, incl. undo, on the D3 screens at `b4ad263e…`.
 * It brings F08-RETRY-STORE-CONNECTION (with QA note N2) into the F08 ledger.
+
+### 18.10 Cross-feature note — the Home Daily entry (F07, 2026-09-29)
+
+* F07 (daily-challenge, activated 2026-09-29) adds a **secondary Daily entry** to Home (F07 `architecture.md` D8). **§18's one-primary-CTA rule holds:** the entry is not a second lime CTA.
+* It shows the day's number, the effective streak and its state, and it is hidden when Remote Config `daily_enabled` is false.
+* The Journey read-model, the CONTINUE rule (§18.3 (2)), the loop track and the error screen are unchanged.
+* The entry is designed in F07-UI and implemented in F07-FE, with F07's own visual gate and QA. F05 stays Done.
+* F10 later owns the main-menu layout, and may move the entry.
