@@ -15,3 +15,6 @@
   * Taken right before the Tech Lead's D3 implementation checkpoint (F05 `architecture.md` §18.8). The checkpoint accepted the delivery, set the gate to Ready for QA and opened F05-QA-D3.
 * **`frontend-before-phase-d3.md`** — the whole F05 `frontend.md` before D3 (the F05-FE / F05-FE3 delivery reports, 2026-09-08 … 2026-09-27), byte for byte (SHA-1 `d32a5ad0…`). Moved by the Frontend/Mobile Developer on 2026-09-29, right before `frontend.md` was rewritten for F05-FE-D3.
 * **`qa-before-phase-d3.md`** — the whole F05 `qa.md` before D3 (the F05-QA … F05-QA-STRICT2 reports, 2026-09-08 … 2026-09-27), byte for byte (SHA-1 `fe23f30a…`). Moved by QA on 2026-09-29, right before `qa.md` was rewritten for F05-QA-D3.
+* **`orchestration-at-qa-d3-verdict.md`** — the F05 orchestration right after QA delivered F05-QA-D3 (2026-09-29), byte for byte (SHA-1 `da3f9c4e…`).
+  * State: In QA; owner Tech Lead; F05-QA-D3 Done, QA Result Approved with Notes; F05.D3-VISUAL-QA PASS; F05.D3-RELEASE-ERROR-CAPTURE PENDING (Blocking Scope release); gate Ready for QA; the F05-QA-D3 Current Brief; the §18.8 Last Decision.
+  * Taken right before the Tech Lead's D3 closure (F05 `architecture.md` §18.9), which set the gate to Passed, moved the release capture to FIRST-APP-DISTRIBUTION and closed F05 Done.

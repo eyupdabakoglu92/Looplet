@@ -9,6 +9,8 @@
 
 **Amended 2026-09-29 (Tech Lead — Design Adoption Phase D3 activation):** §18 added (Home + app shell, `new-surface`). The user decided N1: surface an in-progress replay after 30 / 30 (§18.3 (2)); it replaces the §8 terminal precedence. **Effective 2026-09-29:** the Product Owner revision PO-REV-2026-09-29-F05-CONTINUE was resynced the same day (feature PRD AC7 / AC9). §10 and §17 are superseded for the visual by §18.
 
+**Closed 2026-09-29 (Tech Lead — D3 closure, §18.9):** F05-QA-D3 accepted (94 / 100); Visual Quality Gate Passed; F05 Done; Phase D complete; F05.D3-RELEASE-ERROR-CAPTURE moved from the F05 ledger to FIRST-APP-DISTRIBUTION (correcting §18.8 ruling 3).
+
 **Amended 2026-09-29 (Tech Lead — D3 implementation checkpoint):** §18.8 added. F05-FE-D3 was accepted, and the gate is Ready for QA. The render drift is ruled against the §6 numbers. The iOS launch cross-fade is accepted as platform behaviour. The profile / release store-error capture moves to FIRST-APP-DISTRIBUTION (this amends §18.6 / §18.7 for D3). The in-process Retry limit goes to F08. The F05-QA-D3 plan is set.
 
 Contract authority for F05. Execution state is in `orchestration.md`.
@@ -520,3 +522,44 @@ The F05-FE-D3 delivery (`frontend.md`, commit af5aec8) is **accepted**. Delivery
 * `main.dart` — the app ground.
 
 The round-trip regression covers both. The brief is the F05 orchestration Current Brief.
+
+### 18.9 D3 closure (Tech Lead, 2026-09-29)
+
+F05-QA-D3 (`qa.md`, commit e46f384) is **accepted: Approved with Notes, 94 / 100** (every dimension ≥ 9, no fail condition, no blocking finding). The Visual Quality Gate is **Passed**. F05 is **Done**, and **Design Adoption Phase D is complete** (D1 and D2 in F03 §19.12 / §20.11, D3 here).
+
+**Verified independently at the closure** (HEAD e46f384):
+* **Revision.** The `app/` fingerprint is still `b4ad263e…`: the QA commit touches only `ai-system/`, so the verdict covers the accepted delivery.
+* **Evidence.** Every file `qa.md` cites exists under `qa/d3/`: 9 parity composites, the lossless measurement PNGs and the recordings.
+* **Measurements, re-run with the compiled F03 `parity-d2` tool:**
+  * the N1 capture `QA-16-J2-D3-07.png` gives the CTA band at 487.0 pt (§6 anchor 486.3 ± 2);
+  * the pressed capture `QA-16-J9-cta-pressed.png` gives 332.0 pt against 339.0 pt at rest (0.98).
+
+  Both match `qa.md` E07 / E18.
+* **The simulators were restored:** all three at `large`, Reduce Motion 0.
+* **What QA added on top of the delivery evidence** (checked against the ledger):
+  * N1 warm and cold without a seed override (a real move, a kill, then resume with undo);
+  * AC12 at level 30, solved by real moves;
+  * a new negative case (NI-QA);
+  * the node taps (E21) and the foreground return (E19).
+
+**Rulings:**
+1. **The score and the evidence reuse are accepted.** The reuse follows §18.8 (F05-QA-STRICT2 behaviour; F03-QA-D2R for Play and the result, with `app/lib/play/**` unchanged). QA also re-observed the round trip at runtime.
+2. **The workflow conflict QA raised is a Tech Lead error at §18.8, now corrected.**
+   * §18.8 ruling 3 left F05.D3-RELEASE-ERROR-CAPTURE as a PENDING record in F05's own Pending Evidence and said it did not block F05. The workflow audit treats every non-PASS record in a feature's ledger as blocking final approval and Done, whatever its Blocking Scope. QA rightly neither edited the record nor changed its verdict.
+   * **Correction:** the record leaves the F05 ledger. The scenario is unchanged and still owed. It is tracked under FIRST-APP-DISTRIBUTION in `workflow-follow-ups.md` (owner Frontend/Mobile Developer, at the first device or distribution build). For D3 the rule remains proven by `kDebugMode`, the widget tests and the negative runs NC (Tech Lead) and E04 (QA).
+   * Lesson, recorded as the process item RELEASE-SCOPED-EVIDENCE: evidence that does not block a feature is tracked where it blocks something, not in that feature's ledger.
+3. **Notes routed** (`qa.md` §6):
+   * N1, the debug-build entrance pacing → FIRST-APP-DISTRIBUTION (measure the release build).
+   * N2, the one-frame Retry feedback → attached to F08-RETRY-STORE-CONNECTION (the same Retry path; handle both at the F08 local-evidence stage).
+   * N3, the `LimePill` arrow not scaling with the label at AX5 → RESULT-F00-COMPONENT-ALIGN (the shared component; the D2 result has the same behaviour).
+   * N4 (free text outgrows the capped headline at AX5; by §18.3 (6)) and N5 (`highest_unlocked_level` = 31 after 30, by §3, harmless) → OPTIONAL-QUALITY-NOTES.
+   * N6 (focus / VoiceOver / Android / release capture) stays stated as limits in the existing items.
+   * N7 is F03 behaviour, not a D3 item.
+   * N8 → F00-ARTEFACT-SIZE. The QA evidence is kept as is: the lossless PNGs back the recorded measurements.
+4. **Contract amendments closed.** The D3 items of DESIGN-ADOPTION-CONTRACT-AMENDMENTS (C-1 N1, C-6 `StoreErrorScreen`, C-7 native launch) are delivered and pass QA. A-2 home, A-3 and A-4 are fixed at runtime (the Android launch is resource-tested, not run). The hybrid period (C-8) ends: Home, the shell, Play and the result now all use Loop Glass.
+
+**Structure-only correction to `qa.md`** (no value or text change): the Visual Quality Verdict lines had their values in backticks (``Final Score: `94 / 100` ``, as the module template's placeholders show), so the workflow audit could not read them. The Tech Lead removed the backticks from the five lines (Final Score, Lowest Dimension, Fail Conditions, Runtime Evidence Complete, Result), the §18.7 precedent for `ui-design.md` headings.
+
+**Resume point:** F08 local evidence (F08-LOCAL-EVIDENCE, then F08-QA-FUNCTIONAL; Design Adoption Route). The next Tech Lead turn activates it.
+* It reviews what F08.LOCAL-RESUME can reuse: F03 final QA E4–E15 / R1–R7; F05-QA-STRICT QS-10 / QS-11; and now F05-QA-D3 E09 — exact resume of a replay across a real kill, incl. undo, on the D3 screens at `b4ad263e…`.
+* It brings F08-RETRY-STORE-CONNECTION (with QA note N2) into the F08 ledger.

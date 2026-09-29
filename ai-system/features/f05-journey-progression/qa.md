@@ -114,15 +114,15 @@ Bağımsız puan, yalnız bu turun runtime kanıtından (E05–E20). UI Designer
 | Accessibility and Inclusive Quality | 9 | E16, E17, E20, E06 | AX5'te klip/kaydırma yok; düğüm durumları dolgu + çerçeve türü + boyutla (renk dışı) ayrılıyor; Reduce Motion korunuyor; metin kontrastı yüksek. VoiceOver ve klavye odağı runtime'da sürülmedi (widget testleri var). |
 | Implementation Fidelity and Polish | 10 | E07, E16, E17 | 9 Home state'i + varyantlar render'la birebir; tek dikey fark render'ın kendi §6 kayması (§18.8 kararı 1, açıklanmış); debug satırı ve debug kutusu tek debug-only sapma. Açıklanmamış sapma yok. |
 
-Final Score: `94 / 100`
+Final Score: 94 / 100
 
-Lowest Dimension: `Visual Hierarchy — 9 / 10` (eşit: Layout, Typography, Interaction, Motion, Accessibility — 9)
+Lowest Dimension: Visual Hierarchy — 9 / 10 (eşit: Layout, Typography, Interaction, Motion, Accessibility — 9)
 
-Fail Conditions: `None`
+Fail Conditions: None
 
-Runtime Evidence Complete: `Yes` (iOS Simulator kapsamı; Android ve profile/release store-error yakalaması belirtilmiş limit — §18.8 kararı 3 ile release scope'a taşındı, bu verdict'i bloklamıyor)
+Runtime Evidence Complete: Yes (iOS Simulator kapsamı; Android ve profile/release store-error yakalaması belirtilmiş limit — §18.8 kararı 3 ile release scope'a taşındı, bu verdict'i bloklamıyor)
 
-Result: `PASS`
+Result: PASS
 
 ## 4. Pending Evidence
 

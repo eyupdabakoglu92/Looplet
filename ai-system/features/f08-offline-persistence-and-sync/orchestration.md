@@ -143,13 +143,14 @@ None
 
 ## Next Action
 
-**Queued, reordered by incident 2026-09-26.** F08 waits behind the F05 rework and its re-QA, and then behind the Design Adoption Route (Phase C audit, Phase D screen conversions).
+**Unqueued 2026-09-29 — Design Adoption Phase D is complete** (F05 D3 closed; F05 `architecture.md` §18.9). F08 is the active feature again. **Run Tech Lead — F08 activation** (the resume point), before any delivery task opens.
 
-* **Why:** F08 cannot reach Done while F08.DEPLOY-AUTHORIZATION is OPEN. Its offline-Journey and resume runtime proof also runs through the F03/F05 screens that Phase D will change, so gathering it after the redesign avoids doing it twice.
-* **Tasks:** F08-LOCAL-EVIDENCE and F08-QA-FUNCTIONAL stay Queued; none waits for paid deployment.
-* **At activation:** Tech Lead reviews the reusable provenance before deciding what F08.LOCAL-RESUME and F08.LIFECYCLE can reuse for the identical scope:
-  * F03 final QA qa.md E4-E15 and R1-R7 — real kill/relaunch resume, resume after interruption, idle/paused lifecycle on the real store;
-  * F05-QA-STRICT QS-10/QS-11 — exact Journey resume across a real process kill (grid, moves, undo; restart and thaw not covered).
+* **Why a Tech Lead turn first:** the ledger, the evidence plan and the brief must be re-based on the redesigned F03 / F05 screens and on today's store-error / bootstrap behaviour before F08-LOCAL-EVIDENCE opens.
+* **At activation**, review the reusable provenance for F08.LOCAL-RESUME and F08.LIFECYCLE (identical scope only):
+  * F03 final QA qa.md E4–E15 and R1–R7 — real kill/relaunch resume, resume after interruption, idle/paused lifecycle on the real store;
+  * F05-QA-STRICT QS-10 / QS-11 — exact Journey resume across a real process kill (grid, moves, undo; restart and thaw not covered);
+  * **new:** F05-QA-D3 E09 (2026-09-29, `app/` `b4ad263e…`) — exact resume of a replay across a real kill incl. undo, on the D3 screens; E15 — the store-error screen and Retry on a corrupt store.
+* **Bring in:** F08-RETRY-STORE-CONNECTION (Retry does not reopen the database connection; plus the one-frame Retry feedback, F05-QA-D3 N2) — decide whether it is F08 scope.
 * **Still open:** F08's own scenarios (storage-full, offline Journey, emulator).
 * **Release:** the release task remains Blocked, and no deployment or billing action is authorized.
 
@@ -160,8 +161,8 @@ None
 ## Last Update
 
 * Updated By: Tech Lead
-* Timestamp: 2026-09-26
-* Summary: Routing note only (incident 2026-09-26) — queued behind the F05 rework and the Design Adoption Route (Phase C/D). The ledger, evidence and release gate are unchanged.
+* Timestamp: 2026-09-29
+* Summary: Routing note — Phase D complete (F05 D3 closed); F08 is the active feature; Next Action = Tech Lead activation. The ledger, evidence and release gate are unchanged.
 
 ## Context & Follow-ups
 
@@ -178,6 +179,7 @@ F08 implementation/runbook and the F08-FE12 fix are retained. Exact old tasks an
 
 * 2026-09-18 — migrated state; see the immutable pre-migration snapshot for all earlier tasks, decisions and evidence.
 * 2026-09-26 — Tech Lead: queue reordered (incident "the app still shows the old design"): F05 → design adoption → F08 local evidence. No scope, evidence or release change.
+* 2026-09-29 — Tech Lead (at the F05 D3 closure): Phase D complete; F08 active again; activation by the next Tech Lead turn (new reusable inputs listed in Next Action). No scope, evidence or release change.
 
 ## Release Constraints
 
