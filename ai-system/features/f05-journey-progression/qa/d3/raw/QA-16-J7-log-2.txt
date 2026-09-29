@@ -1,0 +1,1 @@
+2026-09-29 10:00:13.467 Df Runner[16164:45391ca] (Flutter) flutter: store: bootstrap_failed — SqliteException(26): whi

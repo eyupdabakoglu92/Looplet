@@ -10,21 +10,21 @@ In QA
 
 ## Current Owner
 
-QA
+Tech Lead
 
 ## Next Role
 
-QA
+Tech Lead
 
 ## Active Task Ledger
 
 - [x] Task ID: F05-UI-D3 | Assigned Role: UI Designer | Status: Done | Summary: DELIVERED 2026-09-29 (981b807), ACCEPTED at the Tech Lead visual-gate checkpoint 2026-09-29 (architecture §18.7). ui-design.md is the D3 handoff (the pre-D3 file archived: history/f05-journey-progression-2026-09-29/ui-design-before-phase-d3.md): every Home state incl. the N1 terminal-with-replay (D3-07), the loop track with windowing A "sliding five" (adopted) and B (rendered alternative), the store-error screen, native launch iOS / Android, splash, 1.3× / AX5, device variants, the entrance prototype, window and contrast tables, acceptance list §11.1, manifest §12b. 41 renders + 4 contact sheets in design/ from design/src/gen-d3.mjs (reproduced byte for byte at the checkpoint). | Depends On: -
 - [x] Task ID: F05-FE-D3 | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: ACCEPTED at the Tech Lead implementation checkpoint 2026-09-29 (architecture §18.8; commit af5aec8, `app/` fingerprint `b4ad263e…` recomputed; suites and negative runs NA / NC re-run). DELIVERED 2026-09-29 (HEAD 7c1a946 + working tree, `app/` fingerprint `b4ad263e…`; frontend.md, the pre-D3 file archived as history/f05-journey-progression-2026-09-29/frontend-before-phase-d3.md). Home (`LoopTrack`, `LoopNode` open / locked / finish), `JourneyHomeView` (window rule, C1, N1 CTA), the shell (`shell/`: splash, store error, wordmark, layout), native launch (iOS + Android incl. API 31+), `MaterialApp` ground; 565 app tests + 13 / 13 integration_test on the iPhone 16; negative runs NA–NH caught; runtime parity on the 16 / 16e / Pro Max in design/runtime-d3/. Two runtime defects found and fixed (debug row on a live AX5 change; the debug text at AX5). Original brief: Implement the D3 handoff from `app/lib/design` — Home (`LoopTrack` + the `LoopNode` states), the §18.3 (2) CONTINUE rule, the C1 copy rule, splash, `StoreErrorScreen`, native launch assets, the `MaterialApp` ground, the C2 debug row, the C3 entrance; tests and named negative runs; `frontend.md` Visual Parity Evidence incl. the cold-start recording and the production-shaped cold boot (architecture §18.6, §18.7). Brief: Current Brief | Depends On: F05-UI-D3
-- [ ] Task ID: F05-QA-D3 | Assigned Role: QA | Status: Open | Summary: Final-stage independent visual QA of D3 (rubric ≥ 93 from runtime; F05 AC7–AC10 / AC12 incl. the N1 replay rule warm and cold; error screen + Retry; cold start with no white frame; D1 / D2 regression over Home ⇄ `/play`) (architecture §18.6, §18.8). Brief: Current Brief | Depends On: F05-FE-D3
+- [x] Task ID: F05-QA-D3 | Assigned Role: QA | Status: Done | Summary: DONE 2026-09-29 — Approved with Notes, independent rubric 94 / 100 (every dimension ≥ 9, no fail condition), qa.md (evidence qa/d3/; HEAD 078c926, `app/` `b4ad263e…`). Final-stage independent visual QA of D3 (rubric ≥ 93 from runtime; F05 AC7–AC10 / AC12 incl. the N1 replay rule warm and cold; error screen + Retry; cold start with no white frame; D1 / D2 regression over Home ⇄ `/play`) (architecture §18.6, §18.8). Brief: Current Brief | Depends On: F05-FE-D3
 
 ## Open Tasks
 
-* F05-QA-D3 (QA) — Open.
+None
 
 ## Handoff Plan
 
@@ -44,7 +44,7 @@ final
 
 ## QA Result
 
-None
+Approved with Notes
 
 ## QA Modules
 
@@ -145,7 +145,8 @@ The D1 / D2 surfaces that Home opens into and returns from (gate Passed 2026-09-
   * Prerequisite / External Decision: F05.D3-PARITY accepted (gate Ready for QA) — met 2026-09-29 (architecture §18.8)
   * Re-evaluation Trigger: F05-QA-D3 delivery
   * Blocks: Visual Quality Gate = Passed; F05 Done; Phase D completion
-  * Result: PENDING
+  * Result: PASS
+  * Provenance / Note: 2026-09-29 QA (F05-QA-D3), HEAD 078c926 clean, `app/` `b4ad263e…`, debug build on iOS Simulator 18.6 — iPhone 16 / 16e / Pro Max. qa.md E01–E21: analyze + test (app 565, 0 skip) + integration_test 13 / 13; negative runs NB-QA / ND-QA / NI-QA caught; cold start empty / existing / Reduce Motion recorded (no light frame, hand-off invisible); every Home state vs render (horizontal Δ ≤ 0.2 pt, CTA at the §6 anchor); N1 warm and cold without a seed override (real move, kill, resume incl. undo); AC8 / AC9 / AC12 (level 30 solved by real moves → terminal) / AC1; store error + Retry + log; live text sweep to AX5 on three devices; rubric 94 / 100, every dimension ≥ 9, no fail condition. Android and the profile / release store-error capture stay stated limits (F05.D3-RELEASE-ERROR-CAPTURE, release scope).
 
 ## Open Decision Gates
 
@@ -165,7 +166,7 @@ None
 
 ## Next Action
 
-Run QA on F05-QA-D3: the final-stage independent visual QA of D3 (Current Brief; contract architecture §18.6 and §18.8). Then back to the Tech Lead: closure (F05 → Done, Phase D complete) or rework routing.
+Run Tech Lead — reconcile F05-QA-D3 (qa.md: Approved with Notes, rubric 94 / 100, notes N1–N8) and run the D3 closure checkpoint: Visual Quality Gate → Passed, F05 → Done, Phase D complete, then the resume point (F08 local evidence).
 
 ## Last Decision
 
@@ -199,9 +200,9 @@ The orchestration at the Frontend delivery is archived byte for byte as history/
 
 ## Last Update
 
-* Updated By: Tech Lead
+* Updated By: QA
 * Timestamp: 2026-09-29
-* Summary: D3 implementation checkpoint — F05-FE-D3 accepted; Delivery Review Accepted; gate Ready for QA; §16 rulings 1–4 (architecture §18.8); F05.D3-RELEASE-ERROR-CAPTURE → Blocking Scope release; Status In QA; owner → QA (F05-QA-D3).
+* Summary: F05-QA-D3 done — QA Result Approved with Notes (final; rubric 94 / 100, every dimension ≥ 9, no fail condition; no blocking finding; notes N1–N8 in qa.md); F05.D3-VISUAL-QA → PASS; the pre-D3 qa.md archived; owner → Tech Lead (closure checkpoint). **Local audit FAIL, needs the Tech Lead:** `final approval cannot coexist with required pending evidence` — the audit counts the Tech Lead-owned F05.D3-RELEASE-ERROR-CAPTURE (PENDING, Blocking Scope release, §18.8 ruling 3) as required; QA does not edit that record (qa.md §7).
 
 ## Context & Follow-ups
 
@@ -250,6 +251,7 @@ The orchestration at the Frontend delivery is archived byte for byte as history/
   * **Verified:** fingerprint, suites and negative runs NA / NC re-run; code and parity read.
   * **Decided:** F05-FE-D3 accepted; the §16 rulings 1–4 and the F05-QA-D3 plan (architecture §18.8); F05.D3-RELEASE-ERROR-CAPTURE → Blocking Scope release; F08-RETRY-STORE-CONNECTION recorded.
   * **Next:** Delivery Review Accepted; gate Ready for QA; In QA; F05-QA-D3 Open; owner → QA.
+* 2026-09-29 — QA: F05-QA-D3 final visual QA — Approved with Notes (94 / 100); qa.md rewritten (the pre-D3 qa.md archived as history/f05-journey-progression-2026-09-29/qa-before-phase-d3.md); evidence qa/d3/; F05.D3-VISUAL-QA PASS; owner → Tech Lead.
 
 ## Current Brief
 

@@ -1,0 +1,95 @@
+== D3-01-home-new-0of30 vs QA-16-J2-D3-01
+-- render
+band top 67.0 bottom 86.5 left 94.5 right 126.0 height 19.5
+band top 241.5 bottom 269.0 left 56.5 right 185.5 height 27.5
+band top 492.5 bottom 560.5 left 26.5 right 365.5 height 68.0
+-- runtime
+band top 67.7 bottom 87.0 left 94.7 right 125.7 height 19.3
+band top 237.0 bottom 264.3 left 56.7 right 185.0 height 27.3
+band top 487.0 bottom 555.7 left 26.3 right 365.3 height 68.7
+== D3-01b-home-new-level1-in-progress vs QA-16-J2-D3-01b
+-- render
+band top 67.0 bottom 86.5 left 94.5 right 126.0 height 19.5
+band top 241.5 bottom 269.0 left 56.5 right 185.5 height 27.5
+band top 492.5 bottom 560.5 left 26.5 right 365.5 height 68.0
+-- runtime
+band top 67.7 bottom 87.0 left 94.7 right 125.7 height 19.3
+band top 237.0 bottom 264.3 left 56.7 right 185.0 height 27.3
+band top 487.0 bottom 555.7 left 26.3 right 365.3 height 68.7
+== D3-02-home-mid-4of30 vs QA-16-J2-D3-02
+-- render
+band top 67.0 bottom 86.5 left 94.5 right 126.0 height 19.5
+band top 241.5 bottom 269.0 left 56.5 right 185.5 height 27.5
+band top 332.5 bottom 415.5 left 58.5 right 265.0 height 83.0
+band top 492.5 bottom 560.5 left 26.5 right 365.5 height 68.0
+-- runtime
+band top 67.7 bottom 87.0 left 94.7 right 125.7 height 19.3
+band top 237.0 bottom 264.3 left 56.7 right 185.0 height 27.3
+band top 328.3 bottom 411.3 left 58.7 right 265.0 height 83.0
+band top 487.0 bottom 555.7 left 26.3 right 365.3 height 68.7
+== D3-03-home-in-progress-4of30 vs QA-16-J2-D3-03
+-- render
+band top 67.0 bottom 86.5 left 94.5 right 126.0 height 19.5
+band top 241.5 bottom 269.0 left 56.5 right 185.5 height 27.5
+band top 332.5 bottom 415.5 left 58.5 right 265.0 height 83.0
+band top 492.5 bottom 560.5 left 26.5 right 365.5 height 68.0
+-- runtime
+band top 67.7 bottom 87.0 left 94.7 right 125.7 height 19.3
+band top 237.0 bottom 264.3 left 56.7 right 185.0 height 27.3
+band top 328.3 bottom 411.3 left 58.7 right 265.0 height 83.0
+band top 487.0 bottom 555.7 left 26.3 right 365.3 height 68.7
+== D3-04a-home-window-12of30 vs QA-16-J2-D3-04a
+-- render
+band top 67.0 bottom 86.5 left 94.5 right 126.0 height 19.5
+band top 241.5 bottom 269.0 left 56.5 right 185.5 height 27.5
+band top 332.5 bottom 415.5 left 58.5 right 265.0 height 83.0
+band top 492.5 bottom 560.5 left 26.5 right 365.5 height 68.0
+-- runtime
+band top 67.7 bottom 87.0 left 94.7 right 125.7 height 19.3
+band top 237.0 bottom 264.3 left 56.7 right 185.0 height 27.3
+band top 328.3 bottom 411.3 left 58.7 right 265.0 height 83.0
+band top 487.0 bottom 555.7 left 26.3 right 365.3 height 68.7
+== D3-04b-home-window-25of30 vs QA-16-J2-D3-04b
+-- render
+band top 67.0 bottom 86.5 left 94.5 right 126.0 height 19.5
+band top 241.5 bottom 269.0 left 56.5 right 185.5 height 27.5
+band top 332.5 bottom 415.5 left 58.5 right 265.0 height 83.0
+band top 492.5 bottom 560.5 left 26.5 right 365.5 height 68.0
+-- runtime
+band top 67.7 bottom 87.0 left 94.7 right 125.7 height 19.3
+band top 237.0 bottom 264.3 left 56.7 right 185.0 height 27.3
+band top 328.3 bottom 411.3 left 58.7 right 265.0 height 83.0
+band top 487.0 bottom 555.7 left 26.3 right 365.3 height 68.7
+== D3-05-home-replay-before-terminal vs QA-16-J2-D3-05
+-- render
+band top 67.0 bottom 86.5 left 94.5 right 126.0 height 19.5
+band top 241.5 bottom 269.0 left 56.5 right 185.5 height 27.5
+band top 307.5 bottom 416.5 left 51.0 right 343.0 height 109.0
+band top 492.5 bottom 560.5 left 26.5 right 365.5 height 68.0
+-- runtime
+band top 67.7 bottom 87.0 left 94.7 right 125.7 height 19.3
+band top 237.0 bottom 264.3 left 56.7 right 185.0 height 27.3
+band top 303.3 bottom 412.0 left 51.0 right 342.7 height 108.7
+band top 487.0 bottom 555.7 left 26.3 right 365.3 height 68.7
+== D3-06-home-terminal-30of30 vs QA-16-J2-D3-06
+-- render
+band top 67.0 bottom 86.5 left 94.5 right 126.0 height 19.5
+band top 206.0 bottom 233.5 left 124.5 right 255.0 height 27.5
+band top 299.0 bottom 415.5 left 58.5 right 346.0 height 116.5
+band top 492.5 bottom 560.5 left 26.5 right 365.5 height 68.0
+-- runtime
+band top 67.7 bottom 87.0 left 94.7 right 125.7 height 19.3
+band top 201.0 bottom 228.3 left 124.7 right 254.7 height 27.3
+band top 295.0 bottom 411.3 left 58.7 right 346.0 height 116.3
+band top 487.0 bottom 555.7 left 26.3 right 365.3 height 68.7
+== D3-07-home-terminal-with-replay vs QA-16-J2-D3-07
+-- render
+band top 67.0 bottom 86.5 left 94.5 right 126.0 height 19.5
+band top 206.0 bottom 233.5 left 124.5 right 255.0 height 27.5
+band top 307.5 bottom 416.5 left 51.0 right 343.0 height 109.0
+band top 492.5 bottom 560.5 left 26.5 right 365.5 height 68.0
+-- runtime
+band top 67.7 bottom 87.0 left 94.7 right 125.7 height 19.3
+band top 201.0 bottom 228.3 left 124.7 right 254.7 height 27.3
+band top 303.3 bottom 412.0 left 51.0 right 342.7 height 108.7
+band top 487.0 bottom 555.7 left 26.3 right 365.3 height 68.7

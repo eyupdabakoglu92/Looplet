@@ -1,0 +1,2 @@
+2026-09-29 09:59:50.486 Df Runner[16164:45391ca] (Flutter) flutter: store: bootstrap_failed — SqliteException(26): while selecting from statement, file is not a database, file is not a database (code 26)
+2026-09-29 09:59:55.868 Df log[16198:0] [com.apple.log:] log run noninteractively, parent: 41043 (launchd_sim), args: 'log' 'show' '--start' '2026-09-29 09:59:49' '--predicate' 'eventMessage CONTAINS "bootstrap_failed"' 
