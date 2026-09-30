@@ -43,6 +43,24 @@ scripts:
       melos exec --scope="looplet_authoring" --
       "dart run bin/looplet_authoring.dart check ../../content --repo-root ../.."
 
+  content:quality:
+    description: Full F07 Daily quality audit; fails on missing, stale, partial or UNKNOWN evidence.
+    run: >-
+      melos exec --scope="looplet_authoring" --
+      "dart run bin/looplet_authoring.dart audit-daily ../../content/daily/tr --repo-root ../.. --no-pilot --out ../../build/content-quality/daily-audit.json"
+
+  content:corpus-audit:
+    description: Validate the runtime Turkish corpus against sourced curation and preserved legacy inputs.
+    run: >-
+      melos exec --scope="looplet_authoring" --
+      "dart run bin/looplet_authoring.dart audit-corpus --repo-root ../.."
+
+  content:corpus-impact:
+    description: Compare all content under the runtime and staged Turkish corpora; fail until every changed artifact is re-exported.
+    run: >-
+      melos exec --scope="looplet_authoring" --
+      "dart run bin/looplet_authoring.dart audit-corpus-impact --repo-root ../.. --candidate ../../build/content-quality/prospective-dictionary.json --out ../../build/content-quality/corpus-impact.json"
+
   content:sync:
     description: >-
       Mirror the authored Journey content (content/journey/**) into the app

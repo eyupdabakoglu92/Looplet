@@ -1,218 +1,113 @@
-# F07 — Günlük İçerik Spesifikasyonu (Daily Content Spec)
+# F07 — Günlük İçerik Kalite Contract'ı
 
-> **Durum:** Tech Lead contract authority, 2026-09-30 (F07 `architecture.md` A5, kullanıcı incident'ı).
-> Günlük havuzun **nasıl üretileceğini, neyin gerektiğini ve neye göre kabul edileceğini** tanımlar.
-> Amaç: içerik kalitesi rollerde (Developer araç → Content Designer üretim → QA bağımsız kontrol) ölçülerek sağlanır. Kullanıcıya oyun testi veya kalite kararı **gelmez**. Kullanıcıya yalnız ürün PRD'sinin açıkça zorunlu tuttuğu tek karar gelir (§2.1 "Onay").
-> Üst authority: ürün PRD'si (F01, F06, F07), F07 `architecture.md` D2 / D9 / A3 / A4, F06 `architecture.md` (Puzzle şeması, çözücü, zorluk puanı).
+> Revision: 2 — 2026-09-30, kullanıcının içerik kalite iyileştirmesi onayı; architecture A6.
+> Ortak süreç: `../../prompt-content-quality-standard.md`. Ürün: product PRD F01/F06/F07; teknik authority: F02 motoru, F06 solver/export, F07 D2/D9.
+> Bu belge kabul kurallarıdır; araçların yazıldığı veya havuzun geçtiği iddiası değildir. Mevcut 60 günlük havuz reddedilmiş içeriktir, yayına uygun değildir.
 
----
+## 0. Teşhis ve kapsam
 
-## 0. Neden bu belge var (teşhis)
+Mevcut havuz: 60 gün / 30 hedef (hepsi Journey'de). 300 **başlangıç** satırında mevcut sözlüğe uyan 4–5 harfli kelime yok; bu ölçüm çözüm sonu dolguyu ölçmez. 26 buzlu günün 18'inde sabit hücreler ve harf miktarı erimeyi imkânsız kılar. 9 başlangıçta hedefin ≥3 harfi aynı satırda yerindedir. Kayıtlı `tdDegree ≥ 1` yalnız 1 gündedir; bu kayıt tek başına tüm optimal yollar için kanıt değildir.
 
-İlk havuz (F07-CONTENT, 9af777f) bütün **zorunlu kapıları** geçti: çözülebilir, en az hamle kanıtlı, kopya yok, paket kuruluyor. Ama **kalite** ölçülmedi. Tech Lead ölçümleri (2026-09-29 / 30):
+Tech Lead'in eski brief'i/kabulü kalite kusurlarını kullanıcı oyun testine bırakmış; Content Designer kalıcı araç yerine depo dışı üretici kullanmıştır. Rework, teknik kabul **ve** gerekçeli deneyim incelemesi gerektirir. A5 metni `../../history/f07-daily-challenge-2026-09-29/daily-content-spec-at-a5.md` altında tarihsel kayıttır.
 
-| Ölçüm | Sonuç | Anlamı |
+Amaç: 16+ casual oyuncu için günlük, anlaşılır, farklı çözüm fikirleri taşıyan, mekaniklerinin gerçekten işe yaradığı bulmacalar. Hedef görünür; oyuncunun nadir kelime tahmin etmesi istenmez. Rutin içerik elemesi ve oyun testi kullanıcıya görev değildir.
+
+## 1. Motor ve durum tanımları
+
+* 5×5; 5 harfli hedef; satır/sütun dairesel kaydırma, her biri 1 hamle; herhangi bir satırda soldan sağa hedef kazanmadır.
+* Kilitli hücre sabit pivottur; diğer hareketli harfler etrafında döner. Buz aynı davranır; satırında 4–5 harfli sözlük kelimesi oluşunca satırın tüm buzları kalıcı erir.
+* `S0`: oyuncuya verilen başlangıç, `GridState.initial` ile t=0 erime/kazanma değerlendirmesinden sonra. Başlangıçta erimiş buz veya kazanılmış hedef kabul edilmez.
+* `Sbuild`: üreticinin kelimeli taslağı; oynanabilirlik kanıtı değildir. `Send`: saklanan **optimal çözüm tanığı** gerçek motorda S0'dan oynatılınca ulaşılan son durum. Q10 yalnız Send üzerinde ölçülür.
+* Erime tersinir değildir; kazanma terminaldir. Sbuild'den raw karıştırma yalnız aday üretir. Motorun kazanılmış duruma hamle uygulaması veya ters hamlelerin erimeyi geri alması varsayılmaz; her kabul ileri motor replay'iyle kanıtlanır.
+* Optimal tanık tam `optimalMoves` uzunluğundadır; önceki adımlarda kazanma yok, her hamle uygulanmış, son adım kazanmadır. Farklı optimal yollar farklı Send üretebilir; rapor bütün yollar hakkında iddia etmez.
+
+## 2. Sözlük ve kurasyon
+
+Runtime asset: `packages/looplet_dictionary/assets/tr/dictionary.json`; API/şema korunur. Kaynak metadata'sı ve kurasyon raporu sidecar olabilir.
+
+* **Required:** ≥120 uygun 5 harfli hedef; mevcut 30 Journey hedefi korunur, ≥90 yeni hedef. Bütün hedefler words içinde. Günlükte 60 farklı, Journey dışı hedef.
+* **Araştırma hedefi:** ≥2.000 kullanılabilir 4–5 harfli kelime. Bu sayı erime/kalite garantisi değildir; sayı doldurmak için nadir/uygunsuz kelime kabul edilmez. Preflight kaynak kapsamını, pilot aday üretimini ölçer; Tech Lead toplu üretimden önce gerçek kabul profilini gerekçesiyle kilitler. A5'in kanıtsız 2.000 hard minimum'u değişir; 120 hedef ve 60 günlük kapsam gevşemez.
+* `words` genel sözlüktür; mevcut 103 girdinin 19'u 4–5 harf dışındadır. Bunlar yalnız uzunluk nedeniyle silinmez. **Üretim görünümü** `4 ≤ length ≤ 5`, hedef görünümü `length == 5`; genel sözlükteki meşru uzunluklar yanlışlıkla reddedilmez.
+* Türkçe normalizasyon: İ/i ve I/ı ayrı; alfabe/circumflex davranışı F01 authority'sine uygun. Duplicate yok, targets ⊆ words. Belirsiz yazım sessizce dönüştürülmez, karantinaya alınır.
+* Gerçek ve yaygın Türkçe; özel isim, hakaret/küfür, kısaltma, arkaik/aşırı nadir veya uydurulmuş çekimli biçim dışlanır. Tek harf farkı veya soyut anlam tek başına red değildir; benzer hedeflerin takvim çeşitliliği ayrıca incelenir.
+* Kaynak adı, sürüm/tarih, dosya hash'i, kullanım koşulları, kaynak etiketleri, sıklık ölçütü ve dışlama listelerinin kaynakları kaydedilir. Erişilemeyen kaynak kullanılmış gibi yazılmaz. Liste eşleşmesi bütün anlamsal uygunsuzlukları kanıtlamaz.
+* Developer depoda sürümlenen corpus import/audit kontrollerini sağlar. Content Designer kurasyon verisini ve bütün hedeflerin gerekçeli editoryal incelemesini sahiplenir; kalıcı kabul script'i scratchpad'de kalmaz.
+
+**Kabul modeli (kullanıcı onayıyla PO revizyonu):** bütün girdilere otomatik kontroller; bütün hedeflere Content Designer review; QA yeni hedeflerin tamamında bağımsız inceleme ve destek kelimelerinde kaynak/sıklık/risk örneklemi (en az 100 veya daha küçükse tamamı). Düşük sıklık, belirsiz kaynak/etiket ve diakritik sınırları kapsanır; kritik hata etkilenen grubun tamamına incelemeyi genişletir. Belirsiz girdiler kabul dışında kalır. AI review insan review diye kaydedilmez; kullanıcıdan liste okuması beklenmez.
+
+**Etki:** sözlük değişince Journey/smoke/Daily yeniden çözülür; optimum, skor, erime ve bant değişimi raporlanır. Gereken Journey re-export aynı grid/hedef/taşlardan yapılır ve app/assets aynası canonical sync ile güncellenir. Journey bandı/deneyimi bozulursa ayrı rework açılır. Eski Daily havuzun geçici re-export'u yayın onayı değildir. Sözlük hash'i bütün yeni kanıtlara bağlanır.
+
+## 3. Preflight, pilot ve üretim
+
+Sıra: kaynak/fizibilite → corpus/araç readiness'i → **pilot** → Tech Lead checkpoint → 60 gün → bağımsız content QA. Pilot olmadan F07-CONTENT-R1 aktive edilmez.
+
+Pilot: en az 8 kabul edilebilir örnek; açık, kilitli, buzlu, ikisi birden sınıflarından en az 2'şer; hafif/ağır günler ve Türkçe harf sınırları kapsanır. Her required filtre için ayrıca kabul/red fixture'ı gerekir. Başarısız pilot, 8 kabul varmış gibi kapanmaz.
+
+Ölçümler: deneme sayısı, filtre başına red/UNKNOWN, kabul oranı, solve/audit süreleri, mümkünse peak kaynak kullanımı, kaynak/hedef yeterliliği. İlk bütçe sınıf başına 200 aday; her adayın solve/analiz bütçesi F06 default SearchBudget ile başlar (30 s / 5 milyon düğüm / derinlik 16). İlave aramalar da bütçeli; enumeration/skor sınırsız çalışamaz. Bütçe artışı veya algoritma değişikliği gerekçeli Developer/Tech Lead kararıdır; kalite eşiği otomatik düşmez.
+
+1. Takvim sınıfı ve uygun hedef seç. Sbuild'de hedef satırı ve diğer satırlarda sözlük dolgusu kur; en az iki dolgu hedefle en az iki ortak harf içersin. Farklı dolgular; hedefin kendisi/dairesel kayması tekrar edilmez.
+2. Sınıfa göre 1–2 kilit ve/veya 1–2 buz adayı yerleştir. Buz hedef satırında da olabilir; erime tanığı zorunludur. **Sbuild'deki buz satırında kelime yasak değildir**; yalnız S0'da t=0 erime yasaktır.
+3. Pivot maskesini koruyan raw karıştırmayla aday başlangıç üret; başlangıcı gerçek motorla yeniden kur. Karıştırma, ters motor replay'i kanıtı değildir.
+4. Ucuz red (şema, uygun hedef, başlangıç, erime gerekli koşulu, yasaklı liste, tekrar) → bütçeli optimum → optimal tanık → Q5/Q6/Q7/gerileme analizleri → Send dolgusu. Hesaplar bütün girdilerin hash'ine göre yeniden kullanılabilir.
+5. Required FAIL/UNKNOWN adayı teslim dışı bırakır. Seed/attempt sırası deterministik; araç/motor/sözlük/config sabitlenir. Zaman bütçesi farklı makinelerde farklı red oluşturabilir; byte tekrarı yalnız aynı tamamlanmış arama sonuçlarıyla garanti edilir.
+6. Kabul edilen def'i resmi export ile yaz; optimum/metadata'yı audit'te taze doğrula. Optimal/erime/counterfactual kanıtlar sidecar olabilir; runtime Puzzle şeması gereksiz yere değiştirilmez.
+
+## 4. Havuz ve takvim
+
+* 60 gün, geçici 2026-11-01 … 2026-12-30, epoch 2026-11-01; 60 farklı Journey dışı hedef; Journey/smoke/Daily tanım tekrarı yok.
+* Varsayılan ritim: Pzt açık, Sal kilitli, Çar buzlu, Per açık, Cum kilitli, Cmt ikisi, Paz buzlu. Değişiklik gerekçeli Tech Lead contract kararıdır.
+* İlk kabul profili: Pzt–Per optimum 4–5; Cum–Paz 5–7; medium/hard, easy/expert yok. Uygulanabilirlik pilotta ölçülür; başarısız pilot kendiliğinden daha kolay profile geçmez.
+* Her **tam ISO haftasında** Cum–Paz en az bir hard ve kanıtlı geçici gerileme günü; haftada en az iki kanıtlı gerileme günü. İlk/son kısmi haftada yalnız günlük sınırlar; tek günlük haftaya iki gün şartı konmaz.
+* Gerileme: satırlar arasındaki en yüksek doğru-konum sayısı M(s); her optimal çözümde en az bir adımda M azalır. Optimum o kanıtlandıktan sonra M'yi hiç azaltmayan ≤o kazanma yolu aranır: yol varsa özellik yok; eksiksiz arama sonunda yol yoksa kanıtlı; bütçe/cap biterse UNKNOWN. Bilişsel “aha” için göstergedir, oyuncu zevkinin kanıtı değildir.
+* Aynı ilk hedef harfi/kök, baskın dolgu tekrarı ve benzer çözüm fikri editoryal çeşitlilik incelemesinde raporlanır. Salt seed/hedef değişikliği yeni deneyim sayılmaz.
+* Yayın tarihi kayarsa sınıf/zorluk/hafta kontrolleri yeni tarihlerde tekrar çalışır; yalnız dosyaları adlandırmak yeterli değildir. Yayınlanmış gün/epoch değişmez (D2).
+
+## 5. Q1–Q12: teknik kabul
+
+Sonuçlar `PASS / FAIL / UNKNOWN / N/A` + ölçüm + evidence. N/A yalnız aşağıdaki koşullarda; required FAIL/UNKNOWN kabulü engeller. Negatif fixture kendi ihlalinden reddedilmelidir.
+
+| ID | Kapsam / seviye | Kabul kuralı |
 | --- | --- | --- |
-| Dolgu satırlarında gerçek kelime | 300 satırın **0**'ı | Hedef dışındaki 4 satır rastgele harf ("ÇLŞÜİ"). Buz erimesi için malzeme yok, ızgara "okunmuyor". |
-| Buzlu taşı hiç eriyemeyen gün | 26 buzlu günün **18**'i | Buz, kilitli taştan farksız; buz mekaniği boşa gidiyor. |
-| Taş kaldırılınca en az hamle değişmiyor | ölçülen ilk 9 taşlı günün kesin sonuç veren 5'inin **4**'ü (#1, #3, #4, #8); 4'ü çözücü bütçesinde belirsiz | Bu günlerde etiket `medium`'dan `easy`'ye düşüyor: "zorluk" yalnız taş **sayısından** geliyor (puan formülü taş başına +0,8 / +1,2). #1'de taşsız en iyi yol (`D2 R3 U2 R3`) buzlu satıra / sütunlara hiç dokunmuyor, yani taşlar tamamen süs. |
-| Doğru harfi geçici bozmayı gerektiren gün (`tdDegree ≥ 1`) | 60 günün **1**'i | Hemen hiç "aha" anı yok; her gün "4–5 harfi düz yerine it". |
-| Başlangıçta hedefin ≥ 3 harfi doğru yerde bir satır | 60 günün **9**'u | Başlangıç fazla yakın. |
-| Farklı hedef kelime | **30** (her biri 2 kez; hepsi Journey'de de var) | Sözlükte yalnız 30 hedef var. |
+| Q1 | Her gün, required | D2 kimlik/tarih/şema; 5×5; 5 harf uygun hedef; sütunlar açık; def/export eşleşir. |
+| Q2 | Her gün, required | Taze solve ile kanıtlı optimum; kayıt eşit; tanık optimum uzunluğunda ve ileri motor replay'i kazanır. BudgetExceeded/eksik yol red. |
+| Q3 | Gün + tam haftalar, required | §4 optimum ve kanıtlı gerileme ritmi; profil/ölçümler raporda. |
+| Q4 | Gün + tam haftalar, required | Güncel skor/etiket yeniden hesaplanır ve §4'e uyar. Bileşenler görünür; taş sayısı tek başına anlamlı zorluk kanıtı değildir. |
+| Q5 | Her mevcut mekanik grubu ayrı, required | Kilit kaldırılmış ve buz kaldırılmış kopyaları ayrı çöz; diğer grup korunur. Optimum farklıysa etki kanıtlı (yönü raporla); normal optimum o derinliğine kadar tam aramada çözüm yoksa alternatif optimum >o veya çözümsüzdür; kesin alternatif optimum/çözümsüzlük iddiası olmadan bu alt sınır da farkı kanıtlar; eşitse iki sistemde ortak optimal hamle dizisi olmadığını bütçeli ortak-yol aramasıyla kanıtla. Ortak optimal yol veya UNKNOWN red. Tek alternatif yolun değişmesi yetmez. Grup yoksa alt kontrol N/A; bütün taşları kaldırma yalnız ek tanıdır. |
+| Q6 | Her buzlu satır, required | S0'da donuk. Kazanma öncesi erimeye ulaşan ve sonra kazanan gerçek motor yolu (ilk profil: toplam ≤o+2) kaydedilir. Sabit harf uyumu yalnız gerekli koşul, erişilebilirlik kanıtı değildir. Buz yoksa N/A. |
+| Q7 | Her buzlu gün ölçülür; havuzdaki buzlu günlerin ≥yarısı required | En az bir **optimal** tanıkta kazanma öncesi eriyen hücredeki harf sonraki hamlede yer değiştirir. Yalnız son kazanma hamlesindeki erime geçmez. Ek güçlü kanıt: erime devre dışı aynı motor varyantında optimum uzar/çözüm kaybolur; budgetExceeded çözümsüzlük değildir. |
+| Q8 | Her gün, required | S0 kazanılmış değil; hiçbir satırda ≥3 hedef harfi doğru konumda değil; near-target kontrolü açık; t=0 erimiş buz yok. |
+| Q9 | Her gün, advisory | Farklı optimal ilk hamle sayısı veya bulunan alt sınır, enumeration tamamlanma bilgisiyle raporlanır. ≥2 tercih; tek başına açıklık/aha garantisi veya red kuralı değildir. |
+| Q10 | Her gün, required | Saklanan optimal tanığın Send durumunda belirlenmiş kazanan satır dışındaki 4 satırın ≥3'ünde sözlükten 4–5 harfli pencere. Sbuild sayımı yeterli değil. Kelimeler raporda; S0 kelime pencereleri ayrı tanısal ölçüm. |
+| Q11 | Her gün, required | Kaynak/sürümü belli yasaklı listeyle S0 ve saklanan bütün kanıt yollarında (Send dahil) yatay/dikey pencereler taranır. Yön/uzunluklar config'te açık; Türkçe case doğru. Sonuç yalnız taranan durumlar/listenin kapsamını kanıtlar, bütün ulaşılabilir gridlerde anlamsal garanti değildir. Şüpheli kelimeler review/karantinaya gider. |
+| Q12 | Havuz + Journey/smoke, required | Def signature tekrarı yok; 60 farklı Journey dışı hedef. Yakın kopya: hedef/id/tarih hariç harfler, kilit/donuk/erimiş maskeleri ve sütun kuralı aynı başlangıçlar; veya bunlardan biri diğerinden gerçek motorla ≤2 uygulanmış hamlede erişilebilir. Terminal kural korunur; farklı harf multiset'leri ucuz elenir. |
 
-**Kök nedenler:**
+Q7 bireysel “yararlı erime yok” gözlemidir; required sonuç havuz oranıdır. Taşsız günlerde Q5–Q7 N/A doğrudur. İlk 1.000 optimal çözüm evrensel önermeyi kanıtlamaz; varlık iddiasına bir geçerli tanık yeterlidir.
 
-1. **Sözlük çok küçük:** 103 kelime / 30 hedef (geçici liste). Kelime yoksa ne farklı hedef ne eriyebilir buz ne de kelimeli dolgu mümkün.
-2. **Kalite ölçülebilir kurala bağlanmamıştı.** Brief "editoryal hedefler" verdi ama ölçmeyi ve reddetmeyi zorunlu kılmadı. Kararı "insan oyun testi"ne bıraktı. Bu Tech Lead brief'inin hatasıdır.
-3. **Üretici bir araç değildi.** Content Designer depo dışında geçici bir script kullandı; kurallar kodda değil, tekrarlanabilir değil. Rol sözleşmesine göre generator / validator Developer'ındır.
+## 6. Araç contract'ı (Developer)
 
-Bu belge üçünü de kapatır: §2 sözlük, §3–§5 ölçülebilir kurallar, §6 araç.
+* Depoda corpus import/audit: kaynak metadata'sı, genel sözlük/üretim görünümü ayrımı, alfabe/uzunluk, duplicate/subset, dışlama kaydı; pozitif ve gerçek negatif örnekler.
+* `generate-daily`: takvim/sınıf/targets/seed/config/bütçe → def + aday raporu + tanıklar. FAIL/UNKNOWN aday content/ altına yazılmaz. Attempt/checkpoint ile devam; kabul raporu girdi fingerprint'ini taşır.
+* `audit-daily`: export ve sidecar tanıkları yeniden doğrular; Q1–Q12/§4 gün/hafta/havuz sonuçları, değerler, coverage ve fingerprint. Required FAIL/UNKNOWN/NOT RUN → nonzero. N/A koşulları ve Q9 advisory explicit. Bozuk/eksik sidecar, eski hash, yarım havuz, rapor/asset uyuşmazlığı negatif fixture'lardır.
+* Bütün aramalar bütçeli; optimum, constrained ve counterfactual sonuçları ayrı. Unsolvable yalnız tam aramayla; timeout UNKNOWN. Mevcut scorer'ın bütçesiz enumeration/BFS yüzeyleri araç task'ında giderilir.
+* Hızlı content:check korunur. Full audit pahalıysa ayrı koşabilir; **QA/kabul ve yayın öncesi zorunludur**. Pack/publish yolu güncel full-audit fingerprint'ini doğrular; eski rapor veya yalnız exit 0 metni yayın yetkisi değildir. Süre ölçülmeden hızlı CI gereksiz yavaşlatılmaz.
+* Gerçek motor replay'i zorunlu. Counterfactual varyantları test edilir ve yalnız analizde kullanılır; oyunun davranışı değişmez.
 
----
+## 7. Editoryal kabul ve QA
 
-## 1. Oyun kuralları (üreticinin bilmesi gereken kısmı)
+Content Designer pilotta ve havuzun gün tablosunda gerekçelendirir: hedef/dolgu yaygın ve okunabilir mi; mekanik kararı etkiliyor mu; erime için anlaşılabilir kelime fırsatı var mı; çözüm fikri önceki günleri tekrar ediyor mu; ağır/hafif ritmi skordan bağımsız makul mü? Kritik olumsuzluk rework'tür.
 
-* **Izgara:** 5×5 harf. **Hedef:** 5 harfli kelime, ekranda görünür.
-* **Hamle:** bir satırı sağa / sola ya da bir sütunu yukarı / aşağı **dairesel** kaydırmak. Her kaydırma 1 hamle.
-* **Kazanma:** hedef kelime herhangi bir satırda, soldan sağa, bitişik ve doğru sırada oluşur. Ters, dikey, çapraz sayılmaz.
-* **Kilitli taş:** yerinden hiç oynamaz. Satır / sütun kaydırılınca diğer harfler onun etrafında döner (pivot).
-* **Buzlu taş:** kilitli gibi pivottur. Bulunduğu **satırda** soldan sağa 4–5 harfli bir sözlük kelimesi oluştuğu anda o satırdaki bütün buzlu taşlar **erir** ve oturumun geri kalanında normal taş olur (geri alma erimeyi de geri alır).
-* **En az hamle (`optimalMoves`):** çözücünün kanıtladığı minimum. Yıldızlar buna göre hesaplanır (F04), o yüzden yanlış olamaz.
-* **Günlük kuralları:** sütunlar açık, sınırsız hamle, 3 geri alma, sınırsız yeniden başlatma (AC3).
+QA full audit'i bağımsız çalıştırır; negatif fixture assertion/fail yollarını okur. En az 8 gün: dört sınıf, iki ağır gün, gerileme ve en düşük Q7 marjı; pilotta tamamı. Önce çözümü okumadan gerçek motor/uygulama üzerinde inceleme, sonra tanık/counterfactual replay. Yöntem AI/otomatik/insan doğru etiketlenir. Kritik editoryal kusur aynı grubun tamamına incelemeyi genişletir. Kullanıcı oyun testi required değildir.
 
----
+Teslim: 60 export + manifest + defs; kalıcı audit/kanıtlar; corpus/araç/motor/config/içerik hash'leri; komut/exit kodları; pilot kabulü; seed/bütçe/red dağılımı; editoryal gerekçeler ve Journey etki tablosu. content:check, pack-daily ve full audit birlikte geçer. Bağımsız QA tamamlanmadan Content Quality Gate Passed olmaz; F07 app/release QA ayrıca gerekir.
 
-## 2. Girdiler — tam olarak ne lazım
+## 8. Yetki ve kararlar
 
-### 2.1 Sözlük (en kritik girdi — F01-PRODUCTION-CORPUS)
+F07.TARGET-LIST-APPROVAL: kullanıcı iyileştirmeyi onayladı; B'nin güçlendirilmiş hali product PRD ve F01 authority'sine işlenir. Bu sözlük/havuz onayı değildir. Açık içerik kanıtlarını kullanıcı decision'ı olarak yeniden açma.
 
-Dosya: `packages/looplet_dictionary/assets/tr/dictionary.json` (`words`, `targets`; küçük harf, Türkçe normalize — İ/i ve I/ı ayrı).
+İlk karşılaşma ipucu gibi yeni ürün davranışı ayrı PO kapsamıdır. F08 deploy ertelemesi ve yayın izinleri korunur.
 
-| Liste | Şu an | Gereken (en az) | Hedef | Neden |
-| --- | --- | --- | --- | --- |
-| `targets` (5 harf) | 30 | **120** (Journey'nin 30'u + ≥ 90 yeni) | 400 (bir yıllık Günlük) | 60 gün × farklı hedef + reddedilen adaylar için yedek |
-| `words` (4–5 harf; buz eritme ve dolgu) | 103 | **2.000** | 4.000+ | Buzun eriyebilmesi ve dolgu satırlarının gerçek kelime olabilmesi için |
+## 9. Bağımlılıklar
 
-**Kelime kuralları** (ürün PRD F01): gerçek, yaygın Türkçe kelime. Özel isim, küfür / argo / hakaret, kısaltma, arkaik veya çok nadir kelime **yok**. Her hedef aynı zamanda `words` içinde olmalı. Tekrar yok. Çekimli biçim yerine kök veya yaygın sözlük biçimi (ör. "kalem", "kalemi" değil).
+F07-CONTENT-PREFLIGHT (Content Designer: kaynak/fizibilite ve rubric) → Tech Lead → F07-TOOL-DAILY (Developer: corpus araçları + generator/audit + bounded analysis) → F07-CORPUS (Content Designer: genişletme ve etki) → F07-CONTENT-PILOT (8 örnek) → Tech Lead pilot checkpoint → F07-CONTENT-R1 (60 gün) → F07-QA-FUNCTIONAL (app teslimiyle) → mevcut release rotası.
 
-**Kaynak ve süreç** (Content Designer):
-1. Kaynak listeyi seç (TDK Güncel Türkçe Sözlük madde başları + bir sıklık listesi) ve kaynağı raporda yaz.
-2. 4–5 harf filtresi, normalize, dışlama kuralları, sıklık eşiği.
-3. **Otomatik kontroller** (script çıktısı raporda): uzunluk, alfabe (yalnız Türkçe harfler), tekrar yok, `targets ⊆ words`, bir küfür / argo listesine karşı tarama (listenin kaynağı yazılır).
-4. Hedefler için ek kural: çok yaygın, somut, çocuk için de uygun; aynı kökten iki hedef yok.
-
-**Etki (sözlük değişince):**
-* Journey'nin buzlu seviyeleri (L21–L30) daha kolay eriyebilir, bu da en az hamleyi kısaltabilir. `content:check` her şeyi yeniden çözer, değişen seviye **fail** eder ve yeniden `export` gerekir (F05 içeriği; QA gerekir).
-* F01 testleri kelime sayısına bağlıysa Developer günceller.
-* Uygulama henüz dağıtılmadı ve Günlük yayınlanmadı. Sözlüğü değiştirmenin **en ucuz anı şimdi**. İlk yayından sonra her sözlük değişikliği yayınlanmış günleri etkiler (A4 ruling 3).
-
-**Onay — kullanıcıya gelen tek konu:** ürün PRD F01, hedef listesi için *"every entry is a common, manually-approved Turkish word"* ve iki liste için *"both manually reviewed"* diyor. Tech Lead bunu değiştiremez. İki yol:
-* **(a)** Kullanıcı listeleri okur ve onaylar: ~120 hedef kısa bir iş, ama ~2.000 kelimelik liste pratik değil.
-* **(b)** Ürün kararı: `Run Product Owner. Revise: F01 — sözlük ve hedef listesi "manually reviewed" yerine Content Designer'ın yazılı kural setine ve otomatik kontrollerine göre onaylanır; QA bağımsız örneklem kontrolü yapar`.
-
-Bu, karar kapısı **F07.TARGET-LIST-APPROVAL**'dır (yalnız yayını bekletir).
-
-### 2.2 Takvim
-
-* 60 gün, 2026-11-01 … 2026-12-30, `numberingEpoch` 2026-11-01 (geçici; canlı tarih yayın kapısında — A3 ruling 5).
-* Hafta günü sınıf ritmi §4'te.
-
-### 2.3 Araçlar
-
-Mevcut: `looplet_authoring fill / solve / playtest / export / check / pack-daily`.
-
-Gereken (Developer, §6): `generate-daily` ve `audit-daily`. Bunlar gelmeden Content Designer geçici script'le üretmez.
-
----
-
-## 3. Bulmaca başına üretim algoritması
-
-Girdi: tarih `d`, o günün sınıfı `c` (§4), hedef `T`, tohum (seed). Çıktı: bir def dosyası ve `export` ile yazılmış bir `Puzzle`.
-
-```
-1. ÇÖZÜLMÜŞ IZGARA KUR
-   r_T  ← rastgele satır (0..4); satır r_T = T
-   diğer 4 satır ← her biri:
-       - 5 harfli bir sözlük kelimesi, VEYA
-       - 4 harfli sözlük kelimesi + 1 harf (başa ya da sona)
-     ek kurallar:
-       - en az 2 satır T ile ≥ 2 ortak harf taşır (yem / şaşırtma malzemesi)
-       - hiçbir satır T'nin kendisi ya da dairesel kaydırması değil
-       - satırlar arasında tekrar yok; Günlük içinde yakın günlerde aynı dolgu kelimesi yok
-
-2. TAŞLARI YERLEŞTİR (sınıfa göre)
-   açık:     taş yok
-   kilitli:  k ∈ {1,2} kilitli taş. Aday yerler:
-               - r_T satırında, T'nin doğru harfi üstünde (çözümde yerinde kalır)
-               - ya da çözüm yolundaki bir sütunu / satırı "bölen" hücre
-   buzlu:    f ∈ {1,2} buzlu taş, r_T DIŞINDA tek bir satırda (r_F).
-             r_F satırı, çözülmüş halde 4–5 harfli bir kelime İÇERMEZ
-             (yoksa başlangıçta erir), ama §3 adım 4'teki "eriyebilir" testini geçer.
-   kilitli+buzlu: ikisinin birleşimi, aynı hücre değil
-
-3. KARIŞTIR
-   k_raw ← hedef_optimum + 1..3 rastgele ters hamle (motor kuralıyla, pivotlara uyarak)
-   en az 1 sütun hamlesi; en az 1 hamle r_T satırını bozar
-
-4. ÇÖZ VE ÖLÇ (çözücü + skorlayıcı + ek ölçümler)
-   o        ← Solver.solve  (kanıtlı en az hamle; bütçe aşılırsa aday reddedilir)
-   sols     ← tüm optimal çözümler (üst sınır 1000)
-   td       ← tdDegree (doğru harfi geçici bozma derecesi)
-   fm       ← firstMoves (farklı ilk hamle sayısı)
-   score, label ← DifficultyScorer
-   taşEtkisi ← taşlar kaldırılmış kopyanın o' ve çözüm kümesi (bkz. Q5)
-   erime    ← buzlu satır için: çözücü, erimenin mümkün olduğunu bir hamle dizisiyle KANITLAR
-              (erimiş bir duruma ulaşan dizi bulunur ve playtest ile doğrulanır)
-
-5. §5 FİLTRELERİNİN HEPSİNİ UYGULA → biri bile geçmezse aday atılır, yeni tohum dene
-   (her gün için en fazla N deneme; hepsi başarısızsa o gün "blocked" raporlanır, gevşetilmez)
-
-6. KABUL → def dosyasını yaz → resmi `export` ile Puzzle'ı yaz (optimum yeniden kanıtlanır)
-```
-
-**Notlar:**
-* Adım 1'deki gerçek-kelime dolgusu hem ızgarayı "okunur" yapar hem erimeyi mümkün kılar. Rastgele harf dolgusu **yasak**.
-* Hesap maliyeti: sütunlu 5×5'te `o ≥ 6` aday başına dakikalar sürer (F06 brief §11). Üretim AOT derlenmiş araçla, arka planda, gerekirse saatlerce çalışır. Bu kabul edilebilir; kuralı gevşetmek kabul edilmez.
-
----
-
-## 4. Havuz düzeyi kurallar (60 gün)
-
-| Kural | Değer | Tür |
-| --- | --- | --- |
-| Hedefler | 60 **farklı**; hiçbiri Journey hedefi değil (sözlük §2.1'e ulaşınca) | zorunlu |
-| Tanım tekrarı | yok (Journey, smoke, havuz) — mevcut `check` | zorunlu (kapı) |
-| Yakın kopya | hiçbir başlangıç ızgarası, başka bir bulmacanın başlangıcına ≤ 2 hamle mesafede değil | zorunlu (audit) |
-| Haftalık sınıf ritmi | Pzt açık · Sal kilitli · Çar buzlu · Per açık · Cum kilitli · Cmt kilitli+buzlu · Paz buzlu | varsayılan (değişirse raporda gerekçe) |
-| Zorluk ritmi | Pzt–Per: `o` 4–5, `medium` · Cum–Paz: `o` 5–7, en az biri `hard` ve `td ≥ 1` | zorunlu (audit) |
-| Etiket | yalnız `medium` / `hard`; `easy` ve `expert` yok | zorunlu (audit) |
-| "Aha" günleri | haftada en az 2 gün `td ≥ 1` | zorunlu (audit) |
-| Aynı hedef harfi | art arda iki günün hedefi aynı harfle başlamaz | tercih |
-
----
-
-## 5. Bulmaca başına kabul filtreleri (hepsi ölçülür, hepsi zorunlu)
-
-| # | Filtre | Kural |
-| --- | --- | --- |
-| Q1 | Kimlik ve şema | D2 (2): `type daily`, `dailyDate`, `id daily-tr-<tarih>`, `lang tr`; 5×5; 5 harfli hedef; sütunlar açık |
-| Q2 | Kanıtlı optimum | `export` ile yazılmış; `check`'in taze çözümü aynı; bütçe içinde |
-| Q3 | Optimum aralığı | §4 zorluk ritmindeki gün aralığı |
-| Q4 | Etiket | `medium` / `hard` (gün ritmine göre) |
-| Q5 | **Taşlar anlamlı** | Taşların hepsi kaldırılmış kopya çözülür. Taşlı bulmacanın `o`'su taşsızınkinden **farklıysa** veya taşsız bulmacanın en az bir optimal çözümü taşlı bulmacada **uygulanamıyorsa** (taş o yolu kapatıyorsa) taşlar anlamlıdır. İkisi de değilse taşlar süstür → **red**. Taşsız kopya bütçeyi aşarsa sonuç "belirsiz" sayılır → red |
-| Q6 | **Buz eriyebilir** | Her buzlu satırda erime, çözücü / playtest ile bulunmuş gerçek bir hamle dizisiyle **kanıtlı**. Kanıt dizisi raporda |
-| Q7 | Buz anlamlı (buzlu günlerin ≥ yarısı) | Erimenin en az bir optimal çözümün parçası olması veya erimenin çözümü kısaltması |
-| Q8 | Başlangıç çok yakın değil | Başlangıçta hiçbir satırda hedefin ≥ 3 harfi doğru yerde değil; hedefe 1 harf uzaklıkta pencere yok (mevcut `--avoid-near-target` kuralı) |
-| Q9 | Bariz tek yol değil | `firstMoves ≥ 2` (başlangıçta birden fazla makul ilk hamle) |
-| Q10 | Dolgu kelimeli | Çözülmüş ızgarada hedef dışındaki 4 satırın ≥ 3'ü bir sözlük kelimesi içerir |
-| Q11 | Uygunsuz kelime yok | Başlangıç ve çözülmüş ızgaranın hiçbir satır / sütununda (soldan sağa, yukarıdan aşağı) küfür / argo listesinden bir kelime yok |
-| Q12 | Tekrar / yakın kopya | §4 |
-
-Filtre eşikleri `audit-daily`'nin yapılandırmasında durur; eşik değişikliği Tech Lead kararıdır ve raporda görünür.
-
----
-
-## 6. Araç (Developer — Frontend/Mobile Developer)
-
-Kurallar kodda olmalı ki kalite bir rolün özenine bağlı kalmasın.
-
-* **`looplet_authoring generate-daily`:** §3 algoritması. Girdi: takvim, sınıf ritmi, hedef listesi, tohum, deneme sınırı. Çıktı: `tools/looplet_authoring/drafts/daily/<lang>/_defs/*.def.json` + aday raporu. Deterministik (aynı tohum = aynı çıktı).
-* **`looplet_authoring audit-daily <daily/<lang>>`:** §4 + §5'in bütün ölçülebilir kuralları; gün gün tablo (her filtre PASS / FAIL + değerleri) ve havuz özeti; herhangi bir FAIL → exit 1. Her kural için adlandırılmış bir negatif test.
-* `content:check` (CI) **değişmez**: `audit-daily` yavaş olabilir. CI'a eklenip eklenmeyeceği aracın süresi ölçüldükten sonra Tech Lead kararıdır.
-* Sözlük dosyasına dokunmaz; sözlük içeriği Content Designer'ındır.
-
----
-
-## 7. Content Designer'ın teslimi ve kabul
-
-**Teslim:**
-1. 60 pool dosyası + manifest (mevcut yollar, `export` ile) ve def'ler.
-2. `audit-daily` çıktısı: **exit 0**, rapor dosyası repo'da (`features/f07-daily-challenge/content-audit.md` veya aracın ürettiği yol).
-3. `content:check` exit 0; `pack-daily` exit 0.
-4. `content-design.md`: kullanılan komutlar ve exit kodları, tohumlar, reddedilen aday sayıları, bilinen sınırlar.
-
-**Kurallar:**
-* Filtre geçmeyen gün **teslim edilmez**, "açık madde" olarak kullanıcıya bırakılmaz. Ya yeniden üretilir ya da gerekçeli **Tech Lead blocker**'ı olur (ör. "şu hedefle Q6 30 denemede geçmedi").
-* Kalite sorusu kullanıcıya değil **Tech Lead'e** gider. Kullanıcıya yalnız §2.1'deki PRD onayı gider.
-* "Yapılamaz" iddiası denenen yolları ve sayıları içerir.
-* Kod / araç değişikliği yapmaz; araç eksikse blocker.
-
-**QA (content modülü):** `audit-daily`'yi bağımsız çalıştırır; filtre kodunun negatif testlerini okur; en az 5 günü `solve` / `playtest` ile tekrar eder (Q5 / Q6 kanıt dizileri dahil). Kullanıcı oyun testi **gerekmez**.
-
----
-
-## 8. Kullanıcıya kalan kararlar (yalnız ürün kararları)
-
-1. **F07.TARGET-LIST-APPROVAL** — §2.1 (a) veya (b).
-2. *(İsteğe bağlı, ürün)* Kilitli / buzlu taşlar ilk karşılaşmada açıklanmıyor (Journey'de de). Varsayılan: Günlük tüm sınıfları #1'den gösterir (A4 ruling 2). Değiştirmek istenirse `Run Product Owner. Revise: …` (ilk karşılaşma ipucu).
-
----
-
-## 9. Sıra (bağımlılıklar)
-
-```
-F07-CORPUS (Content Designer: sözlük)  ─┐
-F07-TOOL-DAILY (Developer: generate/audit) ─┼─→ F07-CONTENT-R1 (Content Designer: 60 gün, audit exit 0) → QA content
-F07.TARGET-LIST-APPROVAL (kullanıcı / PO) ─┘      (yayın öncesi)
-F07-FE (uygulama) — içerikten bağımsız, paralel
-```
+Developer araçları provisional sözlük/test fixture'larıyla geliştirebilir; üretim onayı veremez. F07-FE teknik olarak içerikten bağımsızdır; tek-owner workflow'da Tech Lead uygun checkpoint'te aktive eder. Bu sıranın yazılması downstream task'ların çalıştırıldığı veya tamamlandığı anlamına gelmez.

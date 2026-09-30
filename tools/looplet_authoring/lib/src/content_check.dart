@@ -200,8 +200,9 @@ String? _journeyManifestShapeProblem(Map<String, Object?> map, String lang) {
   if (levels is! List || levels.isEmpty) {
     return '"levels" must be a non-empty array';
   }
-  if (levels.any((e) => e is! Map))
+  if (levels.any((e) => e is! Map)) {
     return 'every "levels" entry must be an object';
+  }
   return null;
 }
 

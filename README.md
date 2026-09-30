@@ -35,6 +35,7 @@ melos run format:check   # fail if code is not formatted
 melos run analyze        # static analysis (all packages + flutter analyze)
 melos run test           # unit tests (pure-Dart packages) + flutter test (app)
 melos run content:check  # validate committed puzzle artifacts under content/
+# F07 release also requires content:quality; see tools/looplet_authoring/README.md.
 melos run build:app      # release Android App Bundle
 ```
 

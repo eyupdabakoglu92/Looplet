@@ -1,0 +1,22 @@
+{
+  "id": "daily-tr-2026-11-14",
+  "puzzleType": "daily",
+  "dailyDate": "2026-11-14",
+  "language": "tr",
+  "grid": [
+    "yyrar",
+    "çimur",
+    "bağıt",
+    "sauüu",
+    "uökmz"
+  ],
+  "target": "kiraz",
+  "locked": [
+    "0,3",
+    "1,2"
+  ],
+  "frozen": [
+    "0,4"
+  ],
+  "columns": true
+}

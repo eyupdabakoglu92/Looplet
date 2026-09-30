@@ -1,5 +1,7 @@
 # F07 — daily-challenge: Content Design
 
+> HISTORICAL DELIVERY — rejected as production content by A5/A6. This report describes the old 60-day pool; its PASS claims apply only to its original checks/revision. It is not current content-quality evidence or a request for user sign-off. New acceptance: `daily-content-spec.md` revision 2; active work: orchestration Current Brief.
+
 Role: Content Designer · Task: F07-CONTENT · Date: 2026-09-29 · Base: `ece09df` + the working tree below
 
 ---

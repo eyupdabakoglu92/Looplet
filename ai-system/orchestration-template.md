@@ -18,6 +18,7 @@
 * Evidence Reuse: `not-evaluated / allowed / invalidated / not-applicable`; karar fingerprint ile gerekçelendirilir.
 * Visual Scope: none / existing-parity / new-surface / motion-critical / design-system.
 * Visual Quality Gate ve evidence kuralları `/ai-system/design/visual-quality-gate.md` içindedir.
+* Authored content varsa Content Quality Contract feature-relative dosya yolu, Gate `Pending / Ready for QA / Passed`, Evidence güncel referanslardır; kapsam yoksa `Not Required / Not Required / None`. Semantik `prompt-content-quality-standard.md`.
 * Current Phase, Consumed Signals ve Rework Plan yalnız gerekliyse ayrı bölümlerdir.
 
 ## Feature ID
@@ -51,6 +52,18 @@ None
 ## Delivery Review
 
 Pending
+
+## Content Quality Contract
+
+Not Required
+
+## Content Quality Gate
+
+Not Required
+
+## Content Quality Evidence
+
+None
 
 ## Visual Scope
 

@@ -122,6 +122,22 @@ class PuzzleDef {
     return GridCoord(row, col);
   }
 
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'puzzleType': puzzleType.name,
+        if (journeyLevelNumber != null)
+          'journeyLevelNumber': journeyLevelNumber,
+        if (dailyDate != null) 'dailyDate': dailyDate,
+        'language': language,
+        'grid': grid,
+        'target': target,
+        'locked':
+            (locked.toList()..sort()).map((c) => '${c.row},${c.col}').toList(),
+        'frozen':
+            (frozen.toList()..sort()).map((c) => '${c.row},${c.col}').toList(),
+        'columns': columns,
+      };
+
   /// Builds the engine config. Throws [EngineConfigError] (from F02) for a
   /// structurally invalid grid.
   EngineConfig toEngineConfig() => EngineConfig(

@@ -1,0 +1,17 @@
+{
+  "id": "daily-tr-2026-11-02",
+  "puzzleType": "daily",
+  "dailyDate": "2026-11-02",
+  "language": "tr",
+  "grid": [
+    "böhmk",
+    "luker",
+    "fonua",
+    "oeert",
+    "khpam"
+  ],
+  "target": "tohum",
+  "locked": [],
+  "frozen": [],
+  "columns": true
+}

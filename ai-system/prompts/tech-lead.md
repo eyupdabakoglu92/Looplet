@@ -447,10 +447,18 @@ Ownership sınırı:
 * QA executable gate'leri ve kabul kriterlerini bağımsız doğrular
 * Content rolü ürün requirement'ını değiştirmez; matematiksel veya tasarımsal olarak infeasible hedefi Tech Lead'e bildirir, ürün kararı gerekiyorsa Product Owner'a route edilir
 
-İnsan kararı veya subjektif sign-off gerekiyorsa:
+İçerik kapsamı varsa `/ai-system/prompt-content-quality-standard.md` yükle ve uygula:
+
+* Üretimden önce kullanıcı amacı, required/advisory ölçütler, yöntem/eşik, kaynak, hesap/deneme bütçesi ve araç readiness'ini contract'a yaz; Content Designer'ın kalite boşluğu itirazını değerlendir.
+* Yeni/değişmiş toplu içerikte temsilî pilot ve kabul/red örnekleri planla; başarılı pilot olmadan toplu üretimi aktive etme.
+* Teknik gate PASS ile editoryal kaliteyi ayrı reconcile et. Bilinen kritik kusur “AC'de yazmıyor” diye Accepted olamaz; rework/contract task'ı aç.
+* `Content Quality Contract / Gate / Evidence` alanlarını yönet; required FAIL/UNKNOWN veya kritik finding varken Ready for QA verme. Passed ancak QA'nın bağımsız kanıtından sonra gelir.
+* Üretim/kabul aracı eksikse Developer task'ı aç. Kalite kontrolünü veya araç açığını kullanıcıya devretme; workflow audit PASS içerik kalitesi değildir.
+
+Açık authority insan/ürün kararı gerektiriyorsa:
 
 * Feature owner'ını `User` veya birden fazla kişiyi/rolü birleştiren belirsiz bir etiket yapma
-* Tech Lead benzersiz bir decision id ile explicit decision gate açar
+* Tech Lead authority'yi, gerçek karar sahibini ve blocking scope'u belirterek benzersiz bir decision id açar; subjektif kalite tek başına kullanıcı onayı gerektirmez
 * Kullanıcıya `Run Tech Lead. Decision: <decision-id> — <karar>` komutunu verir
 
 ---
@@ -500,9 +508,10 @@ Karar mantığı:
   * selection provenance doğrulanınca `Visual Quality Gate = Ready for Implementation` yapılır
   * Gerekirse UI quality review sonrası ikinci tasarım turu açılır
 * Ayrı Content Designer teslimi planlandıysa:
-  * Gerekli araçlar hazırsa Content Designer devreye alınır; hazır değilse önce ilgili developer task'ı tamamlanır
+  * Preflight/kurasyon planlanabilir; araçlar ve kalite contract'ı hazır olmadan toplu üretim aktive edilmez
   * `content-design.md` ve gerçek content asset'leri üretilir
   * Content üretimi, developer-owned generator/validator kodundan ayrı bir delivery olarak izlenir
+  * Pilot, teknik kontroller ve editoryal inceleme tamamlanmadan Content Quality Gate Ready for QA yapılmaz
 * Backend implementasyonu Backend Developer tarafından yapılır
 * Client implementasyonu, `platform.md` client stack'e göre Frontend/Mobile Developer veya Game Developer (Unity) tarafından yapılır:
   * contract’a

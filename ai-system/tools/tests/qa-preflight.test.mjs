@@ -36,6 +36,23 @@ test('valid declared QA plan passes preflight', t => {
   assert.deepEqual(result.errors, []);
   assert.deepEqual(result.suggested, ['core', 'content']);
 });
+test('content quality cannot enter QA before readiness and the linked contract', t => {
+  const fields = { 'Content Quality Contract': 'quality.md', 'Content Quality Gate': 'Pending',
+    'Content Quality Evidence': 'content-design.md' };
+  const { root, featureDir } = fixture(t, orchestration(fields));
+  assert.match(preflight(root).errors.join('\n'), /Content Quality Gate/);
+  fields['Content Quality Gate'] = 'Ready for QA';
+  writeFileSync(join(featureDir, 'orchestration.md'), orchestration(fields));
+  assert.match(preflight(root).errors.join('\n'), /quality\.md/);
+  writeFileSync(join(featureDir, 'quality.md'), '# Quality\n');
+  assert.deepEqual(preflight(root).errors, []);
+});
+test('declared content quality triggers the module even under a broad QA scope', t => {
+  const { root } = fixture(t, orchestration({ 'QA Scope': 'none', 'QA Modules': 'core',
+    'Content Quality Contract': 'quality.md', 'Content Quality Gate': 'Ready for QA',
+    'Content Quality Evidence': 'content-design.md' }));
+  assert.match(preflight(root).errors.join('\n'), /content QA module|required QA module missing: content/);
+});
 
 test('missing required module fails before QA execution', t => {
   const { root } = fixture(t, orchestration({ 'QA Modules': 'core' }));

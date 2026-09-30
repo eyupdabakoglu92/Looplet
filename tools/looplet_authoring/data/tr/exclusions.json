@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "version": "2026-09-30.1",
+  "source": "Explicit initial safety list authored during F07 remediation; not an exhaustive Turkish profanity lexicon. Editorial review remains required.",
+  "directions": ["horizontal-forward", "horizontal-reverse", "vertical-forward", "vertical-reverse"],
+  "words": ["aptal", "salak", "orospu", "sik", "sikik", "amcık", "yarrak", "piç", "ibne", "bok", "sıç", "göt"],
+  "excludedCategories": ["proper-only", "abbreviation", "archaic", "rare", "unexplained-inflection"]
+}

@@ -37,6 +37,9 @@ const qaFields = {
 const qaPlanFields = {
   'QA Modules': 'core, content', 'Regression Depth': 'impacted', 'Evidence Reuse': 'not-applicable',
 };
+const contentFields = {
+  'Content Quality Contract': 'quality.md', 'Content Quality Gate': 'Pending', 'Content Quality Evidence': 'None',
+};
 const visualFields = {
   'Visual Scope': 'new-surface',
   'Design Foundation': 'ai-system/project-authority/design-foundation.md',
@@ -90,6 +93,71 @@ test('valid active and reviewed terminal fixtures pass the full audit', t => {
 test('legacy orchestration without visual fields remains compatible', t => {
   const root = fixture(t);
   assert.equal(feature().visualDeclared, false);
+  assert.deepEqual(audit(root).errors, []);
+});
+test('content fields require a complete contract and cannot hide authored scope', () => {
+  assert.deepEqual(errorsFor(contentFields), []);
+  assert.match(errorsFor({ 'Content Quality Gate': 'Pending' }).join('\n'), /Content Quality Contract/);
+  assert.match(errorsFor({ ...contentFields, 'Content Quality Gate': 'Not Required',
+    'Content Quality Contract': 'Not Required' }).join('\n'), /authored-content scope/);
+  assert.match(errorsFor({ ...contentFields, 'Content Quality Gate': 'Ready for QA' }).join('\n'), /Content Quality Evidence/);
+});
+test('a structurally accepted delivery cannot enter content QA while quality is pending', () => {
+  const candidate = { ...qaFields, ...qaPlanFields, ...contentFields };
+  assert.match(errorsFor(candidate).join('\n'), /content QA requires Content Quality Gate/);
+  assert.deepEqual(errorsFor({ ...candidate, 'Content Quality Gate': 'Ready for QA',
+    'Content Quality Evidence': 'content-design.md' }), []);
+});
+test('QA reuse of Passed content requires an explicit evidence decision', () => {
+  const passed = { ...contentFields, 'Content Quality Gate': 'Passed', 'Content Quality Evidence': 'qa.md' };
+  assert.match(errorsFor({ ...qaFields, ...qaPlanFields, ...passed }).join('\n'), /evidence reuse/);
+  assert.deepEqual(errorsFor({ ...qaFields, ...qaPlanFields, ...passed, 'Evidence Reuse': 'allowed' }), []);
+});
+test('release preparation can proceed but readiness cannot bypass pending content quality', () => {
+  const fields = { ...contentFields, 'Current Owner': 'DevOps/Release Engineer', 'Next Role': 'DevOps/Release Engineer',
+    'Active Task Ledger': row('sample.release', 'DevOps/Release Engineer'), 'QA Stage': 'functional',
+    'QA Result': 'Functional Approved', 'Release Scope': 'staging' };
+  assert.deepEqual(errorsFor(fields), []);
+  assert.match(errorsFor({ ...fields, 'Release Result': 'Release Ready' }).join('\n'), /content release readiness requires/);
+  assert.deepEqual(errorsFor({ ...fields, 'Content Quality Gate': 'Passed', 'Content Quality Evidence': 'qa.md', 'Release Result': 'Release Ready' }), []);
+});
+test('final approval and closure cannot retain pending content quality', () => {
+  assert.match(errorsFor({ ...terminalFields, ...contentFields }).join('\n'), /final content approval/);
+  assert.match(errorsFor({ ...terminalFields, ...contentFields }).join('\n'), /terminal content feature/);
+  assert.deepEqual(errorsFor({ ...terminalFields, ...contentFields,
+    'Content Quality Gate': 'Passed', 'Content Quality Evidence': 'qa.md' }), []);
+});
+test('full audit requires the linked content quality contract to exist', t => {
+  const root = fixture(t, [sourceFor(contentFields)]);
+  assert.match(audit(root).errors.join('\n'), /Content Quality Contract file missing/);
+  writeFileSync(join(root, 'features/item-0/quality.md'), '# Quality contract\n');
+  assert.deepEqual(audit(root).errors, []);
+});
+test('full audit rejects content readiness or Passed without the delivery and QA artifacts', t => {
+  const fields = { ...terminalFields, ...contentFields, 'Content Quality Gate': 'Passed', 'Content Quality Evidence': 'qa.md' };
+  const root = fixture(t, [sourceFor(fields)]);
+  const dir = join(root, 'features/item-0');
+  writeFileSync(join(dir, 'quality.md'), '# Quality\n');
+  assert.match(audit(root).errors.join('\n'), /requires content-design\.md/);
+  writeFileSync(join(dir, 'content-design.md'), '# Delivery\n');
+  writeFileSync(join(dir, 'qa.md'), '# QA\n\nOnly structural checks passed.\n');
+  assert.match(audit(root).errors.join('\n'), /Authored Content Compliance/);
+  writeFileSync(join(dir, 'qa.md'), '# QA\n\n## Authored Content Compliance\n\nContent Result: PASS\n\nIndependent evidence references.\n');
+  assert.deepEqual(audit(root).errors, []);
+  for (const body of ['Content Result: FAIL', 'Content Result: PASS\nContent Result: FAIL',
+    '```text\nContent Result: PASS\n```', '<!-- Content Result: PASS -->']) {
+    writeFileSync(join(dir, 'qa.md'), '# QA\n\n## Authored Content Compliance\n\n' + body + '\n');
+    assert.match(audit(root).errors.join('\n'), /Content Result: PASS/);
+  }
+});
+test('unrelated QA rejection does not erase a valid independent content verdict', t => {
+  const fields = { ...contentFields, 'Current Owner': 'Tech Lead', 'Next Role': 'Tech Lead',
+    'Active Task Ledger': 'None', 'Content Quality Gate': 'Passed', 'Content Quality Evidence': 'qa.md',
+    'QA Stage': 'functional', 'QA Result': 'Rejected' };
+  const root = fixture(t, [sourceFor(fields)]), dir = join(root, 'features/item-0');
+  writeFileSync(join(dir, 'quality.md'), '# Contract\n');
+  writeFileSync(join(dir, 'content-design.md'), '# Delivery\n');
+  writeFileSync(join(dir, 'qa.md'), '# QA\n\n## Authored Content Compliance\n\nContent Result: PASS\n\nUnchanged content fingerprint; UI finding is independent.\n');
   assert.deepEqual(audit(root).errors, []);
 });
 test('declared QA plan validates modules, depth and evidence reuse without breaking legacy files', () => {

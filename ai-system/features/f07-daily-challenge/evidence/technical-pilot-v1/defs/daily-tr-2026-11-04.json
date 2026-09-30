@@ -1,0 +1,19 @@
+{
+  "id": "daily-tr-2026-11-04",
+  "puzzleType": "daily",
+  "dailyDate": "2026-11-04",
+  "language": "tr",
+  "grid": [
+    "yeıla",
+    "aalel",
+    "yakık",
+    "yzyın",
+    "frokm"
+  ],
+  "target": "lokma",
+  "locked": [],
+  "frozen": [
+    "0,4"
+  ],
+  "columns": true
+}

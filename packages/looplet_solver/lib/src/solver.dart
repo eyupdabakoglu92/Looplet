@@ -18,10 +18,10 @@ abstract final class Solver {
     WordValidator validator, {
     SearchBudget budget = const SearchBudget(),
   }) {
+    final guard = SearchGuard(budget, 'solve');
     final start = GridState.initial(config, validator);
     if (start.isSolved) return const Optimal(0, <Move>[]);
 
-    final stopwatch = Stopwatch()..start();
     final startKey = start.canonicalKey();
     final visited = <String>{startKey};
     final parent = <String, _Parent>{};
@@ -38,10 +38,16 @@ abstract final class Solver {
       }
 
       for (final move in _orderedLegalMoves(config, node.state)) {
+        try {
+          guard.check(visited.length);
+        } on SearchLimitExceeded {
+          return BudgetExceeded(budget);
+        }
         final step = node.state.applyMove(move, config, validator);
         if (!step.applied) continue;
         final childKey = step.state.canonicalKey();
         if (visited.contains(childKey)) continue;
+        if (visited.length >= budget.maxNodes) return BudgetExceeded(budget);
 
         parent[childKey] = _Parent(node.key, move);
         if (step.state.isSolved) {
@@ -50,10 +56,6 @@ abstract final class Solver {
 
         visited.add(childKey);
         queue.add(_Node(step.state, childKey, childDepth));
-
-        if (visited.length > budget.maxNodes) return BudgetExceeded(budget);
-        if (stopwatch.elapsed > budget.timeBudget)
-          return BudgetExceeded(budget);
       }
     }
 
@@ -62,52 +64,68 @@ abstract final class Solver {
     return hitDepthWall ? BudgetExceeded(budget) : const Unsolvable();
   }
 
-  /// Every distinct optimal solution, up to [cap]. Used by the difficulty
-  /// scorer. Deterministic order. Returns `[]` if unsolvable / budget-exceeded,
-  /// `[[]]` if the puzzle is already solved.
+  /// Compatibility API. Throws SearchLimitExceeded on incomplete computation;
+  /// use enumerateOptimalSolutionsWithCoverage for explicit cap coverage.
   static List<List<Move>> enumerateOptimalSolutions(
     EngineConfig config,
     WordValidator validator, {
     int cap = 1000,
-  }) {
-    final result = solve(config, validator);
-    if (result is! Optimal) return const <List<Move>>[];
-    final optimal = result.moves;
-    if (optimal == 0) return <List<Move>>[<Move>[]];
+    SearchBudget budget = const SearchBudget(),
+  }) =>
+      enumerateOptimalSolutionsWithCoverage(config, validator,
+              cap: cap, budget: budget)
+          .sequences;
 
+  static OptimalSolutions enumerateOptimalSolutionsWithCoverage(
+    EngineConfig config,
+    WordValidator validator, {
+    int cap = 1000,
+    SearchBudget budget = const SearchBudget(),
+  }) {
+    if (cap < 1) throw ArgumentError.value(cap, 'cap', 'must be positive');
+    final guard = SearchGuard(budget, 'optimal enumeration');
+    final result = solve(config, validator, budget: budget);
+    if (result is BudgetExceeded) {
+      throw SearchLimitExceeded('optimal solve', budget);
+    }
+    if (result is! Optimal) return const OptimalSolutions([], complete: true);
+    final optimal = result.moves;
+    if (optimal == 0) return const OptimalSolutions([[]], complete: true);
     final start = GridState.initial(config, validator);
-    // Forward BFS building the shortest distance to every state within `optimal`.
     final dist = <String, int>{start.canonicalKey(): 0};
     final queue = Queue<GridState>()..add(start);
     while (queue.isNotEmpty) {
+      guard.check(dist.length);
       final state = queue.removeFirst();
       final depth = dist[state.canonicalKey()]!;
       if (depth == optimal) continue;
       for (final move in _orderedLegalMoves(config, state)) {
+        guard.check(dist.length);
         final step = state.applyMove(move, config, validator);
         if (!step.applied) continue;
         final key = step.state.canonicalKey();
         if (!dist.containsKey(key)) {
+          guard.check(dist.length + 1);
           dist[key] = depth + 1;
           queue.add(step.state);
         }
       }
     }
 
-    // DFS confined to the "optimal DAG": every prefix of an optimal solution is
-    // a shortest path to its state, so only follow edges to a state whose
-    // shortest distance is exactly one greater.
+    // Collect cap+1 to distinguish a complete set of exactly cap solutions
+    // from truncation. DFS prefixes also have a resource bound.
     final solutions = <List<Move>>[];
     final path = <Move>[];
-
+    var prefixes = 0;
     void dfs(GridState state, int depth) {
-      if (solutions.length >= cap) return;
+      if (solutions.length > cap) return;
+      guard.check(++prefixes);
       if (depth == optimal) {
         if (state.isSolved) solutions.add(List<Move>.of(path));
         return;
       }
       for (final move in _orderedLegalMoves(config, state)) {
-        if (solutions.length >= cap) return;
+        if (solutions.length > cap) return;
         final step = state.applyMove(move, config, validator);
         if (!step.applied) continue;
         if (dist[step.state.canonicalKey()] != depth + 1) continue;
@@ -118,7 +136,8 @@ abstract final class Solver {
     }
 
     dfs(start, 0);
-    return solutions;
+    return OptimalSolutions(solutions.take(cap).toList(),
+        complete: solutions.length <= cap);
   }
 
   static List<Move> _orderedLegalMoves(EngineConfig config, GridState state) {

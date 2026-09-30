@@ -1,0 +1,23 @@
+{
+  "id": "daily-tr-2026-11-07",
+  "puzzleType": "daily",
+  "dailyDate": "2026-11-07",
+  "language": "tr",
+  "grid": [
+    "ozuln",
+    "yskın",
+    "paans",
+    "üaümy",
+    "unuyy"
+  ],
+  "target": "yunus",
+  "locked": [
+    "0,4",
+    "1,4"
+  ],
+  "frozen": [
+    "2,4",
+    "3,4"
+  ],
+  "columns": true
+}

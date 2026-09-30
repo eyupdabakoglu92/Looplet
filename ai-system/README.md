@@ -389,6 +389,7 @@ Exact canonical label kullan. Alias ve kısaltma yasak.
 8. **Scope-gating bilgi saklama değildir.** Conflict, blocker veya eksik kanıt varsa ilgili rol bunu açıkça raporlar.
 9. **Handoff/Done öncesi state audit zorunludur.** Delivery local handoff için `--local`, Tech Lead global sync/kapanış için varsayılan full modu kullanır; görev, owner, QA/release ve kapanış gate'leri denetlenir.
 10. **Görsel kalite runtime'da kanıtlanır.** Visual scope'ta seçilmiş Design Foundation, rendered exploration, implementation parity ve bağımsız QA 93+ olmadan feature kapanmaz.
+11. **İçerik kalitesi ayrı kabul edilir.** `prompt-content-quality-standard.md`: Content Designer preflight, pilot ve editoryal kaliteyi; Developer kalıcı araçları; Tech Lead kalite contract'ı/kabulünü; QA bağımsız doğrulamayı sahiplenir. Yeni/reopened authored-content işlerinde `Content Quality Contract / Gate / Evidence` alanları kullanılır. Required FAIL/UNKNOWN kullanıcı sign-off'una veya “bilinen eksik” teslimine çevrilmez. Yapısal workflow PASS, içerik PASS değildir.
 
 State audit'in genel regresyon testleri (Node.js 18+):
 

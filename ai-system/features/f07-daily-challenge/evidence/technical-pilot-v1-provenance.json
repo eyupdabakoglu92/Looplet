@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "status": "technical-pilot-only",
+  "scope": "Developer readiness evidence; no editorial acceptance or independent QA implied",
+  "corpus": "Reproducible output of tools/looplet_authoring import-corpus from the committed provisional curation",
+  "searchBudget": {
+    "secondsPerSearch": 30,
+    "maxNodesPerSearch": 5000000,
+    "maxDepth": 16,
+    "maxAttemptsPerMechanicProfile": 200
+  },
+  "selectedCandidates": [
+    {"date": "2026-11-02", "target": "tohum", "sourceRun": "pilot-probe-3", "attemptIndex": 20, "candidateSeed": 20419310},
+    {"date": "2026-11-03", "target": "leğen", "sourceRun": "pilot-probe-1", "attemptIndex": 0, "candidateSeed": 21260933},
+    {"date": "2026-11-04", "target": "lokma", "sourceRun": "pilot-probe-3", "attemptIndex": 55, "candidateSeed": 22696481},
+    {"date": "2026-11-07", "target": "yunus", "sourceRun": "pilot-probe-3", "attemptIndex": 55, "candidateSeed": 23696484},
+    {"date": "2026-11-09", "target": "radyo", "sourceRun": "pilot-probe-3", "attemptIndex": 17, "candidateSeed": 24395565},
+    {"date": "2026-11-10", "target": "inanç", "sourceRun": "pilot-probe-5-locked", "attemptIndex": 6, "candidateSeed": 20308519},
+    {"date": "2026-11-11", "target": "balon", "sourceRun": "pilot-probe-2", "attemptIndex": 32, "candidateSeed": 26514356},
+    {"date": "2026-11-14", "target": "kiraz", "sourceRun": "pilot-probe-10-prefix", "attemptIndex": 1, "candidateSeed": 20268934}
+  ],
+  "limitations": [
+    "The source-run labels describe local exploratory checkpoints; the committed definitions, proofs and exports are re-audited from their bytes.",
+    "The corpus curation remains provisional and requires Content Designer editorial completion plus independent QA before production use.",
+    "A PASS technical pilot does not authorize 60-day batch generation or production packing."
+  ]
+}

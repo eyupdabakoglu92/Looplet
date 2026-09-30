@@ -1,0 +1,3394 @@
+{
+  "schemaVersion": 1,
+  "status": "provisional-for-pilot",
+  "reviewedAt": "2026-09-30",
+  "reviewMethod": "AI editorial selection in implementation session; not human or independent QA",
+  "accepted": [
+    {
+      "word": "adet",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "adres",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "adım",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "ahşap",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "akrep",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "akıl",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "alan",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "alarm",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "albüm",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "amaç",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "araba",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "armut",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "arzu",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "avize",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "avuç",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "ayran",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "food",
+      "review": "Yaygın yiyecek, içecek veya mutfak sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "ayrı",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "açık",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "ağır",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "bakır",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "food",
+      "review": "Yaygın yiyecek, içecek veya mutfak sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "balon",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "baraj",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "food",
+      "review": "Yaygın yiyecek, içecek veya mutfak sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "baret",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "barış",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "basın",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "baton",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "food",
+      "review": "Yaygın yiyecek, içecek veya mutfak sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "bavul",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "bayır",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "başak",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "başka",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "bebek",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "beden",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "bekçi",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "belge",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "beyaz",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "biber",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "bilet",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "bilgi",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "bilim",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "birey",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "bitki",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "boyut",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "buhar",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "burun",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "böcek",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "bölge",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "bölüm",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "börek",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "food",
+      "review": "Yaygın yiyecek, içecek veya mutfak sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "büyük",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "cadde",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "ceket",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "cevap",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "ceviz",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "cihaz",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "cisim",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "coşku",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "dalga",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "damar",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "davet",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "davul",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "demet",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "demir",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "dergi",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "derin",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "devir",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "devre",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "değer",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "diken",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "dikey",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "dikiş",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "dilim",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "direk",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "diyar",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "dolap",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "dolu",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "doruk",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "doğa",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "doğru",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "duman",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "durak",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "durum",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "dönem",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "döner",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "food",
+      "review": "Yaygın yiyecek, içecek veya mutfak sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "dünya",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "dürüm",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "food",
+      "review": "Yaygın yiyecek, içecek veya mutfak sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "düğme",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "düğün",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "ekin",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "ekmek",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "food",
+      "review": "Yaygın yiyecek, içecek veya mutfak sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "ekran",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "emek",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "emir",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "erken",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "eser",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "eski",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "esmer",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "etken",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "etki",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "etkin",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "evrak",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "fener",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "fikir",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "filiz",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "fizik",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "forma",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "fosil",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "gazoz",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "food",
+      "review": "Yaygın yiyecek, içecek veya mutfak sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "genel",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "geniş",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "geyik",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "gitar",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "giysi",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "gizli",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "göbek",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "gölge",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "görev",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "görüş",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "gövde",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "güneş",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "güreş",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "güven",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "güzel",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "haber",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "hafif",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "halat",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "hamur",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "food",
+      "review": "Yaygın yiyecek, içecek veya mutfak sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "havlu",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "hayal",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "hayat",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "hazır",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "hedef",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "hekim",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "helva",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "food",
+      "review": "Yaygın yiyecek, içecek veya mutfak sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "hesap",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "heybe",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "horoz",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "hukuk",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "hurma",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "huzur",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "hızlı",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "ikram",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "ilke",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "ilmek",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "imza",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "inanç",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "ince",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "incir",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "inek",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "insan",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "iplik",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "irade",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "irmik",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "food",
+      "review": "Yaygın yiyecek, içecek veya mutfak sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "istek",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "izin",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "işlem",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "kablo",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "kadeh",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "kakao",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "food",
+      "review": "Yaygın yiyecek, içecek veya mutfak sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "kalp",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "kalın",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "kalıp",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "kapak",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "karar",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "karga",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "kaset",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "kavak",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "kaya",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "kayık",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "kayın",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "kayıt",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "kazık",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "kaşık",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "kebap",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "food",
+      "review": "Yaygın yiyecek, içecek veya mutfak sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "kefir",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "food",
+      "review": "Yaygın yiyecek, içecek veya mutfak sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "kekik",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "kemer",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "kiler",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "food",
+      "review": "Yaygın yiyecek, içecek veya mutfak sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "kilim",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "kiraz",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "kirpi",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "koala",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "kolay",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "kova",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "koyu",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "koyun",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "kumaş",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "kurak",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "kural",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "kurt",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "kuru",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "kurum",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "kusur",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "kuşak",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "köfte",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "food",
+      "review": "Yaygın yiyecek, içecek veya mutfak sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "kömür",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "köpek",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "köprü",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "küçük",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "kıyma",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "food",
+      "review": "Yaygın yiyecek, içecek veya mutfak sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "lamba",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "lavaş",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "food",
+      "review": "Yaygın yiyecek, içecek veya mutfak sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "leğen",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "lokma",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "food",
+      "review": "Yaygın yiyecek, içecek veya mutfak sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "maden",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "martı",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "marul",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "food",
+      "review": "Yaygın yiyecek, içecek veya mutfak sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "mavi",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "merak",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "mesai",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "mesaj",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "metal",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "metre",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "meşe",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "midye",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "mimar",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "miras",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "mizah",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "model",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "mola",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "moral",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "motor",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "mutlu",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "müzik",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "mısır",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "food",
+      "review": "Yaygın yiyecek, içecek veya mutfak sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "nakış",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "nalın",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "nane",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "nasıl",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "nazik",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "neden",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "nehir",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "nohut",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "food",
+      "review": "Yaygın yiyecek, içecek veya mutfak sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "nokta",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "nutuk",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "nöbet",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "odak",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "odun",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "olta",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "onay",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "ortak",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "oyun",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "paket",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "palet",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "pamuk",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "panda",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "pano",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "pasta",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "food",
+      "review": "Yaygın yiyecek, içecek veya mutfak sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "patik",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "payda",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "pazar",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "pelte",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "food",
+      "review": "Yaygın yiyecek, içecek veya mutfak sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "perde",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "peron",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "pide",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "food",
+      "review": "Yaygın yiyecek, içecek veya mutfak sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "plak",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "polen",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "polis",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "posta",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "proje",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "puan",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "pınar",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "radyo",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "rahat",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "rakam",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "rakım",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "rapor",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "rekor",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "reçel",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "food",
+      "review": "Yaygın yiyecek, içecek veya mutfak sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "rota",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "rozet",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "sabun",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "sade",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "sakin",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "saksı",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "sakız",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "salep",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "food",
+      "review": "Yaygın yiyecek, içecek veya mutfak sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "salça",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "food",
+      "review": "Yaygın yiyecek, içecek veya mutfak sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "sanal",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "sanat",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "saray",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "saçak",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "sebep",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "sefer",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "sehpa",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "selam",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "serin",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "servi",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "serçe",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "sesli",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "seyir",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "silgi",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "simit",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "food",
+      "review": "Yaygın yiyecek, içecek veya mutfak sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "sinek",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "siyah",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "soba",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "sofra",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "food",
+      "review": "Yaygın yiyecek, içecek veya mutfak sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "soluk",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "somun",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "soru",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "soyut",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "soğan",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "soğuk",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "spor",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "sprey",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "statü",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "sucuk",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "food",
+      "review": "Yaygın yiyecek, içecek veya mutfak sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "sunum",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "söğüt",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "süreç",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "sıcak",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "sınav",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "sıra",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "sırt",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "tablo",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "tahin",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "food",
+      "review": "Yaygın yiyecek, içecek veya mutfak sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "tahta",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "takı",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "talep",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "tanık",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "taraf",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "tarak",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "tarla",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "tatlı",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "taze",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "food",
+      "review": "Yaygın yiyecek, içecek veya mutfak sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "temel",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "temiz",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "tempo",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "tepki",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "tepsi",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "terim",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "testi",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "tohum",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "toka",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "topaç",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "torba",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "tuhaf",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "turna",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "turşu",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "food",
+      "review": "Yaygın yiyecek, içecek veya mutfak sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "tutum",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "tuval",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "tören",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "tütsü",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "umut",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "unvan",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "usta",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "uyum",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "uzun",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "vadi",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "vagon",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "vakit",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "vergi",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "veri",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "vida",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "vişne",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "food",
+      "review": "Yaygın yiyecek, içecek veya mutfak sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "vurgu",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "yakın",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "yalın",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "yazar",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "yazı",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "yelek",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "yemek",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "food",
+      "review": "Yaygın yiyecek, içecek veya mutfak sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "yerli",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "yeşil",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "yorum",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "yosun",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "yoğun",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "yulaf",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "food",
+      "review": "Yaygın yiyecek, içecek veya mutfak sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "yunus",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "yurt",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "yılan",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "zafer",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "zarar",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "zarif",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "zayıf",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "zebra",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "zihin",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "zımba",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "çadır",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "çamur",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "çelik",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "çerez",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "çeyiz",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "çeşme",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "çimen",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "çivi",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "çizgi",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "çocuk",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "çorba",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "food",
+      "review": "Yaygın yiyecek, içecek veya mutfak sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "çukur",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "çınar",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "ödev",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "ödül",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "ömür",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "önem",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "öneri",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "ördek",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "örgü",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "öykü",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "özel",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "özgür",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "ücret",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "ülke",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "ürün",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "üzüm",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "ılık",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "ırmak",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "ıslak",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "şafak",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "şahin",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "nature",
+      "review": "Gündelik doğa, bitki veya hayvan sözcüğü.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "şapka",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "şerit",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "şiir",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "society",
+      "review": "Yaygın gündelik kavram veya meslek; özel isim değildir.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "şirin",
+      "source": "zemberek-master",
+      "target": true,
+      "category": "quality",
+      "review": "Yaygın sıfat veya gündelik durum; sözlük biçiminde.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    },
+    {
+      "word": "şişe",
+      "source": "zemberek-master",
+      "target": false,
+      "category": "everyday-object",
+      "review": "Gündelik, somut nesne; ipucu olmadan anlaşılır.",
+      "reviewMethod": "AI editorial selection; independent QA pending"
+    }
+  ],
+  "quarantine": [
+    {
+      "word": "mumlu",
+      "reason": "Exact lowercase source entry missing; no silent spelling conversion."
+    },
+    {
+      "word": "pulra",
+      "reason": "Exact lowercase source entry missing; no silent spelling conversion."
+    },
+    {
+      "word": "raflı",
+      "reason": "Exact lowercase source entry missing; no silent spelling conversion."
+    },
+    {
+      "word": "saplı",
+      "reason": "Exact lowercase source entry missing; no silent spelling conversion."
+    },
+    {
+      "word": "gökçe",
+      "reason": "Additional ambiguity/commonness or inflection review required."
+    },
+    {
+      "word": "nisan",
+      "reason": "Additional ambiguity/commonness or inflection review required."
+    },
+    {
+      "word": "ocak",
+      "reason": "Additional ambiguity/commonness or inflection review required."
+    },
+    {
+      "word": "pelin",
+      "reason": "Additional ambiguity/commonness or inflection review required."
+    },
+    {
+      "word": "sedef",
+      "reason": "Additional ambiguity/commonness or inflection review required."
+    },
+    {
+      "word": "tüyüm",
+      "reason": "Exact lowercase source entry missing; no silent spelling conversion."
+    },
+    {
+      "word": "çaycı",
+      "reason": "Exact lowercase source entry missing; no silent spelling conversion."
+    },
+    {
+      "word": "pilav",
+      "reason": "Exact lowercase source entry missing; no silent spelling conversion."
+    },
+    {
+      "word": "soslu",
+      "reason": "Exact lowercase source entry missing; no silent spelling conversion."
+    },
+    {
+      "word": "sütlü",
+      "reason": "Additional ambiguity/commonness or inflection review required."
+    },
+    {
+      "word": "tuzlu",
+      "reason": "Exact lowercase source entry missing; no silent spelling conversion."
+    },
+    {
+      "word": "unlu",
+      "reason": "Exact lowercase source entry missing; no silent spelling conversion."
+    },
+    {
+      "word": "belgi",
+      "reason": "Additional ambiguity/commonness or inflection review required."
+    },
+    {
+      "word": "hoşça",
+      "reason": "Exact lowercase source entry missing; no silent spelling conversion."
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "lang": "tr",
+  "contentVersion": "quality-candidate-v2",
+  "numberingEpoch": "2026-11-02",
+  "assignments": {
+    "2026-11-02": "daily-tr-2026-11-02",
+    "2026-11-03": "daily-tr-2026-11-03",
+    "2026-11-04": "daily-tr-2026-11-04",
+    "2026-11-07": "daily-tr-2026-11-07",
+    "2026-11-09": "daily-tr-2026-11-09",
+    "2026-11-10": "daily-tr-2026-11-10",
+    "2026-11-11": "daily-tr-2026-11-11",
+    "2026-11-14": "daily-tr-2026-11-14"
+  }
+}

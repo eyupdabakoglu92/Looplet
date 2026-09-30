@@ -13,6 +13,7 @@ export function suggestedModules(feature, featureDir) {
   if (scope.includes('backend') || scope.includes('end-to-end')) result.add('backend-security');
   if (scope.includes('client') || scope.includes('end-to-end') || scope.includes('ui')) result.add('client-ui');
   if (scope.includes('content')) result.add('content');
+  if (feature.contentDeclared && feature.contentGate !== 'Not Required') result.add('content');
   if (feature.visualDeclared && feature.visualScope !== 'none') result.add('visual-quality');
   if (existsSync(join(featureDir, 'game-dev.md'))) result.add('unity-ios');
   const architecturePath = join(featureDir, 'architecture.md');
@@ -41,7 +42,7 @@ export function preflight(root) {
     return { errors, warnings, feature: null, suggested: [] };
   }
   const selected = active[0], feature = selected.feature;
-  errors.push(...validateFeature(feature).filter(error => /QA|Regression Depth|Evidence Reuse|visual|release readiness/i.test(error)));
+  errors.push(...validateFeature(feature).filter(error => /QA|Regression Depth|Evidence Reuse|visual|content|release readiness/i.test(error)));
   const suggested = suggestedModules(feature, selected.featureDir);
   if (!feature.qaPlanDeclared) {
     warnings.push('legacy orchestration: QA plan fields are absent; use the derived plan and let Tech Lead normalize on the next checkpoint');
@@ -54,6 +55,11 @@ export function preflight(root) {
     }
   }
   const requiredArtifacts = [join(selected.featureDir, 'prd.md'), join(selected.featureDir, 'architecture.md')];
+  if (feature.contentDeclared && feature.contentGate !== 'Not Required' && feature.contentContract) {
+    requiredArtifacts.push(resolve(selected.featureDir, feature.contentContract));
+  } else if (!feature.contentDeclared && suggested.includes('content')) {
+    warnings.push('legacy content quality fields absent; Tech Lead must normalize new/reopened content work; this is not a content quality PASS');
+  }
   if (feature.qaPlanDeclared) {
     if (feature.qaModules.includes('backend-security')) requiredArtifacts.push(join(selected.featureDir, 'backend.md'), join(root, 'project-authority', 'setup-manifest.md'));
     if (feature.qaModules.includes('client-ui')) {

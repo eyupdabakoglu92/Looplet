@@ -187,7 +187,7 @@ Her delivery artifact icin kontrol:
   * ayni mantigi uygula
 * `ui-design.md` varsa:
   * UI Designer handoff tamamlandiysa orchestration'da UI Designer phase kapali olmalidir
-* `content-design.md` varsa: task/asset/kanıt ve gerekli insan onayını kontrol et; araç teslimi gerçek içerik yerine geçmez
+* `content-design.md` varsa: `prompt-content-quality-standard.md` ile task/asset/teknik ve editoryal kanıtı, pilotu ve fingerprint'i ayrı kontrol et. Araç teslimi gerçek içerik değildir; required FAIL/UNKNOWN veya kritik kalite kusuru Accepted olamaz. İnsan onayı yalnız açık authority gerektiriyorsa kontrol edilir, kullanıcı kalite fallback'i değildir.
 * `release.md` varsa:
   * DevOps/Release Engineer readiness verdict'i okunur
   * `Release Blocked` veya `Release Validation Pending` varsa otomatik Done'a gecilmez
@@ -264,7 +264,7 @@ Kural:
 * Backend gerekiyorsa `backend.md` mevcut ve tamamlanmis olmali
 * Client implementasyonu gerekiyorsa: client stack Unity/mobil oyun ise `game-dev.md`, degilse `frontend.md` mevcut ve tamamlanmis olmali (ikisi ayni feature'da birlikte zorunlu degildir; `platform.md` client stack alani hangisinin gecerli oldugunu belirler)
 * UI Designer gereken feature'da `ui-design.md` mevcut ve tamamlanmis olmali
-* İçerik planlandıysa content-design.md ve gerçek asset'ler tamamlanmış olmalı
+* İçerik planlandıysa content-design.md, gerçek asset'ler, required kontroller ve editoryal inceleme tamam; Content Quality Gate Ready for QA veya geçerli evidence reuse ile Passed olmalı. QA'nın Authored Content Compliance / Content Result kanıtını Tech Lead reconcile ederek gate'i Passed yapar; genel QA verdict'iyle içerik verdict'ini karıştırmaz.
 * Release gate gerekiyorsa DevOps/Release Engineer task'i QA sonrasina veya gerekli CI/CD config turuna acikca planlanmis olmali
 
 QA handoff oncesi Tech Lead su alanlari feature-level authority'ye acikca yazar:

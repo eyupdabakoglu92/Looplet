@@ -7,6 +7,7 @@
 * Yalnız tamamlanan kendi task'larını Done yap; kısmi/blocked işi kapatma.
 * Kendi Pending Evidence kayıtlarını result/provenance ile güncelle; başkasının kanıtını kapatma.
 * Değişen delivery'de Delivery Review = Pending; Accepted kararını yalnız Tech Lead verir.
+* İlgili içerik/girdi/araç/kural değiştiyse Content Quality Gate = Pending ve etkilenen evidence geçersiz; delivery rolü Ready for QA/Passed yapmaz. Geçerli fingerprint'li bağımsız içerik verdict'i ilgisiz bir QA bulgusuyla otomatik silinmez.
 * QA kendi QA Result'unu, DevOps kendi Release Result'unu yazar; stage/policy'yi değiştirmez.
 * Successor eski Next Role'den değil Handoff Plan ve zorunlu checkpoint'lerden seçilir.
 * Blocker yok ve actionable iş kaldıysa aynı role devam edilir. Yoksa tek geçerli planın Queued task'ları dependency kontrolüyle Open olur; plan yoksa Tech Lead.

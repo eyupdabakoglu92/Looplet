@@ -26,6 +26,7 @@ Yalnız scope'a uygulanabilenler:
 * secret/env isimleri değer sızdırmadan belgeli mi
 * health/readiness/smoke/observability sinyalleri
 * source revision, artifact digest ve target/environment provenance
+* authored-content yayınında Content Quality Gate Passed, required full-audit ve bağımsız review kanıtının yayımlanacak içerik/girdi/araç fingerprint'iyle eşleşmesi; eski/eksik evidence ile publish yolunun reddedilmesi
 
 Release evidence eksikliği bir uygulama bug'ı değilse core `Tech Lead Note` içinde workflow/release blocker olarak ayır. Required runtime/release evidence eksikse `Runtime Validation Pending`; authority/onay eksikse `Decision Pending`.
 

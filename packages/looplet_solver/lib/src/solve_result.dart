@@ -21,6 +21,45 @@ final class SearchBudget {
   final Duration timeBudget;
 }
 
+/// A bounded analysis did not finish. Never interpret this as absence of a
+/// path, or publish partial metrics as a complete difficulty calculation.
+final class SearchLimitExceeded implements Exception {
+  const SearchLimitExceeded(this.phase, this.budget);
+  final String phase;
+  final SearchBudget budget;
+  @override
+  String toString() => 'SearchLimitExceeded($phase: UNKNOWN)';
+}
+
+/// Shared guard for a single analysis. Count retained distinct states in graph
+/// searches and explored prefixes in path enumeration (both consume resources).
+final class SearchGuard {
+  SearchGuard(this.budget, this.phase) {
+    if (budget.maxDepth < 0 ||
+        budget.maxNodes < 1 ||
+        budget.timeBudget <= Duration.zero) {
+      throw ArgumentError('Search budget must have nonnegative depth, positive '
+          'nodes and positive time');
+    }
+  }
+  final SearchBudget budget;
+  final String phase;
+  final Stopwatch _watch = Stopwatch()..start();
+  void check(int nodes) {
+    if (nodes > budget.maxNodes || _watch.elapsed >= budget.timeBudget) {
+      throw SearchLimitExceeded(phase, budget);
+    }
+  }
+}
+
+final class OptimalSolutions {
+  const OptimalSolutions(this.sequences, {required this.complete});
+  final List<List<Move>> sequences;
+
+  /// False means [sequences] is only a deterministic sample, not all paths.
+  final bool complete;
+}
+
 /// The result of a solve. Sealed — exactly one of the three subtypes.
 sealed class SolveResult {
   const SolveResult();

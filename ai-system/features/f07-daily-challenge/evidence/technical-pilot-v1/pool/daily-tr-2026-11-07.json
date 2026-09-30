@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "quality-candidate-v2",
+  "id": "daily-tr-2026-11-07",
+  "puzzleType": "daily",
+  "dailyDate": "2026-11-07",
+  "language": "tr",
+  "grid": [
+    "ozuln",
+    "yskın",
+    "paans",
+    "üaümy",
+    "unuyy"
+  ],
+  "targetWord": "yunus",
+  "lockedCells": [
+    "0,4",
+    "1,4"
+  ],
+  "frozenCells": [
+    "2,4",
+    "3,4"
+  ],
+  "columnMovesEnabled": true,
+  "optimalMoves": 5,
+  "difficultyScore": 8.467,
+  "difficultyLabel": "hard",
+  "difficultyBreakdown": {
+    "o": 5,
+    "cNorm": 0.01,
+    "tdDegree": 0,
+    "locked": 2,
+    "frozen": 2,
+    "firstMoves": 3,
+    "distinctOptimalSolutions": 4,
+    "optimalEnumerationComplete": 1
+  }
+}

@@ -62,8 +62,11 @@ abstract final class DifficultyScorer {
     DifficultyWeights weights = const DifficultyWeights(),
     DifficultyThresholds thresholds = const DifficultyThresholds(),
     int optimalSolutionCap = 1000,
+    SearchBudget budget = const SearchBudget(),
   }) {
-    final result = Solver.solve(config, validator);
+    final result = Solver.solve(config, validator, budget: budget);
+    if (result is BudgetExceeded)
+      throw SearchLimitExceeded('difficulty solve', budget);
     if (result is! Optimal) {
       throw ArgumentError(
         'DifficultyScorer needs a solvable puzzle; solve() returned $result',
@@ -73,13 +76,15 @@ abstract final class DifficultyScorer {
     final o = result.moves;
     final lockedCount = config.lockedCells.length;
     final frozenCount = config.frozenCells.length;
-    final solutions = Solver.enumerateOptimalSolutions(
+    final coverage = Solver.enumerateOptimalSolutionsWithCoverage(
       config,
       validator,
       cap: optimalSolutionCap,
+      budget: budget,
     );
 
-    final cNorm = _correctLookingNorm(config, validator, o);
+    final solutions = coverage.sequences;
+    final cNorm = _correctLookingNorm(config, validator, o, budget);
     final tdDegree = _tempDisplacementDegree(config, validator, solutions);
     final firstMoves =
         solutions.where((s) => s.isNotEmpty).map((s) => s.first).toSet().length;
@@ -104,6 +109,7 @@ abstract final class DifficultyScorer {
         'frozen': frozenCount,
         'firstMoves': firstMoves,
         'distinctOptimalSolutions': distinctOptimal,
+        'optimalEnumerationComplete': coverage.complete ? 1 : 0,
       },
     );
   }
@@ -122,7 +128,9 @@ abstract final class DifficultyScorer {
     EngineConfig config,
     WordValidator validator,
     int optimal,
+    SearchBudget budget,
   ) {
+    final guard = SearchGuard(budget, 'difficulty state tree');
     if (optimal <= 1) return 0;
     final target = _targetChars(config);
     final start = GridState.initial(config, validator);
@@ -132,14 +140,17 @@ abstract final class DifficultyScorer {
     var totalWithinOptimal = 1; // the start state
 
     while (queue.isNotEmpty) {
+      guard.check(dist.length);
       final state = queue.removeFirst();
       final depth = dist[state.canonicalKey()]!;
       if (depth == optimal) continue;
       for (final move in config.legalMoves(state)) {
+        guard.check(dist.length);
         final step = state.applyMove(move, config, validator);
         if (!step.applied) continue;
         final key = step.state.canonicalKey();
         if (dist.containsKey(key)) continue;
+        guard.check(dist.length + 1);
         dist[key] = depth + 1;
         totalWithinOptimal++;
         if (depth + 1 < optimal && _looksClose(target, step.state)) {
@@ -151,8 +162,9 @@ abstract final class DifficultyScorer {
     return correctLooking / totalWithinOptimal;
   }
 
-  /// For each optimal solution, count the steps where the best row's correct
-  /// count decreases; return the minimum over solutions (0 if none).
+  /// Minimum decreases among the enumerated optimal solutions (0 if none).
+  /// With an incomplete enumeration this is a sample upper bound, never proof
+  /// that every optimal path regresses. F07 proves that separately.
   static int _tempDisplacementDegree(
     EngineConfig config,
     WordValidator validator,

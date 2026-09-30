@@ -1,0 +1,19 @@
+{
+  "id": "daily-tr-2026-11-03",
+  "puzzleType": "daily",
+  "dailyDate": "2026-11-03",
+  "language": "tr",
+  "grid": [
+    "leeuk",
+    "eönrl",
+    "permn",
+    "kuğon",
+    "soğue"
+  ],
+  "target": "leğen",
+  "locked": [
+    "1,4"
+  ],
+  "frozen": [],
+  "columns": true
+}

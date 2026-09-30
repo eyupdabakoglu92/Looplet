@@ -1,0 +1,17 @@
+{
+  "id": "daily-tr-2026-11-09",
+  "puzzleType": "daily",
+  "dailyDate": "2026-11-09",
+  "language": "tr",
+  "grid": [
+    "bardı",
+    "jarey",
+    "ördeo",
+    "işllk",
+    "hızam"
+  ],
+  "target": "radyo",
+  "locked": [],
+  "frozen": [],
+  "columns": true
+}

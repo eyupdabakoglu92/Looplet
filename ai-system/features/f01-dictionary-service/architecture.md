@@ -79,7 +79,7 @@
 ```
 
 * `words`: every entry is already **normalized** (Turkish-normalized form, see below), lowercase-normalized per the Turkish map, deduplicated, sorted. No spaces, hyphens, digits, or empty strings. The build/authoring step guarantees this.
-* `targets`: a subset of `words`; every entry is exactly 5 letters for the MVP; each is manually reviewed.
+* `targets`: a subset of `words`; every entry is exactly 5 letters for the MVP. Acceptance follows PO-REV-2026-09-30-CONTENT-QUALITY: documented provenance/exclusions, full automated checks, reasoned Content Designer target review and independent QA. The expanded corpus and cross-feature effect are delivered under F07 daily-content-spec revision 2; no runtime API/schema change.
 * `exclusionsApplied`: documentation of which curation filters produced this asset (informational; surfaced in diagnostics).
 * The runtime **also normalizes** at load (defensive) so a hand-edited asset cannot break the index.
 * Implementation MAY transform this JSON into a more compact in-memory or pre-baked structure (e.g. a `Set` of normalized keys, or a packed sorted blob) as long as every Acceptance Criterion and the footprint/latency metrics hold. The JSON above is the authored/source contract; the in-memory representation is an Open Technical Decision resolved by the Frontend/Mobile Developer against a measured footprint target and recorded in `frontend.md`.

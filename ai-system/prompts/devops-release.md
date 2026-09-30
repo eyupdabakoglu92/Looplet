@@ -36,6 +36,7 @@ Opsiyonel ama release gate kapsaminda genellikle okunur:
 * `/ai-system/features/{feature-name}/game-dev.md`
 * `/ai-system/features/{feature-name}/qa.md`
 * `/ai-system/feature-board.md`
+* Authored-content yayını varsa `/ai-system/prompt-content-quality-standard.md`, feature Content Quality Contract ve güncel kalite evidence. Content Quality Gate Passed olmadan, gerekli tam audit'in yayımlanacak içerik/girdi/araç fingerprint'iyle eşleşmesi doğrulanmadan publish etme; eski rapor veya yalnız hızlı CI PASS yeterli değildir.
 
 ---
 

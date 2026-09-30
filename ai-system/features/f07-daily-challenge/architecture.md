@@ -233,7 +233,7 @@
 * **[OPEN — Product Owner, optional]** AC7's Share wording (prd Open Questions (1)).
 * ~~F07.DIRECTION-SELECT~~ — RESOLVED 2026-09-29: Direction A (A2).
 * ~~F07.DAILY-POOL-SIGNOFF~~ — superseded 2026-09-30 by the user's incident (A5): content acceptance is measured by the roles (`daily-content-spec.md`).
-* **[OPEN — decision gate, `release`]** F07.TARGET-LIST-APPROVAL — the expanded target list's approval (product PRD F01: "manually-approved"), or a Product Owner revision (A5).
+* **[RESOLVED — acceptance model, A6]** F07.TARGET-LIST-APPROVAL — user-approved PO-REV-2026-09-30-CONTENT-QUALITY delegates routine acceptance to documented curation/checks and independent QA. The actual expanded corpus and pool remain unapproved until their evidence passes.
 
 ---
 
@@ -455,3 +455,18 @@
 7. **Unchanged:** the product criteria; D1–D11; the calendar (A3 ruling 5); the Assumption on locked / frozen tiles from #1 (A4 ruling 2; a first-encounter hint would be a Product Owner revision, `daily-content-spec.md` §8).
 
 **Routing:** F07-CORPUS Open (Content Designer) → the corpus checkpoint → F07-TOOL-DAILY (Frontend/Mobile Developer) → F07-CONTENT-R1 (Content Designer) → QA. F07-FE Queued; the Tech Lead activates it when the content chain allows.
+
+---
+
+## A6. User-approved content quality revision (2026-09-30)
+
+**Authority:** the user's approval of the reviewed proposal in this chat. This is a product-policy/core-workflow revision and F07 contract resync; it does not certify the dictionary, pilot, pool or independent QA. A5's unresolved approval, corpus minimum and production sequence are superseded by the rules below; A4 remains historical evidence only.
+
+1. **Acceptance:** product revision PO-REV-2026-09-30-CONTENT-QUALITY and F01 PRD/architecture are synchronized. F07.TARGET-LIST-APPROVAL is RESOLVED (strengthened B). All entries get source/exclusion/automated validation; Content Designer reviews all targets; QA independently reviews new targets and risk-stratified supporting words, expanding on critical defects. No new routine user sign-off. F08 deploy authorization is untouched.
+2. **Quality ownership:** `prompt-content-quality-standard.md` applies. Content Designer owns editorial quality/preflight/pilot, Developer owns lasting tools, Tech Lead owns contract adequacy and gate transitions, QA owns independent validation. A known critical defect cannot be accepted merely because the previous AC omitted it.
+3. **Contract:** `daily-content-spec.md` revision 2 is the current contract. It distinguishes Sbuild/S0/Send, validates real forward paths through irreversible thaw, checks mechanics separately, requires useful pre-win thaw, separates heuristic scores from proof, defines Q7 as a pool ratio and Q9 as advisory, and handles partial ISO weeks. Non-applied filters are explicit N/A; required UNKNOWN fails acceptance.
+4. **Corpus:** ≥120 targets and 60 distinct non-Journey Daily targets remain required. ≥2,000 usable words is a research target to calibrate with source quality/pilot yield; padding with rare words is forbidden. Preserve legitimate existing words outside 4–5 letters; filter the production view rather than shrinking the general dictionary. Corpus validation is a permanent Developer tool. Dictionary changes require Journey/smoke/Daily re-solve, score/thaw review and bundle sync where exports change.
+5. **Tools/pilot:** every search is bounded, including scoring and constrained/counterfactual searches. First calibrate and deliver a representative 8-example pilot; Tech Lead accepts its evidence before batch production. Full audit is mandatory before content acceptance/publishing even if expensive and separate from fast CI. Pack/publish must reject missing/stale full-audit evidence. These are pending Developer deliverables, not existing guarantees.
+6. **Workflow:** adopt Content Quality Contract/Gate/Evidence, initially `daily-content-spec.md / Pending / None`. Activate F07-CONTENT-PREFLIGHT; tool → corpus → pilot → Tech Lead checkpoint → 60-day re-authoring. F07-FE remains independently queued under the single-owner workflow. No content task is marked complete just by this policy revision.
+
+Historical snapshots: `../../history/f07-daily-challenge-2026-09-29/daily-content-spec-at-a5.md` and `orchestration-before-quality-revision.md` in that directory. Implementation/test evidence for the core change is recorded separately from content acceptance.

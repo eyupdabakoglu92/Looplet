@@ -10,6 +10,7 @@ export const qaResults = ['None', 'Functional Approved', 'Approved', 'Approved w
 export const releaseResults = ['None', 'Release Ready', 'Release Ready with Notes', 'Release Blocked', 'Release Validation Pending'];
 export const visualScopes = ['none', 'existing-parity', 'new-surface', 'motion-critical', 'design-system'];
 export const visualGates = ['Not Required', 'Pending', 'Ready for Implementation', 'Ready for QA', 'Passed'];
+export const contentGates = ['Not Required', 'Pending', 'Ready for QA', 'Passed'];
 export const qaModules = ['core', 'backend-security', 'client-ui', 'visual-quality', 'stateful-flow', 'unity-ios', 'content', 'release'];
 export const regressionDepths = ['not-set', 'targeted', 'impacted', 'full'];
 export const evidenceReuseValues = ['not-evaluated', 'allowed', 'invalidated', 'not-applicable'];
@@ -133,6 +134,8 @@ export function parseFeature(source) {
   const doc = document(source), errors = doc.errors;
   const visualHeadings = ['Visual Scope', 'Design Foundation', 'Visual Quality Gate', 'Visual Evidence'];
   const visualDeclared = visualHeadings.some(heading => doc.sections.has(heading));
+  const contentHeadings = ['Content Quality Contract', 'Content Quality Gate', 'Content Quality Evidence'];
+  const contentDeclared = contentHeadings.some(heading => doc.sections.has(heading));
   const qaPlanHeadings = ['QA Modules', 'Regression Depth', 'Evidence Reuse'];
   const qaPlanDeclared = qaPlanHeadings.some(heading => doc.sections.has(heading));
   const evidence = records(doc.body('Pending Evidence'), 'Evidence ID', errors);
@@ -160,6 +163,9 @@ export function parseFeature(source) {
     visualGate: doc.scalar('Visual Quality Gate', visualDeclared),
     visualGateException: doc.scalar('Visual Gate Exception', false),
     visualEvidence: doc.body('Visual Evidence'),
+    contentDeclared, contentContract: doc.scalar('Content Quality Contract', contentDeclared),
+    contentGate: doc.scalar('Content Quality Gate', contentDeclared),
+    contentEvidence: doc.body('Content Quality Evidence'),
     evidence, decisions, pendingEvidence: evidence.some(e => e.Result !== 'PASS'),
     openDecisions: decisions.some(d => d.Status === 'OPEN'), blockers: !none(blocks ?? ''), openInventory,
     plan: rows.map(row => ({ after: list(row['After Tasks'] ?? ''), role: row['Next Role'], activate: list(row['Activate Tasks'] ?? '') })), errors };
@@ -237,6 +243,26 @@ export function validateFeature(f) {
   check(releaseResults.includes(f.releaseResult), 'invalid Release Result');
   check(['none', 'ci-cd-only', 'container-build', 'deploy-development', 'deploy-test', 'deploy-preview', 'staging', 'production-readiness', 'rollback-readiness'].includes(f.releaseScope), 'invalid Release Scope');
   check(f.releaseScope !== 'none' || !f.decisions.some(d => d.Status === 'OPEN' && d['Blocking Scope'] === 'release'), 'release-only decision requires Release Scope');
+  if (f.contentDeclared) {
+    check(contentGates.includes(f.contentGate), 'invalid Content Quality Gate');
+    check(f.contentEvidence !== null, 'Content Quality Evidence section required');
+    const contentScope = f.qaModules.includes('content') || f.qaScope.toLowerCase().includes('content') ||
+      (f.tasks ?? []).some(task => task.role === 'Content Designer' && task.status !== 'Cancelled');
+    if (f.contentGate === 'Not Required') {
+      check(!contentScope, 'authored-content scope cannot use Content Quality Gate = Not Required');
+      check(f.contentContract === 'Not Required', 'non-content scope requires Content Quality Contract = Not Required');
+      check(none(f.contentEvidence ?? ''), 'non-content scope requires Content Quality Evidence = None');
+    } else {
+      check(!none(f.contentContract) && !['Pending', 'Not Required'].includes(f.contentContract) &&
+        !/[{}<>\n]/.test(f.contentContract), 'content scope requires a Content Quality Contract path');
+      if (['Ready for QA', 'Passed'].includes(f.contentGate)) {
+        check(!none(f.contentEvidence ?? ''), 'ready content gate requires Content Quality Evidence');
+      }
+      if (ready(f.releaseResult) && !['none', 'ci-cd-only', 'container-build'].includes(f.releaseScope)) {
+        check(f.contentGate === 'Passed', 'content release readiness requires Content Quality Gate = Passed');
+      }
+    }
+  }
   if (f.visualDeclared) {
     check(visualScopes.includes(f.visualScope), 'invalid Visual Scope');
     check(visualGates.includes(f.visualGate), 'invalid Visual Quality Gate');
@@ -301,6 +327,11 @@ export function validateFeature(f) {
       check(f.review === 'Accepted', 'QA requires Tech Lead delivery review');
       check(['functional', 'final'].includes(f.qaStage) && !none(f.qaScope), 'QA stage/scope required');
       check(f.qaResult === 'None', 'active QA must reset its previous verdict');
+      if (f.contentDeclared && f.contentGate !== 'Not Required') {
+        check(f.qaModules.includes('content'), 'content quality gate requires content QA module');
+        check(f.contentGate === 'Ready for QA' || (f.contentGate === 'Passed' && f.evidenceReuse === 'allowed'),
+          'content QA requires Content Quality Gate = Ready for QA or Passed with evidence reuse');
+      }
       if (f.qaStage === 'final' && f.releaseScope !== 'none') check(ready(f.releaseResult), 'final QA requires release readiness');
       if (f.visualDeclared && f.visualScope !== 'none') check(f.visualGate === 'Ready for QA', 'active visual QA requires Visual Quality Gate = Ready for QA');
       if (f.qaPlanDeclared) {
@@ -323,6 +354,7 @@ export function validateFeature(f) {
   if (['Approved', 'Approved with Notes'].includes(f.qaResult)) {
     check(!f.pendingEvidence && !f.openDecisions && !f.blockers, 'final approval cannot coexist with required pending evidence/decision/blocker');
     check(f.releaseScope === 'none' || ready(f.releaseResult), 'final approval requires release readiness');
+    if (f.contentDeclared && f.contentGate !== 'Not Required') check(f.contentGate === 'Passed', 'final content approval requires Content Quality Gate = Passed');
   }
   if (terminal(f.status)) {
     check(f.owner === '-' && ['-', 'Closed'].includes(f.next), 'terminal routing must be closed');
@@ -335,6 +367,7 @@ export function validateFeature(f) {
     check(f.review === 'Accepted' && f.qaStage === 'final' && ['Approved', 'Approved with Notes'].includes(f.qaResult), 'terminal feature requires reviewed final QA approval');
     check(f.releaseScope === 'none' || ready(f.releaseResult), 'terminal feature requires release readiness');
     if (f.visualDeclared && f.visualScope !== 'none') check(f.visualGate === 'Passed', 'terminal visual feature requires Visual Quality Gate = Passed');
+    if (f.contentDeclared && f.contentGate !== 'Not Required') check(f.contentGate === 'Passed', 'terminal content feature requires Content Quality Gate = Passed');
   }
   return errors;
 }
@@ -413,6 +446,22 @@ export function audit(root, { local = false } = {}) {
     const feature = parseFeature(readFileSync(path, 'utf8')); feature.path = path; features.push(feature);
     errors.push(...validateFeature(feature).map(message => feature.id + ': ' + message));
     errors.push(...visualArtifactErrors(feature, root).map(message => feature.id + ': ' + message));
+    if (feature.contentDeclared && feature.contentGate !== 'Not Required' &&
+        (!feature.contentContract || !existsSync(resolve(dirname(path), feature.contentContract)))) {
+      errors.push(feature.id + ': Content Quality Contract file missing: ' + feature.contentContract);
+    }
+    if (feature.contentDeclared && ['Ready for QA', 'Passed'].includes(feature.contentGate)) {
+      if (!existsSync(join(dirname(path), 'content-design.md'))) errors.push(feature.id + ': ready content gate requires content-design.md');
+      if (feature.contentGate === 'Passed') {
+        const qaPath = join(dirname(path), 'qa.md');
+        const qaDoc = existsSync(qaPath) ? document(readFileSync(qaPath, 'utf8')) : null;
+        const compliance = qaDoc?.body('Authored Content Compliance');
+        const verdicts = (compliance ?? '').split('\n').map(line => line.trim()).filter(line => line.startsWith('Content Result:'));
+        if (!compliance || qaDoc.errors.length || verdicts.length !== 1 || !/^Content Result:\s*PASS$/.test(verdicts[0])) {
+          errors.push(feature.id + ': passed content gate requires QA Authored Content Compliance with Content Result: PASS');
+        }
+      }
+    }
   }
   const check = (condition, message) => { if (!condition) errors.push(message); };
   const ids = new Set(), decisionIds = new Set();

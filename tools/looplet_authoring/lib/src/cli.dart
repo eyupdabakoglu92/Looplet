@@ -7,6 +7,8 @@ import 'package:looplet_engine/looplet_engine.dart';
 import 'package:looplet_solver/looplet_solver.dart';
 
 import 'content_check.dart';
+import 'quality_cli.dart';
+import 'daily_pool_quality.dart';
 import 'daily_source.dart';
 import 'dictionary_validator.dart';
 import 'move_shorthand.dart';
@@ -24,7 +26,12 @@ CommandRunner<int> buildRunner({StringSink? out, StringSink? err}) {
     ..addCommand(_ExportCommand(stdOut, stdErr))
     ..addCommand(_CheckCommand(stdOut, stdErr))
     ..addCommand(_PackDailyCommand(stdOut, stdErr))
-    ..addCommand(_FillCommand(stdOut, stdErr));
+    ..addCommand(_FillCommand(stdOut, stdErr))
+    ..addCommand(CorpusCommand('import', stdOut, stdErr))
+    ..addCommand(CorpusCommand('audit', stdOut, stdErr))
+    ..addCommand(CorpusImpactCommand(stdOut, stdErr))
+    ..addCommand(DailyQualityCommand('generate', stdOut, stdErr))
+    ..addCommand(DailyQualityCommand('audit', stdOut, stdErr));
 }
 
 const String _contentVersionDefault = 'dev';
@@ -257,7 +264,14 @@ class _PackDailyCommand extends _BaseCommand {
         help: 'the served pack to write (default: '
             '<repo-root>/build/daily/daily_pack_<lang>.json)',
       )
-      ..addOption('window-days', defaultsTo: '30');
+      ..addOption('window-days', defaultsTo: '30')
+      ..addOption('quality-report',
+          help:
+              'Current successful full audit report; required for production packs')
+      ..addFlag('development-fixture',
+          defaultsTo: false,
+          help:
+              'Explicit dev-fixture contentVersion only; not accepted for production');
   }
 
   @override
@@ -293,6 +307,21 @@ class _PackDailyCommand extends _BaseCommand {
       err.writeln('pack-daily: ${result.failures.length} failure(s); '
           'nothing written');
       return 1;
+    }
+
+    if (argResults!['development-fixture'] == true) {
+      if (!pack.contentVersion.startsWith('dev-fixture-') ||
+          pack.days.any((day) => day.puzzle.contentVersion != 'dev-fixture')) {
+        throw StateError(
+            'development bypass is restricted to marked dev fixtures');
+      }
+    } else {
+      final reportPath = argResults!['quality-report'] as String?;
+      if (reportPath == null) {
+        throw StateError(
+            'production pack requires --quality-report from audit-daily --no-pilot');
+      }
+      verifyQualityReport(repoRoot, File(manifestPath).parent.path, reportPath);
     }
 
     final outPath = argResults!['out'] as String? ??

@@ -48,6 +48,7 @@ Tech Lead tarafından belirlenen contract ve orchestration planına göre çalı
 
 Opsiyonel:
 
+* `/ai-system/prompt-content-quality-standard.md` ve feature Content Quality Contract (content pipeline/generator/validator/importer scope'unda zorunlu). Kalıcı araçlar Developer sorumluluğundadır; içerik kurasyonu Content Designer'da kalır. Required kurallar için gerçek pozitif/negatif kontroller ve güncel evidence gerekir.
 * /ai-system/project-authority/platform.md (stack ve tooling belirsizse zorunlu hale gelir)
 * /ai-system/project-authority/setup-manifest.md (canonical build/test komutları burada tanımlıdır; QA Build Gate bu dosyaya bağımlıdır — backend task içeriyorsa okunmalıdır)
 * /ai-system/project-authority/release.md (backend değişikliği Docker/container, env config veya deployment davranışını etkiliyorsa zorunlu hale gelir)

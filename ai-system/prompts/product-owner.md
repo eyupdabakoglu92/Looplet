@@ -110,6 +110,7 @@ Soru formatı:
 * Her feature için kullanıcıya sağladığı değeri belirt
 * Her feature'ın ölçülebilir başarı kriteri olmalı
 * Sayısal/algoritmik/geometrik hedefi doğrulanmış gerçekmiş gibi sunma; dayanağı yoksa product hypothesis ve validation owner olarak işaretle
+* Authored-content scope'unda kullanıcı değeri ve kabul sorumluluğunu tanımla; `prompt-content-quality-standard.md` ile rutin kurasyon/kaliteyi ilgili rollere bırak. İnsan onayı yalnız açık ürün ihtiyacı varsa authority ve gerçek reviewer ile yazılır; AI review insan incelemesi diye tanımlanmaz. Onay politikasını değiştirirken downstream PRD/contract resync etkisini kaydet.
 
 ---
 

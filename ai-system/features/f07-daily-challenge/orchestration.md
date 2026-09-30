@@ -10,30 +10,34 @@ In Progress
 
 ## Current Owner
 
-Content Designer
+Tech Lead
 
 ## Next Role
 
-Content Designer
+Tech Lead
 
 ## Active Task Ledger
 
 - [x] Task ID: F07-UI | Assigned Role: UI Designer | Status: Done | Summary: The Daily surfaces on the Selected Foundation (architecture D8): the Home Daily entry (secondary; available / done today / needs connection), the Daily screen states (`loading`, `ready`, `doneToday`, `needsConnection`, `unavailable`), the daily Play header, and the daily result variant (official vs replay; Current + Best Streak; the reserved Share place for F13). At least two materially different rendered directions on identical content, then `ui-design.md` with the screen / state / viewport matrix and a Visual Evidence Manifest. Brief: Current Brief | Depends On: -
 - [x] Task ID: F07-TOOL | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: The daily pack (architecture D2): a `DailyPack` model in `looplet_content`; `looplet_authoring pack-daily` (manifest + pool → the served `daily_pack_{lang}.json`); `check` extended to every D2 (2) rule with named negative cases; a small dev pack from existing smoke / Journey-shaped definitions for delivery and tests (not product content). Brief: Current Brief | Depends On: -
-- [x] Task ID: F07-CONTENT | Assigned Role: Content Designer | Status: Done | Summary: **Superseded as product content by the incident of 2026-09-30 (architecture A5); replaced by F07-CONTENT-R1.** The Turkish Daily pool (workflow-follow-ups F06-CONTENT-DAILY): 60 solved daily puzzles under `content/daily/tr/pool/` on the provisional calendar 2026-11-01 … 12-30 (architecture A3 ruling 5), `daily_manifest_tr.json`, `content-design.md`; `check` + `pack-daily` exit 0. The Tech Lead opens the sign-off gate F07.DAILY-POOL-SIGNOFF at its checkpoint. Brief: Current Brief | Depends On: F07-TOOL
-- [ ] Task ID: F07-CORPUS | Assigned Role: Content Designer | Status: Open | Summary: The Turkish corpus (`daily-content-spec.md` §2.1; F01-PRODUCTION-CORPUS brought into F07): `dictionary.json` `targets` ≥ 120 (the 30 Journey targets kept) and `words` ≥ 2,000 (4–5 letters), with a named source, the exclusion rules and scripted checks; the Journey impact (`content:check`; re-export from the Journey defs only where a stored optimum changed). Brief: Current Brief | Depends On: -
-- [ ] Task ID: F07-TOOL-DAILY | Assigned Role: Frontend/Mobile Developer | Status: Queued | Summary: `looplet_authoring generate-daily` (the §3 algorithm) and `audit-daily` (every measurable §4 / §5 rule, a per-day PASS / FAIL table, exit 1 on any FAIL, a named negative test per rule) — `daily-content-spec.md` §6 | Depends On: -
-- [ ] Task ID: F07-CONTENT-R1 | Assigned Role: Content Designer | Status: Queued | Summary: The Turkish Daily pool again, under `daily-content-spec.md` (§3–§5, §7): 60 days on the same calendar, 60 distinct non-Journey targets, `generate-daily` + `audit-daily` exit 0, `content:check` and `pack-daily` exit 0; replaces the F07-CONTENT pool | Depends On: F07-CORPUS, F07-TOOL-DAILY
+- [x] Task ID: F07-CONTENT | Assigned Role: Content Designer | Status: Done | Summary: **Superseded as product content by the incident of 2026-09-30 (architecture A5); replaced by F07-CONTENT-R1.** The Turkish Daily pool (workflow-follow-ups F06-CONTENT-DAILY): 60 solved daily puzzles under `content/daily/tr/pool/` on the provisional calendar 2026-11-01 … 12-30 (architecture A3 ruling 5), `daily_manifest_tr.json`, `content-design.md`; `check` + `pack-daily` exit 0. Historical acceptance record only; the old user sign-off model was superseded by A5/A6. | Depends On: F07-TOOL
+- [x] Task ID: F07-CONTENT-PREFLIGHT | Assigned Role: Content Designer | Status: Done | Summary: Source/usage and corpus feasibility, candidate counts, exclusion/editorial rubric, representative pilot plan and permanent-tool gaps under daily-content-spec revision 2. Do not expand runtime corpus or batch-author before tool readiness. | Depends On: -
+- [ ] Task ID: F07-CORPUS | Assigned Role: Content Designer | Status: Queued | Summary: Curate the sourced Turkish corpus under daily-content-spec §2: ≥120 targets, keep Journey targets and legitimate existing words, full-list checks via committed tools, editorial target review, Journey/Daily impact and bundle parity. 2,000 usable words is a research target, not permission to pad quality. | Depends On: F07-TOOL-DAILY
+- [x] Task ID: F07-TOOL-DAILY | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: Delivered permanent sourced corpus import/audit, bounded generate-daily and audit-daily Q1–Q12, solver/scorer/counterfactual limits, fingerprinted technical-pilot evidence, and production pack rejection for missing/stale quality evidence. Developer verification and limitations are recorded in quality-tooling-delivery.md; Tech Lead reconciliation remains pending. | Depends On: F07-CONTENT-PREFLIGHT
+- [ ] Task ID: F07-CONTENT-PILOT | Assigned Role: Content Designer | Status: Queued | Summary: At least 8 accepted representative examples (2 per mechanic class), real forward proofs, negative fixtures, editorial review, yield/time and fingerprints; hand off to Tech Lead for pilot acceptance before batch generation. | Depends On: F07-CORPUS, F07-TOOL-DAILY
+- [ ] Task ID: F07-CONTENT-R1 | Assigned Role: Content Designer | Status: Queued | Summary: Re-author 60 days with 60 distinct non-Journey targets under daily-content-spec revision 2; full audit, content:check, pack-daily, editorial review and current evidence. Activate only after Tech Lead accepts the pilot. | Depends On: F07-CONTENT-PILOT
 - [ ] Task ID: F07-FE | Assigned Role: Frontend/Mobile Developer | Status: Queued | Summary: The app (architecture D3–D8): `DailyContentSource` + the debug pack override + the debug today override (A4 ruling 6); cache population / prefetch / eviction; the D3 states; D4 dates and rollover; D5 transactional completion (entry + streak + enqueue); D6 streak; D7 Remote Config + kill-switch (`firebase_remote_config`, `http`); `/daily`, the Home entry, the daily Play header and result per `ui-design.md`; tests + named negatives; Visual Parity Evidence against the selected Direction A (`F07-A-*`); emulator sync evidence; architecture A1 rulings; a debug recipe to run any pool day (for QA; A5). Brief: the archived F07-FE brief ([orchestration at the incident](../../history/f07-daily-challenge-2026-09-29/orchestration-at-content-incident.md)), re-issued at activation | Depends On: F07-UI, F07-TOOL
 - [ ] Task ID: F07-QA-FUNCTIONAL | Assigned Role: QA | Status: Queued | Summary: Functional + visual QA on the emulator and the canonical simulator (architecture D10); the plan is locked at activation. Content acceptance is the audit + QA's content module; no user playtest (A5) | Depends On: F07-FE, F07-CONTENT-R1
-- [ ] Task ID: F07-DEVOPS | Assigned Role: DevOps/Release Engineer | Status: Blocked | Summary: F07's release (architecture D11): pack hosting, publishing `daily_manifest_url`, rollback by repointing, the release smoke. Blocked on F08's deploy (F08.DEPLOY-RESUME → F08-DEVOPS), F07's functional QA and the target-list approval (F07.TARGET-LIST-APPROVAL) | Depends On: F07-QA-FUNCTIONAL
+- [ ] Task ID: F07-DEVOPS | Assigned Role: DevOps/Release Engineer | Status: Blocked | Summary: F07's release (architecture D11): pack hosting, publishing `daily_manifest_url`, rollback by repointing, the release smoke. Blocked on F08's deploy (F08.DEPLOY-RESUME → F08-DEVOPS), F07's functional QA and current content quality evidence (A6; target-list policy decision resolved) | Depends On: F07-QA-FUNCTIONAL
 - [ ] Task ID: F07-QA-FINAL | Assigned Role: QA | Status: Queued | Summary: Final acceptance of the release proof and any affected functional scope | Depends On: F07-DEVOPS
 
 ## Open Tasks
 
-* **F07-CORPUS — Open** (Content Designer; the Current Brief).
-* Queued: F07-TOOL-DAILY (Frontend/Mobile Developer), F07-CONTENT-R1 (Content Designer), F07-FE (Frontend/Mobile Developer; not started, independent of content), F07-QA-FUNCTIONAL, F07-QA-FINAL. Blocked: F07-DEVOPS (F08's deploy; F07.TARGET-LIST-APPROVAL).
-* Done: F07-UI (A1; Direction A, A2), F07-TOOL (A3), F07-CONTENT (A4; superseded as product content at A5).
+* F07-CONTENT-PREFLIGHT — Done; source/design checkpoint in content-preflight.md.
+* F07-TOOL-DAILY — Done; Developer delivery is at the mandatory Tech Lead checkpoint.
+* Queued: F07-CORPUS → F07-CONTENT-PILOT → Tech Lead pilot checkpoint → F07-CONTENT-R1; F07-FE remains independently queued. Tech Lead decides the next activation after reconciling the tooling evidence.
+* F07-QA-FUNCTIONAL / F07-QA-FINAL queued. F07-DEVOPS blocked by F08 deploy readiness; content quality remains a required acceptance dependency.
+* Historical F07-CONTENT is superseded; no production corpus/pilot/pool is approved by A6.
 
 ## Handoff Plan
 
@@ -41,7 +45,19 @@ None
 
 ## Delivery Review
 
-Accepted
+Pending
+
+## Content Quality Contract
+
+daily-content-spec.md
+
+## Content Quality Gate
+
+Pending
+
+## Content Quality Evidence
+
+Developer technical evidence: `quality-tooling-delivery.md`; `evidence/technical-pilot-v1-audit.json` (PASS, `independentQa: false`); `evidence/technical-pilot-v1-provenance.json`. Production corpus, Content Designer pilot, 60-day pool and independent QA remain pending.
 
 ## QA Scope
 
@@ -97,6 +113,17 @@ Verified at A1 (renders counted, fit table read with its negative case). **Selec
 
 ## Pending Evidence
 
+- Evidence ID: F07.TOOL-DAILY-REVIEW
+  * Scenario: Reconcile the permanent corpus/generator/auditor implementation, its fail-closed production pack gate, named negative tests and the eight-example technical pilot. Confirm that Developer feasibility evidence is not mistaken for editorial or independent-QA acceptance.
+  * Required Class: repeatable integration + authority review
+  * Target / Environment: `quality-tooling-delivery.md`, `tools/looplet_authoring`, `packages/looplet_solver`, and `evidence/technical-pilot-v1-audit.json`
+  * Owner Role: Tech Lead
+  * Prerequisite / External Decision: F07-TOOL-DAILY delivery
+  * Re-evaluation Trigger: Any change to the quality contract, solver, engine, corpus importer, generator, auditor, pack gate or technical-pilot bytes
+  * Blocks: F07-CORPUS activation
+  * Delivery Evidence: Developer, 2026-09-30 — 29 solver tests, 96 authoring tests, 93 workflow tests, clean static analysis; durable pilot PASS with `independentQa: false`; old runtime corpus and old Daily pool rejected by the new gates.
+  * Result: PENDING
+
 - Evidence ID: F07.STREAK-ROLLOVER
   * Scenario: The D6 streak table (first day, consecutive, missed day, replay, clock back, DST day, leap day, year boundary) and the D4 date attribution (a run crossing midnight counts for its start date; rollover only when not mid-run)
   * Required Class: automated functional + runtime
@@ -138,7 +165,7 @@ Verified at A1 (renders counted, fit table read with its negative case). **Selec
   * Result: PENDING
 
 - Evidence ID: F07.CONTENT-GATE
-  * Scenario: The Turkish pool passes the executable content gates: `check` (a fresh solve of every artifact, target eligibility, dedup across smoke / Journey / Daily, every D2 (2) rule) and `pack-daily` (60 days, #1 … #60). The user's sign-off is not this item: it is the decision gate F07.DAILY-POOL-SIGNOFF.
+  * Scenario: The Turkish pool passes the executable content gates: `check` (a fresh solve of every artifact, target eligibility, dedup across smoke / Journey / Daily, every D2 (2) rule) and `pack-daily` (60 days, #1 … #60). This proves structural correctness only; quality additionally requires F07.CONTENT-QUALITY under A6.
   * Required Class: repeatable integration
   * Target / Environment: `looplet_authoring` over `content/` and `content/daily/tr/`
   * Owner Role: QA
@@ -149,12 +176,12 @@ Verified at A1 (renders counted, fit table read with its negative case). **Selec
   * Result: PENDING
 
 - Evidence ID: F07.CONTENT-QUALITY
-  * Scenario: Every Daily day passes every measurable rule of `daily-content-spec.md` §4 / §5 (Q1–Q12: distinct non-Journey targets, meaningful tiles, a proven thaw for each frozen row, the difficulty rhythm, not-too-close starts, word filler, no offensive words, no near-duplicates)
+  * Scenario: Every Daily day passes every applicable required rule of `daily-content-spec.md` revision 2 §4–§7; advisory Q9 and permitted N/A are reported separately; real forward/counterfactual proofs and reasoned editorial review are required
   * Required Class: repeatable integration
-  * Target / Environment: `looplet_authoring audit-daily` over `content/daily/tr/` (its rules proven by named negative tests); QA re-runs it and replays at least 5 days with `solve` / `playtest`, including the Q5 / Q6 proof sequences
+  * Target / Environment: `looplet_authoring audit-daily` over `content/daily/tr/` (its rules proven by named negative tests); QA re-runs it and independently reviews/replays at least 8 days with `solve` / `playtest`, including the Q5 / Q6 proof sequences
   * Owner Role: QA
   * Prerequisite / External Decision: F07-TOOL-DAILY; F07-CONTENT-R1
-  * Re-evaluation Trigger: F07-CONTENT-R1 delivery
+  * Re-evaluation Trigger: Any change to the corpus, engine, tools, config, reference paths or content invalidates affected quality evidence
   * Blocks: F07 functional acceptance
   * Result: PENDING
 
@@ -212,12 +239,14 @@ Verified at A1 (renders counted, fit table read with its negative case). **Selec
   * Resolved At: 2026-09-30
 
 - Decision ID: F07.TARGET-LIST-APPROVAL
-  * Question: Genişletilmiş sözlüğün onayı (F07-CORPUS: ≥ 120 hedef, ≥ 2.000 kelime). Ürün PRD'si F01 bunu zorunlu tutuyor: hedefler "manually-approved", iki liste de "manually reviewed". Oyun testi değil; kelime listesi onayı.
-  * Options / Trade-offs: (A) Kullanıcı F07-CORPUS teslim edilince listeleri okur ve onaylar (~120 hedef kısa; ~2.000 kelime pratik değil). (B) Ürün kuralı değişsin: `Run Product Owner. Revise: F01 — sözlük ve hedef listesi Content Designer'ın yazılı kural setine ve otomatik kontrollerine göre onaylanır, QA bağımsız örneklem kontrolü yapar` — kullanıcıya hiç gelmez; PO revizyonu ve Tech Lead resync gerekir.
-  * Recommendation: (B) — kullanıcının "içerik bana gelmesin" yönlendirmesine uygun; kural seti `daily-content-spec.md` §2.1'de hazır. (A) tek seferlik ve kısa bir iş.
-  * Blocks: publishing the Daily (F07-DEVOPS, F07-QA-FINAL, Done); not F07-CORPUS, F07-TOOL-DAILY, F07-CONTENT-R1, F07-FE or functional QA
+  * Question: The acceptance model for the expanded Turkish corpus.
+  * Options / Trade-offs: User list review or documented content curation/automated validation plus independent QA.
+  * Recommendation: Strengthened B, as reviewed with the user.
+  * Blocks: No unresolved user decision; actual corpus/content evidence still blocks acceptance and release through the task/evidence ledger.
   * Blocking Scope: release
-  * Status: OPEN
+  * Status: RESOLVED
+  * Resolution: User approved the content-quality proposal in chat (2026-09-30). PO-REV-2026-09-30-CONTENT-QUALITY applied and F01/F07 resynced (A6): full automated rules, all-target editorial review and independent risk-based QA; no routine user list review. This does not approve an undelivered corpus or pool.
+  * Resolved At: 2026-09-30
 
 ## Blockers
 
@@ -225,24 +254,22 @@ None
 
 ## Next Action
 
-Run Content Designer — F07-CORPUS (the Current Brief).
-
-For the user (only when ready): F07.TARGET-LIST-APPROVAL — `Run Tech Lead. Decision: F07.TARGET-LIST-APPROVAL — A` after reading the list, or `Run Product Owner. Revise: …` for option B. It blocks only publishing.
+Run Tech Lead. Reconcile F07-TOOL-DAILY against `quality-tooling-delivery.md` and the fingerprinted technical pilot; if accepted, activate F07-CORPUS. Do not treat the provisional corpus or Developer pilot as content/QA acceptance.
 
 ## Last Decision
 
-2026-09-30 — the user's content incident (architecture A5).
+2026-09-30 — user-approved content quality revision, architecture A6.
 
-* **Classified:** Existing Active Feature Rework (F07 content); root cause in the Tech Lead's F07-CONTENT brief — unmeasured quality, a user playtest as the acceptance, a generator outside the tools.
-* **Measured on the A4 pool:** 0 / 300 filler rows hold a real word; 18 / 26 frozen days can never thaw; 1 / 60 days needs a temporary displacement; 9 / 60 starts are too close; tiles often do not change the optimum (A5).
-* **Rulings:** `daily-content-spec.md` is the content contract; acceptance is measured (the audit + QA), no user playtest; the corpus is expanded inside F07; the generator / audit is a Developer tool; F07.DAILY-POOL-SIGNOFF superseded; F07.TARGET-LIST-APPROVAL opened (`release`); the A4 pool stays in the repo until R1 replaces it and is not publishable.
-* **Routing:** F07-CORPUS Open → F07-TOOL-DAILY → F07-CONTENT-R1; F07-FE Queued (independent).
+* Shared content quality standard and structural workflow gates adopted; Content Quality Gate Pending.
+* F01 approval policy revised/resynced (PO-REV-2026-09-30-CONTENT-QUALITY); F07.TARGET-LIST-APPROVAL RESOLVED for the model only.
+* daily-content-spec revision 2 corrects state/thaw/proof/partial-week/corpus ambiguities. Permanent tools and a representative pilot are prerequisites.
+* Route: preflight → tools → corpus → pilot → Tech Lead checkpoint → batch → independent QA. No downstream work is claimed complete.
 
 ## Last Update
 
 * Updated By: Tech Lead
 * Timestamp: 2026-09-30
-* Summary: The content incident (A5) — `daily-content-spec.md`; F07-CORPUS Open, F07-TOOL-DAILY / F07-CONTENT-R1 Queued, F07-FE back to Queued; F07.DAILY-POOL-SIGNOFF superseded, F07.TARGET-LIST-APPROVAL opened; owner → Content Designer.
+* Summary: User-authorized core/PRD/F07 quality revision and resync; F07-CONTENT-PREFLIGHT Done; F07-TOOL-DAILY Open; downstream work queued; corpus/pool unapproved. This records authority changes, not a separate role or independent QA execution.
 
 ## Context & Follow-ups
 
@@ -269,38 +296,11 @@ For the user (only when ready): F07.TARGET-LIST-APPROVAL — `Run Tech Lead. Dec
 * 2026-09-29 — Tech Lead: F07-CONTENT checkpoint (architecture A4) — accepted after a re-run and independent negatives; the thaw finding; rulings 1–6; F07.DAILY-POOL-SIGNOFF opened (`release`); F07-FE Open; owner → Frontend/Mobile Developer. [Orchestration at the content delivery](../../history/f07-daily-challenge-2026-09-29/orchestration-at-content-delivery.md) (the F07-CONTENT brief).
 * 2026-09-30 — Tech Lead: the content incident (architecture A5) — `daily-content-spec.md`; F07-CORPUS Open; F07-TOOL-DAILY, F07-CONTENT-R1 Queued; F07-FE back to Queued; F07.DAILY-POOL-SIGNOFF superseded; F07.TARGET-LIST-APPROVAL opened; owner → Content Designer. [Orchestration at the incident](../../history/f07-daily-challenge-2026-09-29/orchestration-at-content-incident.md) (the F07-FE brief).
 
+* 2026-09-30 — User-approved content quality revision (A6): shared standard/gates, F01 product-policy revision, corrected daily contract, preflight/tool/corpus/pilot/batch dependencies; target-list decision resolved. [Prior state](../../history/f07-daily-challenge-2026-09-29/orchestration-before-quality-revision.md).
+* 2026-09-30 — Frontend/Mobile Developer: F07-TOOL-DAILY Done — permanent sourced corpus import/audit, bounded generation and Q1–Q12 audit, bounded solver/scorer/counterfactuals, stale-proof production pack rejection, named negative tests and a fingerprinted 8-example technical pilot; Delivery Review Pending; owner → Tech Lead. [quality-tooling-delivery.md](quality-tooling-delivery.md).
+
 ## Current Brief
 
-**F07-CORPUS — the Turkish corpus** (Content Designer; `daily-content-spec.md` §2.1; architecture A5; product PRD F01; workflow-follow-ups F01-PRODUCTION-CORPUS)
+**Mandatory Tech Lead checkpoint — F07-TOOL-DAILY reconciliation.**
 
-**Read first:**
-* `daily-content-spec.md` — all of it; §0 explains why this task exists, §2.1 is this task;
-* product PRD "dictionary-service (F01)" — the exclusion rules and the target rule;
-* `packages/looplet_dictionary/assets/tr/dictionary.json` — the schema (`_note`, `schemaVersion`, `language`, `words`, `targets`, `exclusionsApplied`) and the current 103 words / 30 targets;
-* F06 `content-authoring-brief.md` §5 (Turkish target words), §6 step 6 (re-export from defs).
-
-**Deliver:**
-1. **`dictionary.json`**, same schema:
-   * `words`: at least **2,000** common Turkish words of 4–5 letters, lowercase, Turkish-normalized (`i`/`ı` distinct), no duplicates;
-   * `targets`: at least **120** five-letter words, **including the 30 current targets unchanged** (the Journey uses them), every target also in `words`;
-   * the current 103 words stay unless one breaks a rule (list any removal with its reason);
-   * `_note` and `exclusionsApplied` updated: the source, the date, the rules.
-2. **The source and the method, recorded:** the source list(s) by name and version (for example, TDK Güncel Türkçe Sözlük entries plus a named frequency list), the frequency cut-off, how inflected forms were excluded.
-3. **Scripted checks, with their output in the report** (the script may live in the scratchpad; its exact command and result go in the report):
-   * length 4–5 (`targets` exactly 5); the Turkish alphabet only;
-   * no duplicates; `targets ⊆ words`;
-   * the exclusion rules — proper nouns, profanity / slang / insults, abbreviations, archaic words — including a scan against a **named** profanity list;
-   * one negative run: a scratch copy with a planted violation of each check fails that check.
-4. **Target quality** (the Content Designer decides; nothing goes to the user): common, concrete, fine for a child; no two targets from the same root; no near-duplicate pair (one letter apart) among the new targets.
-5. **The impact run:**
-   * `melos run content:check` over all content. If a Journey level's stored optimum changed (more words → more thaws), re-export **only that level** from `tools/looplet_authoring/drafts/journey/_defs/` with the same grid, target and tiles, and list old → new optimum and label. If a label leaves its Journey band, stop and report (a blocker to the Tech Lead; do not redesign Journey levels).
-   * The current Daily pool may fail `check` the same way; re-export it from its defs so `content:check` stays green. It is replaced in F07-CONTENT-R1 anyway.
-   * `melos run test` — a failing dictionary test is a blocker for the Developer, not something to edit.
-6. **`content-design.md`**, replacing its content with an F07-CORPUS section: counts, the source, the checks and their exit codes, the Journey impact table, and the list of the **new targets** (the user may be asked to read it — F07.TARGET-LIST-APPROVAL option A).
-
-**Rules:**
-* No code or tool change; no app change beyond the asset; no product criterion change.
-* Quality decisions are yours, within the spec; an ambiguity goes to the Tech Lead, never to the user.
-* A target you cannot meet (for example, fewer than 120 good five-letter words) → report with numbers and what was tried; do not lower the bar.
-
-**Then:** close F07-CORPUS → owner Tech Lead → `Run Tech Lead`. The corpus checkpoint activates F07-TOOL-DAILY (the Developer's generator and audit), then F07-CONTENT-R1.
+Review `quality-tooling-delivery.md`, the implementation/negative controls and `evidence/technical-pilot-v1-audit.json`. Confirm contract coverage and evidence integrity. The prospective corpus remains provisional, the pilot has `independentQa: false`, the runtime dictionary is unchanged and the old 60-day pool remains rejected. If accepted, record the ruling and activate F07-CORPUS; keep Content Quality Gate Pending and F07-CONTENT-PILOT/F07-CONTENT-R1 queued.

@@ -101,6 +101,8 @@ Bu rol **Direct-edit** modunda çalışır:
 
 # INPUT AUTHORITY & CONFLICT HANDLING (CRITICAL)
 
+Authored-content araçları veya entegrasyonu scope'taysa `prompt-content-quality-standard.md` ve feature Content Quality Contract zorunludur. Generator/validator/importer kodu Developer'a, kurasyon Content Designer'a aittir; required kuralın gerçek pozitif/negatif kontrolü, bounded hesap ve güncel evidence teslim edilir.
+
 Shared authority standardı:
 
 * `/ai-system/prompt-input-authority-standard.md`

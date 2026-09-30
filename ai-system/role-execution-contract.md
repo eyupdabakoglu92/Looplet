@@ -30,6 +30,8 @@ project/feature authority dosyaları geçerlidir.
 
 Görsel kalite semantiği için `/ai-system/design/visual-quality-gate.md` bu contract ile birlikte normatif uygulanır; proje estetik kararları `/ai-system/project-authority/design-foundation.md` içinde kalır.
 
+Authored-content kalite semantiği için `/ai-system/prompt-content-quality-standard.md` bu contract ile birlikte uygulanır. Alan ölçütleri feature'ın Content Quality Contract'ında kalır. Tech Lead kalite contract'ını ve `Content Quality Gate` (`Not Required / Pending / Ready for QA / Passed`) ilerlemesini sahiplenir; delivery rolleri etkilenen gate'i Pending'e geri alabilir. QA bağımsız verdict üretir; Content Designer kendi teslimine bağımsız QA onayı veremez. İçerik QA girişinde applicable gate Ready for QA veya geçerli evidence reuse ile Passed olmalı; ilgili feature kapanışında Passed gerekir. Yeni/reopened authored-content işlerinde `Content Quality Contract`, `Content Quality Gate`, `Content Quality Evidence` alanları zorunludur; eski kapalı feature'lar yalnız bu alanlar yok diye yeniden açılmaz.
+
 ---
 
 ## Purpose
@@ -182,6 +184,7 @@ Sadece Tech Lead şunları authoritative olarak değiştirir:
 * global workflow sync
 * `Visual Scope`, `Design Foundation` ve `Visual Quality Gate` sınıflandırması/geçişi
 * `QA Modules`, `Regression Depth` ve `Evidence Reuse` planı
+* İçerik kalite contract'ı, `Content Quality Gate` sınıflandırması ve ilerletilmesi
 
 ### Product authority
 
@@ -204,6 +207,7 @@ Aktif rol yalnız current feature'ın `orchestration.md` dosyasındaki execution
 * `Change Log`
 * kendi scenario'larına ait `Pending Evidence` (kanıt/provenance ile)
 * kendi teslimine ait `Visual Evidence` referansları; bu referanslar gate değerini kendiliğinden ilerletmez
+* kendi teslimine ait `Content Quality Evidence`; değişen içerik/girdi/araç/kural için `Content Quality Gate = Pending` (ilerletme yetkisi vermez)
 * QA için `QA Result`; DevOps için `Release Result`
 
 `QA Stage`, `QA Scope`, `QA Modules`, `Regression Depth`, `Evidence Reuse`, `Release Scope`, `Delivery Review`, `Handoff Plan` ve `Open Decision Gates` kararları Tech Lead'e aittir. Delivery rolü değişen teslimde Delivery Review = Pending yapabilir; Accepted yapamaz. Başka role ait kanıtı veya kullanıcı kararını kapatamaz.
@@ -248,6 +252,7 @@ Tüm After Tasks current role'e ait ve Done olmalı; target task'ların role/dep
 * Technical Analyst ve QA teslimleri daima Tech Lead'e döner.
 * Project Setup doğrulaması ve DevOps release readiness sonrası Tech Lead'e dönülür.
 * QA'ya her girişten önce Tech Lead reconciliation yapar; Delivery Review = Accepted, QA Stage, scope, QA modules, regression depth, evidence reuse kararı ve QA task'larını yazar. Delivery rolü doğrudan QA aktive edemez.
+* Authored-content QA girişinde Tech Lead teknik geçerlilik ve editoryal kaliteyi ayrı doğrular; required FAIL/UNKNOWN veya kritik editoryal finding varken content gate Ready for QA olamaz. Eksik kalite kriteri rework/contract bulgusudur, otomatik kullanıcı sign-off'u değildir.
 * Visual Scope `none` değilse UI Designer → implementation ve implementation → QA geçişleri Tech Lead checkpoint'i gerektirir; ilgili visual gate kanıtını Tech Lead doğrular.
 * Product revision, authority conflict, insan kararı, eksik required evidence ve plansız rework Tech Lead'e gider.
 * UI → client veya developer → content gibi açık planlı, prerequisite'i tamamlanmış doğrudan delivery geçişleri korunur.

@@ -145,6 +145,7 @@ void main() {
       for (final out in <String>[first, second]) {
         final (code, stdout, stderr) = await run(<String>[
           'pack-daily',
+          '--development-fixture',
           _devSource,
           '--repo-root',
           _repoRoot,
@@ -164,8 +165,13 @@ void main() {
 
     test('writes to <repo-root>/build/daily/daily_pack_<lang>.json by default',
         () async {
-      final (code, _, stderr) = await run(
-          <String>['pack-daily', _devSource, '--repo-root', tmp.path]);
+      final (code, _, stderr) = await run(<String>[
+        'pack-daily',
+        '--development-fixture',
+        _devSource,
+        '--repo-root',
+        tmp.path
+      ]);
       expect(code, 0, reason: stderr);
       expect(File('${tmp.path}/build/daily/daily_pack_tr.json').existsSync(),
           true);
@@ -181,8 +187,13 @@ void main() {
         json['contentVersion'] = 'dev-fixture-2026-10-15';
       });
       final out = '${tmp.path}/pack.json';
-      final (code, _, stderr) =
-          await run(<String>['pack-daily', manifest, '--out', out]);
+      final (code, _, stderr) = await run(<String>[
+        'pack-daily',
+        '--development-fixture',
+        manifest,
+        '--out',
+        out
+      ]);
       expect(code, 0, reason: stderr);
       expect(File(out).readAsStringSync(), File(_golden).readAsStringSync());
     });
@@ -192,8 +203,13 @@ void main() {
       final manifest = devSourceIn(tmp);
       editPool(manifest, '2026-10-06', (p) => p['language'] = 'en');
       final out = '${tmp.path}/pack.json';
-      final (code, _, stderr) =
-          await run(<String>['pack-daily', manifest, '--out', out]);
+      final (code, _, stderr) = await run(<String>[
+        'pack-daily',
+        '--development-fixture',
+        manifest,
+        '--out',
+        out
+      ]);
       expect(code, 1);
       expect(stderr, contains('pack-daily FAIL: [lang] 2026-10-06'));
       expect(stderr, contains('nothing written'));
@@ -203,8 +219,13 @@ void main() {
     test('refuses to write into its own source directory', () async {
       final manifest = devSourceIn(tmp);
       final out = '${File(manifest).parent.path}/daily_pack_tr.json';
-      final (code, _, stderr) =
-          await run(<String>['pack-daily', manifest, '--out', out]);
+      final (code, _, stderr) = await run(<String>[
+        'pack-daily',
+        '--development-fixture',
+        manifest,
+        '--out',
+        out
+      ]);
       expect(code, 1);
       expect(stderr, contains('refusing to write into the source'));
       expect(File(out).existsSync(), isFalse);

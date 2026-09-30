@@ -165,11 +165,11 @@ Content brief'inde en az sunlar olmali:
 
 * içerik türü, teslim kapsamı ve çıktı konumu; format/schema ve miktar yalnız gerekliyse
 * product/feature acceptance criteria coverage
-* kapsama uygulanabilen doğruluk, dil, tutarlılık, kapsam ve sıralama hedefleri
-* varsa kullanılacak içerik araçları ve generator/validator talimatı
-* yalnız belirsiz constraint varsa feasibility kanıtı veya unresolved blocker
-* doğrulama yöntemi; executable gate varsa exact check ve pozitif/negatif örnek beklentisi
-* human sign-off gerekiyorsa benzersiz decision id
+* kullanıcı amacı/hedef kitle ve doğruluk, dil, tutarlılık, çeşitlilik, deneyim ölçütleri; required/advisory, uygulanma koşulu, kabul/red yöntemi ve owner
+* kaynak/girdi yeterlilik preflight'ı; varsa kalıcı araçlar, generator/validator talimatı ve readiness blocker'ı
+* yeni/değişmiş toplu üretimde temsilî pilot, iyi/kötü örnekler, bütçe ve Tech Lead kabul checkpoint'i
+* teknik geçerlilik ve editoryal review ayrı; executable gate için exact check, gerçek pozitif/negatif örnek, fingerprint ve UNKNOWN/red davranışı
+* yalnız açık authority'nin gerektirdiği insan kararında authority/karar sahibi/blocking scope ile benzersiz decision id; rutin kalite kullanıcıya devredilmez
 * `content-design.md` ve gercek content asset teslimi
 
 ### 12. Next Role Input - Frontend/Mobile Developer
@@ -288,6 +288,7 @@ Tech Lead'in `orchestration.md` guncellemesinde asgari olarak sunlar net olmali:
 * Active Task Ledger ve Handoff Plan
 * Feature ID; global Active Feature eşleşmesi
 * QA Stage / QA Result / Release Scope / Release Result / Delivery Review
+* Authored content varsa Content Quality Contract / Gate / Evidence (`prompt-content-quality-standard.md`)
 * Pending Evidence / Open Decision Gates
 * Open Tasks
 * Blockers

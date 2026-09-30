@@ -1,0 +1,1386 @@
+{
+  "schemaVersion": 1,
+  "scope": "pilot",
+  "result": "PASS",
+  "independentQa": false,
+  "sourceDir": "/Users/eyupcandabakoglu/Projects/Looplet/ai-system/features/f07-daily-challenge/evidence/technical-pilot-v1",
+  "days": [
+    {
+      "id": "daily-tr-2026-11-02",
+      "date": "2026-11-02",
+      "target": "tohum",
+      "rules": {
+        "Q1": {
+          "status": "PASS",
+          "evidence": "5x5/TR/date/id/columns/eligible non-Journey target"
+        },
+        "Q8": {
+          "status": "PASS",
+          "evidence": {
+            "maxCorrect": 2,
+            "initialThawed": 0,
+            "initialWords": [
+              [],
+              [],
+              [],
+              [],
+              []
+            ]
+          }
+        },
+        "Q11": {
+          "status": "PASS",
+          "evidence": {
+            "found": [],
+            "statesScanned": 6,
+            "directions": "horizontal/vertical, forward/reverse",
+            "scope": "stored reference/thaw/counterfactual/diagnostic paths; exact versioned list only"
+          }
+        },
+        "Q2": {
+          "status": "PASS",
+          "evidence": {
+            "optimal": 4,
+            "referenceLength": 4,
+            "forwardReplay": true
+          }
+        },
+        "Q3": {
+          "status": "PASS",
+          "evidence": {
+            "heavy": false,
+            "expectedMechanic": "open"
+          }
+        },
+        "Q10": {
+          "status": "PASS",
+          "evidence": {
+            "finalFillerWords": [
+              [
+                "buhar"
+              ],
+              [
+                "lokma"
+              ],
+              [
+                "fener"
+              ],
+              [
+                "köpek"
+              ]
+            ]
+          }
+        },
+        "Q4": {
+          "status": "PASS",
+          "evidence": {
+            "score": 5.820234553775744,
+            "label": "medium",
+            "exportMatches": true
+          }
+        },
+        "Q9": {
+          "status": "PASS",
+          "evidence": {
+            "advisory": true,
+            "firstMovesLowerBound": 1,
+            "enumerationComplete": true
+          }
+        },
+        "Q5": {
+          "status": "N/A",
+          "evidence": {
+            "locked": {
+              "status": "N/A",
+              "evidence": "mechanic absent"
+            },
+            "frozen": {
+              "status": "N/A",
+              "evidence": "mechanic absent"
+            }
+          }
+        },
+        "Q6": {
+          "status": "N/A",
+          "evidence": {}
+        },
+        "Q7": {
+          "status": "N/A",
+          "evidence": "individual measure; required ratio is checked at pool scope"
+        },
+        "Q12": {
+          "status": "PASS",
+          "evidence": {
+            "duplicates": [],
+            "scope": "all pool + Journey/smoke; masks and <=2 actual moves"
+          }
+        }
+      },
+      "proof": {
+        "thaw": {},
+        "reference": "U1 R3 D3 U4"
+      },
+      "mechanic": "open",
+      "optimalMoves": 4,
+      "difficulty": {
+        "score": 5.820234553775744,
+        "label": "medium",
+        "breakdown": {
+          "o": 4,
+          "cNorm": 0.0026,
+          "tdDegree": 1,
+          "locked": 0,
+          "frozen": 0,
+          "firstMoves": 1,
+          "distinctOptimalSolutions": 2,
+          "optimalEnumerationComplete": 1
+        }
+      },
+      "regression": {
+        "status": "PASS",
+        "evidence": {
+          "nondecreasingPath": "",
+          "nodes": 24360,
+          "depth": 4
+        }
+      },
+      "accepted": true,
+      "elapsedMs": 3255
+    },
+    {
+      "id": "daily-tr-2026-11-03",
+      "date": "2026-11-03",
+      "target": "leğen",
+      "rules": {
+        "Q1": {
+          "status": "PASS",
+          "evidence": "5x5/TR/date/id/columns/eligible non-Journey target"
+        },
+        "Q8": {
+          "status": "PASS",
+          "evidence": {
+            "maxCorrect": 2,
+            "initialThawed": 0,
+            "initialWords": [
+              [],
+              [],
+              [],
+              [],
+              []
+            ]
+          }
+        },
+        "Q11": {
+          "status": "PASS",
+          "evidence": {
+            "found": [],
+            "statesScanned": 16,
+            "directions": "horizontal/vertical, forward/reverse",
+            "scope": "stored reference/thaw/counterfactual/diagnostic paths; exact versioned list only"
+          }
+        },
+        "Q2": {
+          "status": "PASS",
+          "evidence": {
+            "optimal": 4,
+            "referenceLength": 4,
+            "forwardReplay": true
+          }
+        },
+        "Q3": {
+          "status": "PASS",
+          "evidence": {
+            "heavy": false,
+            "expectedMechanic": "locked"
+          }
+        },
+        "Q10": {
+          "status": "PASS",
+          "evidence": {
+            "finalFillerWords": [
+              [
+                "önem"
+              ],
+              [
+                "peron"
+              ],
+              [
+                "kuru"
+              ],
+              [
+                "soğuk"
+              ]
+            ]
+          }
+        },
+        "Q4": {
+          "status": "PASS",
+          "evidence": {
+            "score": 4.301559584165937,
+            "label": "medium",
+            "exportMatches": true
+          }
+        },
+        "Q9": {
+          "status": "PASS",
+          "evidence": {
+            "advisory": true,
+            "firstMovesLowerBound": 3,
+            "enumerationComplete": true
+          }
+        },
+        "Q5": {
+          "status": "PASS",
+          "evidence": {
+            "locked": {
+              "status": "PASS",
+              "evidence": {
+                "normalOptimal": 4,
+                "ablatedOptimal": 4,
+                "commonOptimal": "ABSENT_WITHIN_DEPTH",
+                "commonReference": "",
+                "nodes": 65477
+              }
+            },
+            "frozen": {
+              "status": "N/A",
+              "evidence": "mechanic absent"
+            }
+          }
+        },
+        "Q6": {
+          "status": "N/A",
+          "evidence": {}
+        },
+        "Q7": {
+          "status": "N/A",
+          "evidence": "individual measure; required ratio is checked at pool scope"
+        },
+        "Q12": {
+          "status": "PASS",
+          "evidence": {
+            "duplicates": [],
+            "scope": "all pool + Journey/smoke; masks and <=2 actual moves"
+          }
+        }
+      },
+      "proof": {
+        "thaw": {},
+        "reference": "L1 U3 D2 U4"
+      },
+      "mechanic": "locked",
+      "optimalMoves": 4,
+      "difficulty": {
+        "score": 4.301559584165937,
+        "label": "medium",
+        "breakdown": {
+          "o": 4,
+          "cNorm": 0.0214,
+          "tdDegree": 0,
+          "locked": 1,
+          "frozen": 0,
+          "firstMoves": 3,
+          "distinctOptimalSolutions": 18,
+          "optimalEnumerationComplete": 1
+        }
+      },
+      "regression": {
+        "status": "FAIL",
+        "evidence": {
+          "nondecreasingPath": "L1 U3 D2 U4",
+          "nodes": 0,
+          "depth": 4
+        }
+      },
+      "accepted": true,
+      "elapsedMs": 3928
+    },
+    {
+      "id": "daily-tr-2026-11-04",
+      "date": "2026-11-04",
+      "target": "lokma",
+      "rules": {
+        "Q1": {
+          "status": "PASS",
+          "evidence": "5x5/TR/date/id/columns/eligible non-Journey target"
+        },
+        "Q8": {
+          "status": "PASS",
+          "evidence": {
+            "maxCorrect": 1,
+            "initialThawed": 0,
+            "initialWords": [
+              [],
+              [],
+              [],
+              [],
+              []
+            ]
+          }
+        },
+        "Q11": {
+          "status": "PASS",
+          "evidence": {
+            "found": [],
+            "statesScanned": 30,
+            "directions": "horizontal/vertical, forward/reverse",
+            "scope": "stored reference/thaw/counterfactual/diagnostic paths; exact versioned list only"
+          }
+        },
+        "Q2": {
+          "status": "PASS",
+          "evidence": {
+            "optimal": 5,
+            "referenceLength": 5,
+            "forwardReplay": true
+          }
+        },
+        "Q3": {
+          "status": "PASS",
+          "evidence": {
+            "heavy": false,
+            "expectedMechanic": "frozen"
+          }
+        },
+        "Q10": {
+          "status": "PASS",
+          "evidence": {
+            "finalFillerWords": [
+              [
+                "ayrı"
+              ],
+              [
+                "yelek"
+              ],
+              [
+                "yakın"
+              ],
+              [
+                "zayıf"
+              ]
+            ]
+          }
+        },
+        "Q4": {
+          "status": "PASS",
+          "evidence": {
+            "score": 5.27276115919733,
+            "label": "medium",
+            "exportMatches": true
+          }
+        },
+        "Q9": {
+          "status": "PASS",
+          "evidence": {
+            "advisory": true,
+            "firstMovesLowerBound": 5,
+            "enumerationComplete": true
+          }
+        },
+        "Q5": {
+          "status": "PASS",
+          "evidence": {
+            "locked": {
+              "status": "N/A",
+              "evidence": "mechanic absent"
+            },
+            "frozen": {
+              "status": "PASS",
+              "evidence": {
+                "normalOptimal": 5,
+                "ablatedOptimal": 4,
+                "ablatedReference": "L4 U4 R0 U0"
+              }
+            }
+          }
+        },
+        "Q6": {
+          "status": "PASS",
+          "evidence": {
+            "0": {
+              "status": "PASS",
+              "evidence": {
+                "path": "D1 R0 L4 U0 U4",
+                "maxLength": 7
+              }
+            }
+          }
+        },
+        "Q7": {
+          "status": "PASS",
+          "evidence": "individual measure; required ratio is checked at pool scope"
+        },
+        "Q12": {
+          "status": "PASS",
+          "evidence": {
+            "duplicates": [],
+            "scope": "all pool + Journey/smoke; masks and <=2 actual moves"
+          }
+        }
+      },
+      "proof": {
+        "thaw": {
+          "0": "D1 R0 L4 U0 U4"
+        },
+        "reference": "D1 R0 L4 U0 U4",
+        "usefulThaw": "D1 R0 L4 U0 U4"
+      },
+      "mechanic": "frozen",
+      "optimalMoves": 5,
+      "difficulty": {
+        "score": 5.27276115919733,
+        "label": "medium",
+        "breakdown": {
+          "o": 5,
+          "cNorm": 0.0034,
+          "tdDegree": 0,
+          "locked": 0,
+          "frozen": 1,
+          "firstMoves": 5,
+          "distinctOptimalSolutions": 33,
+          "optimalEnumerationComplete": 1
+        }
+      },
+      "regression": {
+        "status": "FAIL",
+        "evidence": {
+          "nondecreasingPath": "D1 R0 L4 U0 U4",
+          "nodes": 0,
+          "depth": 5
+        }
+      },
+      "accepted": true,
+      "elapsedMs": 48622
+    },
+    {
+      "id": "daily-tr-2026-11-07",
+      "date": "2026-11-07",
+      "target": "yunus",
+      "rules": {
+        "Q1": {
+          "status": "PASS",
+          "evidence": "5x5/TR/date/id/columns/eligible non-Journey target"
+        },
+        "Q8": {
+          "status": "PASS",
+          "evidence": {
+            "maxCorrect": 1,
+            "initialThawed": 0,
+            "initialWords": [
+              [],
+              [],
+              [],
+              [],
+              []
+            ]
+          }
+        },
+        "Q11": {
+          "status": "PASS",
+          "evidence": {
+            "found": [],
+            "statesScanned": 39,
+            "directions": "horizontal/vertical, forward/reverse",
+            "scope": "stored reference/thaw/counterfactual/diagnostic paths; exact versioned list only"
+          }
+        },
+        "Q2": {
+          "status": "PASS",
+          "evidence": {
+            "optimal": 5,
+            "referenceLength": 5,
+            "forwardReplay": true
+          }
+        },
+        "Q3": {
+          "status": "PASS",
+          "evidence": {
+            "heavy": true,
+            "expectedMechanic": "both"
+          }
+        },
+        "Q10": {
+          "status": "PASS",
+          "evidence": {
+            "finalFillerWords": [
+              [
+                "salon"
+              ],
+              [
+                "yakın"
+              ],
+              [
+                "puan"
+              ],
+              [
+                "üzüm"
+              ]
+            ]
+          }
+        },
+        "Q4": {
+          "status": "PASS",
+          "evidence": {
+            "score": 8.467470849766064,
+            "label": "hard",
+            "exportMatches": true
+          }
+        },
+        "Q9": {
+          "status": "PASS",
+          "evidence": {
+            "advisory": true,
+            "firstMovesLowerBound": 3,
+            "enumerationComplete": true
+          }
+        },
+        "Q5": {
+          "status": "PASS",
+          "evidence": {
+            "locked": {
+              "status": "PASS",
+              "evidence": {
+                "normalOptimal": 5,
+                "ablatedOptimal": 4,
+                "ablatedReference": "L1 L1 R4 D4"
+              }
+            },
+            "frozen": {
+              "status": "PASS",
+              "evidence": {
+                "normalOptimal": 5,
+                "ablatedOptimal": 2,
+                "ablatedReference": "R4 U4"
+              }
+            }
+          }
+        },
+        "Q6": {
+          "status": "PASS",
+          "evidence": {
+            "2": {
+              "status": "PASS",
+              "evidence": {
+                "path": "R4 U1 L0 U1 U4",
+                "maxLength": 7
+              }
+            },
+            "3": {
+              "status": "PASS",
+              "evidence": {
+                "path": "R4 U1 L0 U1 U4",
+                "maxLength": 7
+              }
+            }
+          }
+        },
+        "Q7": {
+          "status": "PASS",
+          "evidence": "individual measure; required ratio is checked at pool scope"
+        },
+        "Q12": {
+          "status": "PASS",
+          "evidence": {
+            "duplicates": [],
+            "scope": "all pool + Journey/smoke; masks and <=2 actual moves"
+          }
+        }
+      },
+      "proof": {
+        "thaw": {
+          "2": "R4 U1 L0 U1 U4",
+          "3": "R4 U1 L0 U1 U4"
+        },
+        "reference": "R4 U1 L0 U1 U4",
+        "usefulThaw": "R4 U1 L0 U1 U4"
+      },
+      "mechanic": "both",
+      "optimalMoves": 5,
+      "difficulty": {
+        "score": 8.467470849766064,
+        "label": "hard",
+        "breakdown": {
+          "o": 5,
+          "cNorm": 0.01,
+          "tdDegree": 0,
+          "locked": 2,
+          "frozen": 2,
+          "firstMoves": 3,
+          "distinctOptimalSolutions": 4,
+          "optimalEnumerationComplete": 1
+        }
+      },
+      "regression": {
+        "status": "FAIL",
+        "evidence": {
+          "nondecreasingPath": "L1 L1 U3 U3 R4",
+          "nodes": 358700,
+          "depth": 5
+        }
+      },
+      "accepted": true,
+      "elapsedMs": 39341
+    },
+    {
+      "id": "daily-tr-2026-11-09",
+      "date": "2026-11-09",
+      "target": "radyo",
+      "rules": {
+        "Q1": {
+          "status": "PASS",
+          "evidence": "5x5/TR/date/id/columns/eligible non-Journey target"
+        },
+        "Q8": {
+          "status": "PASS",
+          "evidence": {
+            "maxCorrect": 2,
+            "initialThawed": 0,
+            "initialWords": [
+              [],
+              [],
+              [],
+              [],
+              []
+            ]
+          }
+        },
+        "Q11": {
+          "status": "PASS",
+          "evidence": {
+            "found": [],
+            "statesScanned": 13,
+            "directions": "horizontal/vertical, forward/reverse",
+            "scope": "stored reference/thaw/counterfactual/diagnostic paths; exact versioned list only"
+          }
+        },
+        "Q2": {
+          "status": "PASS",
+          "evidence": {
+            "optimal": 5,
+            "referenceLength": 5,
+            "forwardReplay": true
+          }
+        },
+        "Q3": {
+          "status": "PASS",
+          "evidence": {
+            "heavy": false,
+            "expectedMechanic": "open"
+          }
+        },
+        "Q10": {
+          "status": "PASS",
+          "evidence": {
+            "finalFillerWords": [
+              [
+                "baraj"
+              ],
+              [
+                "ördek"
+              ],
+              [
+                "işlem"
+              ],
+              [
+                "hızlı"
+              ]
+            ]
+          }
+        },
+        "Q4": {
+          "status": "PASS",
+          "evidence": {
+            "score": 4.265412504339106,
+            "label": "medium",
+            "exportMatches": true
+          }
+        },
+        "Q9": {
+          "status": "PASS",
+          "evidence": {
+            "advisory": true,
+            "firstMovesLowerBound": 4,
+            "enumerationComplete": true
+          }
+        },
+        "Q5": {
+          "status": "N/A",
+          "evidence": {
+            "locked": {
+              "status": "N/A",
+              "evidence": "mechanic absent"
+            },
+            "frozen": {
+              "status": "N/A",
+              "evidence": "mechanic absent"
+            }
+          }
+        },
+        "Q6": {
+          "status": "N/A",
+          "evidence": {}
+        },
+        "Q7": {
+          "status": "N/A",
+          "evidence": "individual measure; required ratio is checked at pool scope"
+        },
+        "Q12": {
+          "status": "PASS",
+          "evidence": {
+            "duplicates": [],
+            "scope": "all pool + Journey/smoke; masks and <=2 actual moves"
+          }
+        }
+      },
+      "proof": {
+        "thaw": {},
+        "reference": "D3 U1 L1 D1 U4"
+      },
+      "mechanic": "open",
+      "optimalMoves": 5,
+      "difficulty": {
+        "score": 4.265412504339106,
+        "label": "medium",
+        "breakdown": {
+          "o": 5,
+          "cNorm": 0.0051,
+          "tdDegree": 0,
+          "locked": 0,
+          "frozen": 0,
+          "firstMoves": 4,
+          "distinctOptimalSolutions": 21,
+          "optimalEnumerationComplete": 1
+        }
+      },
+      "regression": {
+        "status": "FAIL",
+        "evidence": {
+          "nondecreasingPath": "D3 U1 L1 D1 U4",
+          "nodes": 0,
+          "depth": 5
+        }
+      },
+      "accepted": true,
+      "elapsedMs": 35220
+    },
+    {
+      "id": "daily-tr-2026-11-10",
+      "date": "2026-11-10",
+      "target": "inanç",
+      "rules": {
+        "Q1": {
+          "status": "PASS",
+          "evidence": "5x5/TR/date/id/columns/eligible non-Journey target"
+        },
+        "Q8": {
+          "status": "PASS",
+          "evidence": {
+            "maxCorrect": 2,
+            "initialThawed": 0,
+            "initialWords": [
+              [],
+              [],
+              [],
+              [],
+              []
+            ]
+          }
+        },
+        "Q11": {
+          "status": "PASS",
+          "evidence": {
+            "found": [],
+            "statesScanned": 11,
+            "directions": "horizontal/vertical, forward/reverse",
+            "scope": "stored reference/thaw/counterfactual/diagnostic paths; exact versioned list only"
+          }
+        },
+        "Q2": {
+          "status": "PASS",
+          "evidence": {
+            "optimal": 4,
+            "referenceLength": 4,
+            "forwardReplay": true
+          }
+        },
+        "Q3": {
+          "status": "PASS",
+          "evidence": {
+            "heavy": false,
+            "expectedMechanic": "locked"
+          }
+        },
+        "Q10": {
+          "status": "PASS",
+          "evidence": {
+            "finalFillerWords": [
+              [
+                "irade"
+              ],
+              [
+                "saçak"
+              ],
+              [
+                "tarla"
+              ],
+              [
+                "isim"
+              ]
+            ]
+          }
+        },
+        "Q4": {
+          "status": "PASS",
+          "evidence": {
+            "score": 4.504581793779928,
+            "label": "medium",
+            "exportMatches": true
+          }
+        },
+        "Q9": {
+          "status": "PASS",
+          "evidence": {
+            "advisory": true,
+            "firstMovesLowerBound": 2,
+            "enumerationComplete": true
+          }
+        },
+        "Q5": {
+          "status": "PASS",
+          "evidence": {
+            "locked": {
+              "status": "PASS",
+              "evidence": {
+                "normalOptimal": 4,
+                "ablatedOptimalLowerBound": 5,
+                "absenceThroughDepth": 4,
+                "nodes": 65048,
+                "direction": "removing mechanic requires more moves or makes unsolvable"
+              }
+            },
+            "frozen": {
+              "status": "N/A",
+              "evidence": "mechanic absent"
+            }
+          }
+        },
+        "Q6": {
+          "status": "N/A",
+          "evidence": {}
+        },
+        "Q7": {
+          "status": "N/A",
+          "evidence": "individual measure; required ratio is checked at pool scope"
+        },
+        "Q12": {
+          "status": "PASS",
+          "evidence": {
+            "duplicates": [],
+            "scope": "all pool + Journey/smoke; masks and <=2 actual moves"
+          }
+        }
+      },
+      "proof": {
+        "thaw": {},
+        "reference": "L2 U0 D3 U4"
+      },
+      "mechanic": "locked",
+      "optimalMoves": 4,
+      "difficulty": {
+        "score": 4.504581793779928,
+        "label": "medium",
+        "breakdown": {
+          "o": 4,
+          "cNorm": 0.0265,
+          "tdDegree": 0,
+          "locked": 1,
+          "frozen": 0,
+          "firstMoves": 2,
+          "distinctOptimalSolutions": 8,
+          "optimalEnumerationComplete": 1
+        }
+      },
+      "regression": {
+        "status": "FAIL",
+        "evidence": {
+          "nondecreasingPath": "L2 U0 D3 U4",
+          "nodes": 0,
+          "depth": 4
+        }
+      },
+      "accepted": true,
+      "elapsedMs": 2680
+    },
+    {
+      "id": "daily-tr-2026-11-11",
+      "date": "2026-11-11",
+      "target": "balon",
+      "rules": {
+        "Q1": {
+          "status": "PASS",
+          "evidence": "5x5/TR/date/id/columns/eligible non-Journey target"
+        },
+        "Q8": {
+          "status": "PASS",
+          "evidence": {
+            "maxCorrect": 2,
+            "initialThawed": 0,
+            "initialWords": [
+              [],
+              [],
+              [],
+              [],
+              []
+            ]
+          }
+        },
+        "Q11": {
+          "status": "PASS",
+          "evidence": {
+            "found": [],
+            "statesScanned": 25,
+            "directions": "horizontal/vertical, forward/reverse",
+            "scope": "stored reference/thaw/counterfactual/diagnostic paths; exact versioned list only"
+          }
+        },
+        "Q2": {
+          "status": "PASS",
+          "evidence": {
+            "optimal": 4,
+            "referenceLength": 4,
+            "forwardReplay": true
+          }
+        },
+        "Q3": {
+          "status": "PASS",
+          "evidence": {
+            "heavy": false,
+            "expectedMechanic": "frozen"
+          }
+        },
+        "Q10": {
+          "status": "PASS",
+          "evidence": {
+            "finalFillerWords": [
+              [
+                "erik"
+              ],
+              [
+                "palet"
+              ],
+              [
+                "tatlı"
+              ],
+              [
+                "lokma"
+              ]
+            ]
+          }
+        },
+        "Q4": {
+          "status": "PASS",
+          "evidence": {
+            "score": 4.543592654753677,
+            "label": "medium",
+            "exportMatches": true
+          }
+        },
+        "Q9": {
+          "status": "PASS",
+          "evidence": {
+            "advisory": true,
+            "firstMovesLowerBound": 4,
+            "enumerationComplete": true
+          }
+        },
+        "Q5": {
+          "status": "PASS",
+          "evidence": {
+            "locked": {
+              "status": "N/A",
+              "evidence": "mechanic absent"
+            },
+            "frozen": {
+              "status": "PASS",
+              "evidence": {
+                "normalOptimal": 4,
+                "ablatedOptimal": 3,
+                "ablatedReference": "U2 D3 U4"
+              }
+            }
+          }
+        },
+        "Q6": {
+          "status": "PASS",
+          "evidence": {
+            "1": {
+              "status": "PASS",
+              "evidence": {
+                "path": "D3 L2 U2 U4",
+                "maxLength": 6
+              }
+            }
+          }
+        },
+        "Q7": {
+          "status": "PASS",
+          "evidence": "individual measure; required ratio is checked at pool scope"
+        },
+        "Q12": {
+          "status": "PASS",
+          "evidence": {
+            "duplicates": [],
+            "scope": "all pool + Journey/smoke; masks and <=2 actual moves"
+          }
+        }
+      },
+      "proof": {
+        "thaw": {
+          "1": "D3 L2 U2 U4"
+        },
+        "reference": "D3 L2 U2 U4",
+        "usefulThaw": "D3 L2 U2 U4"
+      },
+      "mechanic": "frozen",
+      "optimalMoves": 4,
+      "difficulty": {
+        "score": 4.543592654753677,
+        "label": "medium",
+        "breakdown": {
+          "o": 4,
+          "cNorm": 0.0312,
+          "tdDegree": 0,
+          "locked": 0,
+          "frozen": 1,
+          "firstMoves": 4,
+          "distinctOptimalSolutions": 25,
+          "optimalEnumerationComplete": 1
+        }
+      },
+      "regression": {
+        "status": "FAIL",
+        "evidence": {
+          "nondecreasingPath": "D3 L2 U2 U4",
+          "nodes": 0,
+          "depth": 4
+        }
+      },
+      "accepted": true,
+      "elapsedMs": 3663
+    },
+    {
+      "id": "daily-tr-2026-11-14",
+      "date": "2026-11-14",
+      "target": "kiraz",
+      "rules": {
+        "Q1": {
+          "status": "PASS",
+          "evidence": "5x5/TR/date/id/columns/eligible non-Journey target"
+        },
+        "Q8": {
+          "status": "PASS",
+          "evidence": {
+            "maxCorrect": 2,
+            "initialThawed": 0,
+            "initialWords": [
+              [],
+              [],
+              [],
+              [],
+              []
+            ]
+          }
+        },
+        "Q11": {
+          "status": "PASS",
+          "evidence": {
+            "found": [],
+            "statesScanned": 25,
+            "directions": "horizontal/vertical, forward/reverse",
+            "scope": "stored reference/thaw/counterfactual/diagnostic paths; exact versioned list only"
+          }
+        },
+        "Q2": {
+          "status": "PASS",
+          "evidence": {
+            "optimal": 5,
+            "referenceLength": 5,
+            "forwardReplay": true
+          }
+        },
+        "Q3": {
+          "status": "PASS",
+          "evidence": {
+            "heavy": true,
+            "expectedMechanic": "both"
+          }
+        },
+        "Q10": {
+          "status": "PASS",
+          "evidence": {
+            "finalFillerWords": [
+              [
+                "çamur"
+              ],
+              [
+                "bayır"
+              ],
+              [
+                "söğüt"
+              ],
+              [
+                "uyum"
+              ]
+            ]
+          }
+        },
+        "Q4": {
+          "status": "PASS",
+          "evidence": {
+            "score": 9.255787235400295,
+            "label": "hard",
+            "exportMatches": true
+          }
+        },
+        "Q9": {
+          "status": "PASS",
+          "evidence": {
+            "advisory": true,
+            "firstMovesLowerBound": 3,
+            "enumerationComplete": true
+          }
+        },
+        "Q5": {
+          "status": "PASS",
+          "evidence": {
+            "locked": {
+              "status": "PASS",
+              "evidence": {
+                "normalOptimal": 5,
+                "ablatedOptimalLowerBound": 6,
+                "absenceThroughDepth": 5,
+                "nodes": 826915,
+                "direction": "removing mechanic requires more moves or makes unsolvable"
+              }
+            },
+            "frozen": {
+              "status": "PASS",
+              "evidence": {
+                "normalOptimal": 5,
+                "ablatedOptimal": 5,
+                "commonOptimal": "ABSENT_WITHIN_DEPTH",
+                "commonReference": "",
+                "nodes": 738190
+              }
+            }
+          }
+        },
+        "Q6": {
+          "status": "PASS",
+          "evidence": {
+            "0": {
+              "status": "PASS",
+              "evidence": {
+                "path": "L0 D2 R0 U1 D4",
+                "maxLength": 7
+              }
+            }
+          }
+        },
+        "Q7": {
+          "status": "PASS",
+          "evidence": "individual measure; required ratio is checked at pool scope"
+        },
+        "Q12": {
+          "status": "PASS",
+          "evidence": {
+            "duplicates": [],
+            "scope": "all pool + Journey/smoke; masks and <=2 actual moves"
+          }
+        }
+      },
+      "proof": {
+        "thaw": {
+          "0": "L0 D2 R0 U1 D4"
+        },
+        "reference": "L0 D2 R0 U1 D4",
+        "usefulThaw": "L0 D2 R0 U1 D4"
+      },
+      "mechanic": "both",
+      "optimalMoves": 5,
+      "difficulty": {
+        "score": 9.255787235400295,
+        "label": "hard",
+        "breakdown": {
+          "o": 5,
+          "cNorm": 0.0061,
+          "tdDegree": 1,
+          "locked": 2,
+          "frozen": 1,
+          "firstMoves": 3,
+          "distinctOptimalSolutions": 4,
+          "optimalEnumerationComplete": 1
+        }
+      },
+      "regression": {
+        "status": "PASS",
+        "evidence": {
+          "nondecreasingPath": "",
+          "nodes": 337111,
+          "depth": 5
+        }
+      },
+      "accepted": true,
+      "elapsedMs": 71483
+    }
+  ],
+  "errors": [],
+  "Q12": {
+    "status": "PASS",
+    "evidence": {
+      "duplicates": [],
+      "scope": "all pool + Journey/smoke; masks and <=2 actual moves"
+    }
+  },
+  "pool": {
+    "status": "PASS",
+    "evidence": {
+      "failures": [],
+      "days": 8,
+      "targets": 8,
+      "frozenDays": 4,
+      "usefulThawDays": 4
+    }
+  },
+  "files": {
+    "ai-system/features/f07-daily-challenge/daily-content-spec.md/": "ef4b68a5ecaef97d085d31f99c8964a88665d4a617f95e45c7a60fe1967d87b3",
+    "authoring/dependency-overrides": "8b0e0a98eff7f0627ee66fd066eaa020876039c8d9ad485d512b36e5042aee3b",
+    "content/journey/tr/journey-tr-01.json": "c1897dc99e9d17c377c3bf6256d2d73c7b165a447a2441eba71d0a736cc34dc0",
+    "content/journey/tr/journey-tr-02.json": "b0a0d1827de51bb4449fd84359d858dbcfaa0568e58b4c586398236df214ded9",
+    "content/journey/tr/journey-tr-03.json": "2fabe5b6c81123c9214c9cad20ae45767c346f8c86c8e46f80bcc70498f8c471",
+    "content/journey/tr/journey-tr-04.json": "ca4de46ca7a2a48163b9b8c5e8ac97e6386301945c4fd6a067b5baa3dc664317",
+    "content/journey/tr/journey-tr-05.json": "7e85376bfb873828c1dadd41d7dc0cb0bb2de31282b5f3b8e3a4f8fe4e21caee",
+    "content/journey/tr/journey-tr-06.json": "d8f702c7b3273007226d5ef8422575aff719b460f70198d3a85b895fb0eccbcd",
+    "content/journey/tr/journey-tr-07.json": "9d81f4bbf6eb5c1b28217936a01c723ccda3404d1dab35c1c7baa7325b694ed4",
+    "content/journey/tr/journey-tr-08.json": "0b236e182849b2130ec4f8880b4d7f3d5c16c4c4e5533e44c05336a403953de3",
+    "content/journey/tr/journey-tr-09.json": "f83cf7841fc8d99b310dd9830cd3c64cdeee043c387b7a57ddd5cf38539a3583",
+    "content/journey/tr/journey-tr-10.json": "8a5d9bf5a552a2f78a79e8d09db3aa3972259922629c4b2bd7ba27475920e267",
+    "content/journey/tr/journey-tr-11.json": "3a2548fdb49919bf4d3738fcd982c9daa57f1dcd86a67ac9f0b9b93ab14687ce",
+    "content/journey/tr/journey-tr-12.json": "4468f872138c3ce7e914eef9e8719932599935c586b60963d9cf079e031e66b9",
+    "content/journey/tr/journey-tr-13.json": "a269c23dda6af1a896a27c88bd858079eedfa2122cc7056a4d125b5ef4edc0d9",
+    "content/journey/tr/journey-tr-14.json": "3575b5745585af9a7e9da7ce2307a166149e1bcd90c522cd449995036091bfbb",
+    "content/journey/tr/journey-tr-15.json": "a2e01707eb6cdcc307279a0b99b21c6f1e0784fa6b6c6d9efad72b08845f99ea",
+    "content/journey/tr/journey-tr-16.json": "874ab9c931247cdabb51bc6861ebdf0c980b9a3555a66efd8dcb29f38aad5433",
+    "content/journey/tr/journey-tr-17.json": "62f05c554abfca3e06d13a1ce2b5c81ca31e8679d0874b2602d644ee86656508",
+    "content/journey/tr/journey-tr-18.json": "9644f743a7dfd098904ff133fb51b9e8c96017a94cb850b5d09f02905bb536d1",
+    "content/journey/tr/journey-tr-19.json": "516c95383314561139ba03b6d9f959f1752525fff7f5f919a1ba4c5193fef275",
+    "content/journey/tr/journey-tr-20.json": "f481b7d7d92378a823afc0b8462d3de999b614ba1a01a99a619a782a147d2585",
+    "content/journey/tr/journey-tr-21.json": "57ad9ec8cfe541806dc3f0780152b53db29ce1508fe22923a0230c2a00459139",
+    "content/journey/tr/journey-tr-22.json": "5c50a2e0776ff919b3e99c05d638183e5e0cb730f1507f8b0caef2574c81cfbd",
+    "content/journey/tr/journey-tr-23.json": "f463a8ff6654227edc5d0db2a53dfffb5065e7fc2f471f515ba2a9b925105b8e",
+    "content/journey/tr/journey-tr-24.json": "e90d421fd21050de2a69f6ae48824317eef50dd87413f1595de4a6d6ce7edc59",
+    "content/journey/tr/journey-tr-25.json": "b868c0e26b34051447cce66719af93afdd21a516e11703d896e00ad795806ba6",
+    "content/journey/tr/journey-tr-26.json": "c4c5b8bf8fb820fddc983ed15fb20f396359b1f56e596c65b2db77ea5034cdcc",
+    "content/journey/tr/journey-tr-27.json": "b4fccf5aa9f2484983783d32524ef23369755ea414a7d09fa9012ee84f1e3299",
+    "content/journey/tr/journey-tr-28.json": "3c82235268382dc54138b473a6e19d06f5ba8ce28bd49be44603dd431dcbc862",
+    "content/journey/tr/journey-tr-29.json": "5e0896183cced66adb3b6fd728fe4eb778d72bbb7ae2e729a77ef1c4c8f5551b",
+    "content/journey/tr/journey-tr-30.json": "bdd1205410d44eb59c47e634f53e093674d868708e801246fffe4525f2cb3346",
+    "content/journey/tr/journey_manifest_tr.json": "67edd7b7e0384c47ab766e2f2b1d62ebff1569519ac9a093c80b8b3a676a37b6",
+    "content/smoke/tr/level01.json": "5f8aef3461799edef12726db675904edf7dd659b4410439dc237f195cad457e2",
+    "content/smoke/tr/level02.json": "fcbc10ab96789bcc3821efb0cda4e7b60f3a2bff7d79b0238ac5f1fe63cac43d",
+    "content/smoke/tr/level04.json": "9f0953ae60f75078e513decc63a3e096b22c8e1b2906ed5a018889f286ccbb4c",
+    "content/smoke/tr/level05.json": "1e73983c66e06d21a11d348c86229b02e01aadf251d3e76ea2229f18c1b4e681",
+    "content/smoke/tr/level06.json": "471ccceb5d8d53ff0dd6597eecb74d68725731cce798d07da30ae3c39fc4e4ee",
+    "daily/defs/daily-tr-2026-11-02.json": "7b4e54499b68da8b16088199667d8f3bb5e0b631ae67505600cbe0a9b3d959df",
+    "daily/defs/daily-tr-2026-11-03.json": "5dc327dda8231faa650dea76ad414f508f14bd73efaf84abe9087e7952a333de",
+    "daily/defs/daily-tr-2026-11-04.json": "ad23f1b1add1cd207729ee4d8f45e783b0719c95232af49e26e5e049140d72d9",
+    "daily/defs/daily-tr-2026-11-07.json": "2b440ff6b745f369e98b0cbdfbf9631b87a8df402780874de6467a307cb23d16",
+    "daily/defs/daily-tr-2026-11-09.json": "e5b268d0276565a7c06dfab22ba3a4e8c30dcc405548e0f38a801354c5a4669a",
+    "daily/defs/daily-tr-2026-11-10.json": "f4dc0c3d5066657050c5f8b49a25526ddb7b259bc3998882fc3d61f58ba4bb03",
+    "daily/defs/daily-tr-2026-11-11.json": "209d2d5b52e2914d1064b923fa8509c9cbf963f7aaed339caee15e6fb96ffa65",
+    "daily/defs/daily-tr-2026-11-14.json": "b2b59a73b1caab0fc9a260e176735ebe7bba4bca522a6b0a012fc2304852b9c3",
+    "daily/manifest/": "94f4ce2ea78b7643ddae25a4dd393fa1645a357eaba664020731919e7543e244",
+    "daily/pool/daily-tr-2026-11-02.json": "833a27382dd53fb2dbdcba848691237037137f77c858044cb51eaf25f8f3d242",
+    "daily/pool/daily-tr-2026-11-03.json": "d5c0e757c2a450f027bbd5a59b692a0f902fdbf7d05e4c7f4a0db04447453497",
+    "daily/pool/daily-tr-2026-11-04.json": "8ee5dd552f48d6321b0d12f1a2f4b91bb4e49c871ea2603e8c3ef1b34bd0e540",
+    "daily/pool/daily-tr-2026-11-07.json": "686a3b49d2e3c381b5c289a2c2b458c2e1c3c90a5de6c3f1d77de75b0b0ea64f",
+    "daily/pool/daily-tr-2026-11-09.json": "d40885a642caa76ea9b707113f46d7a9f976bfa06d65221c9773e2000498671d",
+    "daily/pool/daily-tr-2026-11-10.json": "18751180e20040c9d146072157fd4fb42b8d86c6df88ae8beef299a48d59c398",
+    "daily/pool/daily-tr-2026-11-11.json": "bcf67fda429727f77c77d7443ef699e0847f3f6f53ffcc0851f9c2e9a5402823",
+    "daily/pool/daily-tr-2026-11-14.json": "26ddfe0d6f71e49b042a225af0d639549c2cd811f3fca706c0ae4c9d0c254a93",
+    "daily/proofs/daily-tr-2026-11-02.json": "de72b3bfaa3c48b9f581d63b6f694290ca728dc184744cd4cdffd3f64a2f2fcc",
+    "daily/proofs/daily-tr-2026-11-03.json": "cade8996668dea69df676db2df444958406b5ae5f73d3de362cba94b68bcc741",
+    "daily/proofs/daily-tr-2026-11-04.json": "ef51914979978185a518053ebe55bb181e0b3a96162a4e7ece07dc5a842e0262",
+    "daily/proofs/daily-tr-2026-11-07.json": "6b3b6e4964e011e09a363448e52932f8eb946f2b9ac5dbcf1060ed634e6679b4",
+    "daily/proofs/daily-tr-2026-11-09.json": "38809dd2976015a0fd80cb7e97c138d0773727ebc723a3c2f443fee4f00a3f6b",
+    "daily/proofs/daily-tr-2026-11-10.json": "c0772faf5e973a072107716089b5e57864cd58f4ce8f8da03969752c95207c8c",
+    "daily/proofs/daily-tr-2026-11-11.json": "298130ee3043d79bc71ddd17e0c5340bb8dd240c3965df1135088df79349a81b",
+    "daily/proofs/daily-tr-2026-11-14.json": "5c96a59df2fe6bb6dd5cd68afea78ff8a067005c7473cf1428b37060c199b777",
+    "packages/looplet_content/lib/looplet_content.dart": "c311757eb43f7b2c0f042748f36fa2d443b033837abd006e449ad2a0c11d090c",
+    "packages/looplet_content/lib/src/calendar_date.dart": "b83b89948ce3b4e3256eef0d83be8a45086e6e6974192a2bf1abcfc4eb5585b1",
+    "packages/looplet_content/lib/src/daily_pack.dart": "47ffd8e61ae1d53dd846631c6c4760d58ec237c7effe1969e74b39316152c293",
+    "packages/looplet_content/lib/src/puzzle.dart": "7a8b41c3ed6141929e3bf02e56b88518bf695804daf040e8ee347ad5b06f4ac5",
+    "packages/looplet_content/pubspec.yaml/": "c4d65245f68b468a60c2f11316fe721cf6977de185ffb2f6b892d8d72c9be70c",
+    "packages/looplet_core/lib/looplet_core.dart": "91fc22f0df542c4170010dcd784d52ea99f782d5d94ad8b5168315e75fb7383f",
+    "packages/looplet_core/lib/src/content_primitives.dart": "7ee76806550d71c6ca5d8427fec1580526b7d5afd107745d259df869be052b5a",
+    "packages/looplet_core/lib/src/grid_primitives.dart": "9a958c0c8d775e55620155d1fdd8563dbad1db0aedfca69aae48c1ba011a3c47",
+    "packages/looplet_core/lib/src/normalize.dart": "c5afcbaeadfc0e573de0fc9d97dc2deaff4452176b3163cc807ce3f488062078",
+    "packages/looplet_core/lib/src/turkish_case.dart": "40cfdca9275bb7565b5839316fd860842c1bd23bc7e6f17753b45edb96a606fe",
+    "packages/looplet_core/pubspec.yaml/": "8fede8c13026cec2edbfc7188b8c80f016883bc84849ca05ad71441fda75a3ba",
+    "packages/looplet_dictionary/assets/tr/dictionary.json/": "ef65f397173d8c2d19de27d8cec3afa686680372d9bdbdaae843d4674c51cbb6",
+    "packages/looplet_dictionary/lib/looplet_dictionary.dart": "a400d492e332c2be971906ac0380d14fb2b3e14a114c58da70962789b07e7dc4",
+    "packages/looplet_dictionary/lib/src/dictionary_asset.dart": "55730a276e8b653663311b22b5cfcf04c5b66b92b275ded998d42c8e31206801",
+    "packages/looplet_dictionary/lib/src/dictionary_asset_source.dart": "9456ed28c146f31e3e483b102ef77fbc89f1fe75089a7b6e8faa0bb95f545ffb",
+    "packages/looplet_dictionary/lib/src/dictionary_logger.dart": "4948a3e2d976a512c0104b00b02ebc14fec0a71c19d2ea6a22f6ce9203aece06",
+    "packages/looplet_dictionary/lib/src/dictionary_service.dart": "feac596d1daad5be29ac299d6e7099b2875cc0a0d33446932b6f606bcf25d1bc",
+    "packages/looplet_dictionary/lib/src/language_code.dart": "507af548c5b6f541f28fc1bf5eda0120ac32bc498ddc6b9dfc4b2a7bfc16af54",
+    "packages/looplet_dictionary/pubspec.yaml/": "929a0f4d6c60a019e4b28e7c1698247efba4a185e3fa67925169e99b6f997adf",
+    "packages/looplet_engine/lib/looplet_engine.dart": "8227c86a03697ceebddfee23c38f63fc1b63664f3fddcd246cd515edb40b4e53",
+    "packages/looplet_engine/lib/src/engine_config.dart": "7e63e6d678ead003997afad621e4245eb5038ee8330c948980c684c41c8b86c4",
+    "packages/looplet_engine/lib/src/grid_engine.dart": "83761c5522bcd16677d31d4bd164db82371593b9ad5fbebdcdd782671cc19768",
+    "packages/looplet_engine/lib/src/grid_state.dart": "2d284cc2804f2f1b356f0a41630e85d62957a985c658604c69e6d8272de5561f",
+    "packages/looplet_engine/lib/src/move.dart": "23930cb0433e89fd06c4da73e3381274b99fe7d7998d5fe6bcbf2e23828ca90f",
+    "packages/looplet_engine/lib/src/word_validator.dart": "1137226da95f861f0a4a4c979f4e0a79724696b1d4e77a1a4a86d8fc3a5c5435",
+    "packages/looplet_engine/pubspec.yaml/": "630a779ed55f69d05d916d6dc702df32347aeb2f6c7a9a469558ab06729c8ba9",
+    "packages/looplet_solver/lib/looplet_solver.dart": "e08b69f8d457cea5bed8ba19b15ee10f11babc8eaf57f658e584447aed63fd9e",
+    "packages/looplet_solver/lib/src/difficulty.dart": "288c9db338e676de17ed5fd205688ee79ab32ebe32b3673b82265421650d610f",
+    "packages/looplet_solver/lib/src/solve_result.dart": "e934e65b1e392e8267a9c190c258a57e7b4497f41fdf6e690e2786cb5da3b0f2",
+    "packages/looplet_solver/lib/src/solver.dart": "3f73514945b92f526c104ba9ee59744678646d24a618228a605ccc7598e69d97",
+    "packages/looplet_solver/pubspec.yaml/": "69a0f7bc74e4db9363c38d9c511e116b46e145bd1eec890de1e36b8b56a3fe29",
+    "runtime/dart": "bdb9ac08c128ca4c12b0d17ebedc8cb0a880b1aa797f708f685adb2e993d4e3f",
+    "tools/looplet_authoring/bin/looplet_authoring.dart": "1f525a3fdd86debff596419a4b825d7fc48a5657f6bb583689e03308cc728cee",
+    "tools/looplet_authoring/data/tr/curation.json": "b89ada48ccadc58225cbb26455a687ad6b2387f4df9f75e84dc3728154a7cde9",
+    "tools/looplet_authoring/data/tr/exclusions.json": "5744e0d3547af6c21c68a2704b1b137db8ed206ee36080fb26aa5cc8ddcdfbd1",
+    "tools/looplet_authoring/data/tr/legacy-dictionary.json": "ef65f397173d8c2d19de27d8cec3afa686680372d9bdbdaae843d4674c51cbb6",
+    "tools/looplet_authoring/data/tr/sources/zemberek/LICENSE": "c55ac4a942b0e8dc83833680e4afefc5b0ef8a5bc0d17e1addb3c98e235ea07a",
+    "tools/looplet_authoring/data/tr/sources/zemberek/first-10K": "0264f2f84424c160cc3e85578092011040038b782c8f6df92d53c1359f32b414",
+    "tools/looplet_authoring/data/tr/sources/zemberek/master-dictionary.dict": "c539e12904d1ccac4792073f05deeae2babe692249dc4a359da254f1bd338f6f",
+    "tools/looplet_authoring/data/tr/sources/zemberek/source.json": "939e404921bb87923bac69b6d1b627771d620e4245a090023ae5441d2a3ed516",
+    "tools/looplet_authoring/lib/looplet_authoring.dart": "a6ff13720e66ee1b11321f1921a96b61138e15904f4ec4266614fc7d22c23b1b",
+    "tools/looplet_authoring/lib/src/cli.dart": "9833c985102a307eb00559285451e6dbb7af9240b5dcc8c941268cad5b21735b",
+    "tools/looplet_authoring/lib/src/content_check.dart": "59806ab2f4e17250813420303a1107289a882881ced240c15fe471de9638696c",
+    "tools/looplet_authoring/lib/src/corpus_impact.dart": "9d563be44ddf8f9cf1a652aa0a3b0e4d41e26453a5bc1ec8f2a3b95b58a2d0b3",
+    "tools/looplet_authoring/lib/src/corpus_quality.dart": "249f306c888fe6ea3d3230c0877a606c7770ed53a44a68fe644dd019e6d94dc4",
+    "tools/looplet_authoring/lib/src/daily_dev_fixture.dart": "683cc6a986f026651285c22ffa5493429b4596b837551c1861aca9bc3ee755df",
+    "tools/looplet_authoring/lib/src/daily_generator.dart": "a607d6a27e9622385b7866c5ddc62c843ea71819f0a2a001a949336631923791",
+    "tools/looplet_authoring/lib/src/daily_pool_quality.dart": "b85a61e0388cbee17065fbc95fdf51b5d16a4bbe17456deeb6be66482d0ea2b1",
+    "tools/looplet_authoring/lib/src/daily_quality.dart": "4aaa06147f8baeef26f7641714e5d798b3b8865814217e3261df80b8c9efccc5",
+    "tools/looplet_authoring/lib/src/daily_source.dart": "2d723064c61b82b58b1c8cc028e97abb9e52c2489fdbdf917bd6b8bb1590c0b6",
+    "tools/looplet_authoring/lib/src/dictionary_validator.dart": "607d76fcf259f80127a2f53f34742fa78e47c83c6540f8d31af1e81ed4dc09c9",
+    "tools/looplet_authoring/lib/src/move_shorthand.dart": "b8508c5e3750fca27b78bda71f3140fbba023e193720f4005fc05ad830e97705",
+    "tools/looplet_authoring/lib/src/puzzle_def.dart": "e5dd1307bae58feb1ba8996367744d77636742c248dbd698dee87a27daf25655",
+    "tools/looplet_authoring/lib/src/quality_cli.dart": "f1e42015030de46a87e68e404a223143a6068570f9da4021a6ac9d40e19594ae",
+    "tools/looplet_authoring/lib/src/quality_io.dart": "809ede1649f3ab4baff884acd1465c726c0be83b0fe56446326266920f3e9d48",
+    "tools/looplet_authoring/lib/src/quality_search.dart": "573386d79823970fc14f9e084147ef0e188c57e942de550a51075d42afcab8ed",
+    "tools/looplet_authoring/lib/src/turkish_frequency.dart": "1d57616cc39017abc5889280e0f4144ee0f2834b1aa85ffc86006d4ddfe0ad22",
+    "tools/looplet_authoring/pubspec.lock/": "b4f913656b16b2b1bae75dd92550a5b7c283e0edf0f8a87031447a0f459fca9a",
+    "tools/looplet_authoring/pubspec.yaml/": "90bd75d503fa8ccc0c934da22e6417efcc0cef2758c006c2961dc87eee22fb19"
+  },
+  "inputHash": "9bac86103755ad03bae1947ba93726cf93822dfc684e373ff2e52607d2561712",
+  "analysisInputHash": "1af30ad6626a96c20298249d12c24776a46371498e4c309db98f2cbf1261abe5",
+  "budget": {
+    "seconds": 30,
+    "nodes": 5000000,
+    "depth": 16
+  }
+}

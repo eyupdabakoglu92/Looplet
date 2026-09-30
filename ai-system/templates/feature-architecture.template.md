@@ -86,6 +86,8 @@
 * Client validation:
 * Ownership boundaries:
 
+Authored-content kapsamı varsa `feature-content-quality.template.md` üzerinden amaç, required/advisory ölçütler, preflight/pilot, editoryal review ve bağımsız QA contract'ını burada veya bağlı belgede tanımla. `prompt-content-quality-standard.md` uygulanır; orchestration'a Content Quality Contract/Gate/Evidence alanları yazılır. İçerik kapsamı yoksa bu açıklamayı kaldır.
+
 ---
 
 ## State / Flow Semantics

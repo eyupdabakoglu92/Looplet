@@ -1,6 +1,6 @@
 # LOOPLET — Product PRD
 
-Last Updated: 2026-09-29 (revision PO-REV-2026-09-29-F05-CONTINUE — see Revision Log)
+Last Updated: 2026-09-30 (revision PO-REV-2026-09-30-CONTENT-QUALITY — see Revision Log)
 Status: LIVE (Bootstrap by Product Owner)
 Authoritative Source: `/LOOPLET Product Definition Document` (user-provided) — this PRD is the derived, execution-ready translation.
 
@@ -158,7 +158,7 @@ Beklenen çıktı:
 * Given a proper noun or a profanity-list entry, When validation is requested, Then it returns invalid even if otherwise well-formed.
 * Given `language = en` is active, When validation is requested, Then only the English dictionary is consulted.
 * Given a word shorter than the configured minimum (4 for frozen break), When validation is requested, Then it returns invalid by the length rule.
-* Given the MVP target-word list, When reviewed, Then every entry is a common, manually-approved Turkish word.
+* Given a candidate target-word list, When admitted for production, Then every entry is a common Turkish word with recorded source provenance, passes the written exclusion and automated validation rules, and has a reasoned Content Designer editorial review; QA independently reviews every newly admitted target. Uncertain or excluded entries cannot be admitted.
 
 ### Edge Cases
 
@@ -171,7 +171,7 @@ Beklenen çıktı:
 
 ### Notes
 
-* MVP target-word list and the frozen-break validation list are the same curated dictionary; both manually reviewed.
+* MVP targets are a subset of the same curated dictionary used for frozen-break validation. Both lists are accepted through a written Content Designer rule set and automated checks over every entry. QA independently reviews all new targets and a recorded sample of supporting words stratified by source, frequency and risk; a critical defect expands review to the entire affected group. AI review is labelled as AI review, not human review. Routine corpus approval does not require the user to read the lists. The acceptance evidence is tied to the corpus version and invalidated by relevant changes.
 * Consumers: F02 (frozen break), F06 (solver/content validation). F13 (share) must never call this to render words.
 * Dictionary ships as a versioned asset; never generated at runtime.
 
@@ -711,7 +711,7 @@ Also out of MVP (deferred by the source document):
 
 * **Solver optimality & performance (F06):** the star rating is only fair if the stored optimal is a proven minimum. Locked + multiple frozen tiles expand the state space and the branching (thaw order); proving minimality within an acceptable authoring time budget is a real technical risk. → Owner: Tech Lead.
 * **Difficulty-curve tuning (F05/F06):** 30 handcrafted levels must land the source §20 curve. This is manual, playtest-heavy work and it directly drives the Level 5 Reach and retention KPIs.
-* **Turkish dictionary curation (F01):** excluding proper nouns, profanity, abbreviations, and archaic words is manual review effort; frozen-tile UX quality depends on it.
+* **Turkish dictionary curation (F01):** source quality, written exclusions, automated full-list checks and reasoned editorial review are required; uncertain entries stay quarantined. QA sampling cannot guarantee the absence of every semantic defect. Frozen-tile behavior and stored optima must be revalidated against a changed corpus.
 * **Local-timezone daily reset (F07):** clock manipulation, DST, and travel across midnight create streak-integrity edge cases.
 * **Gesture recognition across devices (F03):** dominant-axis + threshold tuning must be right on a wide device range; a single accidental counted move erodes trust in the core promise ("every move must matter").
 * **Analytics completeness is the validation gate (F12):** if instrumentation is incomplete or inaccurate, the Section 52 expand/iterate decision is compromised. Treated as release-blocking.
@@ -938,6 +938,15 @@ Also out of MVP (deferred by the source document):
 ---
 
 # Revision Log
+
+## PO-REV-2026-09-30-CONTENT-QUALITY
+
+* **Authority:** the user approved the reviewed content-quality proposal in chat ("Bunu Looplet'e uygulayalım"). This implementation records the approved product revision and Tech Lead resync; it does not claim a separate Product Owner or independent QA run.
+* **Changed requirement:** F01 dictionary acceptance uses documented source/exclusion rules, automated checks for every entry, Content Designer review of every target and independent QA review of all new targets plus risk-stratified supporting-word sampling. Critical sample defects expand review; uncertain entries remain excluded. No routine user list review or Daily playtest gate.
+* **Preserved:** genuine/common Turkish, proper-noun/profanity/abbreviation/archaic exclusions, Turkish case semantics, target subset, real-engine playtesting, solver-proven optimum, 60-day content scope and release authorization boundaries.
+* **Affected / resynced:** F01 PRD and architecture acceptance wording; F07 daily-content-spec revision 2 / architecture A6 / orchestration; board and system snapshot. F01's historic code acceptance is retained; the new corpus and its Journey impact are pending F07 work, not newly approved content.
+* **Decision:** F07.TARGET-LIST-APPROVAL resolved for the acceptance **model**, not the actual dictionary or pool. F08.DEPLOY-RESUME remains open and unchanged.
+
 
 ## PO-REV-2026-09-29-F05-CONTINUE
 

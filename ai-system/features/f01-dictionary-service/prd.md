@@ -1,7 +1,7 @@
 # F01 — dictionary-service: PRD
 
 > Status: FEATURE PRODUCT AUTHORITY (derived from `/ai-system/product/product-prd.md` §6.1 F01, §23, §24)
-> Tech Lead greenfield-bootstrap output — submitted for user review.
+> Acceptance policy resynced 2026-09-30 from PO-REV-2026-09-30-CONTENT-QUALITY; historical code acceptance is unchanged. Production corpus delivery and QA remain in F07.
 
 ---
 
@@ -27,7 +27,7 @@
 ## In Scope
 
 * A curated Turkish word-list asset bundled with the package (single reviewed source of truth).
-* A curated **target-word** list (5-letter, common, manually reviewed) — a subset/annotation of the dictionary usable by F06 for Journey/Daily target selection.
+* A curated **target-word** list (5-letter, common, accepted under the documented content-quality policy) — a subset/annotation of the dictionary usable by F06 for Journey/Daily target selection.
 * Turkish-locale case normalization utility (`İ↔i`, `I↔ı`, `Ç Ğ Ö Ş Ü` preserved), used for all lookups.
 * Word validation API: `isValidWord(word, {minLength})` and `isEligibleTarget(word)`, resolved against the active language.
 * Language selection: the service is constructed for / switched to a language key; only that language's list is consulted.
@@ -92,7 +92,7 @@ F01 is Infrastructure; expressed as system requirements.
 ## Success Metrics
 
 * 0 must-accept words rejected and 0 must-reject words accepted across the curated QA word set (package test suite, CI-enforced).
-* 100% of shipped MVP target words pass `isEligibleTarget` and are confirmed manually reviewed.
+* 100% of shipped MVP target words pass `isEligibleTarget`, source/exclusion validation and recorded Content Designer editorial review; QA independently reviews all newly admitted targets. Supporting words receive full automated checks and documented risk-stratified QA sampling, expanded on critical defects.
 * Turkish-locale normalization table tests pass for the full `Ç Ğ İ I Ö Ş Ü` set, including `İ ≠ I`.
 * Frozen-tile validation call latency is negligible in the F02 integration (no measurable frame impact from a post-move row scan).
 * Fail-safe path proven by test: corrupt asset → no crash, all lookups `false`.
@@ -101,7 +101,7 @@ F01 is Infrastructure; expressed as system requirements.
 
 ## Open Questions
 
-* **[Product / Content — Owner: Product Owner]** Source and licensing of the initial curated Turkish word list, and who performs the manual review pass for the target-word subset. F01 code does not block on this if a provisional reviewed list is supplied for development.
+* **[Content — Owner: Content Designer; QA independent]** Source/version/usage conditions and corpus curation evidence remain required in F07. Acceptance follows product revision PO-REV-2026-09-30-CONTENT-QUALITY: no routine user list approval; uncertain entries excluded. A provisional development list is not production approval.
 * **[Product — Owner: Product Owner]** Circumflex vowels (`â î û`): are `"kar"`/`"kâr"` distinct playable words, or is the circumflex normalized away? Affects both normalization and the asset. Default assumption: keep them distinct (normalize circumflex only if the curated list is built without circumflex forms).
 * **[Technical — Decided by Tech Lead in `architecture.md`]** In-memory representation of the word list (plain `Set<String>` of normalized keys vs a compact/packed structure) — decided against a measured footprint target during implementation.
 * **[Technical — Decided by Tech Lead in `architecture.md`]** Asset format (newline-delimited text vs pre-hashed binary vs compressed) — decided during implementation with the footprint/latency ACs as the constraint.

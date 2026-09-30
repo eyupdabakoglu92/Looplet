@@ -441,6 +441,7 @@ profile "Technical Analyst" "technicalanalyst ta analyst" \
 profile "Content Designer" "contentdesigner content" \
   "prompts/content-designer.md" \
   "role-execution-contract.md" \
+  "prompt-content-quality-standard.md" \
   "system-state.md"
 profile "UI Designer" "uidesigner ui designer" \
   "prompts/ui-designer.md" \

@@ -1,0 +1,19 @@
+{
+  "id": "daily-tr-2026-11-11",
+  "puzzleType": "daily",
+  "dailyDate": "2026-11-11",
+  "language": "tr",
+  "grid": [
+    "bakka",
+    "erlin",
+    "bpale",
+    "talmt",
+    "lotoı"
+  ],
+  "target": "balon",
+  "locked": [],
+  "frozen": [
+    "1,4"
+  ],
+  "columns": true
+}

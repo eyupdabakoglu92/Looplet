@@ -33,6 +33,7 @@ Sen aynı zamanda yüksek görsel kaliteye sahip, modern, tutarlı, production-g
 
 Opsiyonel:
 
+* `/ai-system/prompt-content-quality-standard.md` ve feature Content Quality Contract (generator, validator, importer veya authored-content entegrasyonu task'ında zorunlu). Kalıcı araçları depoda geliştir; required kuralın gerçek pozitif/negatif kontrolü, bounded hesap ve girdi/evidence fingerprint'i teslim edilir. İçerik kalitesini yalnız parser/build başarısıyla onaylama.
 * /ai-system/project-authority/platform.md (stack ve tooling belirsizse zorunlu hale gelir)
 * /ai-system/project-authority/design-foundation.md (Visual Scope `none` değilse zorunlu)
 * /ai-system/project-authority/release.md (frontend build output, Docker/container, env config veya deployment davranışını etkiliyorsa zorunlu hale gelir)

@@ -1,0 +1,19 @@
+{
+  "id": "daily-tr-2026-11-10",
+  "puzzleType": "daily",
+  "dailyDate": "2026-11-10",
+  "language": "tr",
+  "grid": [
+    "iraaa",
+    "iaçle",
+    "nsara",
+    "tnamk",
+    "isidç"
+  ],
+  "target": "inanç",
+  "locked": [
+    "2,4"
+  ],
+  "frozen": [],
+  "columns": true
+}

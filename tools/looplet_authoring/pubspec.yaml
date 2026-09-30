@@ -10,6 +10,8 @@ environment:
 
 dependencies:
   args: ^2.5.0
+  crypto: ^3.0.3
+  path: ^1.9.0
   looplet_core:
     path: ../../packages/looplet_core
   looplet_engine:

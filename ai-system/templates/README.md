@@ -34,6 +34,8 @@ Bu klasor:
   * `features/{feature-name}/prd.md` icin baslangic
 * `feature-architecture.template.md`
   * `features/{feature-name}/architecture.md` icin baslangic
+* `feature-content-quality.template.md`
+  * Authored-content kalite contract'ı: required/advisory ölçütler, preflight/pilot, editoryal inceleme ve bağımsız QA; architecture'a bağlıdır
 * `feature-analysis.template.md`
   * `features/{feature-name}/analysis.md` icin baslangic
 * `feature-ui-design.template.md`

@@ -1,0 +1,24 @@
+{
+  "repository": "https://github.com/ahmetaa/zemberek-nlp",
+  "commit": "330be8eeba61e17647cfc7e19206b01174f25b44",
+  "files": [
+    {
+      "path": "morphology/src/main/resources/tr/master-dictionary.dict",
+      "bytes": 368797,
+      "sha256": "c539e12904d1ccac4792073f05deeae2babe692249dc4a359da254f1bd338f6f",
+      "url": "https://raw.githubusercontent.com/ahmetaa/zemberek-nlp/330be8eeba61e17647cfc7e19206b01174f25b44/morphology/src/main/resources/tr/master-dictionary.dict"
+    },
+    {
+      "path": "morphology/src/main/resources/tr/first-10K",
+      "bytes": 88039,
+      "sha256": "0264f2f84424c160cc3e85578092011040038b782c8f6df92d53c1359f32b414",
+      "url": "https://raw.githubusercontent.com/ahmetaa/zemberek-nlp/330be8eeba61e17647cfc7e19206b01174f25b44/morphology/src/main/resources/tr/first-10K"
+    },
+    {
+      "path": "LICENSE",
+      "bytes": 572,
+      "sha256": "c55ac4a942b0e8dc83833680e4afefc5b0ef8a5bc0d17e1addb3c98e235ea07a",
+      "url": "https://raw.githubusercontent.com/ahmetaa/zemberek-nlp/330be8eeba61e17647cfc7e19206b01174f25b44/LICENSE"
+    }
+  ]
+}
