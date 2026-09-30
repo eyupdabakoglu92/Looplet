@@ -40,7 +40,7 @@ features/f07-daily-challenge/orchestration.md
 
 ## Current Phase
 
-F07 — F07-TOOL-DAILY-R1 (tooling rework after the A7 checkpoint). Content Quality Gate Pending; target-list acceptance model resolved, production corpus/pool unapproved. Direction A selected; Visual Quality Gate Ready for Implementation. F08 paused (A21).
+F07 — F07-TOOL-DAILY-R2 (Q3 enforces the revision 3 weekend profile, A8). Quality tools accepted; Content Quality Gate Pending; production corpus/pool unapproved. Direction A selected; Visual Quality Gate Ready for Implementation. F08 paused (A21).
 
 ## Current Role
 
@@ -48,17 +48,15 @@ Frontend/Mobile Developer
 
 ## Current Reason
 
-The user approved the reviewed content-quality proposal. Shared quality standard and structural workflow gates now distinguish technical validity, editorial review and independent QA. F07 daily-content-spec revision 2 resolves construction/thaw/proof/corpus ambiguities; first preflight and a measured pilot, then batch generation.
-
-F07-CONTENT-PREFLIGHT is Done (content-preflight.md). F07-TOOL-DAILY was delivered; at the A7 checkpoint its logic and pack gate reconciled, but the pilot PASS did not reproduce — two Tech Lead re-audits with identical fingerprints FAIL on 2026-11-04 (Q4 UNKNOWN: optimal enumeration 29.7 s against the 30 s budget) — and the o = 6–7 weekend profile is unverified under the node bound. F07-TOOL-DAILY-R1 is Open. Corpus, pilot and replacement pool remain queued; existing pool remains unpublishable. F07-FE is independently queued. No production content or independent QA was approved by this workflow revision.
+The user-approved content-quality revision (A6) requires permanent tools, a curated corpus and a measured pilot before batch content. F07-TOOL-DAILY and its rework R1 are accepted at A8: the Tech Lead re-ran the tests and re-audited the technical pilot twice (loaded / idle) with byte-identical results apart from timings. The Developer measured that the F06 `cNorm` tree exceeds the 5,000,000-node bound at optimum 6, so the weekend profile is now optimum 5 (`daily-content-spec.md` revision 3, a Tech Lead contract decision; o ≥ 6 deferred to DAILY-DEEP-PROFILE). R2 makes Q3 enforce it explicitly. No production content or independent QA is approved.
 
 ## Last Completed Action
 
-F07-TOOL-DAILY checkpoint (A7, 2026-09-30): tests (29 / 96 / 93), analysis, corpus audits and three pack-gate negatives reproduced; pilot re-audit FAIL twice (wall-clock margin); Delivery Review Pending; F07-TOOL-DAILY-R1 opened. Previous: the A6 quality revision and resync.
+F07-TOOL-DAILY-R1 checkpoint (A8, 2026-09-30): solver 40 / 40, authoring 105 / 105, workflow 93 / 93, `content:check` SUCCESS, pilot re-audit PASS twice identical, three pack-gate negatives exit 1; TOOL + R1 accepted; spec revision 3; F07-TOOL-DAILY-R2 Open. Previous: the A7 checkpoint (pilot not reproducible → R1).
 
 ## Next Expected Action
 
-Run Frontend/Mobile Developer on F07-TOOL-DAILY-R1. Then Tech Lead checkpoint → F07-CORPUS → F07-CONTENT-PILOT → Tech Lead pilot acceptance → F07-CONTENT-R1. No routine user quality decision is pending. F07-FE is activated separately by Tech Lead.
+Run Frontend/Mobile Developer on F07-TOOL-DAILY-R2. Its Handoff Plan then activates F07-CORPUS (Run Content Designer) → Tech Lead checkpoint (corpus impact + R2 review) → F07-CONTENT-PILOT → Tech Lead pilot acceptance → F07-CONTENT-R1. No user decision is pending. F07-FE is activated separately by Tech Lead.
 
 ## Portfolio Summary
 
@@ -68,7 +66,7 @@ Run Frontend/Mobile Developer on F07-TOOL-DAILY-R1. Then Tech Lead checkpoint �
 * F05: Done (2026-09-29) — Design Adoption Phase D3 (Home + app shell, `new-surface`, architecture §18) closed: F05-QA-D3 Approved with Notes, 94 / 100, gate Passed (§18.9). The user's N1 decision is live (PO-REV-2026-09-29-F05-CONTINUE). Previously Done 2026-09-27 (F05-QA-STRICT2 Approved with Notes).
 * F04: Done — the panel is now the full-screen result (D2, F03 carrier, closed 2026-09-29; F04 §7 / §8 amended 2026-09-28; ACs unchanged and passed on the result).
 * F08: **Blocked — paused by the user's decision F08.FUNCTION-DEPLOY-GO — C (A21).** **Functional Approved** (R2, A13); PREP accepted with a green CI run #2 (A17); F08-BE8 (Node.js 22) accepted (A18); the rules-only deploy held and cancelled (A20); Release Validation Pending. Resume: F08.DEPLOY-RESUME → F08-DEVOPS → F08-QA-FINAL. Its client contract is frozen for F07. Its `StoreErrorScreen` uses the Foundation (D3).
-* F07: **In Progress — active**, owner Frontend/Mobile Developer. A6 quality revision applied: preflight Done, tool delivered but not accepted (A7), tool rework R1 Open, corpus/pilot/batch queued, Content Quality Gate Pending. F07.TARGET-LIST-APPROVAL RESOLVED for policy; no corpus/pool approval. FE queued; release depends on F08 readiness.
+* F07: **In Progress — active**, owner Frontend/Mobile Developer. A6 quality revision applied: preflight Done, tools + R1 accepted (A8), weekend profile o = 5 (spec revision 3), R2 Open, corpus/pilot/batch queued, Content Quality Gate Pending. F07.TARGET-LIST-APPROVAL RESOLVED for policy; no corpus/pool approval. FE queued; release depends on F08 readiness.
 * F09–F13: Not Started. Pending follow-ons are in workflow-follow-ups.md.
 
 ## Release Decision
@@ -108,7 +106,7 @@ Run Frontend/Mobile Developer on F07-TOOL-DAILY-R1. Then Tech Lead checkpoint �
 
 ## Contract Version
 
-Existing application/API contracts retained. Core content-quality gate schema and F01 corpus acceptance policy updated by the user-approved 2026-09-30 revision; F07 daily-content-spec revision 2 is current.
+Existing application/API contracts retained. Core content-quality gate schema and F01 corpus acceptance policy updated by the user-approved 2026-09-30 revision; F07 daily-content-spec revision 3 is current (A8: weekend optimum 5; otherwise revision 2).
 
 ## Pending Breaking Change
 

@@ -1,7 +1,6 @@
 # F07 — Günlük İçerik Kalite Contract'ı
 
-> Revision: 3 — 2026-09-30, Tech Lead contract kararı (architecture A8): §4 hafta sonu optimum profili 5–7 → 5 (ölçülmüş fizibilite; o ≥ 6 ertelendi, workflow-follow-ups DAILY-DEEP-PROFILE). Diğer bütün kurallar revision 2 ile aynı; revision 2 metni `../../history/f07-daily-challenge-2026-09-29/daily-content-spec-rev2.md`.
-> Revision 2 — 2026-09-30, kullanıcının içerik kalite iyileştirmesi onayı; architecture A6.
+> Revision: 2 — 2026-09-30, kullanıcının içerik kalite iyileştirmesi onayı; architecture A6.
 > Ortak süreç: `../../prompt-content-quality-standard.md`. Ürün: product PRD F01/F06/F07; teknik authority: F02 motoru, F06 solver/export, F07 D2/D9.
 > Bu belge kabul kurallarıdır; araçların yazıldığı veya havuzun geçtiği iddiası değildir. Mevcut 60 günlük havuz reddedilmiş içeriktir, yayına uygun değildir.
 
@@ -57,7 +56,7 @@ Pilot: en az 8 kabul edilebilir örnek; açık, kilitli, buzlu, ikisi birden sı
 
 * 60 gün, geçici 2026-11-01 … 2026-12-30, epoch 2026-11-01; 60 farklı Journey dışı hedef; Journey/smoke/Daily tanım tekrarı yok.
 * Varsayılan ritim: Pzt açık, Sal kilitli, Çar buzlu, Per açık, Cum kilitli, Cmt ikisi, Paz buzlu. Değişiklik gerekçeli Tech Lead contract kararıdır.
-* Kabul profili (revision 3, A8): Pzt–Per optimum 4–5; **Cum–Paz optimum tam 5**; medium/hard, easy/expert yok. Hafta sonu ağırlığı optimumdan değil, mekanikten (Cum kilitli, Cmt ikisi, Paz buzlu), etiketten ve aşağıdaki hard + gerileme ritminden gelir; bu kurallar gevşemez. Gerekçe: F06 `cNorm` tanımı o derinliğindeki bütün durumları sayar, budanamaz; o = 6'da ölçülen dört adayın hepsinde 5 milyon düğüm sınırını aşar (Q4 UNKNOWN), o = 7'de Q6 araması da aşar (`evidence/r1-depth-measurement.json`). o ≥ 6 yalnız ayrı bir contract kararıyla geri gelir (DAILY-DEEP-PROFILE). Uygulanabilirlik pilotta ölçülür; başarısız pilot kendiliğinden daha kolay profile geçmez.
+* İlk kabul profili: Pzt–Per optimum 4–5; Cum–Paz 5–7; medium/hard, easy/expert yok. Uygulanabilirlik pilotta ölçülür; başarısız pilot kendiliğinden daha kolay profile geçmez.
 * Her **tam ISO haftasında** Cum–Paz en az bir hard ve kanıtlı geçici gerileme günü; haftada en az iki kanıtlı gerileme günü. İlk/son kısmi haftada yalnız günlük sınırlar; tek günlük haftaya iki gün şartı konmaz.
 * Gerileme: satırlar arasındaki en yüksek doğru-konum sayısı M(s); her optimal çözümde en az bir adımda M azalır. Optimum o kanıtlandıktan sonra M'yi hiç azaltmayan ≤o kazanma yolu aranır: yol varsa özellik yok; eksiksiz arama sonunda yol yoksa kanıtlı; bütçe/cap biterse UNKNOWN. Bilişsel “aha” için göstergedir, oyuncu zevkinin kanıtı değildir.
 * Aynı ilk hedef harfi/kök, baskın dolgu tekrarı ve benzer çözüm fikri editoryal çeşitlilik incelemesinde raporlanır. Salt seed/hedef değişikliği yeni deneyim sayılmaz.
