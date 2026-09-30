@@ -7,10 +7,13 @@ import 'package:looplet_solver/looplet_solver.dart';
 /// Absence is a statement only about the supplied finite depth, never global
 /// unsolvability. History-dependent requirements are included in node identity.
 final class WitnessSearch {
-  const WitnessSearch(this.status, this.moves, this.nodes);
+  const WitnessSearch(this.status, this.moves, this.nodes, {this.stop});
   final String status; // FOUND, ABSENT_WITHIN_DEPTH, UNKNOWN
   final List<Move> moves;
   final int nodes;
+
+  /// Why an UNKNOWN search stopped (cause, nodes, elapsed); null otherwise.
+  final SearchLimitExceeded? stop;
 }
 
 int maxCorrect(EngineConfig config, GridState state) {
@@ -50,6 +53,14 @@ List<GridState>? replay(
 
 /// Finds a shortest bounded witness. The optional second engine must accept
 /// exactly the same sequence and win on its last move (Q5 common optimum).
+///
+/// A child is kept only if `depth + lowerBound(child) <= maxDepth` (for the
+/// common search, the larger bound of the two engines). The bound is
+/// admissible, so a cut child cannot win within [maxDepth] and absence stays
+/// exhaustive; it is consistent, so the first discoverer of every kept state is
+/// kept and the returned witness equals the unpruned breadth-first one (F07
+/// A7). Move filters and history flags only restrict paths, which keeps both
+/// properties. [lowerBound] exists for the pruned-vs-exhaustive tests.
 WitnessSearch searchWitness(
   EngineConfig config,
   WordValidator words, {
@@ -59,8 +70,15 @@ WitnessSearch searchWitness(
   int? thawRowBeforeWin,
   bool requireUsefulThaw = false,
   EngineConfig? commonWith,
+  SearchStats? stats,
+  MoveLowerBound Function(EngineConfig)? lowerBound,
+  String phase = 'quality witness',
 }) {
-  final guard = SearchGuard(budget, 'quality witness');
+  final guard = SearchGuard(budget, phase, stats: stats);
+  final bound = (lowerBound ?? (c) => WinLowerBound(c).call)(config);
+  final otherBound = commonWith == null
+      ? null
+      : (lowerBound ?? (c) => WinLowerBound(c).call)(commonWith);
   final start = GridState.initial(config, words);
   final other =
       commonWith == null ? null : GridState.initial(commonWith, words);
@@ -91,7 +109,7 @@ WitnessSearch searchWitness(
       }
       if (node.depth >= maxDepth) continue;
       if (node.depth >= budget.maxDepth) {
-        throw SearchLimitExceeded('quality depth', budget);
+        throw guard.exceeded(SearchStopCause.depth);
       }
       for (final move in config.legalMoves(node.state)) {
         guard.check(nodes.length);
@@ -109,6 +127,12 @@ WitnessSearch searchWitness(
           // Neither terminal engine permits a later continuation.
           if (step.state.isSolved != nextOther.isSolved) continue;
         }
+        var remaining = bound(step.state);
+        if (otherBound != null) {
+          final second = otherBound(nextOther!);
+          if (second > remaining) remaining = second;
+        }
+        if (node.depth + 1 + remaining > maxDepth) continue;
         final thawed = node.thawed ||
             (thawRowBeforeWin != null &&
                 !step.state.isSolved &&
@@ -126,8 +150,8 @@ WitnessSearch searchWitness(
       }
     }
     return WitnessSearch('ABSENT_WITHIN_DEPTH', const [], nodes.length);
-  } on SearchLimitExceeded {
-    return WitnessSearch('UNKNOWN', const [], nodes.length);
+  } on SearchLimitExceeded catch (stop) {
+    return WitnessSearch('UNKNOWN', const [], nodes.length, stop: stop);
   }
 }
 

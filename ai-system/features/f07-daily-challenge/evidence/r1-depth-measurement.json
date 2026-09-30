@@ -1,0 +1,494 @@
+{
+  "schemaVersion": 1,
+  "scope": "R1 feasibility measurement; not content, not acceptance",
+  "budget": {
+    "seconds": 300,
+    "nodes": 5000000,
+    "depth": 16
+  },
+  "seed": 20260930,
+  "attempts": 796,
+  "optimaSeen": {
+    "4": 119,
+    "3": 133,
+    "6": 15,
+    "5": 60,
+    "2": 99,
+    "1": 38,
+    "7": 2
+  },
+  "elapsedMs": 1616392,
+  "candidates": {
+    "6": [
+      {
+        "date": "2026-11-07",
+        "mechanic": "both",
+        "target": "koyun",
+        "candidateSeed": 174471768,
+        "extraRawMoves": 6,
+        "grid": [
+          "öyovn",
+          "öaeük",
+          "atkkk",
+          "rukım",
+          "dyoko"
+        ],
+        "optimalMoves": 6,
+        "solveMs": 1800,
+        "solvePeakNodes": 9003,
+        "auditMs": 521058,
+        "rules": {
+          "Q1": {
+            "status": "PASS"
+          },
+          "Q8": {
+            "status": "PASS"
+          },
+          "Q11": {
+            "status": "PASS"
+          },
+          "Q2": {
+            "status": "PASS"
+          },
+          "Q3": {
+            "status": "PASS"
+          },
+          "Q10": {
+            "status": "FAIL"
+          },
+          "Q4": {
+            "status": "UNKNOWN",
+            "stop": {
+              "phase": "difficulty state tree",
+              "cause": "nodes",
+              "nodes": 5000001,
+              "elapsedMs": 60964
+            }
+          },
+          "Q9": {
+            "status": "UNKNOWN",
+            "stop": {
+              "phase": "difficulty state tree",
+              "cause": "nodes",
+              "nodes": 5000001,
+              "elapsedMs": 60964
+            }
+          },
+          "Q5": {
+            "status": "FAIL"
+          },
+          "Q6": {
+            "status": "PASS"
+          },
+          "Q7": {
+            "status": "FAIL"
+          }
+        },
+        "regression": "FAIL",
+        "phases": [
+          {
+            "phase": "solve",
+            "peakNodes": 9003,
+            "elapsedMs": 1895
+          },
+          {
+            "phase": "solve",
+            "peakNodes": 9003,
+            "elapsedMs": 1828
+          },
+          {
+            "phase": "optimal enumeration",
+            "peakNodes": 9108,
+            "elapsedMs": 3354
+          },
+          {
+            "phase": "solve",
+            "peakNodes": 9003,
+            "elapsedMs": 1819
+          },
+          {
+            "phase": "difficulty state tree",
+            "peakNodes": 5000001,
+            "elapsedMs": 60964
+          },
+          {
+            "phase": "Q5 locked ablated",
+            "peakNodes": 11962,
+            "elapsedMs": 2334
+          },
+          {
+            "phase": "Q5 frozen ablated",
+            "peakNodes": 16047,
+            "elapsedMs": 2083
+          },
+          {
+            "phase": "Q6 row 0",
+            "peakNodes": 1441550,
+            "elapsedMs": 219676
+          },
+          {
+            "phase": "Q6 row 1",
+            "peakNodes": 1442342,
+            "elapsedMs": 227379
+          },
+          {
+            "phase": "Q7 useful thaw",
+            "peakNodes": 9004,
+            "elapsedMs": 1519
+          }
+        ]
+      },
+      {
+        "date": "2026-11-07",
+        "mechanic": "both",
+        "target": "yunus",
+        "candidateSeed": 298530895,
+        "extraRawMoves": 2,
+        "grid": [
+          "öarfu",
+          "oyuht",
+          "nunbu",
+          "eyüny",
+          "lgzes"
+        ],
+        "optimalMoves": 6,
+        "solveMs": 1587,
+        "solvePeakNodes": 8063,
+        "auditMs": 75987,
+        "rules": {
+          "Q1": {
+            "status": "PASS"
+          },
+          "Q8": {
+            "status": "PASS"
+          },
+          "Q11": {
+            "status": "PASS"
+          },
+          "Q2": {
+            "status": "PASS"
+          },
+          "Q3": {
+            "status": "PASS"
+          },
+          "Q10": {
+            "status": "FAIL"
+          },
+          "Q4": {
+            "status": "UNKNOWN",
+            "stop": {
+              "phase": "difficulty state tree",
+              "cause": "nodes",
+              "nodes": 5000001,
+              "elapsedMs": 62443
+            }
+          },
+          "Q9": {
+            "status": "UNKNOWN",
+            "stop": {
+              "phase": "difficulty state tree",
+              "cause": "nodes",
+              "nodes": 5000001,
+              "elapsedMs": 62443
+            }
+          },
+          "Q5": {
+            "status": "FAIL"
+          },
+          "Q6": {
+            "status": "PASS"
+          },
+          "Q7": {
+            "status": "PASS"
+          }
+        },
+        "regression": "FAIL",
+        "phases": [
+          {
+            "phase": "solve",
+            "peakNodes": 8063,
+            "elapsedMs": 1587
+          },
+          {
+            "phase": "solve",
+            "peakNodes": 8063,
+            "elapsedMs": 1596
+          },
+          {
+            "phase": "optimal enumeration",
+            "peakNodes": 8257,
+            "elapsedMs": 2952
+          },
+          {
+            "phase": "solve",
+            "peakNodes": 8063,
+            "elapsedMs": 1592
+          },
+          {
+            "phase": "difficulty state tree",
+            "peakNodes": 5000001,
+            "elapsedMs": 62443
+          },
+          {
+            "phase": "Q5 locked ablated",
+            "peakNodes": 15266,
+            "elapsedMs": 2850
+          },
+          {
+            "phase": "Q5 locked common",
+            "peakNodes": 8107,
+            "elapsedMs": 2703
+          },
+          {
+            "phase": "Q5 frozen ablated",
+            "peakNodes": 16409,
+            "elapsedMs": 1851
+          }
+        ]
+      }
+    ],
+    "7": [
+      {
+        "date": "2026-11-07",
+        "mechanic": "both",
+        "target": "mizah",
+        "candidateSeed": 980523488,
+        "extraRawMoves": 5,
+        "grid": [
+          "rltüh",
+          "zaömi",
+          "mgemi",
+          "iamia",
+          "larom"
+        ],
+        "optimalMoves": 7,
+        "solveMs": 27414,
+        "solvePeakNodes": 129676,
+        "auditMs": 400578,
+        "rules": {
+          "Q1": {
+            "status": "PASS"
+          },
+          "Q8": {
+            "status": "PASS"
+          },
+          "Q11": {
+            "status": "FAIL"
+          },
+          "Q2": {
+            "status": "PASS"
+          },
+          "Q3": {
+            "status": "PASS"
+          },
+          "Q10": {
+            "status": "FAIL"
+          },
+          "Q4": {
+            "status": "UNKNOWN",
+            "stop": {
+              "phase": "difficulty state tree",
+              "cause": "nodes",
+              "nodes": 5000001,
+              "elapsedMs": 64440
+            }
+          },
+          "Q9": {
+            "status": "UNKNOWN",
+            "stop": {
+              "phase": "difficulty state tree",
+              "cause": "nodes",
+              "nodes": 5000001,
+              "elapsedMs": 64440
+            }
+          },
+          "Q5": {
+            "status": "FAIL"
+          },
+          "Q6": {
+            "status": "UNKNOWN"
+          },
+          "Q7": {
+            "status": "FAIL"
+          }
+        },
+        "regression": "FAIL",
+        "phases": [
+          {
+            "phase": "solve",
+            "peakNodes": 129676,
+            "elapsedMs": 26997
+          },
+          {
+            "phase": "solve",
+            "peakNodes": 129676,
+            "elapsedMs": 25970
+          },
+          {
+            "phase": "optimal enumeration",
+            "peakNodes": 133556,
+            "elapsedMs": 45915
+          },
+          {
+            "phase": "solve",
+            "peakNodes": 129676,
+            "elapsedMs": 25463
+          },
+          {
+            "phase": "difficulty state tree",
+            "peakNodes": 5000001,
+            "elapsedMs": 64440
+          },
+          {
+            "phase": "Q5 locked ablated",
+            "peakNodes": 235710,
+            "elapsedMs": 41074
+          },
+          {
+            "phase": "Q5 frozen ablated",
+            "peakNodes": 21731,
+            "elapsedMs": 272
+          },
+          {
+            "phase": "Q6 row 0",
+            "peakNodes": 5000001,
+            "elapsedMs": 88476
+          },
+          {
+            "phase": "Q6 row 1",
+            "peakNodes": 5000001,
+            "elapsedMs": 86657
+          },
+          {
+            "phase": "Q7 useful thaw",
+            "peakNodes": 129698,
+            "elapsedMs": 20756
+          }
+        ]
+      },
+      {
+        "date": "2026-11-07",
+        "mechanic": "both",
+        "target": "işlem",
+        "candidateSeed": 979132777,
+        "extraRawMoves": 4,
+        "grid": [
+          "rsiyr",
+          "eknal",
+          "etlnm",
+          "büeüş",
+          "ilşii"
+        ],
+        "optimalMoves": 7,
+        "solveMs": 24350,
+        "solvePeakNodes": 119491,
+        "auditMs": 506100,
+        "rules": {
+          "Q1": {
+            "status": "PASS"
+          },
+          "Q8": {
+            "status": "PASS"
+          },
+          "Q11": {
+            "status": "PASS"
+          },
+          "Q2": {
+            "status": "PASS"
+          },
+          "Q3": {
+            "status": "PASS"
+          },
+          "Q10": {
+            "status": "FAIL"
+          },
+          "Q4": {
+            "status": "UNKNOWN",
+            "stop": {
+              "phase": "difficulty state tree",
+              "cause": "nodes",
+              "nodes": 5000001,
+              "elapsedMs": 76599
+            }
+          },
+          "Q9": {
+            "status": "UNKNOWN",
+            "stop": {
+              "phase": "difficulty state tree",
+              "cause": "nodes",
+              "nodes": 5000001,
+              "elapsedMs": 76599
+            }
+          },
+          "Q5": {
+            "status": "FAIL"
+          },
+          "Q6": {
+            "status": "UNKNOWN"
+          },
+          "Q7": {
+            "status": "PASS"
+          }
+        },
+        "regression": "FAIL",
+        "phases": [
+          {
+            "phase": "solve",
+            "peakNodes": 119491,
+            "elapsedMs": 24519
+          },
+          {
+            "phase": "solve",
+            "peakNodes": 119491,
+            "elapsedMs": 25915
+          },
+          {
+            "phase": "optimal enumeration",
+            "peakNodes": 122425,
+            "elapsedMs": 47949
+          },
+          {
+            "phase": "solve",
+            "peakNodes": 119491,
+            "elapsedMs": 26285
+          },
+          {
+            "phase": "difficulty state tree",
+            "peakNodes": 5000001,
+            "elapsedMs": 76599
+          },
+          {
+            "phase": "Q5 locked ablated",
+            "peakNodes": 165995,
+            "elapsedMs": 33370
+          },
+          {
+            "phase": "Q5 locked common",
+            "peakNodes": 115777,
+            "elapsedMs": 40930
+          },
+          {
+            "phase": "Q5 frozen ablated",
+            "peakNodes": 250005,
+            "elapsedMs": 22334
+          },
+          {
+            "phase": "Q6 row 2",
+            "peakNodes": 5000001,
+            "elapsedMs": 106217
+          },
+          {
+            "phase": "Q6 row 3",
+            "peakNodes": 5000001,
+            "elapsedMs": 103968
+          },
+          {
+            "phase": "Q7 useful thaw",
+            "peakNodes": 119561,
+            "elapsedMs": 24282
+          }
+        ]
+      }
+    ]
+  }
+}

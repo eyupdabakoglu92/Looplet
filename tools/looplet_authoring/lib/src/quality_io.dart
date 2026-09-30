@@ -111,6 +111,24 @@ Map<String, String> qualityFingerprint(String repoRoot, String? sourceDir) {
   return {for (final key in keys) key: result[key]!};
 }
 
+/// Portable report path: relative to the repository root, `/`-separated.
+String repoRelative(String repoRoot, String path) =>
+    p.posix.joinAll(p.split(p.relative(p.normalize(p.absolute(path)),
+        from: p.normalize(p.absolute(repoRoot)))));
+
+/// Resolves a report's repo-relative source path; absolute or missing paths
+/// fail closed (a report from another host must not point outside the repo).
+String resolveReportSource(String repoRoot, Object? recorded) {
+  if (recorded is! String || recorded.isEmpty || p.isAbsolute(recorded)) {
+    throw StateError('report sourceDir must be repo-relative: $recorded');
+  }
+  final resolved = p.normalize(p.join(repoRoot, recorded));
+  if (!Directory(resolved).existsSync()) {
+    throw StateError('report sourceDir does not resolve: $recorded');
+  }
+  return resolved;
+}
+
 String fingerprintHash(Map<String, String> files) =>
     sha256.convert(utf8.encode(jsonEncode(files))).toString();
 

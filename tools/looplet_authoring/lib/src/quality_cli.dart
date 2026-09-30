@@ -13,6 +13,19 @@ import 'daily_pool_quality.dart';
 import 'daily_quality.dart';
 import 'quality_io.dart';
 
+/// Outer time ceiling per bounded analysis. The node and depth bounds decide
+/// an accepted verdict; the ceiling only stops a runaway on a slow host.
+const maxAnalysisSeconds = 300;
+
+int analysisSeconds(String raw) {
+  final seconds = int.parse(raw);
+  if (seconds < 1 || seconds > maxAnalysisSeconds) {
+    throw ArgumentError(
+        'seconds must be 1..$maxAnalysisSeconds (F07 A7 ruling 1)');
+  }
+  return seconds;
+}
+
 Set<String> plannedRegressionDates(List<DateTime> dates,
     {required bool pilot, bool forceAll = false}) {
   String stamp(DateTime date) => date.toIso8601String().substring(0, 10);
@@ -96,7 +109,10 @@ class CorpusImpactCommand extends Command<int> {
       ..addOption('baseline')
       ..addOption('candidate', mandatory: true)
       ..addOption('out', mandatory: true)
-      ..addOption('seconds', defaultsTo: '30')
+      ..addOption('seconds',
+          defaultsTo: '$maxAnalysisSeconds',
+          help:
+              'Per-analysis time safety ceiling (1..$maxAnalysisSeconds); nodes/depth decide (F07 A7)')
       ..addOption('nodes', defaultsTo: '5000000')
       ..addOption('depth', defaultsTo: '16');
   }
@@ -115,8 +131,8 @@ class CorpusImpactCommand extends Command<int> {
       final candidate = argResults!['candidate'] as String;
       final output = argResults!['out'] as String;
       final budget = SearchBudget(
-          timeBudget:
-              Duration(seconds: int.parse(argResults!['seconds'] as String)),
+          timeBudget: Duration(
+              seconds: analysisSeconds(argResults!['seconds'] as String)),
           maxNodes: int.parse(argResults!['nodes'] as String),
           maxDepth: int.parse(argResults!['depth'] as String));
       SearchGuard(budget, 'arguments');
@@ -143,7 +159,10 @@ class DailyQualityCommand extends Command<int> {
       ..addOption('repo-root', defaultsTo: '.')
       ..addOption('corpus')
       ..addOption('out', mandatory: true)
-      ..addOption('seconds', defaultsTo: '30')
+      ..addOption('seconds',
+          defaultsTo: '$maxAnalysisSeconds',
+          help:
+              'Per-analysis time safety ceiling (1..$maxAnalysisSeconds); nodes/depth decide (F07 A7)')
       ..addOption('nodes', defaultsTo: '5000000')
       ..addOption('depth', defaultsTo: '16')
       ..addFlag('pilot', defaultsTo: true)
@@ -173,8 +192,8 @@ class DailyQualityCommand extends Command<int> {
       final output = argResults!['out'] as String;
       final pilot = argResults!['pilot'] as bool;
       final budget = SearchBudget(
-          timeBudget:
-              Duration(seconds: int.parse(argResults!['seconds'] as String)),
+          timeBudget: Duration(
+              seconds: analysisSeconds(argResults!['seconds'] as String)),
           maxNodes: int.parse(argResults!['nodes'] as String),
           maxDepth: int.parse(argResults!['depth'] as String));
       SearchGuard(budget, 'arguments'); // validates even an empty pool
@@ -245,10 +264,9 @@ class DailyQualityCommand extends Command<int> {
         }
         final passed = readObject(pilotPath);
         final checkpoint = readObject(acceptancePath);
-        final pilotSource = passed['sourceDir'] as String?;
-        if (pilotSource == null ||
-            passed['inputHash'] !=
-                fingerprintHash(qualityFingerprint(root, pilotSource))) {
+        final pilotSource = resolveReportSource(root, passed['sourceDir']);
+        if (passed['inputHash'] !=
+            fingerprintHash(qualityFingerprint(root, pilotSource))) {
           throw StateError('pilot source changed or fingerprint missing');
         }
 

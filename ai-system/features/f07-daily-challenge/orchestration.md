@@ -10,11 +10,11 @@ In Progress
 
 ## Current Owner
 
-Frontend/Mobile Developer
+Tech Lead
 
 ## Next Role
 
-Frontend/Mobile Developer
+Tech Lead
 
 ## Active Task Ledger
 
@@ -24,7 +24,7 @@ Frontend/Mobile Developer
 - [x] Task ID: F07-CONTENT-PREFLIGHT | Assigned Role: Content Designer | Status: Done | Summary: Source/usage and corpus feasibility, candidate counts, exclusion/editorial rubric, representative pilot plan and permanent-tool gaps under daily-content-spec revision 2. Do not expand runtime corpus or batch-author before tool readiness. | Depends On: -
 - [ ] Task ID: F07-CORPUS | Assigned Role: Content Designer | Status: Queued | Summary: Curate the sourced Turkish corpus under daily-content-spec §2: ≥120 targets, keep Journey targets and legitimate existing words, full-list checks via committed tools, editorial target review, Journey/Daily impact and bundle parity. 2,000 usable words is a research target, not permission to pad quality. Brief additions from A7 ruling 5: per-word rationales (not category templates), a sourced and versioned exclusion list with its over-match recorded, measured filler/thaw yield. | Depends On: F07-TOOL-DAILY-R1
 - [x] Task ID: F07-TOOL-DAILY | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: Delivered permanent sourced corpus import/audit, bounded generate-daily and audit-daily Q1–Q12, solver/scorer/counterfactual limits, fingerprinted technical-pilot evidence, and production pack rejection for missing/stale quality evidence. Developer verification and limitations are recorded in quality-tooling-delivery.md; Tech Lead checkpoint A7: logic reconciled, pilot PASS not reproducible (2026-11-04 Q4 UNKNOWN, enumeration 29.7 s vs 30 s) — review Pending, rework F07-TOOL-DAILY-R1. | Depends On: F07-CONTENT-PREFLIGHT
-- [ ] Task ID: F07-TOOL-DAILY-R1 | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: Tooling rework from A7 rulings 1–3: verdicts not decided by the wall clock (node/depth decide; time is an outer ceiling ≤300 s; stop cause and margin reported); measured o = 6 and o = 7 feasibility with sound pruning and a named pruned-vs-exhaustive test, or measurements returned for a Tech Lead profile decision; repo-relative `sourceDir` with a negative test; regenerated technical pilot re-audited twice identically (once under load). Brief: Current Brief | Depends On: F07-TOOL-DAILY
+- [x] Task ID: F07-TOOL-DAILY-R1 | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: Tooling rework from A7 rulings 1–3: verdicts not decided by the wall clock (node/depth decide; time is an outer ceiling ≤300 s; stop cause and margin reported); measured o = 6 and o = 7 feasibility with sound pruning and a named pruned-vs-exhaustive test, or measurements returned for a Tech Lead profile decision; repo-relative `sourceDir` with a negative test; regenerated technical pilot re-audited twice identically (once under load). Brief: Current Brief | Depends On: F07-TOOL-DAILY
 - [ ] Task ID: F07-CONTENT-PILOT | Assigned Role: Content Designer | Status: Queued | Summary: At least 8 accepted representative examples (2 per mechanic class), real forward proofs, negative fixtures, editorial review, yield/time and fingerprints; hand off to Tech Lead for pilot acceptance before batch generation. | Depends On: F07-CORPUS, F07-TOOL-DAILY-R1
 - [ ] Task ID: F07-CONTENT-R1 | Assigned Role: Content Designer | Status: Queued | Summary: Re-author 60 days with 60 distinct non-Journey targets under daily-content-spec revision 2; full audit, content:check, pack-daily, editorial review and current evidence. Activate only after Tech Lead accepts the pilot. | Depends On: F07-CONTENT-PILOT
 - [ ] Task ID: F07-FE | Assigned Role: Frontend/Mobile Developer | Status: Queued | Summary: The app (architecture D3–D8): `DailyContentSource` + the debug pack override + the debug today override (A4 ruling 6); cache population / prefetch / eviction; the D3 states; D4 dates and rollover; D5 transactional completion (entry + streak + enqueue); D6 streak; D7 Remote Config + kill-switch (`firebase_remote_config`, `http`); `/daily`, the Home entry, the daily Play header and result per `ui-design.md`; tests + named negatives; Visual Parity Evidence against the selected Direction A (`F07-A-*`); emulator sync evidence; architecture A1 rulings; a debug recipe to run any pool day (for QA; A5). Brief: the archived F07-FE brief ([orchestration at the incident](../../history/f07-daily-challenge-2026-09-29/orchestration-at-content-incident.md)), re-issued at activation | Depends On: F07-UI, F07-TOOL
@@ -36,7 +36,7 @@ Frontend/Mobile Developer
 
 * F07-CONTENT-PREFLIGHT — Done; source/design checkpoint in content-preflight.md.
 * F07-TOOL-DAILY — Done as a delivery; Tech Lead checkpoint A7: Delivery Review Pending (pilot PASS not reproducible; weekend profile unverified).
-* **F07-TOOL-DAILY-R1 — Open (Frontend/Mobile Developer).** A7 rulings 1–3; exit criteria in the Current Brief.
+* F07-TOOL-DAILY-R1 — Done (Frontend/Mobile Developer, 2026-09-30); at the mandatory Tech Lead checkpoint. Pilot re-audit PASS twice with identical verdicts; o = 6 / 7 measured infeasible under the node bound (cNorm) — Needs Tech Lead Clarification in `quality-tooling-delivery.md`.
 * Queued: Tech Lead checkpoint → F07-CORPUS → F07-CONTENT-PILOT → Tech Lead pilot checkpoint → F07-CONTENT-R1; F07-FE remains independently queued.
 * F07-QA-FUNCTIONAL / F07-QA-FINAL queued. F07-DEVOPS blocked by F08 deploy readiness; content quality remains a required acceptance dependency.
 * Historical F07-CONTENT is superseded; no production corpus/pilot/pool is approved by A6.
@@ -59,7 +59,7 @@ Pending
 
 ## Content Quality Evidence
 
-Developer technical evidence: `quality-tooling-delivery.md`; `evidence/technical-pilot-v1-audit.json` (delivered PASS, `independentQa: false` — **not reproduced**: two Tech Lead re-audits with identical fingerprints FAIL on 2026-11-04 Q4 UNKNOWN, A7); `evidence/technical-pilot-v1-provenance.json`. Production corpus, Content Designer pilot, 60-day pool and independent QA remain pending.
+Developer technical evidence: `quality-tooling-delivery.md` (R1 section); `evidence/technical-pilot-v1-audit.json` — regenerated by F07-TOOL-DAILY-R1 with the changed tools (same source bytes): PASS, `independentQa: false`, reproduced twice with identical verdicts and peak nodes, once under load (the A7 non-reproduction is superseded pending Tech Lead review); `evidence/technical-pilot-v1-provenance.json` (`reaudits`); `evidence/r1-depth-measurement.json` (o = 6 / 7 feasibility). Production corpus, Content Designer pilot, 60-day pool and independent QA remain pending.
 
 ## QA Scope
 
@@ -124,6 +124,7 @@ Verified at A1 (renders counted, fit table read with its negative case). **Selec
   * Re-evaluation Trigger: Any change to the quality contract, solver, engine, corpus importer, generator, auditor, pack gate or technical-pilot bytes
   * Blocks: F07-CORPUS activation
   * Delivery Evidence: Developer, 2026-09-30 — 29 solver tests, 96 authoring tests, 93 workflow tests, clean static analysis; durable pilot PASS with `independentQa: false`; old runtime corpus and old Daily pool rejected by the new gates.
+  * Delivery Evidence (R1): Frontend/Mobile Developer, 2026-09-30 — solver 40 / 40 (new pruning-soundness tests), authoring 105 / 105 (new search-determinism tests), analyze clean, `content:check` SUCCESS; pilot re-audit PASS twice (idle and under `dart test` load), identical verdicts / proofs / difficulty / peak nodes; o = 6 / 7: Q4 UNKNOWN (nodes) on all four measured candidates (cNorm), Q6 UNKNOWN (nodes) at o = 7. `quality-tooling-delivery.md` R1.
   * Tech Lead re-run (A7, on 1032f8a): test counts, analysis, corpus audits and three pack-gate negatives reproduced. Pilot re-audit twice (loaded and idle host), same `inputHash` / `analysisInputHash`: **FAIL**, 2026-11-04 Q4/Q9 UNKNOWN — optimal enumeration 29.7 s against the 30 s budget. Re-evaluated after F07-TOOL-DAILY-R1.
   * Result: PENDING
 
@@ -257,7 +258,7 @@ None
 
 ## Next Action
 
-Run Frontend/Mobile Developer — F07-TOOL-DAILY-R1 (Current Brief). Then Tech Lead checkpoint; if accepted, F07-CORPUS. The provisional corpus and the Developer pilot are not content/QA acceptance.
+Run Tech Lead. Reconcile F07-TOOL-DAILY-R1 (`quality-tooling-delivery.md` R1) and decide the heavy-day profile against the cNorm measurement; if accepted, activate F07-CORPUS. The provisional corpus and the Developer pilot are not content/QA acceptance.
 
 ## Last Decision
 
@@ -272,9 +273,9 @@ Previous: 2026-09-30 — user-approved content quality revision, architecture A6
 
 ## Last Update
 
-* Updated By: Tech Lead
+* Updated By: Frontend/Mobile Developer
 * Timestamp: 2026-09-30
-* Summary: F07-TOOL-DAILY checkpoint (A7). Independent re-run: tests and pack negatives reproduce; pilot re-audit FAILs twice on 2026-11-04 (Q4 UNKNOWN, time budget). Review Pending; F07-TOOL-DAILY-R1 Open for Frontend/Mobile Developer; corpus/pool unapproved.
+* Summary: F07-TOOL-DAILY-R1 Done — nodes-before-clock guard with stop causes, 300 s ceiling, admissible/consistent pruning (results equal to exhaustive search), repo-relative report source, regenerated pilot PASS twice identically; o = 6 / 7 infeasible under the node bound (cNorm). Delivery Review Pending; owner → Tech Lead.
 
 ## Context & Follow-ups
 
@@ -304,6 +305,7 @@ Previous: 2026-09-30 — user-approved content quality revision, architecture A6
 * 2026-09-30 — User-approved content quality revision (A6): shared standard/gates, F01 product-policy revision, corrected daily contract, preflight/tool/corpus/pilot/batch dependencies; target-list decision resolved. [Prior state](../../history/f07-daily-challenge-2026-09-29/orchestration-before-quality-revision.md).
 * 2026-09-30 — Frontend/Mobile Developer: F07-TOOL-DAILY Done — permanent sourced corpus import/audit, bounded generation and Q1–Q12 audit, bounded solver/scorer/counterfactuals, stale-proof production pack rejection, named negative tests and a fingerprinted 8-example technical pilot; Delivery Review Pending; owner → Tech Lead. [quality-tooling-delivery.md](quality-tooling-delivery.md).
 * 2026-09-30 — Tech Lead: F07-TOOL-DAILY checkpoint (architecture A7) — not accepted: the pilot re-audit FAILs twice with identical fingerprints (2026-11-04 Q4 UNKNOWN, enumeration 29.7 s vs 30 s); o = 6–7 profile unverified; `sourceDir` absolute. F07-TOOL-DAILY-R1 Open; F07-CORPUS → depends on R1; owner → Frontend/Mobile Developer.
+* 2026-09-30 — Frontend/Mobile Developer: F07-TOOL-DAILY-R1 Done — deterministic stop causes, pruned solve/enumeration/witness searches proven equal to exhaustive, portable reports, pilot re-audit PASS twice identically; o = 6 / 7 measured (cNorm exceeds the node bound → Q4 UNKNOWN); Delivery Review Pending; owner → Tech Lead. [quality-tooling-delivery.md](quality-tooling-delivery.md) (R1).
 
 ## Current Brief
 

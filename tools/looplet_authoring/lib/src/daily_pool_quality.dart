@@ -151,7 +151,7 @@ Map<String, dynamic> auditDailyPool(
     'scope': pilot ? 'pilot' : 'full',
     'result': 'FAIL',
     'independentQa': false,
-    'sourceDir': p.normalize(p.absolute(sourceDir)),
+    'sourceDir': repoRelative(repoRoot, sourceDir),
     'days': <dynamic>[],
     'errors': <String>[]
   };
@@ -194,7 +194,9 @@ Map<String, dynamic> auditDailyPool(
       final definitionJson = readObject('$sourceDir/defs/$id.json');
       final def = PuzzleDef.fromJson(definitionJson);
       final proof = readObject('$sourceDir/proofs/$id.json');
+      final stats = SearchStats();
       final day = auditDay(def, words,
+          stats: stats,
           banned: banned,
           journeyTargets: journeyTargets,
           proof: proof,
@@ -202,6 +204,8 @@ Map<String, dynamic> auditDailyPool(
           definitionJson: definitionJson,
           exportJson: exportJson,
           budget: budget);
+      // Host-dependent diagnostics (elapsed); never part of a verdict.
+      day['search'] = stats.toJson();
       definitions.add(def);
       days.add(day);
       progress?.call(

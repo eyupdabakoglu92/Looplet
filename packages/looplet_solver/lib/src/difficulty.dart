@@ -63,10 +63,14 @@ abstract final class DifficultyScorer {
     DifficultyThresholds thresholds = const DifficultyThresholds(),
     int optimalSolutionCap = 1000,
     SearchBudget budget = const SearchBudget(),
+    SearchStats? stats,
   }) {
-    final result = Solver.solve(config, validator, budget: budget);
-    if (result is BudgetExceeded)
-      throw SearchLimitExceeded('difficulty solve', budget);
+    final result =
+        Solver.solve(config, validator, budget: budget, stats: stats);
+    if (result is BudgetExceeded) {
+      throw SearchLimitExceeded('difficulty solve', budget,
+          cause: result.cause, nodes: result.nodes, elapsed: result.elapsed);
+    }
     if (result is! Optimal) {
       throw ArgumentError(
         'DifficultyScorer needs a solvable puzzle; solve() returned $result',
@@ -81,10 +85,11 @@ abstract final class DifficultyScorer {
       validator,
       cap: optimalSolutionCap,
       budget: budget,
+      stats: stats,
     );
 
     final solutions = coverage.sequences;
-    final cNorm = _correctLookingNorm(config, validator, o, budget);
+    final cNorm = _correctLookingNorm(config, validator, o, budget, stats);
     final tdDegree = _tempDisplacementDegree(config, validator, solutions);
     final firstMoves =
         solutions.where((s) => s.isNotEmpty).map((s) => s.first).toSet().length;
@@ -129,8 +134,11 @@ abstract final class DifficultyScorer {
     WordValidator validator,
     int optimal,
     SearchBudget budget,
+    SearchStats? stats,
   ) {
-    final guard = SearchGuard(budget, 'difficulty state tree');
+    // By definition this counts every distinct state within depth `o`, so it
+    // cannot be pruned; its node bound decides feasibility (F07 A7).
+    final guard = SearchGuard(budget, 'difficulty state tree', stats: stats);
     if (optimal <= 1) return 0;
     final target = _targetChars(config);
     final start = GridState.initial(config, validator);

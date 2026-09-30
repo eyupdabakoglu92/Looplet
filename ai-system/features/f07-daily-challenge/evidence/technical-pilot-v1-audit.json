@@ -3,7 +3,7 @@
   "scope": "pilot",
   "result": "PASS",
   "independentQa": false,
-  "sourceDir": "/Users/eyupcandabakoglu/Projects/Looplet/ai-system/features/f07-daily-challenge/evidence/technical-pilot-v1",
+  "sourceDir": "ai-system/features/f07-daily-challenge/evidence/technical-pilot-v1",
   "days": [
     {
       "id": "daily-tr-2026-11-02",
@@ -140,12 +140,44 @@
         "status": "PASS",
         "evidence": {
           "nondecreasingPath": "",
-          "nodes": 24360,
+          "nodes": 21,
           "depth": 4
         }
       },
       "accepted": true,
-      "elapsedMs": 3255
+      "elapsedMs": 673,
+      "search": [
+        {
+          "phase": "solve",
+          "peakNodes": 27,
+          "elapsedMs": 19
+        },
+        {
+          "phase": "solve",
+          "peakNodes": 27,
+          "elapsedMs": 9
+        },
+        {
+          "phase": "optimal enumeration",
+          "peakNodes": 29,
+          "elapsedMs": 11
+        },
+        {
+          "phase": "solve",
+          "peakNodes": 27,
+          "elapsedMs": 7
+        },
+        {
+          "phase": "difficulty state tree",
+          "peakNodes": 65550,
+          "elapsedMs": 612
+        },
+        {
+          "phase": "regression",
+          "peakNodes": 21,
+          "elapsedMs": 6
+        }
+      ]
     },
     {
       "id": "daily-tr-2026-11-03",
@@ -239,7 +271,7 @@
                 "ablatedOptimal": 4,
                 "commonOptimal": "ABSENT_WITHIN_DEPTH",
                 "commonReference": "",
-                "nodes": 65477
+                "nodes": 105
               }
             },
             "frozen": {
@@ -293,7 +325,44 @@
         }
       },
       "accepted": true,
-      "elapsedMs": 3928
+      "elapsedMs": 847,
+      "search": [
+        {
+          "phase": "solve",
+          "peakNodes": 152,
+          "elapsedMs": 26
+        },
+        {
+          "phase": "solve",
+          "peakNodes": 152,
+          "elapsedMs": 21
+        },
+        {
+          "phase": "optimal enumeration",
+          "peakNodes": 181,
+          "elapsedMs": 45
+        },
+        {
+          "phase": "solve",
+          "peakNodes": 152,
+          "elapsedMs": 21
+        },
+        {
+          "phase": "difficulty state tree",
+          "peakNodes": 60553,
+          "elapsedMs": 626
+        },
+        {
+          "phase": "Q5 locked ablated",
+          "peakNodes": 135,
+          "elapsedMs": 20
+        },
+        {
+          "phase": "Q5 locked common",
+          "peakNodes": 105,
+          "elapsedMs": 31
+        }
+      ]
     },
     {
       "id": "daily-tr-2026-11-04",
@@ -450,7 +519,39 @@
         }
       },
       "accepted": true,
-      "elapsedMs": 48622
+      "elapsedMs": 11116,
+      "search": [
+        {
+          "phase": "solve",
+          "peakNodes": 726,
+          "elapsedMs": 148
+        },
+        {
+          "phase": "solve",
+          "peakNodes": 726,
+          "elapsedMs": 143
+        },
+        {
+          "phase": "optimal enumeration",
+          "peakNodes": 801,
+          "elapsedMs": 280
+        },
+        {
+          "phase": "solve",
+          "peakNodes": 726,
+          "elapsedMs": 142
+        },
+        {
+          "phase": "difficulty state tree",
+          "peakNodes": 803418,
+          "elapsedMs": 10403
+        },
+        {
+          "phase": "Q5 frozen ablated",
+          "peakNodes": 960,
+          "elapsedMs": 136
+        }
+      ]
     },
     {
       "id": "daily-tr-2026-11-07",
@@ -614,12 +715,54 @@
         "status": "FAIL",
         "evidence": {
           "nondecreasingPath": "L1 L1 U3 U3 R4",
-          "nodes": 358700,
+          "nodes": 1806,
           "depth": 5
         }
       },
       "accepted": true,
-      "elapsedMs": 39341
+      "elapsedMs": 9340,
+      "search": [
+        {
+          "phase": "solve",
+          "peakNodes": 2055,
+          "elapsedMs": 352
+        },
+        {
+          "phase": "solve",
+          "peakNodes": 2055,
+          "elapsedMs": 357
+        },
+        {
+          "phase": "optimal enumeration",
+          "peakNodes": 2096,
+          "elapsedMs": 723
+        },
+        {
+          "phase": "solve",
+          "peakNodes": 2055,
+          "elapsedMs": 359
+        },
+        {
+          "phase": "difficulty state tree",
+          "peakNodes": 489876,
+          "elapsedMs": 6929
+        },
+        {
+          "phase": "Q5 locked ablated",
+          "peakNodes": 3427,
+          "elapsedMs": 501
+        },
+        {
+          "phase": "Q5 frozen ablated",
+          "peakNodes": 1925,
+          "elapsedMs": 48
+        },
+        {
+          "phase": "regression",
+          "peakNodes": 1806,
+          "elapsedMs": 424
+        }
+      ]
     },
     {
       "id": "daily-tr-2026-11-09",
@@ -761,7 +904,34 @@
         }
       },
       "accepted": true,
-      "elapsedMs": 35220
+      "elapsedMs": 10650,
+      "search": [
+        {
+          "phase": "solve",
+          "peakNodes": 1906,
+          "elapsedMs": 313
+        },
+        {
+          "phase": "solve",
+          "peakNodes": 1906,
+          "elapsedMs": 298
+        },
+        {
+          "phase": "optimal enumeration",
+          "peakNodes": 1945,
+          "elapsedMs": 589
+        },
+        {
+          "phase": "solve",
+          "peakNodes": 1906,
+          "elapsedMs": 301
+        },
+        {
+          "phase": "difficulty state tree",
+          "peakNodes": 907445,
+          "elapsedMs": 9446
+        }
+      ]
     },
     {
       "id": "daily-tr-2026-11-10",
@@ -854,7 +1024,7 @@
                 "normalOptimal": 4,
                 "ablatedOptimalLowerBound": 5,
                 "absenceThroughDepth": 4,
-                "nodes": 65048,
+                "nodes": 227,
                 "direction": "removing mechanic requires more moves or makes unsolvable"
               }
             },
@@ -909,7 +1079,39 @@
         }
       },
       "accepted": true,
-      "elapsedMs": 2680
+      "elapsedMs": 688,
+      "search": [
+        {
+          "phase": "solve",
+          "peakNodes": 222,
+          "elapsedMs": 24
+        },
+        {
+          "phase": "solve",
+          "peakNodes": 222,
+          "elapsedMs": 24
+        },
+        {
+          "phase": "optimal enumeration",
+          "peakNodes": 236,
+          "elapsedMs": 54
+        },
+        {
+          "phase": "solve",
+          "peakNodes": 222,
+          "elapsedMs": 24
+        },
+        {
+          "phase": "difficulty state tree",
+          "peakNodes": 60353,
+          "elapsedMs": 552
+        },
+        {
+          "phase": "Q5 locked ablated",
+          "peakNodes": 227,
+          "elapsedMs": 30
+        }
+      ]
     },
     {
       "id": "daily-tr-2026-11-11",
@@ -1066,7 +1268,39 @@
         }
       },
       "accepted": true,
-      "elapsedMs": 3663
+      "elapsedMs": 900,
+      "search": [
+        {
+          "phase": "solve",
+          "peakNodes": 268,
+          "elapsedMs": 38
+        },
+        {
+          "phase": "solve",
+          "peakNodes": 268,
+          "elapsedMs": 38
+        },
+        {
+          "phase": "optimal enumeration",
+          "peakNodes": 314,
+          "elapsedMs": 86
+        },
+        {
+          "phase": "solve",
+          "peakNodes": 268,
+          "elapsedMs": 38
+        },
+        {
+          "phase": "difficulty state tree",
+          "peakNodes": 60774,
+          "elapsedMs": 695
+        },
+        {
+          "phase": "Q5 frozen ablated",
+          "peakNodes": 369,
+          "elapsedMs": 39
+        }
+      ]
     },
     {
       "id": "daily-tr-2026-11-14",
@@ -1159,7 +1393,7 @@
                 "normalOptimal": 5,
                 "ablatedOptimalLowerBound": 6,
                 "absenceThroughDepth": 5,
-                "nodes": 826915,
+                "nodes": 714,
                 "direction": "removing mechanic requires more moves or makes unsolvable"
               }
             },
@@ -1170,7 +1404,7 @@
                 "ablatedOptimal": 5,
                 "commonOptimal": "ABSENT_WITHIN_DEPTH",
                 "commonReference": "",
-                "nodes": 738190
+                "nodes": 603
               }
             }
           }
@@ -1226,12 +1460,59 @@
         "status": "PASS",
         "evidence": {
           "nondecreasingPath": "",
-          "nodes": 337111,
+          "nodes": 519,
           "depth": 5
         }
       },
       "accepted": true,
-      "elapsedMs": 71483
+      "elapsedMs": 9891,
+      "search": [
+        {
+          "phase": "solve",
+          "peakNodes": 606,
+          "elapsedMs": 130
+        },
+        {
+          "phase": "solve",
+          "peakNodes": 606,
+          "elapsedMs": 129
+        },
+        {
+          "phase": "optimal enumeration",
+          "peakNodes": 614,
+          "elapsedMs": 234
+        },
+        {
+          "phase": "solve",
+          "peakNodes": 606,
+          "elapsedMs": 130
+        },
+        {
+          "phase": "difficulty state tree",
+          "peakNodes": 658164,
+          "elapsedMs": 8743
+        },
+        {
+          "phase": "Q5 locked ablated",
+          "peakNodes": 714,
+          "elapsedMs": 123
+        },
+        {
+          "phase": "Q5 frozen ablated",
+          "peakNodes": 1415,
+          "elapsedMs": 210
+        },
+        {
+          "phase": "Q5 frozen common",
+          "peakNodes": 603,
+          "elapsedMs": 190
+        },
+        {
+          "phase": "regression",
+          "peakNodes": 519,
+          "elapsedMs": 125
+        }
+      ]
     }
   ],
   "errors": [],
@@ -1342,10 +1623,11 @@
     "packages/looplet_engine/lib/src/move.dart": "23930cb0433e89fd06c4da73e3381274b99fe7d7998d5fe6bcbf2e23828ca90f",
     "packages/looplet_engine/lib/src/word_validator.dart": "1137226da95f861f0a4a4c979f4e0a79724696b1d4e77a1a4a86d8fc3a5c5435",
     "packages/looplet_engine/pubspec.yaml/": "630a779ed55f69d05d916d6dc702df32347aeb2f6c7a9a469558ab06729c8ba9",
-    "packages/looplet_solver/lib/looplet_solver.dart": "e08b69f8d457cea5bed8ba19b15ee10f11babc8eaf57f658e584447aed63fd9e",
-    "packages/looplet_solver/lib/src/difficulty.dart": "288c9db338e676de17ed5fd205688ee79ab32ebe32b3673b82265421650d610f",
-    "packages/looplet_solver/lib/src/solve_result.dart": "e934e65b1e392e8267a9c190c258a57e7b4497f41fdf6e690e2786cb5da3b0f2",
-    "packages/looplet_solver/lib/src/solver.dart": "3f73514945b92f526c104ba9ee59744678646d24a618228a605ccc7598e69d97",
+    "packages/looplet_solver/lib/looplet_solver.dart": "aa0e77a6390a764ab3cddca49ddc5419520ad7998da802f15ae3f92c52e68f6d",
+    "packages/looplet_solver/lib/src/difficulty.dart": "1e0d26842a3a08f28e53f59648716655d68c13c0b13271b64af13f170e8ac1e5",
+    "packages/looplet_solver/lib/src/lower_bound.dart": "cd7211881683ef50d67838796d98dfbb9c188bc8327a4993491139cb47acebe4",
+    "packages/looplet_solver/lib/src/solve_result.dart": "c030888a0c66e0bd0fc4b662ecf7cf95149690df24aff9904783b4077cb541ae",
+    "packages/looplet_solver/lib/src/solver.dart": "163ea3284c7b818c97e6d771ac048a0d10e2b191b4e68b482aa8549c22652339",
     "packages/looplet_solver/pubspec.yaml/": "69a0f7bc74e4db9363c38d9c511e116b46e145bd1eec890de1e36b8b56a3fe29",
     "runtime/dart": "bdb9ac08c128ca4c12b0d17ebedc8cb0a880b1aa797f708f685adb2e993d4e3f",
     "tools/looplet_authoring/bin/looplet_authoring.dart": "1f525a3fdd86debff596419a4b825d7fc48a5657f6bb583689e03308cc728cee",
@@ -1363,23 +1645,23 @@
     "tools/looplet_authoring/lib/src/corpus_quality.dart": "249f306c888fe6ea3d3230c0877a606c7770ed53a44a68fe644dd019e6d94dc4",
     "tools/looplet_authoring/lib/src/daily_dev_fixture.dart": "683cc6a986f026651285c22ffa5493429b4596b837551c1861aca9bc3ee755df",
     "tools/looplet_authoring/lib/src/daily_generator.dart": "a607d6a27e9622385b7866c5ddc62c843ea71819f0a2a001a949336631923791",
-    "tools/looplet_authoring/lib/src/daily_pool_quality.dart": "b85a61e0388cbee17065fbc95fdf51b5d16a4bbe17456deeb6be66482d0ea2b1",
-    "tools/looplet_authoring/lib/src/daily_quality.dart": "4aaa06147f8baeef26f7641714e5d798b3b8865814217e3261df80b8c9efccc5",
+    "tools/looplet_authoring/lib/src/daily_pool_quality.dart": "334aa863892a51574dfc7ad007a040f67eb08253392bf577388116397e840e02",
+    "tools/looplet_authoring/lib/src/daily_quality.dart": "272d587a6e72694525870c485a104c3bafa0ba853ef0dad05a14b883820b04f2",
     "tools/looplet_authoring/lib/src/daily_source.dart": "2d723064c61b82b58b1c8cc028e97abb9e52c2489fdbdf917bd6b8bb1590c0b6",
     "tools/looplet_authoring/lib/src/dictionary_validator.dart": "607d76fcf259f80127a2f53f34742fa78e47c83c6540f8d31af1e81ed4dc09c9",
     "tools/looplet_authoring/lib/src/move_shorthand.dart": "b8508c5e3750fca27b78bda71f3140fbba023e193720f4005fc05ad830e97705",
     "tools/looplet_authoring/lib/src/puzzle_def.dart": "e5dd1307bae58feb1ba8996367744d77636742c248dbd698dee87a27daf25655",
-    "tools/looplet_authoring/lib/src/quality_cli.dart": "f1e42015030de46a87e68e404a223143a6068570f9da4021a6ac9d40e19594ae",
-    "tools/looplet_authoring/lib/src/quality_io.dart": "809ede1649f3ab4baff884acd1465c726c0be83b0fe56446326266920f3e9d48",
-    "tools/looplet_authoring/lib/src/quality_search.dart": "573386d79823970fc14f9e084147ef0e188c57e942de550a51075d42afcab8ed",
+    "tools/looplet_authoring/lib/src/quality_cli.dart": "c474114f7b203dcf817b51e513ce24aeca8772ebfa1cb0e8f43bc3560c2aedd1",
+    "tools/looplet_authoring/lib/src/quality_io.dart": "2db32aba3bfd284e10f942d0d17ff93b8165b10fdb38a0b0bb552cc02b19269a",
+    "tools/looplet_authoring/lib/src/quality_search.dart": "b7033a9d9e1a850c2eb6f51943840331733f5fa00c35a1d675ad79b568ab8da1",
     "tools/looplet_authoring/lib/src/turkish_frequency.dart": "1d57616cc39017abc5889280e0f4144ee0f2834b1aa85ffc86006d4ddfe0ad22",
     "tools/looplet_authoring/pubspec.lock/": "b4f913656b16b2b1bae75dd92550a5b7c283e0edf0f8a87031447a0f459fca9a",
     "tools/looplet_authoring/pubspec.yaml/": "90bd75d503fa8ccc0c934da22e6417efcc0cef2758c006c2961dc87eee22fb19"
   },
-  "inputHash": "9bac86103755ad03bae1947ba93726cf93822dfc684e373ff2e52607d2561712",
-  "analysisInputHash": "1af30ad6626a96c20298249d12c24776a46371498e4c309db98f2cbf1261abe5",
+  "inputHash": "97519ea3921ad54bc6ceeffb69dc16659e763b2fac95fef4b9b1948aa727f3b0",
+  "analysisInputHash": "52150b45f44c23590e7bf4cf228154a4e96e02b6081beb2cdde622aff6144046",
   "budget": {
-    "seconds": 30,
+    "seconds": 300,
     "nodes": 5000000,
     "depth": 16
   }

@@ -82,6 +82,7 @@ Map<String, dynamic> auditDay(
   bool findWitnesses = false,
   bool stopAtCheapFailure = false,
   bool requireRegression = false,
+  SearchStats? stats,
 }) {
   final watch = Stopwatch()..start();
   final rules = <String, Map<String, dynamic>>{};
@@ -137,10 +138,21 @@ Map<String, dynamic> auditDay(
     report['elapsedMs'] = watch.elapsedMilliseconds;
     return report;
   }
-  final solve = Solver.solve(config, words, budget: budget);
+  final solve = Solver.solve(config, words, budget: budget, stats: stats);
   if (solve is! Optimal) {
-    rules['Q2'] = verdict(solve is BudgetExceeded ? 'UNKNOWN' : 'FAIL',
-        'optimal solve did not return a proof');
+    rules['Q2'] = verdict(
+        solve is BudgetExceeded ? 'UNKNOWN' : 'FAIL',
+        solve is BudgetExceeded
+            ? {
+                'reason': 'optimal solve did not return a proof',
+                'stop': {
+                  'phase': 'solve',
+                  'cause': solve.cause.name,
+                  'nodes': solve.nodes,
+                  'elapsedMs': solve.elapsed.inMilliseconds
+                }
+              }
+            : 'optimal solve did not return a proof');
     for (final key in ['Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q9', 'Q10']) {
       rules[key] = verdict('UNKNOWN', 'depends on a proven optimum');
     }
@@ -216,7 +228,11 @@ Map<String, dynamic> auditDay(
       return WitnessSearch('FOUND', reference, 0);
     }
     return searchWitness(config, words,
-        maxDepth: o, budget: budget, nondecreasingOnly: true);
+        maxDepth: o,
+        budget: budget,
+        nondecreasingOnly: true,
+        stats: stats,
+        phase: 'regression');
   }
 
   Map<String, dynamic> regressionVerdict(WitnessSearch found) => verdict(
@@ -228,7 +244,8 @@ Map<String, dynamic> auditDay(
           {
             'nondecreasingPath': formatMoves(found.moves),
             'nodes': found.nodes,
-            'depth': o
+            'depth': o,
+            if (found.stop != null) 'stop': found.stop!.toJson()
           });
   WitnessSearch? regression;
   if (requireRegression && stopAtCheapFailure) {
@@ -242,7 +259,8 @@ Map<String, dynamic> auditDay(
     }
   }
   try {
-    final difficulty = DifficultyScorer.score(config, words, budget: budget);
+    final difficulty =
+        DifficultyScorer.score(config, words, budget: budget, stats: stats);
     final expected = def
         .toPuzzle(
             optimalMoves: o,
@@ -278,8 +296,8 @@ Map<String, dynamic> auditDay(
           difficulty.breakdown['optimalEnumerationComplete'] == 1
     });
   } on SearchLimitExceeded catch (e) {
-    rules['Q4'] = verdict('UNKNOWN', '$e');
-    rules['Q9'] = verdict('UNKNOWN', {'advisory': true, 'reason': '$e'});
+    rules['Q4'] = verdict('UNKNOWN', {'stop': e.toJson()});
+    rules['Q9'] = verdict('UNKNOWN', {'advisory': true, 'stop': e.toJson()});
   }
   if (stopAtCheapFailure && rules['Q4']!['status'] != 'PASS') {
     report['accepted'] = false;
@@ -298,10 +316,11 @@ Map<String, dynamic> auditDay(
     // Only paths through the proven normal optimum matter. Exhaustive
     // absence through o proves a strictly larger optimum (or unsolvability),
     // without claiming an exact ablated optimum or searching deeper.
-    final alternative =
-        searchWitness(ablated, words, maxDepth: o, budget: budget);
+    final alternative = searchWitness(ablated, words,
+        maxDepth: o, budget: budget, stats: stats, phase: 'Q5 $group ablated');
     if (alternative.status == 'UNKNOWN') {
-      groups[group] = verdict('UNKNOWN', 'ablation solve budget');
+      groups[group] = verdict('UNKNOWN',
+          {'reason': 'ablation search', 'stop': alternative.stop?.toJson()});
     } else if (alternative.status == 'ABSENT_WITHIN_DEPTH') {
       groups[group] = verdict('PASS', {
         'normalOptimal': o,
@@ -325,7 +344,11 @@ Map<String, dynamic> auditDay(
         final common = commonRef != null
             ? WitnessSearch('FOUND', reference, 0)
             : searchWitness(config, words,
-                maxDepth: o, budget: budget, commonWith: ablated);
+                maxDepth: o,
+                budget: budget,
+                commonWith: ablated,
+                stats: stats,
+                phase: 'Q5 $group common');
         if (common.status == 'FOUND') {
           allStates.addAll(replay(config, words, common.moves)!);
           allStates.addAll(replay(ablated, words, common.moves)!);
@@ -341,7 +364,8 @@ Map<String, dynamic> auditDay(
               'ablatedOptimal': o,
               'commonOptimal': common.status,
               'commonReference': formatMoves(common.moves),
-              'nodes': common.nodes
+              'nodes': common.nodes,
+              if (common.stop != null) 'stop': common.stop!.toJson()
             });
       }
     }
@@ -374,6 +398,7 @@ Map<String, dynamic> auditDay(
     }
 
     List<Move> path = [];
+    SearchLimitExceeded? thawStop;
     try {
       path = parseMoves((proof['thaw'] as Map?)?['$row'] as String? ??
           formatMoves(reference));
@@ -381,7 +406,12 @@ Map<String, dynamic> auditDay(
     String status = validThaw(path) ? 'PASS' : 'FAIL';
     if (status != 'PASS' && findWitnesses) {
       final found = searchWitness(config, words,
-          maxDepth: o + 2, budget: budget, thawRowBeforeWin: row);
+          maxDepth: o + 2,
+          budget: budget,
+          thawRowBeforeWin: row,
+          stats: stats,
+          phase: 'Q6 row $row');
+      thawStop = found.stop;
       path = found.moves;
       status = found.status == 'UNKNOWN'
           ? 'UNKNOWN'
@@ -393,8 +423,11 @@ Map<String, dynamic> auditDay(
       thawProofs['$row'] = formatMoves(path);
       allStates.addAll(replay(config, words, path)!);
     }
-    thawResults['$row'] =
-        verdict(status, {'path': formatMoves(path), 'maxLength': o + 2});
+    thawResults['$row'] = verdict(status, {
+      'path': formatMoves(path),
+      'maxLength': o + 2,
+      if (thawStop != null) 'stop': thawStop.toJson()
+    });
   }
   rules['Q6'] = verdict(
       thawResults.isEmpty
@@ -424,11 +457,17 @@ Map<String, dynamic> auditDay(
     usefulPath = [];
   }
   var usefulStatus = useful(usefulPath) ? 'PASS' : 'FAIL';
+  SearchLimitExceeded? usefulStop;
   if (config.frozenCells.isNotEmpty &&
       usefulStatus != 'PASS' &&
       findWitnesses) {
     final found = searchWitness(config, words,
-        maxDepth: o, budget: budget, requireUsefulThaw: true);
+        maxDepth: o,
+        budget: budget,
+        requireUsefulThaw: true,
+        stats: stats,
+        phase: 'Q7 useful thaw');
+    usefulStop = found.stop;
     usefulPath = found.moves;
     usefulStatus = found.status == 'UNKNOWN'
         ? 'UNKNOWN'
@@ -440,8 +479,15 @@ Map<String, dynamic> auditDay(
     generatedProof['usefulThaw'] = formatMoves(usefulPath);
     allStates.addAll(replay(config, words, usefulPath)!);
   }
-  rules['Q7'] = verdict(config.frozenCells.isEmpty ? 'N/A' : usefulStatus,
-      'individual measure; required ratio is checked at pool scope');
+  rules['Q7'] = verdict(
+      config.frozenCells.isEmpty ? 'N/A' : usefulStatus,
+      usefulStop == null
+          ? 'individual measure; required ratio is checked at pool scope'
+          : {
+              'reason':
+                  'individual measure; required ratio is checked at pool scope',
+              'stop': usefulStop.toJson()
+            });
   regression ??= regressionSearch();
   report['regression'] = regressionVerdict(regression);
   if (regression.status == 'FOUND') {

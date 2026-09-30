@@ -9,5 +9,6 @@
 library looplet_solver;
 
 export 'src/difficulty.dart';
+export 'src/lower_bound.dart';
 export 'src/solve_result.dart';
 export 'src/solver.dart';
