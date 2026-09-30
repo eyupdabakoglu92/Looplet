@@ -232,7 +232,8 @@
 * **[OPEN — F07 release gate, Tech Lead + DevOps]** the production pack host and its plan / billing needs.
 * **[OPEN — Product Owner, optional]** AC7's Share wording (prd Open Questions (1)).
 * ~~F07.DIRECTION-SELECT~~ — RESOLVED 2026-09-29: Direction A (A2).
-* **[OPEN — decision gate, `release`]** F07.DAILY-POOL-SIGNOFF — the user signs off the pool; opened at the F07-CONTENT checkpoint (A4).
+* ~~F07.DAILY-POOL-SIGNOFF~~ — superseded 2026-09-30 by the user's incident (A5): content acceptance is measured by the roles (`daily-content-spec.md`).
+* **[OPEN — decision gate, `release`]** F07.TARGET-LIST-APPROVAL — the expanded target list's approval (product PRD F01: "manually-approved"), or a Product Owner revision (A5).
 
 ---
 
@@ -426,3 +427,31 @@
 * A rework choice (options B / C) or a Product Owner revision (D) changes the pool, and so invalidates the content part of any functional QA evidence taken before it. The Tech Lead re-plans QA at that intake.
 
 **Routing:** **F07-FE → Open** (Frontend/Mobile Developer, the orchestration Current Brief). F07-CONTENT is Done and accepted. The contract is otherwise unchanged.
+
+---
+
+## A5. Incident — content quality and the acceptance model (Tech Lead, 2026-09-30)
+
+**Intake:** `Run Tech Lead. Incident:` by the user — content management must be done well by the roles and must not come to the user; the Content Designer's work was not good enough; the user asked for the content algorithm and exactly what is needed, and may improve the Content Designer role.
+
+* **Classified Scope:** Existing Active Feature Rework (F07 content). **Root cause:** the Tech Lead's F07-CONTENT brief. It stated editorial targets without making them measured, rejecting rules; it made a user playtest the quality gate (a carry-over from F06's "human playtest" model); and it left the generator to a script outside the tools, although generators belong to a Developer (role-execution-contract). The Content Designer then delivered to the letter and handed the quality questions to the user.
+* **Measured on the A4 pool** (Tech Lead, 2026-09-29 / 30, read-only scripts and the AOT-built CLI in the scratchpad):
+  * filler rows holding a real dictionary word: **0 of 300**;
+  * frozen-tile days that can never thaw: **18 of 26** (A4);
+  * days needing a temporary displacement (`tdDegree ≥ 1`): **1 of 60**; `cNorm` ≤ 0.053 everywhere;
+  * starts with a row already holding ≥ 3 target letters in place: **9 of 60**;
+  * tiles removed (the first 9 tile days, 30 s solver budget): in **4 of the 5 conclusive cases** (#1, #3, #4, #8) the optimum is unchanged and the label falls from `medium` to `easy`; on #1 the tile-free optimal line `D2 R3 U2 R3` never touches the frozen row or columns, so the tiles are decorative; #7 is the one where tiles matter (3 → 4); 4 cases hit the budget (inconclusive). The run was stopped there; `audit-daily` measures this for every day (Q5).
+  * The difficulty score adds +0.8 per locked and +1.2 per frozen tile whether or not the tile matters, so the labels overstate these days.
+* **Workflow Impact: Re-route Current Flow.** F07-FE had not started (no app change since beb7bfe); it returns to Queued and stays independent of content.
+
+**Rulings:**
+
+1. **`daily-content-spec.md` is the content contract** for the Daily (Turkish, for the user and the Content Designer). Where it conflicts, it overrides the F07-CONTENT brief's editorial targets and A4 rulings 1 (30 targets × 2 is no longer accepted) and 3 (a frozen tile must be able to thaw, Q6). A4 ruling 6 (the debug today override) stays.
+2. **Acceptance model:** content is accepted by measurement — the Developer's `audit-daily` (every §4 / §5 rule, with named negative tests), the Content Designer's delivery with the audit at exit 0, and QA's independent content module. **No user playtest.** The product PRD's authoring flow ("the designer playtests with real engine rules") is met by the Content Designer's `playtest` runs of the Q5 / Q6 proof lines. Quality questions go to the Tech Lead, never to the user.
+3. **The corpus is expanded inside F07** (F07-CORPUS; F01-PRODUCTION-CORPUS brought into the ledger for Turkish): `targets` ≥ 120 (the 30 Journey targets unchanged), `words` ≥ 2,000. It is a content asset change; the app has not been distributed and no Daily is published, so now is the cheapest moment. **Cross-feature:** Journey levels whose optimum changes are re-exported from their defs (same grid and tiles; an F05 content change, verified by QA — F07.CORPUS-IMPACT); F01's tests must pass.
+4. **The only product decision left for the user:** the product PRD F01 requires the targets to be "manually-approved" and both lists "manually reviewed". The Tech Lead cannot change that. Gate **F07.TARGET-LIST-APPROVAL** (`release`): (A) the user reads the lists (the ~2,000-word list is impractical), or (B) a Product Owner revision delegates the approval to the Content Designer's written rule set and scripted checks plus QA sampling.
+5. **Tools:** `generate-daily` and `audit-daily` in `looplet_authoring` (F07-TOOL-DAILY, Frontend/Mobile Developer). `content:check` in CI is unchanged until the audit's runtime is measured.
+6. **F07.DAILY-POOL-SIGNOFF — superseded** (RESOLVED): the A4 pool is not signed off. It stays in the repo so `content:check` stays green, is not publishable, and is replaced by F07-CONTENT-R1.
+7. **Unchanged:** the product criteria; D1–D11; the calendar (A3 ruling 5); the Assumption on locked / frozen tiles from #1 (A4 ruling 2; a first-encounter hint would be a Product Owner revision, `daily-content-spec.md` §8).
+
+**Routing:** F07-CORPUS Open (Content Designer) → the corpus checkpoint → F07-TOOL-DAILY (Frontend/Mobile Developer) → F07-CONTENT-R1 (Content Designer) → QA. F07-FE Queued; the Tech Lead activates it when the content chain allows.

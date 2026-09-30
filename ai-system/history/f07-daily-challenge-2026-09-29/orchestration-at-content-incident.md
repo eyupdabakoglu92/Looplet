@@ -10,30 +10,28 @@ In Progress
 
 ## Current Owner
 
-Content Designer
+Frontend/Mobile Developer
 
 ## Next Role
 
-Content Designer
+Frontend/Mobile Developer
 
 ## Active Task Ledger
 
 - [x] Task ID: F07-UI | Assigned Role: UI Designer | Status: Done | Summary: The Daily surfaces on the Selected Foundation (architecture D8): the Home Daily entry (secondary; available / done today / needs connection), the Daily screen states (`loading`, `ready`, `doneToday`, `needsConnection`, `unavailable`), the daily Play header, and the daily result variant (official vs replay; Current + Best Streak; the reserved Share place for F13). At least two materially different rendered directions on identical content, then `ui-design.md` with the screen / state / viewport matrix and a Visual Evidence Manifest. Brief: Current Brief | Depends On: -
 - [x] Task ID: F07-TOOL | Assigned Role: Frontend/Mobile Developer | Status: Done | Summary: The daily pack (architecture D2): a `DailyPack` model in `looplet_content`; `looplet_authoring pack-daily` (manifest + pool → the served `daily_pack_{lang}.json`); `check` extended to every D2 (2) rule with named negative cases; a small dev pack from existing smoke / Journey-shaped definitions for delivery and tests (not product content). Brief: Current Brief | Depends On: -
-- [x] Task ID: F07-CONTENT | Assigned Role: Content Designer | Status: Done | Summary: **Superseded as product content by the incident of 2026-09-30 (architecture A5); replaced by F07-CONTENT-R1.** The Turkish Daily pool (workflow-follow-ups F06-CONTENT-DAILY): 60 solved daily puzzles under `content/daily/tr/pool/` on the provisional calendar 2026-11-01 … 12-30 (architecture A3 ruling 5), `daily_manifest_tr.json`, `content-design.md`; `check` + `pack-daily` exit 0. The Tech Lead opens the sign-off gate F07.DAILY-POOL-SIGNOFF at its checkpoint. Brief: Current Brief | Depends On: F07-TOOL
-- [ ] Task ID: F07-CORPUS | Assigned Role: Content Designer | Status: Open | Summary: The Turkish corpus (`daily-content-spec.md` §2.1; F01-PRODUCTION-CORPUS brought into F07): `dictionary.json` `targets` ≥ 120 (the 30 Journey targets kept) and `words` ≥ 2,000 (4–5 letters), with a named source, the exclusion rules and scripted checks; the Journey impact (`content:check`; re-export from the Journey defs only where a stored optimum changed). Brief: Current Brief | Depends On: -
-- [ ] Task ID: F07-TOOL-DAILY | Assigned Role: Frontend/Mobile Developer | Status: Queued | Summary: `looplet_authoring generate-daily` (the §3 algorithm) and `audit-daily` (every measurable §4 / §5 rule, a per-day PASS / FAIL table, exit 1 on any FAIL, a named negative test per rule) — `daily-content-spec.md` §6 | Depends On: -
-- [ ] Task ID: F07-CONTENT-R1 | Assigned Role: Content Designer | Status: Queued | Summary: The Turkish Daily pool again, under `daily-content-spec.md` (§3–§5, §7): 60 days on the same calendar, 60 distinct non-Journey targets, `generate-daily` + `audit-daily` exit 0, `content:check` and `pack-daily` exit 0; replaces the F07-CONTENT pool | Depends On: F07-CORPUS, F07-TOOL-DAILY
-- [ ] Task ID: F07-FE | Assigned Role: Frontend/Mobile Developer | Status: Queued | Summary: The app (architecture D3–D8): `DailyContentSource` + the debug pack override + the debug today override (A4 ruling 6); cache population / prefetch / eviction; the D3 states; D4 dates and rollover; D5 transactional completion (entry + streak + enqueue); D6 streak; D7 Remote Config + kill-switch (`firebase_remote_config`, `http`); `/daily`, the Home entry, the daily Play header and result per `ui-design.md`; tests + named negatives; Visual Parity Evidence against the selected Direction A (`F07-A-*`); emulator sync evidence; architecture A1 rulings; a debug recipe to run any pool day (for QA; A5). Brief: the archived F07-FE brief ([orchestration at the incident](../../history/f07-daily-challenge-2026-09-29/orchestration-at-content-incident.md)), re-issued at activation | Depends On: F07-UI, F07-TOOL
-- [ ] Task ID: F07-QA-FUNCTIONAL | Assigned Role: QA | Status: Queued | Summary: Functional + visual QA on the emulator and the canonical simulator (architecture D10); the plan is locked at activation. Content acceptance is the audit + QA's content module; no user playtest (A5) | Depends On: F07-FE, F07-CONTENT-R1
-- [ ] Task ID: F07-DEVOPS | Assigned Role: DevOps/Release Engineer | Status: Blocked | Summary: F07's release (architecture D11): pack hosting, publishing `daily_manifest_url`, rollback by repointing, the release smoke. Blocked on F08's deploy (F08.DEPLOY-RESUME → F08-DEVOPS), F07's functional QA and the target-list approval (F07.TARGET-LIST-APPROVAL) | Depends On: F07-QA-FUNCTIONAL
+- [x] Task ID: F07-CONTENT | Assigned Role: Content Designer | Status: Done | Summary: The Turkish Daily pool (workflow-follow-ups F06-CONTENT-DAILY): 60 solved daily puzzles under `content/daily/tr/pool/` on the provisional calendar 2026-11-01 … 12-30 (architecture A3 ruling 5), `daily_manifest_tr.json`, `content-design.md`; `check` + `pack-daily` exit 0. The Tech Lead opens the sign-off gate F07.DAILY-POOL-SIGNOFF at its checkpoint. Brief: Current Brief | Depends On: F07-TOOL
+- [ ] Task ID: F07-FE | Assigned Role: Frontend/Mobile Developer | Status: Open | Summary: The app (architecture D3–D8): `DailyContentSource` + the debug pack override + the debug today override (A4 ruling 6); cache population / prefetch / eviction; the D3 states; D4 dates and rollover; D5 transactional completion (entry + streak + enqueue); D6 streak; D7 Remote Config + kill-switch (`firebase_remote_config`, `http`); `/daily`, the Home entry, the daily Play header and result per `ui-design.md`; tests + named negatives; Visual Parity Evidence against the selected Direction A (`F07-A-*`); emulator sync evidence; architecture A1 rulings; the pool playtest recipe. Brief: Current Brief | Depends On: F07-UI, F07-TOOL
+- [ ] Task ID: F07-QA-FUNCTIONAL | Assigned Role: QA | Status: Queued | Summary: Functional + visual QA on the emulator and the canonical simulator (architecture D10); the plan is locked at activation. The pool sign-off is not its prerequisite (A4) | Depends On: F07-FE, F07-CONTENT
+- [ ] Task ID: F07-DEVOPS | Assigned Role: DevOps/Release Engineer | Status: Blocked | Summary: F07's release (architecture D11): pack hosting, publishing `daily_manifest_url`, rollback by repointing, the release smoke. Blocked on F08's deploy (F08.DEPLOY-RESUME → F08-DEVOPS), F07's functional QA and the pool sign-off (F07.DAILY-POOL-SIGNOFF) | Depends On: F07-QA-FUNCTIONAL
 - [ ] Task ID: F07-QA-FINAL | Assigned Role: QA | Status: Queued | Summary: Final acceptance of the release proof and any affected functional scope | Depends On: F07-DEVOPS
 
 ## Open Tasks
 
-* **F07-CORPUS — Open** (Content Designer; the Current Brief).
-* Queued: F07-TOOL-DAILY (Frontend/Mobile Developer), F07-CONTENT-R1 (Content Designer), F07-FE (Frontend/Mobile Developer; not started, independent of content), F07-QA-FUNCTIONAL, F07-QA-FINAL. Blocked: F07-DEVOPS (F08's deploy; F07.TARGET-LIST-APPROVAL).
-* Done: F07-UI (A1; Direction A, A2), F07-TOOL (A3), F07-CONTENT (A4; superseded as product content at A5).
+* **F07-FE — Open** (Frontend/Mobile Developer; the Current Brief).
+* F07-CONTENT — Done, accepted at A4 (2026-09-29). The pool's sign-off is the user's decision gate F07.DAILY-POOL-SIGNOFF (OPEN, `release`).
+* F07-TOOL — Done, accepted at A3. F07-UI — Done, accepted at A1; **Direction A selected** (A2).
+* Queued: F07-QA-FUNCTIONAL, F07-QA-FINAL. Blocked: F07-DEVOPS (F08's deploy; the pool sign-off).
 
 ## Handoff Plan
 
@@ -142,30 +140,10 @@ Verified at A1 (renders counted, fit table read with its negative case). **Selec
   * Required Class: repeatable integration
   * Target / Environment: `looplet_authoring` over `content/` and `content/daily/tr/`
   * Owner Role: QA
-  * Prerequisite / External Decision: F07-CONTENT-R1 (the A4 pool is superseded, A5)
-  * Re-evaluation Trigger: F07-CORPUS and F07-CONTENT-R1 deliveries; any change under `content/`, the dictionary asset or the authoring tool
+  * Prerequisite / External Decision: F07-CONTENT (Done, accepted at A4)
+  * Re-evaluation Trigger: any change under `content/daily/`, the dictionary asset or the authoring tool
   * Blocks: F07 functional acceptance
   * Delivery Evidence: Content Designer, 2026-09-29 (`content-design.md` §5). **Tech Lead re-run on 9af777f (A4):** `content:check` exit 0, 110 s; `pack-daily` exit 0, byte-identical pack (sha256 `fb33384d…db31`); three independent negatives on scratch copies (stale optimum, duplicate definition + `[noRepeat]`, `[puzzleDate]`), each exit 1, and the baseline exit 0. QA still evaluates independently.
-  * Result: PENDING
-
-- Evidence ID: F07.CONTENT-QUALITY
-  * Scenario: Every Daily day passes every measurable rule of `daily-content-spec.md` §4 / §5 (Q1–Q12: distinct non-Journey targets, meaningful tiles, a proven thaw for each frozen row, the difficulty rhythm, not-too-close starts, word filler, no offensive words, no near-duplicates)
-  * Required Class: repeatable integration
-  * Target / Environment: `looplet_authoring audit-daily` over `content/daily/tr/` (its rules proven by named negative tests); QA re-runs it and replays at least 5 days with `solve` / `playtest`, including the Q5 / Q6 proof sequences
-  * Owner Role: QA
-  * Prerequisite / External Decision: F07-TOOL-DAILY; F07-CONTENT-R1
-  * Re-evaluation Trigger: F07-CONTENT-R1 delivery
-  * Blocks: F07 functional acceptance
-  * Result: PENDING
-
-- Evidence ID: F07.CORPUS-IMPACT
-  * Scenario: After the corpus change, all committed content still passes `content:check` (Journey, smoke, Daily); any Journey level whose optimum changed is re-exported from its def with the same grid and tiles; F01's dictionary tests pass
-  * Required Class: repeatable integration + automated functional
-  * Target / Environment: `melos run content:check`, `melos run test`
-  * Owner Role: QA
-  * Prerequisite / External Decision: F07-CORPUS
-  * Re-evaluation Trigger: F07-CORPUS delivery
-  * Blocks: F07 functional acceptance and release (the Journey change is also an F05 content change)
   * Result: PENDING
 
 - Evidence ID: F07.COLD-BOOT
@@ -207,16 +185,6 @@ Verified at A1 (renders counted, fit table read with its negative case). **Selec
   * Recommendation: (A), oyun testi günleri adil bulursa — gönderilmiş Journey ile tutarlı, kök neden sözlük. Test kilitli / buzlu taşları kafa karıştırıcı bulursa (D).
   * Blocks: publishing the pool — F07-DEVOPS, F07-QA-FINAL and Done; not F07-FE or F07-QA-FUNCTIONAL (A4)
   * Blocking Scope: release
-  * Status: RESOLVED
-  * Resolution: Superseded by the user's incident (2026-09-30, architecture A5) — the pool is not signed off; content quality belongs to the roles under `daily-content-spec.md` (a measured audit + QA), with no user playtest; the pool is re-authored in F07-CONTENT-R1
-  * Resolved At: 2026-09-30
-
-- Decision ID: F07.TARGET-LIST-APPROVAL
-  * Question: Genişletilmiş sözlüğün onayı (F07-CORPUS: ≥ 120 hedef, ≥ 2.000 kelime). Ürün PRD'si F01 bunu zorunlu tutuyor: hedefler "manually-approved", iki liste de "manually reviewed". Oyun testi değil; kelime listesi onayı.
-  * Options / Trade-offs: (A) Kullanıcı F07-CORPUS teslim edilince listeleri okur ve onaylar (~120 hedef kısa; ~2.000 kelime pratik değil). (B) Ürün kuralı değişsin: `Run Product Owner. Revise: F01 — sözlük ve hedef listesi Content Designer'ın yazılı kural setine ve otomatik kontrollerine göre onaylanır, QA bağımsız örneklem kontrolü yapar` — kullanıcıya hiç gelmez; PO revizyonu ve Tech Lead resync gerekir.
-  * Recommendation: (B) — kullanıcının "içerik bana gelmesin" yönlendirmesine uygun; kural seti `daily-content-spec.md` §2.1'de hazır. (A) tek seferlik ve kısa bir iş.
-  * Blocks: publishing the Daily (F07-DEVOPS, F07-QA-FINAL, Done); not F07-CORPUS, F07-TOOL-DAILY, F07-CONTENT-R1, F07-FE or functional QA
-  * Blocking Scope: release
   * Status: OPEN
 
 ## Blockers
@@ -225,24 +193,30 @@ None
 
 ## Next Action
 
-Run Content Designer — F07-CORPUS (the Current Brief).
+Run Frontend/Mobile Developer — F07-FE (the Current Brief).
 
-For the user (only when ready): F07.TARGET-LIST-APPROVAL — `Run Tech Lead. Decision: F07.TARGET-LIST-APPROVAL — A` after reading the list, or `Run Product Owner. Revise: …` for option B. It blocks only publishing.
+In parallel, the user reviews the pool and answers `Run Tech Lead. Decision: F07.DAILY-POOL-SIGNOFF — <A / B / C / D>` (the playtest is possible once F07-FE has delivered its recipe).
 
 ## Last Decision
 
-2026-09-30 — the user's content incident (architecture A5).
+2026-09-29 — the F07-CONTENT checkpoint (architecture A4).
 
-* **Classified:** Existing Active Feature Rework (F07 content); root cause in the Tech Lead's F07-CONTENT brief — unmeasured quality, a user playtest as the acceptance, a generator outside the tools.
-* **Measured on the A4 pool:** 0 / 300 filler rows hold a real word; 18 / 26 frozen days can never thaw; 1 / 60 days needs a temporary displacement; 9 / 60 starts are too close; tiles often do not change the optimum (A5).
-* **Rulings:** `daily-content-spec.md` is the content contract; acceptance is measured (the audit + QA), no user playtest; the corpus is expanded inside F07; the generator / audit is a Developer tool; F07.DAILY-POOL-SIGNOFF superseded; F07.TARGET-LIST-APPROVAL opened (`release`); the A4 pool stays in the repo until R1 replaces it and is not publishable.
-* **Routing:** F07-CORPUS Open → F07-TOOL-DAILY → F07-CONTENT-R1; F07-FE Queued (independent).
+* **F07-CONTENT accepted** (9af777f): the Tech Lead re-ran `content:check` (exit 0) and `pack-daily` (byte-identical pack), ran three independent negatives, and recomputed the per-day table from the artifacts (60 / 60).
+* **Finding:** 18 of the 26 frozen-tile days can never thaw with the provisional dictionary; Journey L22 and L24 too (FROZEN-ROW-THAW-CONTENT corrected).
+* **Rulings:**
+  1. 30 targets × 2 accepted for the MVP pool, subject to the sign-off (the brief's distinct-target goal withdrawn as infeasible);
+  2. locked / frozen from #1 — an Assumption the playtest tests;
+  3. the thaw finding is part of the sign-off; the dictionary ↔ optimum coupling is recorded;
+  4. difficulty unchanged;
+  5. placement and calendar unchanged;
+  6. a debug-only today override for the playtest.
+* **F07.DAILY-POOL-SIGNOFF opened** (`release`). **Routing:** F07-FE Open.
 
 ## Last Update
 
 * Updated By: Tech Lead
-* Timestamp: 2026-09-30
-* Summary: The content incident (A5) — `daily-content-spec.md`; F07-CORPUS Open, F07-TOOL-DAILY / F07-CONTENT-R1 Queued, F07-FE back to Queued; F07.DAILY-POOL-SIGNOFF superseded, F07.TARGET-LIST-APPROVAL opened; owner → Content Designer.
+* Timestamp: 2026-09-29
+* Summary: The F07-CONTENT checkpoint (A4) — accepted; rulings 1–6; F07.DAILY-POOL-SIGNOFF opened (`release`); F07-FE Open; owner → Frontend/Mobile Developer.
 
 ## Context & Follow-ups
 
@@ -267,40 +241,50 @@ For the user (only when ready): F07.TARGET-LIST-APPROVAL — `Run Tech Lead. Dec
 * 2026-09-29 — Tech Lead: F07-TOOL checkpoint (architecture A3) — accepted; rulings 1–5 (pool model, D2 readings, no reuse, `CalendarDate`, the provisional calendar); F07-CONTENT Open; owner → Content Designer. [Orchestration at the TOOL delivery](../../history/f07-daily-challenge-2026-09-29/orchestration-at-tool-delivery.md) (the F07-TOOL brief).
 * 2026-09-29 — Content Designer: F07-CONTENT Done — 60 pool puzzles + manifest + defs; `content:check` / `pack-daily` exit 0; the negative run recorded; 30 targets × 2 (corpus limit); Content Validation Pending; owner → Tech Lead. [content-design.md](content-design.md).
 * 2026-09-29 — Tech Lead: F07-CONTENT checkpoint (architecture A4) — accepted after a re-run and independent negatives; the thaw finding; rulings 1–6; F07.DAILY-POOL-SIGNOFF opened (`release`); F07-FE Open; owner → Frontend/Mobile Developer. [Orchestration at the content delivery](../../history/f07-daily-challenge-2026-09-29/orchestration-at-content-delivery.md) (the F07-CONTENT brief).
-* 2026-09-30 — Tech Lead: the content incident (architecture A5) — `daily-content-spec.md`; F07-CORPUS Open; F07-TOOL-DAILY, F07-CONTENT-R1 Queued; F07-FE back to Queued; F07.DAILY-POOL-SIGNOFF superseded; F07.TARGET-LIST-APPROVAL opened; owner → Content Designer. [Orchestration at the incident](../../history/f07-daily-challenge-2026-09-29/orchestration-at-content-incident.md) (the F07-FE brief).
 
 ## Current Brief
 
-**F07-CORPUS — the Turkish corpus** (Content Designer; `daily-content-spec.md` §2.1; architecture A5; product PRD F01; workflow-follow-ups F01-PRODUCTION-CORPUS)
+**F07-FE — the Daily in the app** (Frontend/Mobile Developer; architecture D3–D8, D10, A1 rulings 1–6, A3 ruling 4, A4 ruling 6)
 
 **Read first:**
-* `daily-content-spec.md` — all of it; §0 explains why this task exists, §2.1 is this task;
-* product PRD "dictionary-service (F01)" — the exclusion rules and the target rule;
-* `packages/looplet_dictionary/assets/tr/dictionary.json` — the schema (`_note`, `schemaVersion`, `language`, `words`, `targets`, `exclusionsApplied`) and the current 103 words / 30 targets;
-* F06 `content-authoring-brief.md` §5 (Turkish target words), §6 step 6 (re-export from defs).
+* `architecture.md`: Dependency Edges, D3–D10, A1 (the six UI rulings), A3 ruling 4, A4 ruling 6;
+* `ui-design.md` §4–§11.1 and §12a — Direction A only. The **selected source** is the `F07-A-*` renders in `design/` (A2); B is not built;
+* F08 `architecture.md`: Persistence Schema, the `sync_queue` contract, Offline Daily Cache (with the A1 envelope note), Streak-Integrity / Clock. F08's client surface is **frozen**: no schema or signature change (Dependency Edges);
+* F03 `architecture.md` §20 (the result, the win timeline) and F05 `architecture.md` §18 / §18.10 (Home, the AX5 scroll amendment);
+* `frontend.md`, F07-TOOL section: `DailyPack`, `CalendarDate`, the dev pack and its generator.
 
-**Deliver:**
-1. **`dictionary.json`**, same schema:
-   * `words`: at least **2,000** common Turkish words of 4–5 letters, lowercase, Turkish-normalized (`i`/`ı` distinct), no duplicates;
-   * `targets`: at least **120** five-letter words, **including the 30 current targets unchanged** (the Journey uses them), every target also in `words`;
-   * the current 103 words stay unless one breaks a rule (list any removal with its reason);
-   * `_note` and `exclusionsApplied` updated: the source, the date, the rules.
-2. **The source and the method, recorded:** the source list(s) by name and version (for example, TDK Güncel Türkçe Sözlük entries plus a named frequency list), the frequency cut-off, how inflected forms were excluded.
-3. **Scripted checks, with their output in the report** (the script may live in the scratchpad; its exact command and result go in the report):
-   * length 4–5 (`targets` exactly 5); the Turkish alphabet only;
-   * no duplicates; `targets ⊆ words`;
-   * the exclusion rules — proper nouns, profanity / slang / insults, abbreviations, archaic words — including a scan against a **named** profanity list;
-   * one negative run: a scratch copy with a planted violation of each check fails that check.
-4. **Target quality** (the Content Designer decides; nothing goes to the user): common, concrete, fine for a child; no two targets from the same root; no near-duplicate pair (one letter apart) among the new targets.
-5. **The impact run:**
-   * `melos run content:check` over all content. If a Journey level's stored optimum changed (more words → more thaws), re-export **only that level** from `tools/looplet_authoring/drafts/journey/_defs/` with the same grid, target and tiles, and list old → new optimum and label. If a label leaves its Journey band, stop and report (a blocker to the Tech Lead; do not redesign Journey levels).
-   * The current Daily pool may fail `check` the same way; re-export it from its defs so `content:check` stays green. It is replaced in F07-CONTENT-R1 anyway.
-   * `melos run test` — a failing dictionary test is a blocker for the Developer, not something to edit.
-6. **`content-design.md`**, replacing its content with an F07-CORPUS section: counts, the source, the checks and their exit codes, the Journey impact table, and the list of the **new targets** (the user may be asked to read it — F07.TARGET-LIST-APPROVAL option A).
+**Deliver** (each item traceable to code and tests in `frontend.md`, F07-FE section):
+1. **Content source (D2 (7), D3):** `DailyContentSource.fetchPack(lang)` over HTTPS (`http`; 10 s timeout; one attempt per trigger); client validation with `DailyPack` (a rejected pack caches nothing, logs `daily_pack_invalid`, and gives `unavailable`); the five triggers; population of today … today + 7 into `daily_puzzle_cache` as the **day envelope** `{dailyNumber, puzzle}` (A1 ruling 1), never overwriting a date that has an official result; eviction at start (today − 14, keeping in-progress and unsynced dates). `LOOPLET_DAILY_PACK_URL` is the debug override.
+2. **Dates (D4, A3 ruling 4, A4 ruling 6):** `CalendarDate` only. The start date is kept across midnight and across kill / relaunch; restore from the snapshot id plus the cache (a missing row → the snapshot is discarded → Home); rollover re-evaluation on opening `/daily` and on `resumed`, never mid-run. **`LOOPLET_DAILY_TODAY`** (debug only) fixes the Daily's today as A4 ruling 6 states.
+3. **Completion (D5):** one Drift transaction — `recordCompletion`, then on a first run the D6 streak write and `DailyResultSyncService.enqueue` with the F08 fields and `clientAttemptNumber = 1`. A replay writes only the attempt. No `personal_best` write. If `enqueue` cannot join the caller's transaction, **stop and report** before changing anything.
+4. **Streak (D6):** the rule and the effective display (0 unless the last completed date is today or yesterday).
+5. **Remote Config (D7):** add `firebase_remote_config` (compatible with the pinned `firebase_core ^3.6.0` line) and `http`. No Flutter / Firebase upgrade; the lockfile changes only by these additions and their transitive needs — list them. In-app defaults; a non-blocking `fetchAndActivate` at start (1 h / 0 in debug); the `daily_enabled`, `daily_manifest_url` and `daily_sync_enabled` effects. **An in-progress daily run is never killed.** An injected fake for tests.
+6. **Surfaces (D8, `ui-design.md` A):**
+   * `/daily` with the five states;
+   * the Home entry: secondary, slate, the A1 ruling 2 mapping (`unavailable` → hidden), `#N` only when known; Home scrolls only above the 1.3× cap (A1 ruling 4);
+   * the daily Play header (`GÜNLÜK · #N` + the date);
+   * the daily result (A1 ruling 5): the stats card with stars, `OPTİMAL` in the subtitle, no `EN İYİ`, the replay's official row, the streak card and its reveal, the chip precedence, the zero-height Share slot (ruling 3), no Next Level;
+   * the navigation: `/daily` back → Home; the result → `/daily` or replay in place;
+   * `WeekTrack`, `DailyEntryCard`, the `LoopNode` states, the icons `check` / `offline`; no token change;
+   * Turkish copy only through `DailyStrings` (§11.1); no raw error text.
+7. **Tests with named negatives** (evidence standard §3: each rule → an assertion → a negative that breaks it):
+   * the D6 table — first day, consecutive, missed day, same-day replay, clock back, DST day, leap day, year boundary;
+   * D4 — midnight crossing, rollover not mid-run, restore with a missing cache row;
+   * D3 — population, no overwrite after an official result, eviction keeps in-progress / unsynced dates, each invalid-pack rule → `unavailable`;
+   * D5 — first run → entry + streak + exactly one queue item, all in one transaction (a forced failure rolls back all three); replay → attempt only;
+   * D7 — each kill-switch effect, and a running daily survives `daily_enabled = false`;
+   * both debug overrides are inert in profile / release (F07.DEBUG-OVERRIDES).
+8. **Emulator evidence (F07.FIRST-RUN-SYNC):** a real daily first run → exactly one server doc; a replay → no new queue item and the doc unchanged. Use the F08-FE13 wiring (`LOOPLET_FIREBASE_EMULATOR`, Java 21 first on `PATH` — setup-manifest) and the **real date** (the dev pack generator's `--anchor`), never `LOOPLET_DAILY_TODAY`.
+9. **Cold boot (F07.COLD-BOOT):** a runtime capture on the canonical iPhone 16 simulator: empty state; existing state with a cached day; an in-progress daily run killed and relaunched; offline; a failing pack URL. Home and Journey are never delayed.
+10. **Visual Parity Evidence** against the `F07-A-*` renders: runtime captures of every §12a row you implement (Home entry states, `/daily` states, the Play header, the result first run / replay / 0 → 1 Perfect), iPhone 16 / 16e / Pro Max, 1.3× and AX5, the reduced-motion path. Side-by-side with the render ids, and a gap list. The tolerances are `ui-design.md` §11.
+11. **The pool playtest recipe** (for the user's sign-off, A4 ruling 6): the exact commands to build the real pool's pack, serve or point to it, and run a debug build on any pool day. Prove it once on one pool day (e.g. #1).
+
+**Workspace gates before handing back:** `melos run format:check`, `melos run analyze`, `melos run test`, `melos run content:check` — each with its exit code and counts.
 
 **Rules:**
-* No code or tool change; no app change beyond the asset; no product criterion change.
-* Quality decisions are yours, within the spec; an ambiguity goes to the Tech Lead, never to the user.
-* A target you cannot meet (for example, fewer than 120 good five-letter words) → report with numbers and what was tried; do not lower the bar.
+* No change to F08's schema, repos or sync service; no change to `content/`, the pool or the authoring tool. A needed change → a blocker to the Tech Lead.
+* No deploy, no console change, no real Firebase project use; Remote Config is never emulated.
+* Claude does not change system settings. The real no-network run (F07.OFFLINE-DAILY) is the user's, at QA.
+* A `ui-design.md` conflict or a gap you cannot close within the tolerances → `Needs Tech Lead Clarification` in `frontend.md`; do not invent a new pattern.
 
-**Then:** close F07-CORPUS → owner Tech Lead → `Run Tech Lead`. The corpus checkpoint activates F07-TOOL-DAILY (the Developer's generator and audit), then F07-CONTENT-R1.
+**Then:** close F07-FE → owner Tech Lead → `Run Tech Lead`. The implementation checkpoint reconciles the delivery, sets the Visual Quality Gate, and locks the F07-QA-FUNCTIONAL plan.

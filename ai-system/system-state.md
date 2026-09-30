@@ -40,39 +40,33 @@ features/f07-daily-challenge/orchestration.md
 
 ## Current Phase
 
-F07 — F07-FE (the Daily in the app). F07-CONTENT accepted (A4); F07.DAILY-POOL-SIGNOFF OPEN (`release`, the user); Direction A selected (A2); Visual Quality Gate Ready for Implementation. F08 paused (A21).
+F07 — F07-CORPUS (the Turkish corpus), after the content incident (A5). F07.TARGET-LIST-APPROVAL OPEN (`release`); Direction A selected (A2); Visual Quality Gate Ready for Implementation. F08 paused (A21).
 
 ## Current Role
 
-Frontend/Mobile Developer
+Content Designer
 
 ## Current Reason
 
-**The F07-CONTENT checkpoint** on 2026-09-29 (F07 `architecture.md` A4).
+**The user's content incident** on 2026-09-30 (F07 `architecture.md` A5): content must be done well by the roles and must not come to the user.
 
-* **F07-CONTENT accepted** (9af777f): 60 pool days (2026-11-01 … 12-30), the manifest, 60 defs.
-  * The Tech Lead re-ran `content:check` (exit 0, 110 s) and `pack-daily` (a byte-identical pack), ran three independent negatives on scratch copies, and recomputed the per-day table from the artifacts (60 / 60 match).
-* **Tech Lead finding:** 18 of the 26 frozen-tile days can never thaw with the provisional dictionary (a sound necessary-condition test). Journey L22 and L24 cannot either — FROZEN-ROW-THAW-CONTENT corrected.
-* **Rulings:**
-  1. 30 targets × 2 accepted for the MVP pool, subject to the sign-off; the brief's distinct-target goal is withdrawn as infeasible (F01-PRODUCTION-CORPUS);
-  2. locked / frozen tiles from #1 — an Assumption the playtest tests; the fix would be a PO revision;
-  3. the thaw finding is part of the sign-off; any dictionary change needs an impact check on published Daily days and the Journey;
-  4. difficulty unchanged; 5. placement and calendar unchanged;
-  6. a debug-only `LOOPLET_DAILY_TODAY` so the pool can be played before its dates.
-* **F07.DAILY-POOL-SIGNOFF opened** (`release`: blocks publishing, not F07-FE). **F07-FE is Open.**
+* **Classified:** Existing Active Feature Rework (F07 content). Root cause: the Tech Lead's F07-CONTENT brief (unmeasured quality, a user playtest as the gate, a generator outside the tools).
+* **Measured on the A4 pool:** 0 / 300 filler rows are real words; 18 / 26 frozen days never thaw; 1 / 60 days needs a temporary displacement; 9 / 60 starts are too close; in 4 of 5 conclusive tile-removal tests the tiles do not change the optimum.
+* **Rulings:** `daily-content-spec.md` (Turkish) is the content contract — the corpus, the per-puzzle algorithm, Q1–Q12, pool rules, the tools; acceptance is measured (the audit + QA), no user playtest; the corpus is expanded in F07 (targets ≥ 120, words ≥ 2,000); `generate-daily` / `audit-daily` are Developer tools; F07.DAILY-POOL-SIGNOFF superseded; F07.TARGET-LIST-APPROVAL opened (product F01 manual review, or a PO revision).
+* **F07-CORPUS is Open.** F07-FE returns to Queued (not started).
 
 ## Last Completed Action
 
-Tech Lead on 2026-09-29 — **the F07-CONTENT checkpoint** (A4): delivery accepted, the thaw finding, rulings 1–6, F07.DAILY-POOL-SIGNOFF opened, F07-FE activated.
-Before it: the F07-CONTENT delivery (Content Designer, 9af777f) and the F07-TOOL checkpoint (A3, ece09df).
+Tech Lead on 2026-09-30 — **the content incident intake** (A5): the measurements, `daily-content-spec.md`, the re-routed content track, the new gate.
+Before it: the F07-CONTENT checkpoint (A4, d7ce26b) and the F07-CONTENT delivery (9af777f).
 
 ## Next Expected Action
 
-Run Frontend/Mobile Developer on F07-FE (the F07 orchestration Current Brief).
+Run Content Designer on F07-CORPUS (the F07 orchestration Current Brief).
 
-In parallel, the user's pool review: `Run Tech Lead. Decision: F07.DAILY-POOL-SIGNOFF — <A / B / C / D>` (a playtest is possible once F07-FE delivers its recipe).
+For the user, whenever ready: F07.TARGET-LIST-APPROVAL (A: read the lists after F07-CORPUS; B: `Run Product Owner. Revise: …`).
 
-Then the Tech Lead's implementation checkpoint and F07-QA-FUNCTIONAL.
+Then the corpus checkpoint → F07-TOOL-DAILY → F07-CONTENT-R1; F07-FE when the Tech Lead activates it.
 
 ## Portfolio Summary
 
@@ -82,12 +76,12 @@ Then the Tech Lead's implementation checkpoint and F07-QA-FUNCTIONAL.
 * F05: Done (2026-09-29) — Design Adoption Phase D3 (Home + app shell, `new-surface`, architecture §18) closed: F05-QA-D3 Approved with Notes, 94 / 100, gate Passed (§18.9). The user's N1 decision is live (PO-REV-2026-09-29-F05-CONTINUE). Previously Done 2026-09-27 (F05-QA-STRICT2 Approved with Notes).
 * F04: Done — the panel is now the full-screen result (D2, F03 carrier, closed 2026-09-29; F04 §7 / §8 amended 2026-09-28; ACs unchanged and passed on the result).
 * F08: **Blocked — paused by the user's decision F08.FUNCTION-DEPLOY-GO — C (A21).** **Functional Approved** (R2, A13); PREP accepted with a green CI run #2 (A17); F08-BE8 (Node.js 22) accepted (A18); the rules-only deploy held and cancelled (A20); Release Validation Pending. Resume: F08.DEPLOY-RESUME → F08-DEVOPS → F08-QA-FINAL. Its client contract is frozen for F07. Its `StoreErrorScreen` uses the Foundation (D3).
-* F07: **In Progress — the active feature** (activated 2026-09-29, A21). F07-UI accepted (A1); Direction A selected (A2); F07-TOOL accepted (A3); F07-CONTENT accepted (A4); **F07-FE Open** (Frontend/Mobile Developer); F07.DAILY-POOL-SIGNOFF OPEN (the user); then F07-QA-FUNCTIONAL; F07-DEVOPS Blocked on F08's deploy and the sign-off.
+* F07: **In Progress — the active feature** (activated 2026-09-29, A21). F07-UI (A1), Direction A (A2), F07-TOOL (A3), F07-CONTENT (A4) accepted; **the content incident (A5, 2026-09-30)** re-routed content under `daily-content-spec.md`: **F07-CORPUS Open** (Content Designer) → F07-TOOL-DAILY → F07-CONTENT-R1; F07-FE Queued; F07.TARGET-LIST-APPROVAL OPEN; F07-DEVOPS Blocked on F08's deploy and that gate.
 * F09–F13: Not Started. Pending follow-ons are in workflow-follow-ups.md.
 
 ## Release Decision
 
-**F08.DEPLOY-RESUME is OPEN** (2026-09-29, F08 A21): authorize the first Firebase deploy (Blaze with a budget alert; rules + Remote Config + the `nodejs22` function). It resumes F08-DEVOPS, and it is also needed before F07's release (F07-DEVOPS). **F07.DAILY-POOL-SIGNOFF is OPEN** (2026-09-29, F07 A4): the user's sign-off of the Turkish Daily pool, also needed before F07-DEVOPS. Until then, no Blaze, billing, deploy or console change. F08.FUNCTION-DEPLOY-GO (C, A21), F08.DEPLOY-GO (B, A19; its rules-only step held and cancelled at A20), F08.DEPLOY-AUTHORIZATION (A16) and F08.CI-FIRST-PUSH (A14) are RESOLVED. Every push needs the user's approval.
+**F08.DEPLOY-RESUME is OPEN** (2026-09-29, F08 A21): authorize the first Firebase deploy (Blaze with a budget alert; rules + Remote Config + the `nodejs22` function). It resumes F08-DEVOPS, and it is also needed before F07's release (F07-DEVOPS). **F07.TARGET-LIST-APPROVAL is OPEN** (2026-09-30, F07 A5): the product F01 manual review of the expanded dictionary, or a Product Owner revision delegating it; needed before F07-DEVOPS. F07.DAILY-POOL-SIGNOFF was superseded at A5 (no user playtest). Until then, no Blaze, billing, deploy or console change. F08.FUNCTION-DEPLOY-GO (C, A21), F08.DEPLOY-GO (B, A19; its rules-only step held and cancelled at A20), F08.DEPLOY-AUTHORIZATION (A16) and F08.CI-FIRST-PUSH (A14) are RESOLVED. Every push needs the user's approval.
 
 ## Global Risks
 
@@ -108,7 +102,7 @@ Then the Tech Lead's implementation checkpoint and F07-QA-FUNCTIONAL.
   * RESULT-F00-COMPONENT-ALIGN — the `EN İYİ` ★ offset and the pressed-pill brightness.
   * Release-build pacing was not measured (debug video only); it belongs to FIRST-APP-DISTRIBUTION — for the result (D2) and the Home entrance (D3, F05-QA-D3 N1).
 * **Post-D3 follow-ups (non-blocking, in workflow-follow-ups.md):** FIRST-APP-DISTRIBUTION (the profile / release store-error capture, moved from the F05 ledger); F08-RETRY-STORE-CONNECTION (+ the one-frame Retry feedback, N2); RESULT-F00-COMPONENT-ALIGN (+ the `LimePill` arrow at AX5, N3); OPTIONAL-QUALITY-NOTES (N4, N5); RELEASE-SCOPED-EVIDENCE (process).
-* **Commits:** the D1 rework, its closure and the D2 activation are in 489606d — its tracked `app/` diff from 5798c70 hashes to QA's `88f1dca3…` and the two changed sources match QA's SHA-1s (re-verified at the D2 checkpoint); the F03-UI-D2 handoff is in 6352a75; the F03-FE-D2 delivery is in 67d9ecb (`app/` tree `f5641d2f…`, QA's evidence-reuse fingerprint); the F03-QA-D2 verdict is in f28aedb; the reconciliation in 3cd4a3b; the F03-FE-D2R rework in 77c33b9 (`app/` tree `5298c81a…`, the re-QA fingerprint); the F03-QA-D2R verdict in 5677471. The D2 closure and the D3 activation are in 171f0c1; the PO revision in 230ce0c; its resync in 9a36147; the F05-UI-D3 handoff in 981b807; the visual-gate checkpoint in 7c1a946; the F05-FE-D3 delivery in af5aec8 (`app/` `b4ad263e…`, the D3 QA fingerprint); the implementation checkpoint in 078c926; the F05-QA-D3 verdict in e46f384. The D3 closure is in b7493d6. The F08 activation is in 1d373d7; the F08-FE13 / LOCAL-EVIDENCE delivery in beb7bfe (`app/` `9de12e6a…`); the FE13 checkpoint in b8e37ab; the F08-BE6 delivery in c70527a; the BE6 checkpoint in 84430c9; the F08-QA-FUNCTIONAL verdict in d882211; the QA checkpoint (A9) in 8f26243; the F08-BE7 delivery in cb96719; the BE7 checkpoint (A10) in 695f783; the F08-QA-FUNCTIONAL-R1 verdict in 4cb836a; the A11 checkpoint, the offline run and the A12 intake in e55176f; the F08-QA-FUNCTIONAL-R2 verdict in 0d65c73; the A13 checkpoint in 8a0522f — pushed to `origin/main` by the user (CI run #1); the A14–A16 records in 6b31195; the F08-DEVOPS-PREP delivery in c592081 — pushed by the user (CI run #2, green); the A17 checkpoint in ebe59ce; the F08-BE8 delivery in 9f6b6e6 (not pushed). The A18 checkpoint and the A19 intake are in dfccce3; the held F08-DEVOPS-RULES in b2873cc. The A20 checkpoint is in 79d6c2d. The A21 intake and the F07 activation are in 642e1d2; the F07-UI delivery is in decde49; the A1 checkpoint and the A2 decision in 8cc28fc; the F07-TOOL delivery in 209daf1; the A3 checkpoint in ece09df; the F07-CONTENT delivery in 9af777f. The A4 checkpoint is uncommitted (documents only).
+* **Commits:** the D1 rework, its closure and the D2 activation are in 489606d — its tracked `app/` diff from 5798c70 hashes to QA's `88f1dca3…` and the two changed sources match QA's SHA-1s (re-verified at the D2 checkpoint); the F03-UI-D2 handoff is in 6352a75; the F03-FE-D2 delivery is in 67d9ecb (`app/` tree `f5641d2f…`, QA's evidence-reuse fingerprint); the F03-QA-D2 verdict is in f28aedb; the reconciliation in 3cd4a3b; the F03-FE-D2R rework in 77c33b9 (`app/` tree `5298c81a…`, the re-QA fingerprint); the F03-QA-D2R verdict in 5677471. The D2 closure and the D3 activation are in 171f0c1; the PO revision in 230ce0c; its resync in 9a36147; the F05-UI-D3 handoff in 981b807; the visual-gate checkpoint in 7c1a946; the F05-FE-D3 delivery in af5aec8 (`app/` `b4ad263e…`, the D3 QA fingerprint); the implementation checkpoint in 078c926; the F05-QA-D3 verdict in e46f384. The D3 closure is in b7493d6. The F08 activation is in 1d373d7; the F08-FE13 / LOCAL-EVIDENCE delivery in beb7bfe (`app/` `9de12e6a…`); the FE13 checkpoint in b8e37ab; the F08-BE6 delivery in c70527a; the BE6 checkpoint in 84430c9; the F08-QA-FUNCTIONAL verdict in d882211; the QA checkpoint (A9) in 8f26243; the F08-BE7 delivery in cb96719; the BE7 checkpoint (A10) in 695f783; the F08-QA-FUNCTIONAL-R1 verdict in 4cb836a; the A11 checkpoint, the offline run and the A12 intake in e55176f; the F08-QA-FUNCTIONAL-R2 verdict in 0d65c73; the A13 checkpoint in 8a0522f — pushed to `origin/main` by the user (CI run #1); the A14–A16 records in 6b31195; the F08-DEVOPS-PREP delivery in c592081 — pushed by the user (CI run #2, green); the A17 checkpoint in ebe59ce; the F08-BE8 delivery in 9f6b6e6 (not pushed). The A18 checkpoint and the A19 intake are in dfccce3; the held F08-DEVOPS-RULES in b2873cc. The A20 checkpoint is in 79d6c2d. The A21 intake and the F07 activation are in 642e1d2; the F07-UI delivery is in decde49; the A1 checkpoint and the A2 decision in 8cc28fc; the F07-TOOL delivery in 209daf1; the A3 checkpoint in ece09df; the F07-CONTENT delivery in 9af777f; the A4 checkpoint in d7ce26b. The A5 incident is uncommitted (documents only).
 * **F08 unreadable-DB gap (found 2026-09-29):** fixed in F08-FE13 (beb7bfe) and accepted at the checkpoint; the runtime and automated evidence awaits independent QA (F08.UNREADABLE-DB). The Retry reconnect is delivered too. The one-frame Retry feedback (N2) stays a follow-up.
 * **Migration partial-apply (found by F08-FE13, 2026-09-29):** Drift does not wrap `onUpgrade` in a transaction, so a failing step could leave a partial apply. It is fixed and accepted (F08 A6 ruling 1). The first real schema step must add its own real-file migration test.
 * **Emulator suite (F08-BE6):** was 30 / 31 because of a contract-invalid fixture, not a handler defect; fixed in c70527a and accepted — 31 / 31 on Java 21 (first on `PATH`; setup-manifest).
