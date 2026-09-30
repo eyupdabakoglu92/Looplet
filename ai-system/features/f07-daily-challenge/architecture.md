@@ -470,3 +470,35 @@
 6. **Workflow:** adopt Content Quality Contract/Gate/Evidence, initially `daily-content-spec.md / Pending / None`. Activate F07-CONTENT-PREFLIGHT; tool → corpus → pilot → Tech Lead checkpoint → 60-day re-authoring. F07-FE remains independently queued under the single-owner workflow. No content task is marked complete just by this policy revision.
 
 Historical snapshots: `../../history/f07-daily-challenge-2026-09-29/daily-content-spec-at-a5.md` and `orchestration-before-quality-revision.md` in that directory. Implementation/test evidence for the core change is recorded separately from content acceptance.
+
+---
+
+## A7. F07-TOOL-DAILY checkpoint (Tech Lead, 2026-09-30)
+
+**Verdict: Delivery Review Pending — not accepted.** The tool logic reconciles with `daily-content-spec.md` revision 2, but the delivered pilot PASS is not reproducible on the delivery host, and the budgets make the contract's weekend profile unverifiable. A targeted Developer rework (F07-TOOL-DAILY-R1) is opened; F07-CORPUS stays Queued behind it.
+
+**Re-run by the Tech Lead on 1032f8a** (scratchpad only; no repository file changed):
+
+* `dart test`: `looplet_solver` 29 / 29, `looplet_authoring` 96 / 96; `dart analyze` (authoring) clean; `node --test ai-system/tools/tests/*.test.mjs` 93 / 93. Matches the delivery.
+* `import-corpus` → staging: 517 words / 369 targets; `audit-corpus` on it PASS; on the runtime asset FAIL (expected — 103 / 30 unchanged).
+* **Independent pack-gate negatives** on the superseded canonical pool: `pack-daily` without `--quality-report`, with the pilot report, and with `--development-fixture` — each exit 1, nothing written.
+* **Pilot re-audit (`audit-daily` over `evidence/technical-pilot-v1`, the staging corpus, default budget), twice** — the first run concurrent with the test suites, the second on an idle host. `inputHash` and `analysisInputHash` are **identical** to the delivered report, and every file fingerprint matches. **Both runs: pilot FAIL, exit 1.** 7 of 8 days reproduce; **2026-11-04 (`lokma`, frozen, o = 5): Q4 and Q9 PASS → UNKNOWN**, `SearchLimitExceeded(optimal enumeration)`. The pool rule then fails (fewer than 8 accepted days).
+* **Root cause, measured:** `Solver.enumerateOptimalSolutionsWithCoverage` for that day completes in **29.7 s against the 30 s budget** (33 optimal solutions, complete; the difficulty is identical to the export — medium, 5.2728). Its guard covers a full breadth-first ball of every state within depth o before the DFS, so the cost grows ~20^o. The delivered PASS was a wall-clock margin, not a property of the inputs.
+
+**Reconciliation (DURUM 3.8):**
+
+1. **Task coverage** — import/audit/impact, `generate-daily`, `audit-daily` Q1–Q12, bounded solver/scorer, fingerprints, fail-closed production pack and the 8-day pilot are all present. Incomplete item: reproducible pilot evidence.
+2. **Contract compliance** — read, not only run: `searchWitness` is breadth-first (shortest witness) and `replay` requires a real engine win with no earlier win or rejected move; the Q5 equal-optimum branch refutes via the reference or a joint search in which both engines must win on the same move; Q6 requires a pre-win thaw of that row on a winning path ≤ o + 2; Q7 requires an optimal-length winning path moving an already-thawed letter (the win-move thaw does not count); the regression claim is an exhaustive non-decreasing search to depth o; Q10 reads the witness's final state; UNKNOWN never accepts. The batch path requires a current pilot PASS plus a Tech Lead acceptance record bound to the report hash. Compliant.
+3. **Authority** — no conflict with A6 or revision 2. §3 already warns that time budgets can reject differently on different machines; it does not permit accepted evidence that the same host cannot reproduce.
+4. **Preserved behavior** — the full existing `content/` check passes after the solver changes (delivery); the runtime dictionary is untouched; the difficulty result is unchanged when enumeration completes (verified on 2026-11-04).
+5. **Evidence quality** — test counts and pack negatives reproduced; the pilot claim failed reproduction (above).
+
+**Rulings:**
+
+1. **Determinism (R1 scope).** An accepted verdict must not be decided by the wall clock. Node and depth limits are the deciding bounds; the time limit is an outer safety ceiling, and a stop caused by time is reported as UNKNOWN with its cause (`time` / `nodes` / `depth`) and the measured margin. The Developer may raise the time ceiling per analysis (up to 300 s) or change the algorithm, with measurements written in the delivery; the 5,000,000-node / depth-16 bounds and every quality threshold stay. Exit: the regenerated pilot re-audits to identical per-rule verdicts twice on the canonical host, once under concurrent load.
+2. **Weekend profile feasibility (R1 scope).** §4 sets Fri–Sun optimum 5–7, but a breadth-first ball at depth 6–7 (~20^6–20^7 states) cannot fit 5,000,000 nodes, so enumeration (Q4), Q5 absence, the regression proof and the useful-thaw search would all return UNKNOWN for o ≥ 6 — the profile would silently shrink to o = 5. **This is an inference from the measured growth, not a measurement**; R1 measures it. The expected fix is sound pruning (for example an admissible lower bound from the solver's heuristic), proven by a named test that a pruned absence claim equals the exhaustive result on small fixtures. If o = 6–7 stays infeasible after that work, the Developer returns the measurements and the Tech Lead decides the profile as a contract change — the profile is never eased silently.
+3. **Portability (R1 scope).** The report's `sourceDir` is an absolute host path and the batch gate re-fingerprints that path; it becomes repo-relative, with a negative test. The `runtime/dart` fingerprint entry (the full `Platform.version`) stays fail-closed: a production pack must be built with the same Dart runtime as its full audit, or be re-audited. This is recorded for F07-DEVOPS.
+4. **Accepted as is:** the Q-rule logic above, the production-pack gate, the fixture separation, the bounded-generation CLI limits and the corpus import/audit tools.
+5. **Carried into the F07-CORPUS brief (Content Designer, not tool defects):** the provisional curation carries category-template rationales ("Yaygın gündelik kavram…"), not the per-word meaning/rationale §2 requires; the exclusion list is a self-authored 12-word list, while Q11 requires a list with a named source and version, and its substring match (for example `sik`, `bok`) will over-reject — the Content Designer sources and versions the list and records the expected over-match; the staging corpus is 517 words / 369 targets against the ≥ 2,000 research target, and filler (Q10) and thaw yield must be measured, not assumed.
+
+**Workflow impact: Continue current flow** with one inserted task. F07-TOOL-DAILY stays Done as a delivery; its review is Pending. F07-TOOL-DAILY-R1 (Frontend/Mobile Developer) Open → Tech Lead checkpoint → F07-CORPUS. Content Quality Gate Pending; F07-FE Queued; F08 paused.
